@@ -1658,10 +1658,79 @@ function CheckoutPage({ cart, onPlaceOrder }) {
     payment: "cod",
   });
   const [placed, setPlaced] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = () => {
-    setPlaced(true);
-    setTimeout(() => onPlaceOrder(), 2000);
+  const handleSubmit = async () => {
+    // Validate form
+    if (!form.name || !form.email || !form.phone) {
+      setError("Please fill in all required fields (Name, Email, Phone)");
+      return;
+    }
+    if (!form.flat || !form.area || !form.city || !form.state) {
+      setError("Please fill in complete address details");
+      return;
+    }
+    if (cart.length === 0) {
+      setError("Your cart is empty");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      // Prepare order data (no login required)
+      const orderData = {
+        customer: {
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          age: form.age ? Number(form.age) : undefined,
+        },
+        shippingAddress: {
+          flat: form.flat,
+          area: form.area,
+          landmark: form.landmark,
+          city: form.city,
+          state: form.state,
+          country: form.country,
+          pincode: "",
+        },
+        items: cart.map(item => ({
+          productId: item.id, // Keep as-is (number or string)
+          quantity: item.qty,
+        })),
+        couponCode: "",
+        paymentMethod: form.payment,
+      };
+
+      console.log("🌙 Placing order...", orderData);
+
+      // Send order to backend (without authentication)
+      const response = await fetch("http://localhost:5000/api/orders/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        console.log("✅ Order placed successfully!", result.order);
+        setPlaced(true);
+        setTimeout(() => onPlaceOrder(), 2000);
+      } else {
+        setError(result.message || "Failed to place order. Please try again.");
+      }
+    } catch (err) {
+      console.error("Order placement error:", err);
+      setError("Network error. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
@@ -1711,6 +1780,22 @@ function CheckoutPage({ cart, onPlaceOrder }) {
             padding: "2rem",
           }}>
             <h3 style={{ fontFamily: "'Cinzel', serif", color: "#a78bfa", fontSize: "0.85rem", letterSpacing: "0.2em", marginTop: 0 }}>DELIVERY INFORMATION</h3>
+
+            {/* Error Message */}
+            {error && (
+              <div style={{
+                background: "rgba(244,63,94,0.1)",
+                border: "1px solid #f43f5e",
+                borderRadius: 10,
+                padding: "12px",
+                marginBottom: "1rem",
+                color: "#f43f5e",
+                fontSize: "0.85rem",
+                fontFamily: "'Cormorant Garamond', serif",
+              }}>
+                ⚠️ {error}
+              </div>
+            )}
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
               {[["Full Name", "name", "text"], ["Age", "age", "number"], ["Email", "email", "email"], ["Phone", "phone", "tel"]].map(([label, key, type]) => (
@@ -1785,9 +1870,10 @@ function CheckoutPage({ cart, onPlaceOrder }) {
             </div>
             <button
               onClick={handleSubmit}
+              disabled={loading}
               style={{
                 width: "100%",
-                background: "linear-gradient(135deg, #7c3aed, #a78bfa)",
+                background: loading ? "rgba(167,139,250,0.5)" : "linear-gradient(135deg, #7c3aed, #a78bfa)",
                 border: "none",
                 color: "#fff",
                 padding: "16px",
@@ -1795,10 +1881,13 @@ function CheckoutPage({ cart, onPlaceOrder }) {
                 fontFamily: "'Cinzel', serif",
                 fontSize: "0.85rem",
                 letterSpacing: "0.15em",
-                cursor: "pointer",
+                cursor: loading ? "not-allowed" : "pointer",
                 boxShadow: "0 8px 32px rgba(124,58,237,0.4)",
+                opacity: loading ? 0.7 : 1,
               }}
-            >PLACE ORDER ✨</button>
+            >
+              {loading ? "⏳ Processing..." : "PLACE ORDER ✨"}
+            </button>
           </div>
         </div>
       </div>

@@ -694,7 +694,7 @@ function Customers({ token, showToast }) {
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                {["Customer", "Phone", "Joined", "Status"].map(h => (
+                {["Customer", "Phone", "Orders", "Total Spent", "Joined", "Status"].map(h => (
                   <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: "#64748b", fontSize: "0.75rem", letterSpacing: "0.1em", fontWeight: 600 }}>{h}</th>
                 ))}
               </tr>
@@ -716,6 +716,15 @@ function Customers({ token, showToast }) {
                     </div>
                   </td>
                   <td style={{ padding: "12px 16px" }}><span style={{ color: "#64748b", fontSize: "0.85rem" }}>{c.phone || "—"}</span></td>
+                  <td style={{ padding: "12px 16px" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                      <span style={{ color: "#a78bfa", fontWeight: 600, fontSize: "0.88rem" }}>{c.orderCount || 0} orders</span>
+                      {c.orders && c.orders.length > 0 && (
+                        <span style={{ fontSize: "0.72rem", color: "#64748b" }}>Latest: {new Date(c.orders[0].createdAt).toLocaleDateString()}</span>
+                      )}
+                    </div>
+                  </td>
+                  <td style={{ padding: "12px 16px" }}><span style={{ color: "#10b981", fontWeight: 600, fontSize: "0.88rem" }}>₹{(c.totalSpent || 0).toLocaleString()}</span></td>
                   <td style={{ padding: "12px 16px" }}><span style={{ color: "#64748b", fontSize: "0.85rem" }}>{new Date(c.createdAt).toLocaleDateString()}</span></td>
                   <td style={{ padding: "12px 16px" }}><Badge color={c.isActive ? "green" : "red"}>{c.isActive ? "Active" : "Blocked"}</Badge></td>
                 </tr>

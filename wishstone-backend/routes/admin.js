@@ -122,21 +122,54 @@ router.delete("/category/delete/:id", async (req, res) => {
 // ── ORDERS ───────────────────────────────────────────────────
 router.get("/orders", async (req, res) => {
   try {
-    const { page = 1, limit = 20, status } = req.query;
+    const { page = 1, limit = 20, status, search } = req.query;
     const query = {};
     if (status) query.orderStatus = status;
-    const orders = await Order.find(query).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(Number(limit));
+    if (search) {
+      query.$or = [
+        { "customer.name": { $regex: search, $options: "i" } },
+        { "customer.email": { $regex: search, $options: "i" } },
+        { orderNumber: { $regex: search, $options: "i" } }
+      ];
+    }
+    const orders = await Order.find(query)
+      .populate("user", "name email phone")
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
     const total = await Order.countDocuments(query);
     res.json({ success: true, orders, total });
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
+// Get single order details
+router.get("/orders/:id", async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate("user", "name email phone role createdAt")
+      .populate("items.product", "name images price");
+    if (!order) return res.status(404).json({ success: false, message: "Order not found." });
+    res.json({ success: true, order });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// Update order status
 router.put("/orders/:id/status", async (req, res) => {
   try {
     const { status, note, trackingNumber } = req.body;
-    const update = { orderStatus: status, $push: { statusHistory: { status, note: note || "" } } };
+    const validStatuses = ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ success: false, message: "Invalid status value." });
+    }
+    
+    const update = { 
+      orderStatus: status, 
+      $push: { statusHistory: { status, note: note || "" } } 
+    };
     if (trackingNumber) update.trackingNumber = trackingNumber;
     if (status === "delivered") update.deliveredAt = new Date();
+    if (status === "cancelled") update.paymentStatus = "refunded";
+    
     const order = await Order.findByIdAndUpdate(req.params.id, update, { new: true });
     if (!order) return res.status(404).json({ success: false, message: "Order not found." });
     res.json({ success: true, order });
@@ -175,8 +208,89 @@ router.delete("/coupon/delete/:id", async (req, res) => {
 // ── CUSTOMERS ────────────────────────────────────────────────
 router.get("/customers", async (req, res) => {
   try {
-    const customers = await User.find({ role: "user" }).sort({ createdAt: -1 }).select("-password");
+    // Get all unique customers from orders (both guest and registered)
+    const orders = await Order.find().select("customer user createdAt totalAmount").sort({ createdAt: -1 });
+    
+    // Create a map of unique customers by email
+    const customerMap = new Map();
+    
+    for (const order of orders) {
+      const email = order.customer.email.toLowerCase();
+      
+      if (!customerMap.has(email)) {
+        // Check if this is a registered user
+        const registeredUser = order.user ? await User.findById(order.user).select("-password") : null;
+        
+        customerMap.set(email, {
+          _id: registeredUser?._id || order._id,
+          name: order.customer.name,
+          email: order.customer.email,
+          phone: order.customer.phone || registeredUser?.phone || "",
+          age: order.customer.age || registeredUser?.age,
+          isActive: registeredUser?.isActive !== false,
+          createdAt: order.createdAt,
+          isGuest: !registeredUser,
+          orderCount: 0,
+          totalSpent: 0,
+          orders: []
+        });
+      }
+      
+      // Update stats
+      const customer = customerMap.get(email);
+      customer.orderCount += 1;
+      customer.totalSpent += order.totalAmount || 0;
+      
+      // Add recent orders (limit to 5)
+      if (customer.orders.length < 5) {
+        customer.orders.push({
+          orderNumber: order.orderNumber,
+          totalAmount: order.totalAmount,
+          orderStatus: order.orderStatus,
+          paymentStatus: order.paymentStatus,
+          createdAt: order.createdAt
+        });
+      }
+    }
+    
+    // Convert map to array and sort by creation date
+    const customers = Array.from(customerMap.values()).sort((a, b) => 
+      new Date(b.createdAt) - new Date(a.createdAt)
+    );
+    
     res.json({ success: true, customers });
+  } catch (e) { 
+    res.status(500).json({ success: false, message: e.message }); 
+  }
+});
+
+// Get single customer details with full order history
+router.get("/customers/:id", async (req, res) => {
+  try {
+    const customer = await User.findById(req.params.id)
+      .select("-password")
+      .populate({
+        path: "orders",
+        model: "Order",
+        populate: { path: "items.product", select: "name images price" }
+      });
+    
+    if (!customer) return res.status(404).json({ success: false, message: "Customer not found." });
+    
+    const orderCount = await Order.countDocuments({ user: req.params.id });
+    const totalSpent = await Order.aggregate([
+      { $match: { user: req.params.id } },
+      { $group: { _id: null, total: { $sum: "$totalAmount" } } }
+    ]);
+    
+    res.json({ 
+      success: true, 
+      customer: {
+        ...customer.toObject(),
+        orderCount,
+        totalSpent: totalSpent[0]?.total || 0
+      }
+    });
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
