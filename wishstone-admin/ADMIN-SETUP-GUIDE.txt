@@ -1,0 +1,124 @@
+==============================================================
+  WISHSTONE ADMIN PANEL — SETUP GUIDE
+==============================================================
+
+WHAT'S INSIDE:
+  wishstone-admin/   ← Admin panel React app (runs on port 3001)
+
+REQUIREMENTS:
+  ✅ Your wishstone-backend must already be running
+  ✅ Node.js must be installed (nodejs.org)
+
+==============================================================
+  STEP 1 — Open PowerShell in this folder
+==============================================================
+In Windows Explorer, open this extracted folder.
+Right-click → "Open in Terminal" or "Open PowerShell here"
+
+==============================================================
+  STEP 2 — Install and start admin panel
+==============================================================
+
+  cd wishstone-admin
+  npm install
+  npm start
+
+Your browser opens at: http://localhost:3001
+
+==============================================================
+  STEP 3 — Login
+==============================================================
+
+  Email:    admin@wishstone.com
+  Password: wishstone@123
+
+  (These were created when you ran "node seed.js" earlier)
+
+==============================================================
+  WHAT YOU CAN DO IN THE ADMIN PANEL
+==============================================================
+
+📊 DASHBOARD
+  - Total orders, revenue, products, customers at a glance
+  - Recent orders list with status
+  - Top selling products ranked
+
+💎 PRODUCTS
+  - See all your products in a table
+  - Add new product (name, price, category, stock, benefits etc.)
+  - Edit any product details
+  - Delete/deactivate products
+  - Mark as Best Seller or Featured
+
+📦 ORDERS
+  - See every order placed on your website
+  - Filter by status: pending, confirmed, shipped, delivered, etc.
+  - Click "Manage" on any order to:
+      → See customer name, email, phone
+      → See full delivery address
+      → See exactly what was ordered
+      → Update the order status
+      → Add tracking number
+
+👥 CUSTOMERS
+  - See all registered users
+  - Their name, email, phone, join date
+
+🎫 COUPONS
+  - See all active coupons
+  - Create new coupon:
+      → Set code (e.g. SAVE200)
+      → Flat ₹ off OR percentage % off
+      → Minimum order value
+      → Usage limit
+      → Expiry date
+  - Edit or delete existing coupons
+
+📂 CATEGORIES
+  - See Manifestation, Therapy, Habit Builder
+  - Add new categories
+  - Edit category details
+
+==============================================================
+  RUNNING EVERYTHING TOGETHER
+==============================================================
+
+You need 3 terminals open at the same time:
+
+Terminal 1 — Backend (always first!):
+  cd wishstone-backend
+  npm run dev
+  → Must show: 🚀 Server running on port 5000
+
+Terminal 2 — Main Website:
+  cd wishstone-frontend
+  npm start
+  → Opens at: http://localhost:3000
+
+Terminal 3 — Admin Panel:
+  cd wishstone-admin
+  npm start
+  → Opens at: http://localhost:3001
+
+==============================================================
+  CHANGING YOUR ADMIN PASSWORD
+==============================================================
+
+Open MongoDB Atlas or use the backend API:
+
+  POST http://localhost:5000/api/auth/login
+  Body: { "email": "admin@wishstone.com", "password": "wishstone@123" }
+
+Then use the token to update your profile.
+Or simply re-run "node seed.js" in the backend (WARNING: clears all data!)
+
+==============================================================
+  IF ADMIN PANEL SHOWS "FAILED TO LOAD"
+==============================================================
+
+This means the backend is not running.
+→ Go to your backend terminal and run: npm run dev
+→ Make sure you see "Server running on port 5000"
+→ Refresh the admin panel
+
+==============================================================
