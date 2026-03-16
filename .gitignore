@@ -1,9 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
-
-# Environment variables
-.env
 
 # Build outputs
 dist/
@@ -18,5 +14,8 @@ build/
 .DS_Store
 Thumbs.db
 
-# Test files
-test-auth.js
+# Test files (keep auth test)
+# test-auth.js
+
+# Package lock files (optional - can be committed for consistency)
+# package-lock.json
