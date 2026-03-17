@@ -209,7 +209,10 @@ router.delete("/coupon/delete/:id", async (req, res) => {
 router.get("/customers", async (req, res) => {
   try {
     // Get all unique customers from orders (both guest and registered)
-    const orders = await Order.find().select("customer user createdAt totalAmount").sort({ createdAt: -1 });
+    // Include shippingAddress and paymentMethod so admin can see full delivery info
+    const orders = await Order.find()
+      .select("customer user shippingAddress paymentMethod orderNumber orderStatus paymentStatus createdAt totalAmount")
+      .sort({ createdAt: -1 });
     
     // Create a map of unique customers by email
     const customerMap = new Map();
@@ -232,6 +235,8 @@ router.get("/customers", async (req, res) => {
           isGuest: !registeredUser,
           orderCount: 0,
           totalSpent: 0,
+          // Store the latest delivery address (from the most recent order)
+          latestAddress: order.shippingAddress || {},
           orders: []
         });
       }
@@ -241,13 +246,15 @@ router.get("/customers", async (req, res) => {
       customer.orderCount += 1;
       customer.totalSpent += order.totalAmount || 0;
       
-      // Add recent orders (limit to 5)
-      if (customer.orders.length < 5) {
+      // Add recent orders with full delivery details (limit to 10)
+      if (customer.orders.length < 10) {
         customer.orders.push({
           orderNumber: order.orderNumber,
           totalAmount: order.totalAmount,
           orderStatus: order.orderStatus,
           paymentStatus: order.paymentStatus,
+          paymentMethod: order.paymentMethod,
+          shippingAddress: order.shippingAddress || {},
           createdAt: order.createdAt
         });
       }

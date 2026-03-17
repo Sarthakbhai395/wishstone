@@ -8,15 +8,34 @@ const css = `
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:#0a0b0d;font-family:'Space Grotesk',sans-serif;color:#e2e8f0;}
-  ::-webkit-scrollbar{width:4px;}
+  ::-webkit-scrollbar{width:5px;height:5px;}
   ::-webkit-scrollbar-track{background:#0a0b0d;}
-  ::-webkit-scrollbar-thumb{background:#7c3aed;border-radius:2px;}
+  ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#7c3aed,#a78bfa);border-radius:4px;}
   input,textarea,select{font-family:'Space Grotesk',sans-serif;}
   @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeInScale{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:scale(1)}}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
   @keyframes spin{to{transform:rotate(360deg)}}
   @keyframes slideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
   @keyframes glow{0%,100%{box-shadow:0 0 20px rgba(124,58,237,0.3)}50%{box-shadow:0 0 40px rgba(124,58,237,0.6)}}
+  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  .ws-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .ws-table-wrap table{min-width:700px;}
+  @media(max-width:1100px){
+    .ws-sidebar{width:68px!important;overflow:hidden;}
+    .ws-sidebar .ws-sidebar-text{display:none!important;}
+    .ws-sidebar .ws-brand-text{display:none!important;}
+    .ws-main{margin-left:68px!important;}
+  }
+  @media(max-width:768px){
+    .ws-sidebar{display:none!important;}
+    .ws-main{margin-left:0!important;padding:1rem!important;}
+    .ws-stat-grid{grid-template-columns:1fr 1fr!important;}
+    .ws-two-col{grid-template-columns:1fr!important;}
+  }
+  @media(max-width:480px){
+    .ws-stat-grid{grid-template-columns:1fr!important;}
+  }
 `;
 
 // ─── API HELPER ───────────────────────────────────────────────
@@ -210,19 +229,19 @@ const NAV = [
 
 function Sidebar({ active, onNav, admin, onLogout }) {
   return (
-    <aside style={{
+    <aside className="ws-sidebar" style={{
       width: 240, minHeight: "100vh",
-      background: "#0d0f13",
-      borderRight: "1px solid rgba(255,255,255,0.05)",
+      background: "linear-gradient(180deg, #0d0f13 0%, #10121a 100%)",
+      borderRight: "1px solid rgba(255,255,255,0.06)",
       display: "flex", flexDirection: "column",
       position: "fixed", left: 0, top: 0, bottom: 0,
-      zIndex: 100,
+      zIndex: 100, transition: "width 0.3s ease",
     }}>
       {/* Brand */}
       <div style={{ padding: "1.5rem 1.5rem 1rem", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 36, height: 36, background: "linear-gradient(135deg, #7c3aed, #a78bfa)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>💎</div>
-          <div>
+          <div style={{ width: 36, height: 36, background: "linear-gradient(135deg, #7c3aed, #a78bfa)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>💎</div>
+          <div className="ws-brand-text">
             <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem", color: "#fff" }}>Wishstone</div>
             <div style={{ fontSize: "0.65rem", color: "#7c3aed", letterSpacing: "0.1em" }}>ADMIN PANEL</div>
           </div>
@@ -244,8 +263,8 @@ function Sidebar({ active, onNav, admin, onLogout }) {
             onMouseEnter={e => { if (active !== item.id) { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.color = "#e2e8f0"; } }}
             onMouseLeave={e => { if (active !== item.id) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b"; } }}
           >
-            <span style={{ fontSize: 18 }}>{item.icon}</span>
-            {item.label}
+            <span style={{ fontSize: 18, flexShrink: 0 }}>{item.icon}</span>
+            <span className="ws-sidebar-text">{item.label}</span>
           </button>
         ))}
       </nav>
@@ -253,16 +272,16 @@ function Sidebar({ active, onNav, admin, onLogout }) {
       {/* Admin info */}
       <div style={{ padding: "1rem 1.25rem", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-          <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg, #7c3aed, #ec4899)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>
+          <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg, #7c3aed, #ec4899)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
             {admin?.name?.[0] || "A"}
           </div>
-          <div>
+          <div className="ws-sidebar-text">
             <div style={{ fontSize: "0.85rem", color: "#e2e8f0", fontWeight: 500 }}>{admin?.name || "Admin"}</div>
             <div style={{ fontSize: "0.7rem", color: "#64748b" }}>Super Admin</div>
           </div>
         </div>
         <button onClick={onLogout} style={{ ...btnGhost, width: "100%", fontSize: "0.8rem", padding: "8px" }}>
-          🚪 Logout
+          🚪 <span className="ws-sidebar-text">Logout</span>
         </button>
       </div>
     </aside>
@@ -293,14 +312,14 @@ function Dashboard({ token }) {
       </div>
 
       {/* Stats grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
+      <div className="ws-stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
         <Stat icon="📦" label="Total Orders" value={data.totalOrders} color="#7c3aed" />
         <Stat icon="💰" label="Total Revenue" value={`₹${(data.totalRevenue || 0).toLocaleString()}`} color="#10b981" />
         <Stat icon="💎" label="Products" value={data.totalProducts} color="#3b82f6" />
         <Stat icon="👥" label="Customers" value={data.totalUsers} color="#ec4899" />
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+      <div className="ws-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
         {/* Recent Orders */}
         <div style={{ background: "#13151a", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "1.5rem" }}>
           <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: "1rem", color: "#fff", marginBottom: "1.2rem", display: "flex", alignItems: "center", gap: 8 }}>
@@ -668,6 +687,7 @@ function Customers({ token, showToast }) {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [expanded, setExpanded] = useState(null);
 
   useEffect(() => {
     api.get("/admin/customers", token)
@@ -677,61 +697,193 @@ function Customers({ token, showToast }) {
 
   const filtered = customers.filter(c =>
     c.name?.toLowerCase().includes(search.toLowerCase()) ||
-    c.email?.toLowerCase().includes(search.toLowerCase())
+    c.email?.toLowerCase().includes(search.toLowerCase()) ||
+    c.phone?.includes(search)
+  );
+
+  const formatAddress = (addr) => {
+    if (!addr) return "—";
+    const parts = [addr.flat, addr.area, addr.landmark, addr.city, addr.state, addr.country].filter(Boolean);
+    return parts.length > 0 ? parts.join(", ") : "—";
+  };
+
+  // Info field component for clean layout
+  const InfoField = ({ label, value, icon }) => (
+    <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <span style={{ color: "#64748b", fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase", display: "flex", alignItems: "center", gap: 4 }}>
+        {icon && <span style={{ fontSize: 11 }}>{icon}</span>}{label}
+      </span>
+      <span style={{ color: "#e2e8f0", fontSize: "0.88rem", fontWeight: 500 }}>{value || "—"}</span>
+    </div>
   );
 
   return (
     <div style={{ animation: "fadeIn 0.4s ease" }}>
-      <div style={{ marginBottom: "2rem" }}>
-        <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: "1.6rem", fontWeight: 800, color: "#fff" }}>Customers</h1>
-        <p style={{ color: "#64748b", fontSize: "0.85rem", marginTop: 4 }}>{customers.length} registered users</p>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
+        <div>
+          <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: "1.6rem", fontWeight: 800, color: "#fff" }}>Customers</h1>
+          <p style={{ color: "#64748b", fontSize: "0.85rem", marginTop: 4 }}>{customers.length} total customers · All delivery details visible below</p>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.25)", borderRadius: 10, padding: "8px 16px", display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 16 }}>👥</span>
+            <span style={{ color: "#a78bfa", fontWeight: 700, fontSize: "1.1rem", fontFamily: "'Syne', sans-serif" }}>{customers.length}</span>
+          </div>
+        </div>
       </div>
-      <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍  Search customers..." style={{ ...inputSx, maxWidth: 340, marginBottom: "1.5rem" }}
-        onFocus={e => e.target.style.borderColor = "#7c3aed"} onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.1)"} />
 
-      {loading ? <p style={{ color: "#64748b" }}>Loading...</p> : (
-        <div style={{ background: "#13151a", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                {["Customer", "Phone", "Orders", "Total Spent", "Joined", "Status"].map(h => (
-                  <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: "#64748b", fontSize: "0.75rem", letterSpacing: "0.1em", fontWeight: 600 }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((c) => (
-                <tr key={c._id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}
-                  onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.02)"}
-                  onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                  <td style={{ padding: "12px 16px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg, #7c3aed, #ec4899)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
-                        {c.name?.[0]?.toUpperCase()}
-                      </div>
-                      <div>
-                        <div style={{ fontSize: "0.88rem", color: "#e2e8f0" }}>{c.name}</div>
-                        <div style={{ fontSize: "0.75rem", color: "#64748b" }}>{c.email}</div>
-                      </div>
+      {/* Search */}
+      <div style={{ marginBottom: "1.5rem" }}>
+        <input value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="🔍  Search by name, email or phone..."
+          style={{ ...inputSx, maxWidth: 420, background: "rgba(255,255,255,0.03)", borderRadius: 12, padding: "12px 16px" }}
+          onFocus={e => e.target.style.borderColor = "#7c3aed"} onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.1)"} />
+      </div>
+
+      {loading ? (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "1rem" }}>
+          {[1,2,3].map(i => (
+            <div key={i} style={{ height: 200, borderRadius: 16, background: "linear-gradient(90deg, #13151a 25%, #1a1d24 50%, #13151a 75%)", backgroundSize: "200% 100%", animation: "shimmer 1.5s infinite" }} />
+          ))}
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          {filtered.map((c, idx) => (
+            <div key={c._id} style={{
+              background: "linear-gradient(145deg, #13151a, #161922)",
+              border: expanded === idx ? "1px solid rgba(124,58,237,0.4)" : "1px solid rgba(255,255,255,0.06)",
+              borderRadius: 18,
+              overflow: "hidden",
+              transition: "all 0.3s ease",
+              animation: `fadeIn ${0.2 + idx * 0.05}s ease`,
+              boxShadow: expanded === idx ? "0 8px 40px rgba(124,58,237,0.12)" : "0 2px 12px rgba(0,0,0,0.2)",
+            }}>
+              {/* Top gradient accent bar */}
+              <div style={{ height: 3, background: `linear-gradient(90deg, #7c3aed, #ec4899, #7c3aed)`, opacity: expanded === idx ? 1 : 0.4, transition: "opacity 0.3s" }} />
+
+              {/* ── MAIN INFO — Always Visible ── */}
+              <div style={{ padding: "1.5rem" }}>
+                {/* Row 1: Avatar + Name + Stats */}
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "1.2rem", flexWrap: "wrap", gap: "1rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                    <div style={{ width: 48, height: 48, borderRadius: 14, background: "linear-gradient(135deg, #7c3aed, #ec4899)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 800, color: "#fff", flexShrink: 0, boxShadow: "0 4px 16px rgba(124,58,237,0.3)" }}>
+                      {c.name?.[0]?.toUpperCase()}
                     </div>
-                  </td>
-                  <td style={{ padding: "12px 16px" }}><span style={{ color: "#64748b", fontSize: "0.85rem" }}>{c.phone || "—"}</span></td>
-                  <td style={{ padding: "12px 16px" }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                      <span style={{ color: "#a78bfa", fontWeight: 600, fontSize: "0.88rem" }}>{c.orderCount || 0} orders</span>
-                      {c.orders && c.orders.length > 0 && (
-                        <span style={{ fontSize: "0.72rem", color: "#64748b" }}>Latest: {new Date(c.orders[0].createdAt).toLocaleDateString()}</span>
-                      )}
+                    <div>
+                      <div style={{ fontSize: "1.05rem", fontWeight: 600, color: "#fff", fontFamily: "'Syne', sans-serif" }}>{c.name}</div>
+                      <div style={{ fontSize: "0.8rem", color: "#64748b", marginTop: 2 }}>{c.email}</div>
                     </div>
-                  </td>
-                  <td style={{ padding: "12px 16px" }}><span style={{ color: "#10b981", fontWeight: 600, fontSize: "0.88rem" }}>₹{(c.totalSpent || 0).toLocaleString()}</span></td>
-                  <td style={{ padding: "12px 16px" }}><span style={{ color: "#64748b", fontSize: "0.85rem" }}>{new Date(c.createdAt).toLocaleDateString()}</span></td>
-                  <td style={{ padding: "12px 16px" }}><Badge color={c.isActive ? "green" : "red"}>{c.isActive ? "Active" : "Blocked"}</Badge></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {filtered.length === 0 && <p style={{ color: "#64748b", padding: "2rem", textAlign: "center" }}>No customers found.</p>}
+                  </div>
+                  {/* Stats pills */}
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <div style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.2)", borderRadius: 8, padding: "6px 12px", textAlign: "center" }}>
+                      <div style={{ color: "#a78bfa", fontSize: "1rem", fontWeight: 700 }}>{c.orderCount || 0}</div>
+                      <div style={{ color: "#64748b", fontSize: "0.6rem", letterSpacing: "0.08em" }}>ORDERS</div>
+                    </div>
+                    <div style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 8, padding: "6px 12px", textAlign: "center" }}>
+                      <div style={{ color: "#10b981", fontSize: "1rem", fontWeight: 700 }}>₹{(c.totalSpent || 0).toLocaleString()}</div>
+                      <div style={{ color: "#64748b", fontSize: "0.6rem", letterSpacing: "0.08em" }}>SPENT</div>
+                    </div>
+                    <Badge color={c.isActive ? "green" : "red"}>{c.isActive ? "Active" : "Blocked"}</Badge>
+                    <Badge color={c.isGuest ? "yellow" : "blue"}>{c.isGuest ? "Guest" : "Registered"}</Badge>
+                  </div>
+                </div>
+
+                {/* Row 2: Personal Details + Full Delivery Address — ALL VISIBLE */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.2rem" }}>
+
+                  {/* LEFT — Personal Info */}
+                  <div style={{ background: "rgba(255,255,255,0.02)", borderRadius: 12, padding: "1rem", border: "1px solid rgba(255,255,255,0.04)" }}>
+                    <p style={{ color: "#a78bfa", fontSize: "0.68rem", letterSpacing: "0.12em", fontWeight: 600, marginBottom: 12, textTransform: "uppercase" }}>👤 Personal Details</p>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                      <InfoField label="Full Name" value={c.name} />
+                      <InfoField label="Email" value={c.email} />
+                      <InfoField label="Phone" value={c.phone} />
+                      <InfoField label="Age" value={c.age} />
+                      <InfoField label="Joined" value={new Date(c.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })} />
+                    </div>
+                  </div>
+
+                  {/* RIGHT — Full Delivery Address */}
+                  <div style={{ background: "rgba(124,58,237,0.04)", borderRadius: 12, padding: "1rem", border: "1px solid rgba(124,58,237,0.12)" }}>
+                    <p style={{ color: "#a78bfa", fontSize: "0.68rem", letterSpacing: "0.12em", fontWeight: 600, marginBottom: 12, textTransform: "uppercase" }}>📍 Delivery Address</p>
+                    {c.latestAddress && Object.values(c.latestAddress).some(v => v) ? (
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                        <InfoField icon="🏠" label="Flat / House No." value={c.latestAddress.flat} />
+                        <InfoField icon="🛣️" label="Area / Street" value={c.latestAddress.area} />
+                        <InfoField icon="📌" label="Landmark" value={c.latestAddress.landmark} />
+                        <InfoField icon="🏙️" label="City" value={c.latestAddress.city} />
+                        <InfoField icon="🗺️" label="State" value={c.latestAddress.state} />
+                        <InfoField icon="🌍" label="Country" value={c.latestAddress.country} />
+                        {c.latestAddress.pincode && <InfoField icon="📮" label="Pincode" value={c.latestAddress.pincode} />}
+                      </div>
+                    ) : (
+                      <p style={{ color: "#475569", fontSize: "0.82rem", fontStyle: "italic" }}>No delivery address available yet.</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Expand / Collapse for Order History */}
+                <div style={{ marginTop: "1rem", textAlign: "center" }}>
+                  <button onClick={() => setExpanded(expanded === idx ? null : idx)} style={{
+                    background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)",
+                    color: "#a78bfa", borderRadius: 10, padding: "8px 20px", cursor: "pointer",
+                    fontSize: "0.78rem", fontWeight: 500, letterSpacing: "0.05em",
+                    transition: "all 0.2s",
+                  }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(124,58,237,0.1)"; e.currentTarget.style.borderColor = "rgba(124,58,237,0.3)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.03)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}
+                  >
+                    {expanded === idx ? "▲ Hide Order History" : `▼ Show Order History (${c.orderCount || 0})`}
+                  </button>
+                </div>
+              </div>
+
+              {/* ── EXPANDED: Order History ── */}
+              {expanded === idx && (
+                <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", padding: "1.5rem", background: "rgba(0,0,0,0.15)", animation: "fadeIn 0.25s ease" }}>
+                  <p style={{ color: "#64748b", fontSize: "0.72rem", letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>📦 Order History</p>
+                  {c.orders && c.orders.length > 0 ? (
+                    c.orders.map((o, i) => (
+                      <div key={i} style={{
+                        background: "rgba(255,255,255,0.02)", borderRadius: 12, padding: "1rem",
+                        marginBottom: i < c.orders.length - 1 ? "0.75rem" : 0,
+                        border: "1px solid rgba(255,255,255,0.04)",
+                      }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 8 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                            <span style={{ color: "#a78bfa", fontWeight: 600, fontSize: "0.88rem" }}>{o.orderNumber || "—"}</span>
+                            <Badge color={o.orderStatus === "delivered" ? "green" : o.orderStatus === "cancelled" ? "red" : o.orderStatus === "shipped" ? "blue" : "yellow"}>{o.orderStatus}</Badge>
+                            <Badge color={o.paymentStatus === "paid" ? "green" : o.paymentStatus === "failed" ? "red" : "gray"}>{o.paymentMethod?.toUpperCase() || "—"}</Badge>
+                          </div>
+                          <div style={{ textAlign: "right" }}>
+                            <span style={{ color: "#10b981", fontWeight: 700, fontSize: "0.95rem" }}>₹{(o.totalAmount || 0).toLocaleString()}</span>
+                            <div style={{ color: "#64748b", fontSize: "0.72rem" }}>{new Date(o.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</div>
+                          </div>
+                        </div>
+                        {o.shippingAddress && Object.values(o.shippingAddress).some(v => v) && (
+                          <div style={{ background: "rgba(124,58,237,0.04)", borderRadius: 8, padding: "8px 12px", border: "1px solid rgba(124,58,237,0.08)" }}>
+                            <span style={{ color: "#64748b", fontSize: "0.68rem", letterSpacing: "0.08em" }}>📍 SHIPPED TO: </span>
+                            <span style={{ color: "#94a3b8", fontSize: "0.82rem" }}>{formatAddress(o.shippingAddress)}</span>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p style={{ color: "#475569", fontSize: "0.82rem" }}>No orders found for this customer.</p>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+
+          {filtered.length === 0 && (
+            <div style={{ textAlign: "center", padding: "4rem 2rem" }}>
+              <div style={{ fontSize: 48, marginBottom: "1rem" }}>👥</div>
+              <p style={{ color: "#64748b", fontSize: "1rem" }}>No customers found matching your search.</p>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -992,7 +1144,7 @@ export default function AdminApp() {
       <style>{css}</style>
       <div style={{ display: "flex", minHeight: "100vh", background: "#0a0b0d" }}>
         <Sidebar active={page} onNav={setPage} admin={admin} onLogout={handleLogout} />
-        <main style={{ flex: 1, marginLeft: 240, padding: "2rem 2.5rem", maxWidth: "calc(100vw - 240px)" }}>
+        <main className="ws-main" style={{ flex: 1, marginLeft: 240, padding: "2rem 2.5rem", maxWidth: "calc(100vw - 240px)", transition: "margin-left 0.3s ease, padding 0.3s ease" }}>
           <PageComponent token={token} showToast={showToast} />
         </main>
       </div>

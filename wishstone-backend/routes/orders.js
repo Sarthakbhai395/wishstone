@@ -49,24 +49,28 @@ router.post("/create", async (req, res) => {
           } else {
             // Product not found with this ID
             console.warn(`Product with ID ${item.productId} not found in database.`);
-            // Use placeholder
+            // Use placeholder with item's provided price if available
+            const itemPrice = item.price || 0;
             orderItems.push({ 
-              name: `Product`, 
-              image: "", 
-              price: 0,
+              name: item.name || `Product`, 
+              image: item.image || "", 
+              price: itemPrice,
               quantity: item.quantity 
             });
+            subtotal += itemPrice * item.quantity;
           }
         } else {
           // Not a valid ObjectId format (likely mock ID like "6")
-          // Skip database lookup and use as-is
-          console.log(`Mock product ID detected: ${item.productId}. Using as placeholder.`);
+          // Use the price sent from frontend if available
+          console.log(`Mock product ID detected: ${item.productId}. Using provided data.`);
+          const itemPrice = item.price || 0;
           orderItems.push({ 
-            name: `Product`, 
-            image: "", 
-            price: 0,
+            name: item.name || `Product`, 
+            image: item.image || "", 
+            price: itemPrice,
             quantity: item.quantity 
           });
+          subtotal += itemPrice * item.quantity;
         }
       } catch (error) {
         console.error("Error processing product:", error.message);

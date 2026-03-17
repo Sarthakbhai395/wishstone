@@ -1699,6 +1699,9 @@ function CheckoutPage({ cart, onPlaceOrder }) {
         },
         items: cart.map(item => ({
           productId: item.id, // Keep as-is (number or string)
+          name: item.name,
+          image: item.image,
+          price: item.price,
           quantity: item.qty,
         })),
         couponCode: "",
