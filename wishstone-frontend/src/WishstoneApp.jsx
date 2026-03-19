@@ -1527,8 +1527,26 @@ export default function WishstoneApp() {
   useEffect(()=>{
     const hash=window.location.hash.slice(1);
     if(hash==="signup"||hash==="login") setPage(hash);
+
+    // Validate token on mount — if user was deleted or token is invalid, clear session
     const stored=localStorage.getItem("user");
-    if(stored) setUser(JSON.parse(stored));
+    const token=localStorage.getItem("token");
+    if(stored && token){
+      fetch("http://localhost:5000/api/auth/me",{
+        headers:{"Authorization":`Bearer ${token}`}
+      }).then(r=>r.json()).then(data=>{
+        if(data.success){
+          setUser(JSON.parse(stored));
+        } else {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          setUser(null);
+        }
+      }).catch(()=>{
+        // Network error — still load from localStorage so app works offline
+        setUser(JSON.parse(stored));
+      });
+    }
   },[]);
 
   useEffect(()=>{
@@ -1547,6 +1565,11 @@ export default function WishstoneApp() {
 
   const handleNav=nav=>{
     setSelProd(null); setSelCat(null);
+    if(nav==="dashboard" && !user){
+      window.location.hash="signup";
+      setPage("signup");
+      return;
+    }
     setPage(["cart","wishlist","products","dashboard"].includes(nav)?nav:"home");
   };
 
@@ -1574,7 +1597,10 @@ export default function WishstoneApp() {
   const renderPage=()=>{
     if(page==="signup") return <SignupPage onSignupSuccess={handleSignupSuccess}/>;
     if(page==="login") return <LoginPage onSuccess={handleLogin}/>;
-    if(page==="dashboard"&&user) return <UserDashboard user={user} onLogout={handleLogout}/>;
+    if(page==="dashboard"){
+      if(!user){ return <SignupPage onSignupSuccess={handleSignupSuccess}/>; }
+      return <UserDashboard user={user} onLogout={handleLogout}/>;
+    }
     if(page==="product"&&selProd) return <ProductPage product={selProd} onAdd={addToCart} onWish={togWish} wished={wishlist.includes(selProd.id)}/>;
     if(page==="category"&&selCat) return <CategoryPage category={selCat} onAdd={addToCart} onWish={togWish} wished={wishlist} onClick={p=>{setSelProd(p);setPage("product");scrollTop();}} cart={cart} onQty={updQty}/>;
     if(page==="products") return <AllProductsPage onAdd={addToCart} onWish={togWish} wished={wishlist} onClick={p=>{setSelProd(p);setPage("product");scrollTop();}} cart={cart} onQty={updQty}/>;
