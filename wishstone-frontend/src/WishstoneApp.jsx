@@ -68,14 +68,19 @@ const CSS = `
   @keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
 
   /* ─── RESPONSIVE ─── */
+  @media(max-width:1024px){
+    .footer-grid{grid-template-columns:1fr 1fr !important;}
+    .cat-grid{grid-template-columns:repeat(2,1fr) !important;}
+  }
   @media(max-width:768px){
-    .hero-title{font-size:clamp(2rem,8vw,3.2rem) !important;}
-    .hero-stats{gap:1.5rem !important;flex-wrap:wrap;}
+    .hero-title{font-size:clamp(1.8rem,7vw,3rem) !important;}
+    .hero-stats{gap:1.2rem !important;flex-wrap:wrap;justify-content:center;}
     .hero-btns{flex-direction:column;align-items:center;}
     .hero-btns button{width:100%;max-width:280px;}
     .cat-grid{grid-template-columns:1fr !important;}
     .prod-grid{grid-template-columns:repeat(2,1fr) !important;}
-    .story-grid{grid-template-columns:1fr !important;gap:3rem !important;}
+    .story-grid{grid-template-columns:1fr !important;gap:2rem !important;}
+    .story-grid img{max-width:100%;}
     .footer-grid{grid-template-columns:1fr 1fr !important;}
     .checkout-grid{grid-template-columns:1fr !important;}
     .cart-grid{grid-template-columns:1fr !important;}
@@ -83,13 +88,37 @@ const CSS = `
     .vid-thumbs{grid-template-columns:repeat(2,1fr) !important;}
     .section-pad{padding:70px 1.5rem !important;}
     .header-nav{display:none !important;}
+    .header-auth{display:none !important;}
+    .header-icons{display:none !important;}
     .mobile-menu-btn{display:flex !important;}
     .cart-item-row{flex-wrap:wrap;}
+    .dashboard-grid{grid-template-columns:1fr !important;}
+    .dashboard-sidebar{position:static !important;height:auto !important;}
+    .checkout-form-grid{grid-template-columns:1fr !important;}
+    .checkout-city-grid{grid-template-columns:1fr 1fr !important;}
+    .profile-grid{grid-template-columns:1fr !important;}
+    .order-detail-grid{grid-template-columns:1fr !important;}
+    .payment-btns{flex-direction:column !important;}
+    .payment-btns button{flex:none !important;width:100% !important;}
+    .prod-benefits-grid{grid-template-columns:1fr !important;}
+    .cart-summary{position:static !important;top:auto !important;}
   }
   @media(max-width:480px){
     .prod-grid{grid-template-columns:1fr !important;}
     .footer-grid{grid-template-columns:1fr !important;}
     .section-pad{padding:60px 1rem !important;}
+    .hero-stats{gap:0.8rem !important;}
+    .checkout-city-grid{grid-template-columns:1fr !important;}
+    .vid-thumbs{grid-template-columns:repeat(2,1fr) !important;}
+    .cart-item-row{gap:0.8rem !important;}
+    .cart-item-row img{width:64px !important;height:64px !important;}
+    .signup-card{padding:1.5rem 1.2rem !important;}
+    .login-card{padding:1.5rem 1.2rem !important;}
+    .dashboard-content{padding:1.5rem !important;}
+    .track-modal-inner{padding:1.2rem !important;}
+    .track-steps{gap:0.5rem !important;}
+    .track-steps>div{min-width:0 !important;}
+    .track-steps p{font-size:0.58rem !important;}
   }
 `;
 
@@ -132,7 +161,7 @@ function Particles() {
 }
 
 // ─── MOBILE MENU ─────────────────────────────────────────────
-function MobileMenu({ open, onClose, onNav, categoryRef, storyRef }) {
+function MobileMenu({ open, onClose, onNav, categoryRef, storyRef, cartCount, wishCount, user, onLogout }) {
   if (!open) return null;
   const go = (key) => {
     onClose();
@@ -141,12 +170,45 @@ function MobileMenu({ open, onClose, onNav, categoryRef, storyRef }) {
     else onNav(key);
   };
   return (
-    <div style={{position:"fixed",inset:0,zIndex:2000,background:"rgba(22,27,46,0.97)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"2rem",animation:"fadeIn 0.2s ease"}}>
-      <button onClick={onClose} style={{position:"absolute",top:20,right:20,background:"none",border:"none",color:T.cream,fontSize:28,cursor:"pointer"}}>✕</button>
+    <div style={{position:"fixed",inset:0,zIndex:2000,background:"rgba(22,27,46,0.98)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"1.4rem",animation:"fadeIn 0.2s ease",overflowY:"auto",padding:"2rem 1rem"}}>
+      <button onClick={onClose} style={{position:"absolute",top:20,right:20,background:"none",border:"none",color:T.cream,fontSize:28,cursor:"pointer",lineHeight:1}}>✕</button>
+      
+      {/* Logo */}
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:"0.5rem"}}>
+        <div style={{width:32,height:32,borderRadius:"50%",background:`linear-gradient(135deg,${T.gold},${T.goldD})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15}}>💎</div>
+        <span style={{fontFamily:"'Cinzel',serif",fontWeight:700,fontSize:"1.1rem",letterSpacing:"0.14em",color:T.cream}}>WISHSTONE</span>
+      </div>
+
+      {/* Nav links */}
       {[["Home","home"],["Category","category"],["Products","products"],["Our Story","our-story"]].map(([l,k])=>(
-        <button key={k} onClick={()=>go(k)} style={{background:"none",border:"none",color:T.cream,fontFamily:"'Cinzel',serif",fontSize:"1.3rem",letterSpacing:"0.2em",cursor:"pointer",padding:"0.5rem 2rem",borderBottom:`1px solid ${T.gold}33`,width:220,textAlign:"center"}}
+        <button key={k} onClick={()=>go(k)} style={{background:"none",border:"none",color:T.cream,fontFamily:"'Cinzel',serif",fontSize:"1.1rem",letterSpacing:"0.2em",cursor:"pointer",padding:"0.6rem 2rem",borderBottom:`1px solid ${T.gold}22`,width:240,textAlign:"center",transition:"color 0.2s"}}
           onMouseEnter={e=>e.target.style.color=T.gold} onMouseLeave={e=>e.target.style.color=T.cream}>{l}</button>
       ))}
+
+      {/* Cart + Wishlist */}
+      <div style={{display:"flex",gap:"1rem",marginTop:"0.5rem"}}>
+        <button onClick={()=>go("wishlist")} style={{background:`rgba(201,169,110,0.1)`,border:`1px solid ${T.gold}44`,color:T.cream,borderRadius:8,padding:"10px 20px",cursor:"pointer",fontFamily:"'Cinzel',serif",fontSize:"0.8rem",letterSpacing:"0.1em",display:"flex",alignItems:"center",gap:6}}>
+          🤍 Wishlist {wishCount>0&&<span style={{background:T.gold,color:T.navy,borderRadius:"50%",width:18,height:18,fontSize:10,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center"}}>{wishCount}</span>}
+        </button>
+        <button onClick={()=>go("cart")} style={{background:`rgba(196,116,122,0.15)`,border:`1px solid ${T.rose}44`,color:T.cream,borderRadius:8,padding:"10px 20px",cursor:"pointer",fontFamily:"'Cinzel',serif",fontSize:"0.8rem",letterSpacing:"0.1em",display:"flex",alignItems:"center",gap:6}}>
+          🛒 Cart {cartCount>0&&<span style={{background:T.rose,color:"#fff",borderRadius:"50%",width:18,height:18,fontSize:10,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center"}}>{cartCount}</span>}
+        </button>
+      </div>
+
+      {/* Auth */}
+      <div style={{display:"flex",flexDirection:"column",gap:"0.7rem",width:240,marginTop:"0.5rem"}}>
+        {user ? (
+          <>
+            <button onClick={()=>go("dashboard")} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"12px",borderRadius:6,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:800,width:"100%"}}>👤 DASHBOARD</button>
+            <button onClick={()=>{onClose();onLogout();}} style={{background:"transparent",border:`1px solid ${T.rose}66`,color:T.rose,padding:"12px",borderRadius:6,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.14em",cursor:"pointer",width:"100%"}}>🚪 LOGOUT</button>
+          </>
+        ) : (
+          <>
+            <button onClick={()=>{onClose();window.location.hash="login";onNav("login");}} style={{background:"transparent",border:`1px solid ${T.gold}66`,color:T.cream,padding:"12px",borderRadius:6,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.14em",cursor:"pointer",width:"100%"}}>LOGIN</button>
+            <button onClick={()=>{onClose();window.location.hash="signup";onNav("signup");}} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"12px",borderRadius:6,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:800,width:"100%"}}>SIGN UP</button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -166,7 +228,7 @@ function Header({ cartCount, wishCount, onNav, currentPage, categoryRef, storyRe
 
   return (
     <>
-      <MobileMenu open={mOpen} onClose={()=>setMOpen(false)} onNav={onNav} categoryRef={categoryRef} storyRef={storyRef}/>
+      <MobileMenu open={mOpen} onClose={()=>setMOpen(false)} onNav={onNav} categoryRef={categoryRef} storyRef={storyRef} cartCount={cartCount} wishCount={wishCount} user={user} onLogout={onLogout}/>
       <header style={{position:"fixed",top:0,left:0,right:0,zIndex:1000,padding:"0 clamp(1rem,4vw,3rem)",height:68,display:"flex",alignItems:"center",justifyContent:"space-between",background:`rgba(33,40,66,${scrolled?0.98:0.92})`,backdropFilter:"blur(18px)",borderBottom:`1px solid rgba(201,169,110,${scrolled?0.2:0.08})`,transition:"all 0.35s ease"}}>
         {/* Logo */}
         <div onClick={()=>{onNav("home");scrollTop();}} style={{cursor:"pointer",display:"flex",alignItems:"center",gap:9,flexShrink:0}}>
@@ -183,30 +245,35 @@ function Header({ cartCount, wishCount, onNav, currentPage, categoryRef, storyRe
           })}
         </nav>
 
-        {/* Icons */}
-        <div style={{display:"flex",gap:"0.8rem",alignItems:"center"}}>
-          {[["wishlist","🤍",wishCount,T.gold],["cart","🛒",cartCount,T.rose]].map(([pg,ic,cnt,bc])=>(
-            <button key={pg} onClick={()=>{onNav(pg);scrollTop();}} style={{background:"none",border:"none",cursor:"pointer",position:"relative",padding:4}}>
-              <span style={{fontSize:20}}>{ic}</span>
-              {cnt>0&&<span style={{position:"absolute",top:-2,right:-2,background:bc,color:T.navy,borderRadius:"50%",width:15,height:15,fontSize:8,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center"}}>{cnt}</span>}
-            </button>
-          ))}
-          
-          {/* Auth Buttons */}
-          {user ? (
-            <>
-              <button onClick={()=>{onNav("dashboard");scrollTop();}} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"8px 16px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:700,marginLeft:"0.5rem"}}>DASHBOARD</button>
-              <button onClick={onLogout} style={{background:"transparent",border:`1px solid ${T.cream}44`,color:T.cream,padding:"8px 16px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.14em",cursor:"pointer",transition:"all 0.25s"}} onMouseEnter={e=>{e.target.style.borderColor=T.rose;e.target.style.color=T.rose;}} onMouseLeave={e=>{e.target.style.borderColor=`${T.cream}44`;e.target.style.color=T.cream;}}>LOGOUT</button>
-            </>
-          ) : (
-            <>
-              <button onClick={()=>window.location.hash="login"} style={{background:"transparent",border:`1px solid ${T.cream}44`,color:T.cream,padding:"8px 16px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.14em",cursor:"pointer",marginLeft:"0.5rem",transition:"all 0.25s"}} onMouseEnter={e=>{e.target.style.borderColor=T.gold;e.target.style.color=T.gold;}} onMouseLeave={e=>{e.target.style.borderColor=`${T.cream}44`;e.target.style.color=T.cream;}}>LOGIN</button>
-              <button onClick={()=>window.location.hash="signup"} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"8px 16px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:700}}>SIGNUP</button>
-            </>
-          )}
-          
-          {/* Hamburger */}
-          <button className="mobile-menu-btn" onClick={()=>setMOpen(true)} style={{display:"none",background:"none",border:`1px solid ${T.gold}55`,borderRadius:6,padding:"6px 8px",cursor:"pointer",flexDirection:"column",gap:4}}>
+        {/* Right side: icons + auth + hamburger */}
+        <div style={{display:"flex",gap:"0.6rem",alignItems:"center"}}>
+          {/* Cart + Wishlist icons — hidden on mobile via CSS */}
+          <div className="header-icons" style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
+            {[["wishlist","🤍",wishCount,T.gold],["cart","🛒",cartCount,T.rose]].map(([pg,ic,cnt,bc])=>(
+              <button key={pg} onClick={()=>{onNav(pg);scrollTop();}} style={{background:"none",border:"none",cursor:"pointer",position:"relative",padding:4}}>
+                <span style={{fontSize:20}}>{ic}</span>
+                {cnt>0&&<span style={{position:"absolute",top:-2,right:-2,background:bc,color:T.navy,borderRadius:"50%",width:15,height:15,fontSize:8,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center"}}>{cnt}</span>}
+              </button>
+            ))}
+          </div>
+
+          {/* Auth Buttons — hidden on mobile via CSS */}
+          <div className="header-auth" style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
+            {user ? (
+              <>
+                <button onClick={()=>{onNav("dashboard");scrollTop();}} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"8px 14px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:700}}>DASHBOARD</button>
+                <button onClick={onLogout} style={{background:"transparent",border:`1px solid ${T.cream}44`,color:T.cream,padding:"8px 14px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.14em",cursor:"pointer",transition:"all 0.25s"}} onMouseEnter={e=>{e.target.style.borderColor=T.rose;e.target.style.color=T.rose;}} onMouseLeave={e=>{e.target.style.borderColor=`${T.cream}44`;e.target.style.color=T.cream;}}>LOGOUT</button>
+              </>
+            ) : (
+              <>
+                <button onClick={()=>window.location.hash="login"} style={{background:"transparent",border:`1px solid ${T.cream}44`,color:T.cream,padding:"8px 14px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.14em",cursor:"pointer",transition:"all 0.25s"}} onMouseEnter={e=>{e.target.style.borderColor=T.gold;e.target.style.color=T.gold;}} onMouseLeave={e=>{e.target.style.borderColor=`${T.cream}44`;e.target.style.color=T.cream;}}>LOGIN</button>
+                <button onClick={()=>window.location.hash="signup"} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"8px 14px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:700}}>SIGNUP</button>
+              </>
+            )}
+          </div>
+
+          {/* Hamburger — shown on mobile */}
+          <button className="mobile-menu-btn" onClick={()=>setMOpen(true)} style={{display:"none",background:"none",border:`1px solid ${T.gold}55`,borderRadius:6,padding:"6px 8px",cursor:"pointer",flexDirection:"column",gap:4,alignItems:"center"}}>
             {[0,1,2].map(i=><div key={i} style={{width:20,height:2,background:T.cream,borderRadius:1}}/>)}
           </button>
         </div>
@@ -752,7 +819,7 @@ function ProductPage({ product, onAdd, onWish, wished }) {
             </div>
             <div style={{marginBottom:"1.5rem"}}>
               <p style={{color:T.goldD,fontSize:"0.63rem",letterSpacing:"0.22em",fontFamily:"'Cinzel',serif",marginBottom:8}}>BENEFITS</p>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:7}}>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:7}} className="prod-benefits-grid">
                 {product.benefits.map(b=>(
                   <div key={b} style={{display:"flex",alignItems:"center",gap:7}}>
                     <div style={{width:4,height:4,background:T.goldD,transform:"rotate(45deg)",flexShrink:0}}/>
@@ -892,7 +959,7 @@ function CartPage({ cart, onQty, onRemove, onCheckout }) {
             ))}
           </div>
           <div>
-            <div style={{border:`1px solid ${T.goldD}33`,borderRadius:4,padding:"1.8rem",position:"sticky",top:110,background:`rgba(201,169,110,0.04)`}}>
+            <div style={{border:`1px solid ${T.goldD}33`,borderRadius:4,padding:"1.8rem",position:"sticky",top:110,background:`rgba(201,169,110,0.04)`}} className="cart-summary">
               <h3 style={{fontFamily:"'Cinzel',serif",color:T.navy,fontSize:"0.85rem",letterSpacing:"0.18em",marginTop:0}}>ORDER SUMMARY</h3>
               <Divider/>
               <div style={{display:"flex",gap:8,marginBottom:6}}>
@@ -988,7 +1055,7 @@ function CheckoutPage({ cart, onPlaceOrder, couponCode="", discount=0 }) {
         <div className="checkout-grid" style={{display:"grid",gridTemplateColumns:"1fr 320px",gap:"1.8rem",marginTop:"1rem"}}>
           <div style={{border:`1px solid ${T.goldD}22`,borderRadius:4,padding:"1.8rem",background:`rgba(201,169,110,0.03)`}}>
             <h3 style={{fontFamily:"'Cinzel',serif",color:T.goldD,fontSize:"0.74rem",letterSpacing:"0.22em",marginTop:0}}>DELIVERY INFORMATION</h3>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.9rem",marginBottom:"0.9rem"}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.9rem",marginBottom:"0.9rem"}} className="checkout-form-grid">
               {[["Full Name","name","text"],["Age","age","number"],["Email","email","email"],["Phone","phone","tel"]].map(([l,k,t])=>(
                 <div key={k}><label style={lSx}>{l}</label><input type={t} value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} style={iSx}/></div>
               ))}
@@ -996,13 +1063,13 @@ function CheckoutPage({ cart, onPlaceOrder, couponCode="", discount=0 }) {
             {[["Flat / House No.","flat"],["Area / Street","area"],["Landmark","landmark"]].map(([l,k])=>(
               <div key={k} style={{marginBottom:"0.9rem"}}><label style={lSx}>{l}</label><input value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} style={iSx}/></div>
             ))}
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"0.9rem",marginBottom:"1.5rem"}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"0.9rem",marginBottom:"1.5rem"}} className="checkout-city-grid">
               {[["City","city"],["State","state"],["Country","country"]].map(([l,k])=>(
                 <div key={k}><label style={lSx}>{l}</label><input value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} style={iSx}/></div>
               ))}
             </div>
             <h3 style={{fontFamily:"'Cinzel',serif",color:T.goldD,fontSize:"0.74rem",letterSpacing:"0.22em",marginBottom:"0.9rem"}}>PAYMENT METHOD</h3>
-            <div style={{display:"flex",gap:"0.8rem",flexWrap:"wrap"}}>
+            <div style={{display:"flex",gap:"0.8rem",flexWrap:"wrap"}} className="payment-btns">
               {[["cod","💵 Cash on Delivery"],["prepaid","💳 Online Payment"],["qr","📱 QR Code"]].map(([v,l])=>(
                 <button key={v} onClick={()=>setForm({...form,payment:v})} style={{flex:1,minWidth:100,background:form.payment===v?`rgba(139,105,20,0.12)`:`rgba(201,169,110,0.04)`,border:`1px solid ${form.payment===v?T.goldD:`${T.goldD}33`}`,color:form.payment===v?T.goldD:"rgba(33,40,66,0.5)",borderRadius:2,padding:"10px 6px",cursor:"pointer",fontFamily:"'Cinzel',serif",fontSize:"0.63rem",letterSpacing:"0.06em",transition:"all 0.25s"}}>{l}</button>
               ))}
@@ -1126,7 +1193,7 @@ function SignupPage({ onSignupSuccess }) {
 
   return (
     <div style={{paddingTop:100,background:T.cream,minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:"100px 1.5rem 3rem"}}>
-      <div style={{maxWidth:460,width:"100%",border:`2px solid ${T.goldD}`,borderRadius:8,padding:"2.5rem 2rem",background:"#fff",boxShadow:`0 20px 60px rgba(139,105,20,0.25)`}}>
+      <div style={{maxWidth:460,width:"100%",border:`2px solid ${T.goldD}`,borderRadius:8,padding:"2.5rem 2rem",background:"#fff",boxShadow:`0 20px 60px rgba(139,105,20,0.25)`}} className="signup-card">
         <div style={{textAlign:"center",marginBottom:"2rem"}}>
           <div style={{width:60,height:60,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,margin:"0 auto 12px",boxShadow:`0 0 30px ${T.gold}66`}}>💎</div>
           <h1 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"2rem",margin:"0 0 6px",fontWeight:900}}>Create Account</h1>
@@ -1170,7 +1237,7 @@ function LoginPage({ onSuccess }) {
 
   return (
     <div style={{paddingTop:100,background:T.cream,minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:"100px 1.5rem 3rem"}}>
-      <div style={{maxWidth:460,width:"100%",border:`2px solid ${T.goldD}`,borderRadius:8,padding:"2.5rem 2rem",background:"#fff",boxShadow:`0 20px 60px rgba(139,105,20,0.25)`}}>
+      <div style={{maxWidth:460,width:"100%",border:`2px solid ${T.goldD}`,borderRadius:8,padding:"2.5rem 2rem",background:"#fff",boxShadow:`0 20px 60px rgba(139,105,20,0.25)`}} className="login-card">
         <div style={{textAlign:"center",marginBottom:"2rem"}}>
           <div style={{width:60,height:60,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,margin:"0 auto 12px",boxShadow:`0 0 30px ${T.gold}66`}}>💎</div>
           <h1 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"2rem",margin:"0 0 6px",fontWeight:900}}>Welcome Back</h1>
@@ -1238,8 +1305,8 @@ function UserDashboard({ user, onLogout }) {
       <div style={{maxWidth:1200,margin:"0 auto",padding:"2rem clamp(1.5rem,4vw,3rem)",minHeight:"100%"}}>
         <h1 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"clamp(1.6rem,4vw,2rem)",marginBottom:"0.4rem"}}>My Dashboard</h1>
         <Divider/>
-        <div style={{display:"grid",gridTemplateColumns:"260px 1fr",gap:"2rem",marginTop:"1.5rem"}}>
-          <div style={{border:`2px solid ${T.goldD}`,borderRadius:8,padding:"1.8rem",height:"fit-content",background:"#fff",position:"sticky",top:"2rem",boxShadow:`0 8px 24px rgba(139,105,20,0.15)`}}>
+        <div className="dashboard-grid" style={{display:"grid",gridTemplateColumns:"260px 1fr",gap:"2rem",marginTop:"1.5rem"}}>
+          <div className="dashboard-sidebar" style={{border:`2px solid ${T.goldD}`,borderRadius:8,padding:"1.8rem",height:"fit-content",background:"#fff",position:"sticky",top:"2rem",boxShadow:`0 8px 24px rgba(139,105,20,0.15)`}}>
             <div style={{textAlign:"center",marginBottom:"1.5rem"}}>
               <div style={{width:90,height:90,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:40,margin:"0 auto 14px",boxShadow:`0 0 30px ${T.gold}66`,border:"3px solid #fff"}}>👤</div>
               <h3 style={{fontFamily:"'Cinzel',serif",color:T.navy,fontSize:"1.1rem",margin:"0 0 6px",fontWeight:800}}>{user.name}</h3>
@@ -1250,7 +1317,7 @@ function UserDashboard({ user, onLogout }) {
               <button key={k} onClick={()=>setActiveTab(k)} style={{width:"100%",background:activeTab===k?`linear-gradient(135deg,${T.goldD},${T.gold})`:"transparent",border:activeTab===k?"none":`1px solid ${T.goldD}33`,color:activeTab===k?"#fff":T.navy,padding:"14px 16px",borderRadius:6,cursor:"pointer",fontFamily:"'Cinzel',serif",fontSize:"0.8rem",letterSpacing:"0.08em",textAlign:"left",marginBottom:"0.6rem",transition:"all 0.3s",fontWeight:activeTab===k?800:600,boxShadow:activeTab===k?`0 4px 12px ${T.gold}44`:"none"}}>{l}</button>
             ))}
           </div>
-          <div style={{border:`2px solid ${T.goldD}`,borderRadius:8,padding:"2.5rem",background:"#fff",minHeight:"600px",boxShadow:`0 8px 24px rgba(139,105,20,0.15)`}}>
+          <div style={{border:`2px solid ${T.goldD}`,borderRadius:8,padding:"2.5rem",background:"#fff",minHeight:"600px",boxShadow:`0 8px 24px rgba(139,105,20,0.15)`}} className="dashboard-content">
             {activeTab==="profile"&&(
               <div>
                 <div style={{display:"flex",alignItems:"center",gap:"1rem",marginBottom:"2rem"}}>
@@ -1260,7 +1327,7 @@ function UserDashboard({ user, onLogout }) {
                     <p style={{color:T.goldD,fontSize:"0.9rem",margin:0,fontWeight:500}}>Manage your personal details</p>
                   </div>
                 </div>
-                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1.5rem",marginBottom:"2rem"}}>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1.5rem",marginBottom:"2rem"}} className="profile-grid">
                   {[["Full Name","name","text"],["Email Address","email","email"],["Phone Number","phone","tel"],["Age","age","number"]].map(([l,k,t])=>(
                     <div key={k}>
                       <label style={lSx}>{l}</label>
@@ -1342,7 +1409,7 @@ function UserDashboard({ user, onLogout }) {
               <div style={{width:70,height:70,background:"#fff",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32,margin:"0 auto 1rem",boxShadow:"0 8px 24px rgba(0,0,0,0.2)"}}>🚚</div>
               <h2 style={{fontFamily:"'Cinzel Decorative',serif",color:"#fff",fontSize:"1.6rem",margin:0,textShadow:"0 2px 8px rgba(0,0,0,0.2)"}}>Order Tracking</h2>
             </div>
-            <div style={{padding:"2rem",textAlign:"center"}}>
+            <div style={{padding:"2rem",textAlign:"center"}} className="track-modal-inner">
               <div style={{marginBottom:"1.5rem"}}>
                 <div style={{width:60,height:60,background:`rgba(139,105,20,0.1)`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 1rem",border:`2px solid ${T.goldD}`}}>
                   <span style={{fontSize:28}}>✨</span>
@@ -1354,7 +1421,7 @@ function UserDashboard({ user, onLogout }) {
                 <p style={{fontFamily:"'Cinzel',serif",color:T.goldD,fontSize:"0.75rem",letterSpacing:"0.12em",marginBottom:"0.5rem",fontWeight:600}}>ESTIMATED DELIVERY</p>
                 <p style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"1.8rem",fontWeight:900,margin:0}}>4-5 Days</p>
               </div>
-              <div style={{display:"flex",justifyContent:"space-around",marginBottom:"1.5rem"}}>
+              <div style={{display:"flex",justifyContent:"space-around",marginBottom:"1.5rem"}} className="track-steps">
                 {[["📦","Order Placed"],["🔄","Processing"],["🚚","Shipped"],["✅","Delivered"]].map(([ic,txt],i)=>(
                   <div key={i} style={{textAlign:"center"}}>
                     <div style={{width:44,height:44,background:i<2?`linear-gradient(135deg,${T.goldD},${T.gold})`:i===2?"rgba(139,105,20,0.2)":"rgba(33,40,66,0.1)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,margin:"0 auto 6px",border:i===2?`2px solid ${T.goldD}`:"none"}}>{ic}</div>

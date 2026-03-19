@@ -29,12 +29,24 @@ const css = `
   }
   @media(max-width:768px){
     .ws-sidebar{display:none!important;}
-    .ws-main{margin-left:0!important;padding:1rem!important;}
+    .ws-sidebar.ws-open{display:flex!important;z-index:500;}
+    .ws-mobile-bar{display:flex!important;}
+    .ws-main{margin-left:0!important;padding:1rem!important;padding-top:4.5rem!important;}
     .ws-stat-grid{grid-template-columns:1fr 1fr!important;}
     .ws-two-col{grid-template-columns:1fr!important;}
+    .ws-modal-grid{grid-template-columns:1fr!important;}
+    .ws-customer-grid{grid-template-columns:1fr!important;}
+    .ws-order-detail-grid{grid-template-columns:1fr!important;}
   }
   @media(max-width:480px){
     .ws-stat-grid{grid-template-columns:1fr!important;}
+    .ws-main{padding:0.75rem!important;padding-top:4.5rem!important;}
+  }
+  .ws-mobile-bar{display:none;position:fixed;top:0;left:0;right:0;height:56px;background:#0d0f13;border-bottom:1px solid rgba(255,255,255,0.06);z-index:400;align-items:center;padding:0 1rem;gap:12px;}
+  .ws-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:499;}
+  .ws-overlay.ws-open{display:block;}
+  @media(max-width:768px){
+    .ws-close-btn{display:block!important;}
   }
 `;
 
@@ -653,7 +665,7 @@ function Orders({ token, showToast }) {
       {/* Order detail modal */}
       {selected && (
         <Modal title={`📦 Order ${selected.orderNumber || selected._id.slice(-8)}`} onClose={() => setSelected(null)} width={680}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }} className="ws-order-detail-grid">
             {/* Customer Info */}
             <div style={{ background: "rgba(124,58,237,0.06)", borderRadius: 12, padding: "1rem", border: "1px solid rgba(124,58,237,0.15)" }}>
               <p style={{ color: "#a78bfa", fontSize: "0.68rem", letterSpacing: "0.12em", fontWeight: 600, marginBottom: 10, textTransform: "uppercase" }}>👤 Customer Info</p>
@@ -702,7 +714,7 @@ function Orders({ token, showToast }) {
           </div>
 
           {/* Payment + Date row */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }} className="ws-order-detail-grid">
             <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: "0.8rem", border: "1px solid rgba(255,255,255,0.06)" }}>
               <p style={{ color: "#64748b", fontSize: "0.68rem", letterSpacing: "0.1em", marginBottom: 6 }}>PAYMENT METHOD</p>
               <p style={{ color: "#e2e8f0", fontSize: "0.9rem", fontWeight: 600, textTransform: "uppercase", marginBottom: 4 }}>{selected.paymentMethod || "—"}</p>
@@ -846,7 +858,7 @@ function Customers({ token, showToast }) {
                 </div>
 
                 {/* Row 2: Personal Details + Full Delivery Address — ALL VISIBLE */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.2rem" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.2rem" }} className="ws-customer-grid">
 
                   {/* LEFT — Personal Info */}
                   <div style={{ background: "rgba(255,255,255,0.02)", borderRadius: 12, padding: "1rem", border: "1px solid rgba(255,255,255,0.04)" }}>
@@ -1282,7 +1294,7 @@ function ManageUsers({ token, showToast }) {
       {/* User Details Modal */}
       {selectedUser && (
         <Modal title="User Details" onClose={() => setSelectedUser(null)} width={700}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }} className="ws-modal-grid">
             <div>
               <label style={labelSx}>Full Name</label>
               <div style={{ color: "#e2e8f0", fontSize: "0.95rem", padding: "10px 0" }}>{selectedUser.name}</div>
@@ -1384,6 +1396,7 @@ export default function AdminApp() {
   const [admin, setAdmin] = useState(() => { try { return JSON.parse(localStorage.getItem("ws_admin_info") || "null"); } catch { return null; } });
   const [page, setPage] = useState("dashboard");
   const [toast, setToast] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogin = (t, a) => {
     setToken(t); setAdmin(a);
@@ -1413,7 +1426,80 @@ export default function AdminApp() {
     <>
       <style>{css}</style>
       <div style={{ display: "flex", minHeight: "100vh", background: "#0a0b0d" }}>
-        <Sidebar active={page} onNav={setPage} admin={admin} onLogout={handleLogout} />
+        {/* Mobile overlay */}
+        <div className={`ws-overlay${sidebarOpen ? " ws-open" : ""}`} onClick={() => setSidebarOpen(false)} />
+
+        {/* Mobile top bar */}
+        <div className="ws-mobile-bar">
+          <button onClick={() => setSidebarOpen(true)} style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.3)", borderRadius: 8, padding: "6px 10px", cursor: "pointer", display: "flex", flexDirection: "column", gap: 4 }}>
+            {[0,1,2].map(i => <div key={i} style={{ width: 18, height: 2, background: "#a78bfa", borderRadius: 1 }} />)}
+          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ width: 28, height: 28, background: "linear-gradient(135deg, #7c3aed, #a78bfa)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>💎</div>
+            <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.9rem", color: "#fff" }}>Wishstone Admin</span>
+          </div>
+        </div>
+
+        <aside className={`ws-sidebar${sidebarOpen ? " ws-open" : ""}`} style={{
+          width: 240, minHeight: "100vh",
+          background: "linear-gradient(180deg, #0d0f13 0%, #10121a 100%)",
+          borderRight: "1px solid rgba(255,255,255,0.06)",
+          display: "flex", flexDirection: "column",
+          position: "fixed", left: 0, top: 0, bottom: 0,
+          zIndex: 100, transition: "width 0.3s ease",
+        }}>
+          {/* Brand */}
+          <div style={{ padding: "1.5rem 1.5rem 1rem", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 36, height: 36, background: "linear-gradient(135deg, #7c3aed, #a78bfa)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>💎</div>
+                <div className="ws-brand-text">
+                  <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem", color: "#fff" }}>Wishstone</div>
+                  <div style={{ fontSize: "0.65rem", color: "#7c3aed", letterSpacing: "0.1em" }}>ADMIN PANEL</div>
+                </div>
+              </div>
+              <button onClick={() => setSidebarOpen(false)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 20, lineHeight: 1, display: "none" }} className="ws-close-btn">✕</button>
+            </div>
+          </div>
+
+          {/* Nav */}
+          <nav style={{ flex: 1, padding: "1rem 0.75rem" }}>
+            {NAV.map((item) => (
+              <button key={item.id} onClick={() => { setPage(item.id); setSidebarOpen(false); }} style={{
+                width: "100%", display: "flex", alignItems: "center", gap: 12,
+                padding: "10px 14px", borderRadius: 10, marginBottom: 2,
+                background: page === item.id ? "rgba(124,58,237,0.15)" : "transparent",
+                border: page === item.id ? "1px solid rgba(124,58,237,0.3)" : "1px solid transparent",
+                color: page === item.id ? "#a78bfa" : "#64748b",
+                cursor: "pointer", textAlign: "left", fontSize: "0.9rem", fontWeight: 500,
+                transition: "all 0.2s",
+              }}
+                onMouseEnter={e => { if (page !== item.id) { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.color = "#e2e8f0"; } }}
+                onMouseLeave={e => { if (page !== item.id) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b"; } }}
+              >
+                <span style={{ fontSize: 18, flexShrink: 0 }}>{item.icon}</span>
+                <span className="ws-sidebar-text">{item.label}</span>
+              </button>
+            ))}
+          </nav>
+
+          {/* Admin info */}
+          <div style={{ padding: "1rem 1.25rem", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+              <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg, #7c3aed, #ec4899)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>
+                {admin?.name?.[0] || "A"}
+              </div>
+              <div className="ws-sidebar-text">
+                <div style={{ fontSize: "0.85rem", color: "#e2e8f0", fontWeight: 500 }}>{admin?.name || "Admin"}</div>
+                <div style={{ fontSize: "0.7rem", color: "#64748b" }}>Super Admin</div>
+              </div>
+            </div>
+            <button onClick={handleLogout} style={{ ...btnGhost, width: "100%", fontSize: "0.8rem", padding: "8px" }}>
+              🚪 <span className="ws-sidebar-text">Logout</span>
+            </button>
+          </div>
+        </aside>
+
         <main className="ws-main" style={{ flex: 1, marginLeft: 240, padding: "2rem 2.5rem", maxWidth: "calc(100vw - 240px)", transition: "margin-left 0.3s ease, padding 0.3s ease" }}>
           <PageComponent token={token} showToast={showToast} />
         </main>
