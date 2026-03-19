@@ -406,22 +406,29 @@ function UsesSection() {
     v.play().catch(() => {}); // autoplay may be blocked silently
   }, [active]);
 
-  // Track progress bar
+  const MAX_SEC = 5;
+
+  // Track progress bar — capped at MAX_SEC
   const handleTimeUpdate = () => {
     const v = videoRef.current;
-    if (!v || !v.duration) return;
-    setProgress((v.currentTime / v.duration) * 100);
+    if (!v) return;
+    if (v.currentTime >= MAX_SEC) {
+      setProgress(100);
+      setActive(prev => (prev + 1) % VIDEOS.length);
+      return;
+    }
+    setProgress((v.currentTime / MAX_SEC) * 100);
   };
 
-  // When video ends, go to next
+  // When video ends naturally, go to next
   const handleEnded = () => {
     setProgress(0);
     setActive(prev => (prev + 1) % VIDEOS.length);
   };
 
-  // Fallback: if video fails to load, still auto-advance after 6s
+  // Fallback: if video fails to load, still auto-advance after 5s
   const handleError = () => {
-    setTimeout(() => setActive(prev => (prev + 1) % VIDEOS.length), 6000);
+    setTimeout(() => setActive(prev => (prev + 1) % VIDEOS.length), 5000);
   };
 
   const goTo = (i) => {
