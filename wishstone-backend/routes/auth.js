@@ -43,4 +43,29 @@ router.post("/admin/login", async (req, res) => {
 // Me
 router.get("/me", protect, (req, res) => res.json({ success: true, user: req.user }));
 
+// Update profile
+router.put("/update-profile", protect, async (req, res) => {
+  try {
+    const { name, phone, age } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, phone, age },
+      { new: true, runValidators: true }
+    ).select("-password");
+    
+    // Return updated user data
+    res.json({ 
+      success: true, 
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        age: user.age,
+        role: user.role
+      }
+    });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
 module.exports = router;

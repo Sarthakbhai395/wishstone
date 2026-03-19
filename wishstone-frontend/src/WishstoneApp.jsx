@@ -33,10 +33,10 @@ const FAQS = [
 ];
 
 const VIDEOS = [
-  { title:"Crystal Cleansing Ritual", thumb:"https://images.pexels.com/photos/29858947/pexels-photo-29858947.jpeg", tag:"Manifestation", src:"https://videos.pexels.com/video-files/4763824/4763824-hd_1920_1080_25fps.mp4" },
+  { title:"Crystal Cleansing Ritual", thumb:"https://images.pexels.com/photos/29858947/pexels-photo-29858947.jpeg", tag:"Manifestation", src:"https://www.pexels.com/download/video/854228/" },
   { title:"Moon Water Preparation",   thumb:"https://images.pexels.com/photos/19824838/pexels-photo-19824838.jpeg", tag:"Therapy",       src:"https://videos.pexels.com/video-files/3571264/3571264-hd_1920_1080_30fps.mp4" },
-  { title:"Morning Habit Ritual",     thumb:"https://images.pexels.com/photos/920534/pexels-photo-920534.jpeg",    tag:"Habit Builder", src:"https://videos.pexels.com/video-files/4623585/4623585-hd_1920_1080_25fps.mp4" },
-  { title:"Sacred Space Setup",       thumb:"https://images.pexels.com/photos/6498990/pexels-photo-6498990.jpeg", tag:"Therapy",       src:"https://videos.pexels.com/video-files/5019904/5019904-hd_1920_1080_25fps.mp4" },
+  { title:"Morning Habit Ritual",     thumb:"https://images.pexels.com/photos/920534/pexels-photo-920534.jpeg",    tag:"Habit Builder", src:"https://www.pexels.com/download/video/854739/" },
+  { title:"Sacred Space Setup",       thumb:"https://images.pexels.com/photos/6498990/pexels-photo-6498990.jpeg", tag:"Therapy",       src:"https://www.pexels.com/download/video/1093662/" },
 ];
 
 // ─── SCROLL TO TOP UTILITY ────────────────────────────────────
@@ -152,7 +152,7 @@ function MobileMenu({ open, onClose, onNav, categoryRef, storyRef }) {
 }
 
 // ─── HEADER ───────────────────────────────────────────────────
-function Header({ cartCount, wishCount, onNav, currentPage, categoryRef, storyRef }) {
+function Header({ cartCount, wishCount, onNav, currentPage, categoryRef, storyRef, user, onLogout }) {
   const [scrolled,setScrolled]=useState(false);
   const [mOpen,setMOpen]=useState(false);
   useEffect(()=>{ const h=()=>setScrolled(window.scrollY>50); window.addEventListener("scroll",h); return()=>window.removeEventListener("scroll",h); },[]);
@@ -191,6 +191,20 @@ function Header({ cartCount, wishCount, onNav, currentPage, categoryRef, storyRe
               {cnt>0&&<span style={{position:"absolute",top:-2,right:-2,background:bc,color:T.navy,borderRadius:"50%",width:15,height:15,fontSize:8,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center"}}>{cnt}</span>}
             </button>
           ))}
+          
+          {/* Auth Buttons */}
+          {user ? (
+            <>
+              <button onClick={()=>{onNav("dashboard");scrollTop();}} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"8px 16px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:700,marginLeft:"0.5rem"}}>DASHBOARD</button>
+              <button onClick={onLogout} style={{background:"transparent",border:`1px solid ${T.cream}44`,color:T.cream,padding:"8px 16px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.14em",cursor:"pointer",transition:"all 0.25s"}} onMouseEnter={e=>{e.target.style.borderColor=T.rose;e.target.style.color=T.rose;}} onMouseLeave={e=>{e.target.style.borderColor=`${T.cream}44`;e.target.style.color=T.cream;}}>LOGOUT</button>
+            </>
+          ) : (
+            <>
+              <button onClick={()=>window.location.hash="login"} style={{background:"transparent",border:`1px solid ${T.cream}44`,color:T.cream,padding:"8px 16px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.14em",cursor:"pointer",marginLeft:"0.5rem",transition:"all 0.25s"}} onMouseEnter={e=>{e.target.style.borderColor=T.gold;e.target.style.color=T.gold;}} onMouseLeave={e=>{e.target.style.borderColor=`${T.cream}44`;e.target.style.color=T.cream;}}>LOGIN</button>
+              <button onClick={()=>window.location.hash="signup"} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"8px 16px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:700}}>SIGNUP</button>
+            </>
+          )}
+          
           {/* Hamburger */}
           <button className="mobile-menu-btn" onClick={()=>setMOpen(true)} style={{display:"none",background:"none",border:`1px solid ${T.gold}55`,borderRadius:6,padding:"6px 8px",cursor:"pointer",flexDirection:"column",gap:4}}>
             {[0,1,2].map(i=><div key={i} style={{width:20,height:2,background:T.cream,borderRadius:1}}/>)}
@@ -814,11 +828,33 @@ function ProductPage({ product, onAdd, onWish, wished }) {
 
 // ─── CART ─────────────────────────────────────────────────────
 function CartPage({ cart, onQty, onRemove, onCheckout }) {
-  const [coupon,setCoupon]=useState(""); const [disc,setDisc]=useState(0); const [msg,setMsg]=useState("");
-  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0); const ship=sub>=999?0:99; const total=sub+ship-disc;
-  const applyC=()=>{ if(coupon.toUpperCase()==="WOW300"){setDisc(300);setMsg("✅ ₹300 off applied!");}else{setDisc(0);setMsg("❌ Invalid coupon");} };
+  const [coupon,setCoupon]=useState(""); const [disc,setDisc]=useState(0); const [msg,setMsg]=useState(""); const [applying,setApplying]=useState(false); const [appliedCode,setAppliedCode]=useState("");
+  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0); const ship=sub>=999?0:99; const total=Math.max(0,sub+ship-disc);
   const iSx={width:"100%",background:`rgba(201,169,110,0.07)`,border:`1px solid ${T.goldD}44`,borderRadius:2,color:T.navy,padding:"10px 12px",fontSize:"0.95rem",outline:"none",boxSizing:"border-box"};
   const lSx={color:"rgba(33,40,66,0.5)",fontSize:"0.63rem",letterSpacing:"0.15em",fontFamily:"'Cinzel',serif",display:"block",marginBottom:5,textTransform:"uppercase"};
+
+  const applyC=async()=>{
+    if(!coupon.trim()) return;
+    setApplying(true); setMsg("");
+    try{
+      const res=await fetch(`http://localhost:5000/api/coupons/validate`,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({code:coupon.trim().toUpperCase(),orderTotal:sub}),
+      });
+      const data=await res.json();
+      if(!data.success) throw new Error(data.message||"Invalid coupon");
+      setDisc(data.discount);
+      setAppliedCode(coupon.trim().toUpperCase());
+      setMsg(`✅ ${data.message||"Coupon applied!"}`);
+    }catch(err){
+      setDisc(0); setAppliedCode("");
+      setMsg(`❌ ${err.message}`);
+    }
+    setApplying(false);
+  };
+
+  const removeC=()=>{ setDisc(0); setAppliedCode(""); setCoupon(""); setMsg(""); };
 
   if(!cart.length) return (
     <div style={{paddingTop:130,textAlign:"center",background:T.cream,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:14,padding:"130px 2rem"}}>
@@ -860,8 +896,11 @@ function CartPage({ cart, onQty, onRemove, onCheckout }) {
               <h3 style={{fontFamily:"'Cinzel',serif",color:T.navy,fontSize:"0.85rem",letterSpacing:"0.18em",marginTop:0}}>ORDER SUMMARY</h3>
               <Divider/>
               <div style={{display:"flex",gap:8,marginBottom:6}}>
-                <input value={coupon} onChange={e=>setCoupon(e.target.value)} placeholder="Coupon code" style={{...iSx,flex:1}}/>
-                <button onClick={applyC} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,borderRadius:2,padding:"0 14px",cursor:"pointer",fontFamily:"'Cinzel',serif",fontSize:"0.65rem",fontWeight:800,letterSpacing:"0.1em",whiteSpace:"nowrap"}}>APPLY</button>
+                <input value={coupon} onChange={e=>{setCoupon(e.target.value);if(appliedCode){removeC();}}} placeholder="Coupon code" style={{...iSx,flex:1}} onKeyDown={e=>e.key==="Enter"&&applyC()}/>
+                {appliedCode
+                  ? <button onClick={removeC} style={{background:"rgba(192,57,43,0.1)",border:"1px solid rgba(192,57,43,0.3)",color:"#c0392b",borderRadius:2,padding:"0 12px",cursor:"pointer",fontFamily:"'Cinzel',serif",fontSize:"0.65rem",fontWeight:800,whiteSpace:"nowrap"}}>REMOVE</button>
+                  : <button onClick={applyC} disabled={applying} style={{background:applying?"#aaa":`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,borderRadius:2,padding:"0 14px",cursor:applying?"not-allowed":"pointer",fontFamily:"'Cinzel',serif",fontSize:"0.65rem",fontWeight:800,letterSpacing:"0.1em",whiteSpace:"nowrap"}}>{applying?"...":"APPLY"}</button>
+                }
               </div>
               {msg&&<p style={{color:disc>0?"#2d7a5a":"#c0392b",fontSize:"0.78rem",marginBottom:10}}>{msg}</p>}
               {[["Subtotal",`₹${sub.toLocaleString()}`],["Shipping",ship===0?"FREE":`₹${ship}`],...(disc>0?[["Discount",`-₹${disc}`]]:[])].map(([l,v])=>(
@@ -874,7 +913,7 @@ function CartPage({ cart, onQty, onRemove, onCheckout }) {
                 <span style={{color:T.navy,fontFamily:"'Cinzel',serif",fontSize:"0.95rem"}}>Total</span>
                 <span style={{color:T.goldD,fontFamily:"'Cinzel',serif",fontSize:"1.2rem",fontWeight:700}}>₹{total.toLocaleString()}</span>
               </div>
-              <button onClick={onCheckout} style={{width:"100%",background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"14px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.16em",cursor:"pointer",fontWeight:800,boxShadow:`0 6px 24px ${T.gold}44`}}>PROCEED TO CHECKOUT</button>
+              <button onClick={()=>onCheckout({couponCode:appliedCode,discount:disc})} style={{width:"100%",background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"14px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.16em",cursor:"pointer",fontWeight:800,boxShadow:`0 6px 24px ${T.gold}44`}}>PROCEED TO CHECKOUT</button>
             </div>
           </div>
         </div>
@@ -884,12 +923,53 @@ function CartPage({ cart, onQty, onRemove, onCheckout }) {
 }
 
 // ─── CHECKOUT ─────────────────────────────────────────────────
-function CheckoutPage({ cart, onPlaceOrder }) {
-  const [form,setForm]=useState({name:"",age:"",email:"",phone:"",flat:"",area:"",landmark:"",city:"",state:"",country:"India",payment:"cod"});
+function CheckoutPage({ cart, onPlaceOrder, couponCode="", discount=0 }) {
+  const [form,setForm]=useState(()=>{
+    // Pre-fill from logged-in user if available
+    try{
+      const u=JSON.parse(localStorage.getItem("user")||"null");
+      if(u) return {name:u.name||"",age:u.age||"",email:u.email||"",phone:u.phone||"",flat:"",area:"",landmark:"",city:"",state:"",country:"India",payment:"cod"};
+    }catch(e){}
+    return {name:"",age:"",email:"",phone:"",flat:"",area:"",landmark:"",city:"",state:"",country:"India",payment:"cod"};
+  });
   const [placed,setPlaced]=useState(false);
-  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState("");
+  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const ship=sub>=999?0:99;
+  const total=Math.max(0,sub+ship-discount);
   const iSx={width:"100%",background:`rgba(201,169,110,0.06)`,border:`1px solid ${T.goldD}33`,borderRadius:2,color:T.navy,padding:"10px 12px",fontSize:"0.95rem",outline:"none",boxSizing:"border-box"};
   const lSx={color:"rgba(33,40,66,0.5)",fontSize:"0.63rem",letterSpacing:"0.15em",fontFamily:"'Cinzel',serif",display:"block",marginBottom:5,textTransform:"uppercase"};
+
+  const handlePlaceOrder=async()=>{
+    if(!form.name||!form.email||!form.phone||!form.flat||!form.city||!form.state){
+      setError("Please fill in all required fields (name, email, phone, address).");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try{
+      const orderPayload={
+        customer:{name:form.name,email:form.email,phone:form.phone,age:form.age||""},
+        shippingAddress:{flat:form.flat,area:form.area,landmark:form.landmark,city:form.city,state:form.state,country:form.country},
+        items:cart.map(i=>({productId:String(i.id),name:i.name,price:i.price,quantity:i.qty,image:i.image||""})),
+        paymentMethod:form.payment,
+        couponCode:couponCode||undefined,
+      };
+      const res=await fetch("http://localhost:5000/api/orders/create",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(orderPayload),
+      });
+      const data=await res.json();
+      if(!data.success) throw new Error(data.message||"Order failed");
+      setPlaced(true);
+      setTimeout(()=>onPlaceOrder(),2500);
+    }catch(err){
+      setError(err.message||"Something went wrong. Please try again.");
+    }
+    setLoading(false);
+  };
 
   if(placed) return (
     <div style={{paddingTop:130,textAlign:"center",background:T.cream,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:14,padding:"130px 2rem"}}>
@@ -937,11 +1017,24 @@ function CheckoutPage({ cart, onPlaceOrder }) {
                 <span style={{color:T.navy,fontFamily:"'Cinzel',serif",fontSize:"0.82rem",flexShrink:0}}>₹{(item.price*item.qty).toLocaleString()}</span>
               </div>
             ))}
+            <div style={{borderTop:`1px solid ${T.goldD}22`,paddingTop:"0.9rem",marginTop:"0.4rem"}}>
+              {[["Subtotal",`₹${sub.toLocaleString()}`],["Shipping",ship===0?"FREE":`₹${ship}`],...(discount>0?[["Coupon ("+couponCode+")",`-₹${discount.toLocaleString()}`]]:[])].map(([l,v])=>(
+                <div key={l} style={{display:"flex",justifyContent:"space-between",marginBottom:7}}>
+                  <span style={{color:"rgba(33,40,66,0.55)",fontSize:"0.85rem"}}>{l}</span>
+                  <span style={{color:l.startsWith("Coupon")?"#2d7a5a":T.navy,fontFamily:"'Cinzel',serif",fontSize:"0.8rem",fontWeight:l.startsWith("Coupon")?700:400}}>{v}</span>
+                </div>
+              ))}
+              {couponCode&&<div style={{background:"rgba(45,122,90,0.08)",border:"1px solid rgba(45,122,90,0.2)",borderRadius:4,padding:"6px 10px",marginBottom:8,display:"flex",alignItems:"center",gap:6}}>
+                <span style={{fontSize:14}}>🎫</span>
+                <span style={{color:"#2d7a5a",fontSize:"0.78rem",fontWeight:600}}>{couponCode} applied</span>
+              </div>}
+            </div>
             <div style={{borderTop:`1px solid ${T.goldD}22`,paddingTop:"0.9rem",display:"flex",justifyContent:"space-between",marginBottom:"1.2rem"}}>
               <span style={{color:T.navy,fontFamily:"'Cinzel',serif"}}>Total</span>
               <span style={{color:T.goldD,fontFamily:"'Cinzel',serif",fontSize:"1.15rem",fontWeight:700}}>₹{total.toLocaleString()}</span>
             </div>
-            <button onClick={()=>{setPlaced(true);setTimeout(()=>onPlaceOrder(),2200);}} style={{width:"100%",background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"14px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.16em",cursor:"pointer",fontWeight:800,boxShadow:`0 6px 24px ${T.gold}44`}}>PLACE ORDER ✨</button>
+            {error&&<p style={{color:"#c0392b",fontSize:"0.8rem",marginBottom:"0.8rem",background:"rgba(192,57,43,0.08)",padding:"8px 10px",borderRadius:4,border:"1px solid rgba(192,57,43,0.2)"}}>{error}</p>}
+            <button onClick={handlePlaceOrder} disabled={loading} style={{width:"100%",background:loading?"#aaa":`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"14px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.16em",cursor:loading?"not-allowed":"pointer",fontWeight:800,boxShadow:loading?"none":`0 6px 24px ${T.gold}44`,transition:"all 0.3s"}}>{loading?"PLACING ORDER...":"PLACE ORDER ✨"}</button>
           </div>
         </div>
       </div>
@@ -1009,6 +1102,275 @@ function HomePage({ onCatClick, onAdd, onWish, wished, onProdClick, catRef, stor
   );
 }
 
+// ─── SIGNUP PAGE ──────────────────────────────────────────────
+function SignupPage({ onSignupSuccess }) {
+  const [form,setForm]=useState({name:"",email:"",password:"",phone:"",age:""});
+  const [error,setError]=useState("");
+  const [loading,setLoading]=useState(false);
+  const iSx={width:"100%",background:"#fff",border:`2px solid ${T.goldD}`,borderRadius:4,color:T.navy,padding:"12px 14px",fontSize:"0.95rem",outline:"none",boxSizing:"border-box",fontWeight:500};
+  const lSx={color:T.navy,fontSize:"0.75rem",letterSpacing:"0.08em",fontFamily:"'Cinzel',serif",display:"block",marginBottom:6,textTransform:"uppercase",fontWeight:600};
+
+  const handleSubmit=async(e)=>{
+    e.preventDefault();
+    setError("");
+    if(!form.name||!form.email||!form.password) return setError("Name, email and password are required");
+    setLoading(true);
+    try{
+      const res=await fetch("http://localhost:5000/api/auth/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(form)});
+      const data=await res.json();
+      if(!data.success) throw new Error(data.message);
+      // Don't store token yet - redirect to login
+      onSignupSuccess();
+    }catch(err){setError(err.message);setLoading(false);}
+  };
+
+  return (
+    <div style={{paddingTop:100,background:T.cream,minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:"100px 1.5rem 3rem"}}>
+      <div style={{maxWidth:460,width:"100%",border:`2px solid ${T.goldD}`,borderRadius:8,padding:"2.5rem 2rem",background:"#fff",boxShadow:`0 20px 60px rgba(139,105,20,0.25)`}}>
+        <div style={{textAlign:"center",marginBottom:"2rem"}}>
+          <div style={{width:60,height:60,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,margin:"0 auto 12px",boxShadow:`0 0 30px ${T.gold}66`}}>💎</div>
+          <h1 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"2rem",margin:"0 0 6px",fontWeight:900}}>Create Account</h1>
+          <Divider/>
+          <p style={{color:T.goldD,fontSize:"1rem",fontStyle:"italic",fontWeight:500}}>Join the Wishstone family</p>
+        </div>
+        <form onSubmit={handleSubmit}>
+          {[["Full Name","name","text"],["Email","email","email"],["Password","password","password"],["Phone","phone","tel"],["Age","age","number"]].map(([l,k,t])=>(
+            <div key={k} style={{marginBottom:"1rem"}}><label style={lSx}>{l}{k==="age"?" (Optional)":""}</label><input type={t} value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} style={iSx} required={k!=="age"&&k!=="phone"}/></div>
+          ))}
+          {error&&<p style={{color:"#c0392b",fontSize:"0.9rem",marginBottom:"1rem",textAlign:"center",fontWeight:600,background:"rgba(192,57,43,0.1)",padding:"10px",borderRadius:4}}>{error}</p>}
+          <button type="submit" disabled={loading} style={{width:"100%",background:loading?"#999":`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:"#fff",padding:"14px",borderRadius:4,fontFamily:"'Cinzel',serif",fontSize:"0.85rem",letterSpacing:"0.16em",cursor:loading?"not-allowed":"pointer",fontWeight:800,marginBottom:"1rem",boxShadow:`0 8px 28px ${T.gold}66`,transition:"transform 0.2s"}}>{loading?"CREATING...":"CREATE ACCOUNT"}</button>
+        </form>
+        <p style={{textAlign:"center",color:T.navy,fontSize:"0.92rem",fontWeight:500}}>Already have an account? <button onClick={()=>window.location.hash="login"} style={{background:"none",border:"none",color:T.goldD,cursor:"pointer",textDecoration:"underline",fontFamily:"inherit",fontSize:"inherit",fontWeight:700}}>Login</button></p>
+      </div>
+    </div>
+  );
+}
+
+// ─── LOGIN PAGE ───────────────────────────────────────────────
+function LoginPage({ onSuccess }) {
+  const [form,setForm]=useState({email:"",password:""});
+  const [error,setError]=useState("");
+  const [loading,setLoading]=useState(false);
+  const iSx={width:"100%",background:"#fff",border:`2px solid ${T.goldD}`,borderRadius:4,color:T.navy,padding:"12px 14px",fontSize:"0.95rem",outline:"none",boxSizing:"border-box",fontWeight:500};
+  const lSx={color:T.navy,fontSize:"0.75rem",letterSpacing:"0.08em",fontFamily:"'Cinzel',serif",display:"block",marginBottom:6,textTransform:"uppercase",fontWeight:600};
+
+  const handleSubmit=async(e)=>{
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try{
+      const res=await fetch("http://localhost:5000/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(form)});
+      const data=await res.json();
+      if(!data.success) throw new Error(data.message);
+      localStorage.setItem("token",data.token);
+      localStorage.setItem("user",JSON.stringify(data.user));
+      onSuccess(data.user);
+    }catch(err){setError(err.message);setLoading(false);}
+  };
+
+  return (
+    <div style={{paddingTop:100,background:T.cream,minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:"100px 1.5rem 3rem"}}>
+      <div style={{maxWidth:460,width:"100%",border:`2px solid ${T.goldD}`,borderRadius:8,padding:"2.5rem 2rem",background:"#fff",boxShadow:`0 20px 60px rgba(139,105,20,0.25)`}}>
+        <div style={{textAlign:"center",marginBottom:"2rem"}}>
+          <div style={{width:60,height:60,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,margin:"0 auto 12px",boxShadow:`0 0 30px ${T.gold}66`}}>💎</div>
+          <h1 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"2rem",margin:"0 0 6px",fontWeight:900}}>Welcome Back</h1>
+          <Divider/>
+          <p style={{color:T.goldD,fontSize:"1rem",fontStyle:"italic",fontWeight:500}}>Login to your account</p>
+        </div>
+        <form onSubmit={handleSubmit}>
+          {[["Email","email","email"],["Password","password","password"]].map(([l,k,t])=>(
+            <div key={k} style={{marginBottom:"1.2rem"}}><label style={lSx}>{l}</label><input type={t} value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} style={iSx} required/></div>
+          ))}
+          {error&&<p style={{color:"#c0392b",fontSize:"0.9rem",marginBottom:"1rem",textAlign:"center",fontWeight:600,background:"rgba(192,57,43,0.1)",padding:"10px",borderRadius:4}}>{error}</p>}
+          <button type="submit" disabled={loading} style={{width:"100%",background:loading?"#999":`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:"#fff",padding:"14px",borderRadius:4,fontFamily:"'Cinzel',serif",fontSize:"0.85rem",letterSpacing:"0.16em",cursor:loading?"not-allowed":"pointer",fontWeight:800,marginBottom:"1rem",boxShadow:`0 8px 28px ${T.gold}66`,transition:"transform 0.2s"}}>{loading?"LOGGING IN...":"LOGIN"}</button>
+        </form>
+        <p style={{textAlign:"center",color:T.navy,fontSize:"0.92rem",fontWeight:500}}>Don't have an account? <button onClick={()=>window.location.hash="signup"} style={{background:"none",border:"none",color:T.goldD,cursor:"pointer",textDecoration:"underline",fontFamily:"inherit",fontSize:"inherit",fontWeight:700}}>Sign up</button></p>
+      </div>
+    </div>
+  );
+}
+
+// ─── USER DASHBOARD ───────────────────────────────────────────
+function UserDashboard({ user, onLogout }) {
+  const [activeTab,setActiveTab]=useState("profile");
+  const [orders,setOrders]=useState([]);
+  const [profile,setProfile]=useState({name:user.name,email:user.email,phone:user.phone||"",age:user.age||""});
+  const [loading,setLoading]=useState(false);
+  const [msg,setMsg]=useState("");
+  const [trackModal,setTrackModal]=useState(false);
+
+  useEffect(()=>{
+    const fetchOrders=async()=>{
+      try{
+        const token=localStorage.getItem("token");
+        const res=await fetch("http://localhost:5000/api/orders/my-orders",{headers:{"Authorization":`Bearer ${token}`}});
+        const data=await res.json();
+        if(data.success) setOrders(data.orders||[]);
+      }catch(err){console.error(err);}
+    };
+    if(activeTab==="orders") fetchOrders();
+  },[activeTab]);
+
+  const updateProfile=async()=>{
+    setLoading(true);
+    setMsg("");
+    try{
+      const token=localStorage.getItem("token");
+      const res=await fetch("http://localhost:5000/api/auth/update-profile",{method:"PUT",headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`},body:JSON.stringify(profile)});
+      const data=await res.json();
+      if(!data.success) throw new Error(data.message);
+      
+      // Update localStorage with new user data
+      const updatedUser = {...user, name: profile.name, phone: profile.phone, age: profile.age};
+      localStorage.setItem("user",JSON.stringify(updatedUser));
+      
+      setMsg("✅ Profile updated successfully!");
+      setTimeout(()=>setMsg(""),3000);
+    }catch(err){setMsg("❌ "+err.message);}
+    setLoading(false);
+  };
+
+  const iSx={width:"100%",background:"#fff",border:`2px solid ${T.goldD}`,borderRadius:4,color:T.navy,padding:"12px 14px",fontSize:"0.95rem",outline:"none",boxSizing:"border-box",fontWeight:500};
+  const lSx={color:T.navy,fontSize:"0.75rem",letterSpacing:"0.08em",fontFamily:"'Cinzel',serif",display:"block",marginBottom:6,textTransform:"uppercase",fontWeight:600};
+
+  return (
+    <div style={{position:"fixed",inset:0,top:68,background:T.cream,overflow:"auto"}}>
+      <div style={{maxWidth:1200,margin:"0 auto",padding:"2rem clamp(1.5rem,4vw,3rem)",minHeight:"100%"}}>
+        <h1 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"clamp(1.6rem,4vw,2rem)",marginBottom:"0.4rem"}}>My Dashboard</h1>
+        <Divider/>
+        <div style={{display:"grid",gridTemplateColumns:"260px 1fr",gap:"2rem",marginTop:"1.5rem"}}>
+          <div style={{border:`2px solid ${T.goldD}`,borderRadius:8,padding:"1.8rem",height:"fit-content",background:"#fff",position:"sticky",top:"2rem",boxShadow:`0 8px 24px rgba(139,105,20,0.15)`}}>
+            <div style={{textAlign:"center",marginBottom:"1.5rem"}}>
+              <div style={{width:90,height:90,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:40,margin:"0 auto 14px",boxShadow:`0 0 30px ${T.gold}66`,border:"3px solid #fff"}}>👤</div>
+              <h3 style={{fontFamily:"'Cinzel',serif",color:T.navy,fontSize:"1.1rem",margin:"0 0 6px",fontWeight:800}}>{user.name}</h3>
+              <p style={{color:T.goldD,fontSize:"0.85rem",margin:0,fontWeight:500}}>{user.email}</p>
+            </div>
+            <Divider/>
+            {[["profile","👤 Profile"],["orders","📦 My Orders"],["track","🚚 Track Order"]].map(([k,l])=>(
+              <button key={k} onClick={()=>setActiveTab(k)} style={{width:"100%",background:activeTab===k?`linear-gradient(135deg,${T.goldD},${T.gold})`:"transparent",border:activeTab===k?"none":`1px solid ${T.goldD}33`,color:activeTab===k?"#fff":T.navy,padding:"14px 16px",borderRadius:6,cursor:"pointer",fontFamily:"'Cinzel',serif",fontSize:"0.8rem",letterSpacing:"0.08em",textAlign:"left",marginBottom:"0.6rem",transition:"all 0.3s",fontWeight:activeTab===k?800:600,boxShadow:activeTab===k?`0 4px 12px ${T.gold}44`:"none"}}>{l}</button>
+            ))}
+          </div>
+          <div style={{border:`2px solid ${T.goldD}`,borderRadius:8,padding:"2.5rem",background:"#fff",minHeight:"600px",boxShadow:`0 8px 24px rgba(139,105,20,0.15)`}}>
+            {activeTab==="profile"&&(
+              <div>
+                <div style={{display:"flex",alignItems:"center",gap:"1rem",marginBottom:"2rem"}}>
+                  <div style={{width:60,height:60,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,boxShadow:`0 0 20px ${T.gold}44`}}>✨</div>
+                  <div>
+                    <h2 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"1.4rem",margin:"0 0 4px",fontWeight:900}}>Profile Information</h2>
+                    <p style={{color:T.goldD,fontSize:"0.9rem",margin:0,fontWeight:500}}>Manage your personal details</p>
+                  </div>
+                </div>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1.5rem",marginBottom:"2rem"}}>
+                  {[["Full Name","name","text"],["Email Address","email","email"],["Phone Number","phone","tel"],["Age","age","number"]].map(([l,k,t])=>(
+                    <div key={k}>
+                      <label style={lSx}>{l}</label>
+                      <input type={t} value={profile[k]} onChange={e=>setProfile({...profile,[k]:e.target.value})} style={iSx} disabled={k==="email"}/>
+                    </div>
+                  ))}
+                </div>
+                {msg&&<div style={{background:msg.includes("✅")?"rgba(45,122,90,0.1)":"rgba(192,57,43,0.1)",border:`2px solid ${msg.includes("✅")?"#2d7a5a":"#c0392b"}`,borderRadius:6,padding:"14px 18px",marginBottom:"1.5rem",display:"flex",alignItems:"center",gap:"12px"}}>
+                  <span style={{fontSize:24}}>{msg.includes("✅")?"✅":"❌"}</span>
+                  <p style={{color:msg.includes("✅")?"#2d7a5a":"#c0392b",fontSize:"0.95rem",margin:0,fontWeight:600}}>{msg.replace("✅ ","").replace("❌ ","")}</p>
+                </div>}
+                <div style={{display:"flex",gap:"1rem"}}>
+                  <button onClick={updateProfile} disabled={loading} style={{background:loading?"#999":`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:"#fff",padding:"14px 32px",borderRadius:6,fontFamily:"'Cinzel',serif",fontSize:"0.85rem",letterSpacing:"0.14em",cursor:loading?"not-allowed":"pointer",fontWeight:800,boxShadow:loading?"none":`0 6px 20px ${T.gold}55`,transition:"all 0.3s"}}>{loading?"UPDATING...":"💾 SAVE CHANGES"}</button>
+                  <button onClick={onLogout} style={{background:"transparent",border:`2px solid #c0392b`,color:"#c0392b",padding:"14px 32px",borderRadius:6,fontFamily:"'Cinzel',serif",fontSize:"0.85rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:800,transition:"all 0.3s"}} onMouseEnter={e=>{e.target.style.background="#c0392b";e.target.style.color="#fff";}} onMouseLeave={e=>{e.target.style.background="transparent";e.target.style.color="#c0392b";}}>🚪 LOGOUT</button>
+                </div>
+              </div>
+            )}
+            {activeTab==="orders"&&(
+              <div>
+                <div style={{display:"flex",alignItems:"center",gap:"1rem",marginBottom:"2rem"}}>
+                  <div style={{width:60,height:60,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,boxShadow:`0 0 20px ${T.gold}44`}}>📦</div>
+                  <div>
+                    <h2 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"1.4rem",margin:"0 0 4px",fontWeight:900}}>My Orders</h2>
+                    <p style={{color:T.goldD,fontSize:"0.9rem",margin:0,fontWeight:500}}>{orders.length} orders placed</p>
+                  </div>
+                </div>
+                {orders.length===0?<div style={{textAlign:"center",padding:"3rem 2rem"}}>
+                  <div style={{fontSize:64,marginBottom:"1rem"}}>🛍️</div>
+                  <p style={{color:"rgba(33,40,66,0.6)",fontStyle:"italic",fontSize:"1.1rem"}}>No orders yet. Start shopping!</p>
+                </div>:orders.map(order=>(
+                  <div key={order._id} style={{border:`2px solid ${T.goldD}33`,borderRadius:8,padding:"1.6rem",marginBottom:"1.5rem",background:"rgba(255,255,255,0.5)",transition:"all 0.3s"}} onMouseEnter={e=>e.currentTarget.style.boxShadow=`0 8px 24px rgba(139,105,20,0.2)`} onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
+                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:"1rem",paddingBottom:"1rem",borderBottom:`1px solid ${T.goldD}22`}}>
+                      <div>
+                        <p style={{fontFamily:"'Cinzel',serif",color:T.navy,fontSize:"1rem",margin:"0 0 6px",fontWeight:700}}>Order #{order.orderNumber}</p>
+                        <p style={{color:"rgba(33,40,66,0.5)",fontSize:"0.85rem",margin:0}}>📅 {new Date(order.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}</p>
+                      </div>
+                      <div style={{textAlign:"right"}}>
+                        <p style={{fontFamily:"'Cinzel',serif",color:T.goldD,fontSize:"1.2rem",margin:"0 0 8px",fontWeight:800}}>₹{order.totalAmount?.toLocaleString()}</p>
+                        <span style={{background:order.orderStatus==="delivered"?"#2d7a5a":order.orderStatus==="cancelled"?"#c0392b":T.goldD,color:"#fff",padding:"4px 14px",borderRadius:4,fontSize:"0.7rem",fontFamily:"'Cinzel',serif",letterSpacing:"0.08em",fontWeight:800}}>{order.orderStatus?.toUpperCase()}</span>
+                      </div>
+                    </div>
+                    {order.items&&order.items.length>0&&(
+                      <div>
+                        <p style={{fontFamily:"'Cinzel',serif",color:T.goldD,fontSize:"0.75rem",letterSpacing:"0.1em",marginBottom:"1rem",fontWeight:700}}>📦 ORDER ITEMS ({order.items.length})</p>
+                        {order.items.map((item,idx)=>(
+                          <div key={idx} style={{display:"flex",gap:"1rem",marginBottom:"1rem",alignItems:"center",background:"rgba(255,255,255,0.8)",padding:"1rem",borderRadius:6,border:`1px solid ${T.goldD}22`}}>
+                            <div style={{width:60,height:60,borderRadius:6,background:`linear-gradient(135deg,${T.gold}22,${T.goldD}22)`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,flexShrink:0,border:`1px solid ${T.goldD}33`}}>💎</div>
+                            <div style={{flex:1}}>
+                              <p style={{color:T.navy,fontSize:"0.95rem",margin:"0 0 4px",fontWeight:600}}>{item.name||"Product"}</p>
+                              <p style={{color:"rgba(33,40,66,0.5)",fontSize:"0.82rem",margin:0}}>Qty: {item.quantity} × ₹{item.price?.toLocaleString()}</p>
+                            </div>
+                            <p style={{color:T.goldD,fontSize:"1rem",fontWeight:800}}>₹{((item.price||0)*(item.quantity||0)).toLocaleString()}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+            {activeTab==="track"&&(
+              <div style={{textAlign:"center",padding:"3rem 2rem"}}>
+                <div style={{width:120,height:120,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:56,margin:"0 auto 1.5rem",boxShadow:`0 0 50px ${T.gold}66`,animation:"pulse 2s ease-in-out infinite"}}>📦</div>
+                <h2 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"1.8rem",marginBottom:"1rem",fontWeight:900}}>Track Your Order</h2>
+                <p style={{color:"rgba(33,40,66,0.6)",fontSize:"1.05rem",marginBottom:"2.5rem",lineHeight:1.8}}>Click below to view delivery status and estimated arrival time</p>
+                <button onClick={()=>setTrackModal(true)} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:"#fff",padding:"16px 40px",borderRadius:8,fontFamily:"'Cinzel',serif",fontSize:"0.9rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:800,boxShadow:`0 8px 28px ${T.gold}66`,transition:"all 0.3s"}} onMouseEnter={e=>e.target.style.transform="translateY(-2px)"} onMouseLeave={e=>e.target.style.transform="translateY(0)"}>🚚 TRACK ORDER</button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Track Order Modal */}
+      {trackModal&&(
+        <div onClick={()=>setTrackModal(false)} style={{position:"fixed",inset:0,zIndex:2000,background:"rgba(0,0,0,0.75)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem",animation:"fadeIn 0.3s ease"}}>
+          <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:12,overflow:"hidden",width:"100%",maxWidth:500,border:`2px solid ${T.goldD}`,boxShadow:`0 40px 100px rgba(0,0,0,0.4)`,animation:"scaleIn 0.3s cubic-bezier(0.34,1.56,0.64,1)"}}>
+            <div style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,padding:"1.5rem",textAlign:"center",position:"relative"}}>
+              <button onClick={()=>setTrackModal(false)} style={{position:"absolute",top:12,right:12,background:"rgba(255,255,255,0.2)",border:"none",color:"#fff",width:32,height:32,borderRadius:"50%",cursor:"pointer",fontSize:18,fontWeight:700}}>×</button>
+              <div style={{width:70,height:70,background:"#fff",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32,margin:"0 auto 1rem",boxShadow:"0 8px 24px rgba(0,0,0,0.2)"}}>🚚</div>
+              <h2 style={{fontFamily:"'Cinzel Decorative',serif",color:"#fff",fontSize:"1.6rem",margin:0,textShadow:"0 2px 8px rgba(0,0,0,0.2)"}}>Order Tracking</h2>
+            </div>
+            <div style={{padding:"2rem",textAlign:"center"}}>
+              <div style={{marginBottom:"1.5rem"}}>
+                <div style={{width:60,height:60,background:`rgba(139,105,20,0.1)`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 1rem",border:`2px solid ${T.goldD}`}}>
+                  <span style={{fontSize:28}}>✨</span>
+                </div>
+                <h3 style={{fontFamily:"'Cinzel',serif",color:T.navy,fontSize:"1.2rem",marginBottom:"0.8rem",fontWeight:700}}>Your Order is On The Way!</h3>
+                <p style={{color:"rgba(33,40,66,0.7)",fontSize:"1rem",lineHeight:1.8,marginBottom:"1rem"}}>Your magical products are being carefully prepared and will be delivered to your doorstep soon.</p>
+              </div>
+              <div style={{background:`rgba(139,105,20,0.08)`,border:`1px solid ${T.goldD}33`,borderRadius:8,padding:"1.2rem",marginBottom:"1.5rem"}}>
+                <p style={{fontFamily:"'Cinzel',serif",color:T.goldD,fontSize:"0.75rem",letterSpacing:"0.12em",marginBottom:"0.5rem",fontWeight:600}}>ESTIMATED DELIVERY</p>
+                <p style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"1.8rem",fontWeight:900,margin:0}}>4-5 Days</p>
+              </div>
+              <div style={{display:"flex",justifyContent:"space-around",marginBottom:"1.5rem"}}>
+                {[["📦","Order Placed"],["🔄","Processing"],["🚚","Shipped"],["✅","Delivered"]].map(([ic,txt],i)=>(
+                  <div key={i} style={{textAlign:"center"}}>
+                    <div style={{width:44,height:44,background:i<2?`linear-gradient(135deg,${T.goldD},${T.gold})`:i===2?"rgba(139,105,20,0.2)":"rgba(33,40,66,0.1)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,margin:"0 auto 6px",border:i===2?`2px solid ${T.goldD}`:"none"}}>{ic}</div>
+                    <p style={{color:i<2?T.goldD:"rgba(33,40,66,0.5)",fontSize:"0.7rem",fontFamily:"'Cinzel',serif",letterSpacing:"0.05em",fontWeight:i<2?700:500}}>{txt}</p>
+                  </div>
+                ))}
+              </div>
+              <button onClick={()=>setTrackModal(false)} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:"#fff",padding:"12px 28px",borderRadius:4,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:800,width:"100%"}}>GOT IT</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── MAIN APP ─────────────────────────────────────────────────
 export default function WishstoneApp() {
   const [page,setPage]=useState("home");
@@ -1016,8 +1378,26 @@ export default function WishstoneApp() {
   const [selProd,setSelProd]=useState(null);
   const [cart,setCart]=useState([]);
   const [wishlist,setWishlist]=useState([]);
+  const [user,setUser]=useState(null);
+  const [checkoutCoupon,setCheckoutCoupon]=useState({couponCode:"",discount:0});
   const catRef=useRef(null);
   const storyRef=useRef(null);
+
+  useEffect(()=>{
+    const hash=window.location.hash.slice(1);
+    if(hash==="signup"||hash==="login") setPage(hash);
+    const stored=localStorage.getItem("user");
+    if(stored) setUser(JSON.parse(stored));
+  },[]);
+
+  useEffect(()=>{
+    const handleHash=()=>{
+      const hash=window.location.hash.slice(1);
+      if(hash==="signup"||hash==="login") setPage(hash);
+    };
+    window.addEventListener("hashchange",handleHash);
+    return()=>window.removeEventListener("hashchange",handleHash);
+  },[]);
 
   const addToCart=p=>setCart(prev=>{ const e=prev.find(i=>i.id===p.id); return e?prev.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i):[...prev,{...p,qty:1}]; });
   const updQty=(id,qty)=>qty<1?setCart(prev=>prev.filter(i=>i.id!==id)):setCart(prev=>prev.map(i=>i.id===id?{...i,qty}:i));
@@ -1026,17 +1406,39 @@ export default function WishstoneApp() {
 
   const handleNav=nav=>{
     setSelProd(null); setSelCat(null);
-    setPage(["cart","wishlist","products"].includes(nav)?nav:"home");
+    setPage(["cart","wishlist","products","dashboard"].includes(nav)?nav:"home");
+  };
+
+  const handleSignupSuccess=()=>{
+    // After signup, redirect to login page
+    window.location.hash="login";
+    setPage("login");
+  };
+
+  const handleLogin=(userData)=>{
+    setUser(userData);
+    setPage("home");
+    window.location.hash="";
+  };
+
+  const handleLogout=()=>{
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    setPage("home");
   };
 
   const cartCount=cart.reduce((s,i)=>s+i.qty,0);
 
   const renderPage=()=>{
+    if(page==="signup") return <SignupPage onSignupSuccess={handleSignupSuccess}/>;
+    if(page==="login") return <LoginPage onSuccess={handleLogin}/>;
+    if(page==="dashboard"&&user) return <UserDashboard user={user} onLogout={handleLogout}/>;
     if(page==="product"&&selProd) return <ProductPage product={selProd} onAdd={addToCart} onWish={togWish} wished={wishlist.includes(selProd.id)}/>;
     if(page==="category"&&selCat) return <CategoryPage category={selCat} onAdd={addToCart} onWish={togWish} wished={wishlist} onClick={p=>{setSelProd(p);setPage("product");scrollTop();}}/>;
     if(page==="products") return <AllProductsPage onAdd={addToCart} onWish={togWish} wished={wishlist} onClick={p=>{setSelProd(p);setPage("product");scrollTop();}}/>;
-    if(page==="cart") return <CartPage cart={cart} onQty={updQty} onRemove={rmCart} onCheckout={()=>setPage("checkout")}/>;
-    if(page==="checkout") return <CheckoutPage cart={cart} onPlaceOrder={()=>{setCart([]);setPage("home");scrollTop();}}/>;
+    if(page==="cart") return <CartPage cart={cart} onQty={updQty} onRemove={rmCart} onCheckout={(couponData)=>{setCheckoutCoupon(couponData||{couponCode:"",discount:0});setPage("checkout");}}/>;
+    if(page==="checkout") return <CheckoutPage cart={cart} onPlaceOrder={()=>{setCart([]);setCheckoutCoupon({couponCode:"",discount:0});setPage("home");scrollTop();}} couponCode={checkoutCoupon.couponCode} discount={checkoutCoupon.discount}/>;
     if(page==="wishlist") return <WishlistPage ids={wishlist} onAdd={addToCart} onWish={togWish} onClick={p=>{setSelProd(p);setPage("product");scrollTop();}}/>;
     return <HomePage onCatClick={cat=>{setSelCat(cat);setPage("category");scrollTop();}} onAdd={addToCart} onWish={togWish} wished={wishlist} onProdClick={p=>{setSelProd(p);setPage("product");scrollTop();}} catRef={catRef} storyRef={storyRef}/>;
   };
@@ -1045,7 +1447,7 @@ export default function WishstoneApp() {
     <>
       <style>{CSS}</style>
       <div style={{fontFamily:"'Cormorant Garamond',serif",background:T.navyD,minHeight:"100vh"}}>
-        <Header cartCount={cartCount} wishCount={wishlist.length} onNav={handleNav} currentPage={page} categoryRef={catRef} storyRef={storyRef}/>
+        <Header cartCount={cartCount} wishCount={wishlist.length} onNav={handleNav} currentPage={page} categoryRef={catRef} storyRef={storyRef} user={user} onLogout={handleLogout}/>
         <OfferBanner/>
         <main>{renderPage()}</main>
       </div>

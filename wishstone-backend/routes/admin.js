@@ -88,8 +88,8 @@ router.put("/product/update/:id", upload.fields([{ name: "images", maxCount: 5 }
 
 router.delete("/product/delete/:id", async (req, res) => {
   try {
-    await Product.findByIdAndUpdate(req.params.id, { isActive: false });
-    res.json({ success: true, message: "Product removed." });
+    await Product.findByIdAndDelete(req.params.id); // Permanent delete
+    res.json({ success: true, message: "Product permanently deleted." });
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
@@ -208,62 +208,110 @@ router.delete("/coupon/delete/:id", async (req, res) => {
 // ── CUSTOMERS ────────────────────────────────────────────────
 router.get("/customers", async (req, res) => {
   try {
-    // Get all unique customers from orders (both guest and registered)
-    // Include shippingAddress and paymentMethod so admin can see full delivery info
+    // Get ALL registered users (not just those with orders)
+    const allUsers = await User.find({ role: "user" }).select("-password").sort({ createdAt: -1 });
+    
+    // Get all orders to calculate stats
     const orders = await Order.find()
-      .select("customer user shippingAddress paymentMethod orderNumber orderStatus paymentStatus createdAt totalAmount")
+      .select("customer user shippingAddress paymentMethod orderNumber orderStatus paymentStatus createdAt totalAmount items")
       .sort({ createdAt: -1 });
     
-    // Create a map of unique customers by email
-    const customerMap = new Map();
+    // Create customer list with all registered users
+    const customers = [];
     
-    for (const order of orders) {
-      const email = order.customer.email.toLowerCase();
+    for (const user of allUsers) {
+      // Find all orders for this user
+      const userOrders = orders.filter(order => 
+        order.user?.toString() === user._id.toString() || 
+        order.customer.email.toLowerCase() === user.email.toLowerCase()
+      );
       
-      if (!customerMap.has(email)) {
-        // Check if this is a registered user
-        const registeredUser = order.user ? await User.findById(order.user).select("-password") : null;
-        
-        customerMap.set(email, {
-          _id: registeredUser?._id || order._id,
+      // Calculate stats
+      const orderCount = userOrders.length;
+      const totalSpent = userOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+      
+      // Get latest address from most recent order
+      const latestOrder = userOrders[0];
+      const latestAddress = latestOrder?.shippingAddress || {};
+      
+      // Get recent orders (limit to 10)
+      const recentOrders = userOrders.slice(0, 10).map(order => ({
+        orderNumber: order.orderNumber,
+        totalAmount: order.totalAmount,
+        orderStatus: order.orderStatus,
+        paymentStatus: order.paymentStatus,
+        paymentMethod: order.paymentMethod,
+        shippingAddress: order.shippingAddress || {},
+        createdAt: order.createdAt,
+        items: order.items || []
+      }));
+      
+      customers.push({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone || "",
+        age: user.age,
+        isActive: user.isActive !== false,
+        createdAt: user.createdAt,
+        isGuest: false,
+        orderCount,
+        totalSpent,
+        latestAddress,
+        orders: recentOrders
+      });
+    }
+    
+    // Also include guest customers (those who ordered without registering)
+    const guestEmails = new Set(allUsers.map(u => u.email.toLowerCase()));
+    const guestOrders = orders.filter(order => 
+      !order.user && !guestEmails.has(order.customer.email.toLowerCase())
+    );
+    
+    // Group guest orders by email
+    const guestMap = new Map();
+    for (const order of guestOrders) {
+      const email = order.customer.email.toLowerCase();
+      if (!guestMap.has(email)) {
+        guestMap.set(email, {
+          _id: order._id,
           name: order.customer.name,
           email: order.customer.email,
-          phone: order.customer.phone || registeredUser?.phone || "",
-          age: order.customer.age || registeredUser?.age,
-          isActive: registeredUser?.isActive !== false,
+          phone: order.customer.phone || "",
+          age: order.customer.age,
+          isActive: true,
           createdAt: order.createdAt,
-          isGuest: !registeredUser,
+          isGuest: true,
           orderCount: 0,
           totalSpent: 0,
-          // Store the latest delivery address (from the most recent order)
           latestAddress: order.shippingAddress || {},
           orders: []
         });
       }
       
-      // Update stats
-      const customer = customerMap.get(email);
-      customer.orderCount += 1;
-      customer.totalSpent += order.totalAmount || 0;
+      const guest = guestMap.get(email);
+      guest.orderCount += 1;
+      guest.totalSpent += order.totalAmount || 0;
       
-      // Add recent orders with full delivery details (limit to 10)
-      if (customer.orders.length < 10) {
-        customer.orders.push({
+      if (guest.orders.length < 10) {
+        guest.orders.push({
           orderNumber: order.orderNumber,
           totalAmount: order.totalAmount,
           orderStatus: order.orderStatus,
           paymentStatus: order.paymentStatus,
           paymentMethod: order.paymentMethod,
           shippingAddress: order.shippingAddress || {},
-          createdAt: order.createdAt
+          createdAt: order.createdAt,
+          items: order.items || []
         });
       }
     }
     
-    // Convert map to array and sort by creation date
-    const customers = Array.from(customerMap.values()).sort((a, b) => 
-      new Date(b.createdAt) - new Date(a.createdAt)
-    );
+    // Add guest customers to the list
+    customers.push(...Array.from(guestMap.values()));
+    
+    // Sort by creation date (most recent first)
+    customers.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     
     res.json({ success: true, customers });
   } catch (e) { 
@@ -298,6 +346,27 @@ router.get("/customers/:id", async (req, res) => {
         totalSpent: totalSpent[0]?.total || 0
       }
     });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// Delete user
+router.delete("/users/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: "User not found." });
+    
+    // Permanent delete
+    await User.findByIdAndDelete(req.params.id);
+    
+    res.json({ success: true, message: "User deleted successfully." });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// Clear all users (except admins)
+router.delete("/users-clear-all", async (req, res) => {
+  try {
+    const result = await User.deleteMany({ role: { $ne: "admin" } });
+    res.json({ success: true, message: `${result.deletedCount} users deleted successfully.` });
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 

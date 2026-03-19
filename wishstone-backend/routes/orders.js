@@ -100,8 +100,20 @@ router.post("/create", async (req, res) => {
     
     const totalAmount = Math.max(0, subtotal + shippingCost - discount);
     
-    // Create order - user field is optional for guest checkout
-    const order = await Order.create({ 
+    // Check if user is logged in (from token) and find user by email
+    let userId = null;
+    try {
+      const User = require("../models/User");
+      const user = await User.findOne({ email: customer.email });
+      if (user) {
+        userId = user._id;
+      }
+    } catch (err) {
+      console.log("Could not find user:", err.message);
+    }
+    
+    // Create order - include user field if user is registered
+    const orderData = { 
       customer, 
       shippingAddress, 
       items: orderItems, 
@@ -113,8 +125,15 @@ router.post("/create", async (req, res) => {
       paymentMethod,
       paymentStatus: paymentMethod === "cod" ? "pending" : "paid",
       orderStatus: "pending",
-      statusHistory: [{ status: "pending", note: "Order placed successfully" }] 
-    });
+      statusHistory: [{ status: "pending", note: "Order placed successfully" }]
+    };
+    
+    // Add user reference if user is registered
+    if (userId) {
+      orderData.user = userId;
+    }
+    
+    const order = await Order.create(orderData);
     
     res.status(201).json({ 
       success: true, 
@@ -136,6 +155,16 @@ router.post("/create", async (req, res) => {
 router.get("/my", protect, async (req, res) => {
   try {
     const orders = await Order.find({ "customer.email": req.user.email }).sort({ createdAt: -1 });
+    res.json({ success: true, orders });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// Get my orders (authenticated users)
+router.get("/my-orders", protect, async (req, res) => {
+  try {
+    const orders = await Order.find({ "customer.email": req.user.email })
+      .sort({ createdAt: -1 })
+      .select("orderNumber totalAmount orderStatus paymentStatus items createdAt");
     res.json({ success: true, orders });
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });

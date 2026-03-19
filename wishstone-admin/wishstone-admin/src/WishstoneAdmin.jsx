@@ -223,6 +223,7 @@ const NAV = [
   { id: "products",  icon: "💎", label: "Products" },
   { id: "orders",    icon: "📦", label: "Orders" },
   { id: "customers", icon: "👥", label: "Customers" },
+  { id: "users",     icon: "👤", label: "Manage Users" },
   { id: "coupons",   icon: "🎫", label: "Coupons" },
   { id: "categories",icon: "📂", label: "Categories" },
 ];
@@ -548,7 +549,7 @@ function Orders({ token, showToast }) {
   const load = async () => {
     try {
       const r = await api.get("/admin/orders", token);
-      setOrders(r.data.orders);
+      setOrders(r.data.orders || []);
     } catch { showToast("Failed to load orders", "error"); }
     setLoading(false);
   };
@@ -586,80 +587,134 @@ function Orders({ token, showToast }) {
         ))}
       </div>
 
-      {loading ? <p style={{ color: "#64748b" }}>Loading...</p> : (
-        <div style={{ background: "#13151a", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      {loading ? <p style={{ color: "#64748b" }}>Loading orders...</p> : (
+        <div className="ws-table-wrap" style={{ background: "#13151a", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, overflow: "hidden" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 900 }}>
             <thead>
               <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                {["Order #", "Customer", "Items", "Total", "Payment", "Status", "Date", "Actions"].map(h => (
-                  <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: "#64748b", fontSize: "0.75rem", letterSpacing: "0.1em", fontWeight: 600 }}>{h}</th>
+                {["Order #", "Customer", "Products", "Total", "Payment", "Status", "Date", "Actions"].map(h => (
+                  <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: "#64748b", fontSize: "0.75rem", letterSpacing: "0.1em", fontWeight: 600, whiteSpace: "nowrap" }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filtered.map((o) => (
-                <tr key={o._id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}
+                <tr key={o._id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)", transition: "background 0.15s" }}
                   onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.02)"}
                   onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                  <td style={{ padding: "12px 16px" }}><span style={{ color: "#a78bfa", fontWeight: 600, fontSize: "0.85rem" }}>{o.orderNumber || o._id.slice(-8)}</span></td>
+                  <td style={{ padding: "12px 16px", whiteSpace: "nowrap" }}>
+                    <span style={{ color: "#a78bfa", fontWeight: 700, fontSize: "0.85rem" }}>{o.orderNumber || o._id.slice(-8)}</span>
+                  </td>
                   <td style={{ padding: "12px 16px" }}>
-                    <div style={{ fontSize: "0.85rem", color: "#e2e8f0" }}>{o.customer?.name}</div>
+                    <div style={{ fontSize: "0.88rem", color: "#e2e8f0", fontWeight: 500 }}>{o.customer?.name || "—"}</div>
                     <div style={{ fontSize: "0.72rem", color: "#64748b" }}>{o.customer?.email}</div>
                     <div style={{ fontSize: "0.72rem", color: "#64748b" }}>{o.customer?.phone}</div>
                   </td>
-                  <td style={{ padding: "12px 16px" }}><span style={{ color: "#64748b", fontSize: "0.85rem" }}>{o.items?.length} item(s)</span></td>
-                  <td style={{ padding: "12px 16px" }}><span style={{ color: "#10b981", fontWeight: 600, fontSize: "0.88rem" }}>₹{o.totalAmount?.toLocaleString()}</span></td>
+                  <td style={{ padding: "12px 16px", maxWidth: 200 }}>
+                    {(o.items || []).slice(0, 2).map((item, i) => (
+                      <div key={i} style={{ fontSize: "0.78rem", color: "#94a3b8", marginBottom: 2 }}>
+                        {item.name} <span style={{ color: "#64748b" }}>×{item.quantity}</span>
+                      </div>
+                    ))}
+                    {(o.items || []).length > 2 && (
+                      <div style={{ fontSize: "0.72rem", color: "#7c3aed" }}>+{o.items.length - 2} more</div>
+                    )}
+                  </td>
+                  <td style={{ padding: "12px 16px", whiteSpace: "nowrap" }}>
+                    <span style={{ color: "#10b981", fontWeight: 700, fontSize: "0.95rem" }}>₹{(o.totalAmount || 0).toLocaleString()}</span>
+                  </td>
                   <td style={{ padding: "12px 16px" }}>
-                    <div><Badge color={PAYMENT_COLORS[o.paymentStatus] || "gray"}>{o.paymentStatus}</Badge></div>
-                    <div style={{ fontSize: "0.72rem", color: "#64748b", marginTop: 3, textTransform: "uppercase" }}>{o.paymentMethod}</div>
+                    <Badge color={PAYMENT_COLORS[o.paymentStatus] || "gray"}>{o.paymentStatus}</Badge>
+                    <div style={{ fontSize: "0.68rem", color: "#64748b", marginTop: 3, textTransform: "uppercase" }}>{o.paymentMethod}</div>
                   </td>
                   <td style={{ padding: "12px 16px" }}><Badge color={STATUS_COLORS[o.orderStatus] || "gray"}>{o.orderStatus}</Badge></td>
-                  <td style={{ padding: "12px 16px" }}><span style={{ color: "#64748b", fontSize: "0.78rem" }}>{new Date(o.createdAt).toLocaleDateString()}</span></td>
+                  <td style={{ padding: "12px 16px", whiteSpace: "nowrap" }}>
+                    <span style={{ color: "#64748b", fontSize: "0.78rem" }}>{new Date(o.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</span>
+                  </td>
                   <td style={{ padding: "12px 16px" }}>
-                    <button onClick={() => { setSelected(o); setNewStatus(o.orderStatus); setTrackingNo(o.trackingNumber || ""); }} style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.3)", color: "#a78bfa", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: "0.8rem" }}>
-                      Manage
+                    <button onClick={() => { setSelected(o); setNewStatus(o.orderStatus); setTrackingNo(o.trackingNumber || ""); }}
+                      style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.3)", color: "#a78bfa", borderRadius: 8, padding: "6px 14px", cursor: "pointer", fontSize: "0.8rem", fontWeight: 600, whiteSpace: "nowrap" }}>
+                      View Details
                     </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {filtered.length === 0 && <p style={{ color: "#64748b", padding: "2rem", textAlign: "center" }}>No orders found.</p>}
+          {filtered.length === 0 && (
+            <div style={{ textAlign: "center", padding: "4rem 2rem" }}>
+              <div style={{ fontSize: 48, marginBottom: "1rem" }}>📦</div>
+              <p style={{ color: "#64748b", fontSize: "1rem" }}>No orders found.</p>
+            </div>
+          )}
         </div>
       )}
 
       {/* Order detail modal */}
       {selected && (
-        <Modal title={`Order ${selected.orderNumber || selected._id.slice(-8)}`} onClose={() => setSelected(null)} width={600}>
-          {/* Customer */}
-          <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 12, padding: "1rem", marginBottom: "1rem" }}>
-            <p style={{ color: "#64748b", fontSize: "0.72rem", letterSpacing: "0.1em", marginBottom: 8 }}>CUSTOMER INFO</p>
-            <p style={{ color: "#e2e8f0", fontSize: "0.9rem" }}>{selected.customer?.name} · {selected.customer?.phone}</p>
-            <p style={{ color: "#64748b", fontSize: "0.82rem" }}>{selected.customer?.email}</p>
-          </div>
-          {/* Address */}
-          <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 12, padding: "1rem", marginBottom: "1rem" }}>
-            <p style={{ color: "#64748b", fontSize: "0.72rem", letterSpacing: "0.1em", marginBottom: 8 }}>DELIVERY ADDRESS</p>
-            <p style={{ color: "#e2e8f0", fontSize: "0.85rem", lineHeight: 1.7 }}>
-              {selected.shippingAddress?.flat}, {selected.shippingAddress?.area}<br />
-              {selected.shippingAddress?.landmark && <>{selected.shippingAddress.landmark}<br /></>}
-              {selected.shippingAddress?.city}, {selected.shippingAddress?.state} — {selected.shippingAddress?.country}
-            </p>
-          </div>
-          {/* Items */}
-          <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 12, padding: "1rem", marginBottom: "1rem" }}>
-            <p style={{ color: "#64748b", fontSize: "0.72rem", letterSpacing: "0.1em", marginBottom: 8 }}>ORDER ITEMS</p>
-            {selected.items?.map((item, i) => (
-              <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                <span style={{ color: "#e2e8f0", fontSize: "0.85rem" }}>{item.name} × {item.quantity}</span>
-                <span style={{ color: "#a78bfa", fontSize: "0.85rem" }}>₹{(item.price * item.quantity).toLocaleString()}</span>
+        <Modal title={`📦 Order ${selected.orderNumber || selected._id.slice(-8)}`} onClose={() => setSelected(null)} width={680}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+            {/* Customer Info */}
+            <div style={{ background: "rgba(124,58,237,0.06)", borderRadius: 12, padding: "1rem", border: "1px solid rgba(124,58,237,0.15)" }}>
+              <p style={{ color: "#a78bfa", fontSize: "0.68rem", letterSpacing: "0.12em", fontWeight: 600, marginBottom: 10, textTransform: "uppercase" }}>👤 Customer Info</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <div><span style={{ color: "#64748b", fontSize: "0.72rem" }}>Name: </span><span style={{ color: "#e2e8f0", fontSize: "0.88rem", fontWeight: 500 }}>{selected.customer?.name || "—"}</span></div>
+                <div><span style={{ color: "#64748b", fontSize: "0.72rem" }}>Email: </span><span style={{ color: "#e2e8f0", fontSize: "0.85rem" }}>{selected.customer?.email || "—"}</span></div>
+                <div><span style={{ color: "#64748b", fontSize: "0.72rem" }}>Phone: </span><span style={{ color: "#e2e8f0", fontSize: "0.85rem" }}>{selected.customer?.phone || "—"}</span></div>
+                {selected.customer?.age && <div><span style={{ color: "#64748b", fontSize: "0.72rem" }}>Age: </span><span style={{ color: "#e2e8f0", fontSize: "0.85rem" }}>{selected.customer.age}</span></div>}
+                {selected.user && <div style={{ marginTop: 4 }}><Badge color="blue">Registered User</Badge></div>}
               </div>
-            ))}
-            <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 8, fontWeight: 600 }}>
-              <span style={{ color: "#e2e8f0" }}>Total</span>
-              <span style={{ color: "#10b981" }}>₹{selected.totalAmount?.toLocaleString()}</span>
+            </div>
+            {/* Delivery Address */}
+            <div style={{ background: "rgba(16,185,129,0.05)", borderRadius: 12, padding: "1rem", border: "1px solid rgba(16,185,129,0.15)" }}>
+              <p style={{ color: "#34d399", fontSize: "0.68rem", letterSpacing: "0.12em", fontWeight: 600, marginBottom: 10, textTransform: "uppercase" }}>📍 Delivery Address</p>
+              {selected.shippingAddress ? (
+                <div style={{ color: "#94a3b8", fontSize: "0.85rem", lineHeight: 1.8 }}>
+                  {selected.shippingAddress.flat && <div>{selected.shippingAddress.flat}</div>}
+                  {selected.shippingAddress.area && <div>{selected.shippingAddress.area}</div>}
+                  {selected.shippingAddress.landmark && <div>Near: {selected.shippingAddress.landmark}</div>}
+                  <div>{[selected.shippingAddress.city, selected.shippingAddress.state].filter(Boolean).join(", ")}</div>
+                  {selected.shippingAddress.country && <div>{selected.shippingAddress.country}</div>}
+                </div>
+              ) : <p style={{ color: "#475569", fontSize: "0.82rem" }}>No address available</p>}
             </div>
           </div>
+
+          {/* Order Items */}
+          <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 12, padding: "1rem", marginBottom: "1rem", border: "1px solid rgba(255,255,255,0.06)" }}>
+            <p style={{ color: "#64748b", fontSize: "0.68rem", letterSpacing: "0.12em", fontWeight: 600, marginBottom: 10, textTransform: "uppercase" }}>🛍️ Order Items ({selected.items?.length || 0})</p>
+            {(selected.items || []).map((item, i) => (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: i < (selected.items.length - 1) ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(124,58,237,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, flexShrink: 0 }}>💎</div>
+                  <div>
+                    <div style={{ color: "#e2e8f0", fontSize: "0.88rem", fontWeight: 500 }}>{item.name || "Product"}</div>
+                    <div style={{ color: "#64748b", fontSize: "0.72rem" }}>Qty: {item.quantity} × ₹{(item.price || 0).toLocaleString()}</div>
+                  </div>
+                </div>
+                <span style={{ color: "#a78bfa", fontWeight: 700, fontSize: "0.9rem" }}>₹{((item.price || 0) * (item.quantity || 0)).toLocaleString()}</span>
+              </div>
+            ))}
+            <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 10, marginTop: 4, borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+              <span style={{ color: "#94a3b8", fontSize: "0.88rem" }}>Order Total</span>
+              <span style={{ color: "#10b981", fontWeight: 800, fontSize: "1rem" }}>₹{(selected.totalAmount || 0).toLocaleString()}</span>
+            </div>
+          </div>
+
+          {/* Payment + Date row */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+            <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: "0.8rem", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <p style={{ color: "#64748b", fontSize: "0.68rem", letterSpacing: "0.1em", marginBottom: 6 }}>PAYMENT METHOD</p>
+              <p style={{ color: "#e2e8f0", fontSize: "0.9rem", fontWeight: 600, textTransform: "uppercase", marginBottom: 4 }}>{selected.paymentMethod || "—"}</p>
+              <Badge color={PAYMENT_COLORS[selected.paymentStatus] || "gray"}>{selected.paymentStatus}</Badge>
+            </div>
+            <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: "0.8rem", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <p style={{ color: "#64748b", fontSize: "0.68rem", letterSpacing: "0.1em", marginBottom: 6 }}>ORDER DATE</p>
+              <p style={{ color: "#e2e8f0", fontSize: "0.9rem", fontWeight: 500 }}>{new Date(selected.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" })}</p>
+              <p style={{ color: "#64748b", fontSize: "0.75rem" }}>{new Date(selected.createdAt).toLocaleTimeString("en-IN")}</p>
+            </div>
+          </div>
+
           {/* Update status */}
           <div style={{ marginBottom: "1rem" }}>
             <label style={labelSx}>Update Order Status</label>
@@ -673,8 +728,8 @@ function Orders({ token, showToast }) {
               onFocus={e => e.target.style.borderColor = "#7c3aed"} onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.1)"} />
           </div>
           <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
-            <button onClick={() => setSelected(null)} style={btnGhost}>Cancel</button>
-            <button onClick={updateStatus} style={btnPrimary}>Update Order</button>
+            <button onClick={() => setSelected(null)} style={btnGhost}>Close</button>
+            <button onClick={updateStatus} style={btnPrimary}>Update Status</button>
           </div>
         </Modal>
       )}
@@ -1108,6 +1163,221 @@ function Categories({ token, showToast }) {
   );
 }
 
+// ─── MANAGE USERS ─────────────────────────────────────────────
+function ManageUsers({ token, showToast }) {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [confirm, setConfirm] = useState(null);
+  const [clearAllConfirm, setClearAllConfirm] = useState(false);
+
+  const load = async () => {
+    try {
+      const r = await api.get("/admin/customers", token);
+      setUsers(r.data.customers || []);
+    } catch (err) {
+      showToast("Failed to load users", "error");
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/admin/users/${id}`, token);
+      showToast("User deleted successfully", "success");
+      setConfirm(null);
+      load();
+    } catch (err) {
+      showToast(err.response?.data?.message || "Failed to delete user", "error");
+    }
+  };
+
+  const handleClearAll = async () => {
+    try {
+      const r = await api.delete("/admin/users-clear-all", token);
+      showToast(r.data.message || "All users cleared successfully", "success");
+      setClearAllConfirm(false);
+      load();
+    } catch (err) {
+      showToast(err.response?.data?.message || "Failed to clear users", "error");
+    }
+  };
+
+  const filtered = users.filter(u => 
+    u.name?.toLowerCase().includes(search.toLowerCase()) || 
+    u.email?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div style={{ animation: "fadeIn 0.4s ease" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+        <div>
+          <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: "1.6rem", fontWeight: 800, color: "#fff" }}>Manage Users</h1>
+          <p style={{ color: "#64748b", fontSize: "0.85rem", marginTop: 4 }}>{users.length} registered users</p>
+        </div>
+        <button onClick={() => setClearAllConfirm(true)} style={{ ...btnPrimary, background: "linear-gradient(135deg, #ef4444, #f87171)" }}>🗑 Clear All Users</button>
+      </div>
+
+      {/* Search */}
+      <div style={{ marginBottom: "1.5rem" }}>
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍  Search users by name or email..." style={{ ...inputSx, maxWidth: 400 }}
+          onFocus={e => e.target.style.borderColor = "#7c3aed"} onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.1)"} />
+      </div>
+
+      {loading ? <p style={{ color: "#64748b" }}>Loading users...</p> : (
+        <div style={{ background: "#13151a", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, overflow: "hidden" }}>
+          <div className="ws-table-wrap">
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                  {["User", "Email", "Phone", "Orders", "Total Spent", "Status", "Joined", "Actions"].map(h => (
+                    <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: "#64748b", fontSize: "0.75rem", letterSpacing: "0.1em", fontWeight: 600 }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((u) => (
+                  <tr key={u._id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)", transition: "background 0.15s" }}
+                    onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.02)"}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                    <td style={{ padding: "12px 16px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg, #7c3aed, #ec4899)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
+                          {u.name?.[0]?.toUpperCase() || "U"}
+                        </div>
+                        <div>
+                          <div style={{ fontSize: "0.88rem", color: "#e2e8f0", fontWeight: 500 }}>{u.name}</div>
+                          {u.isGuest && <Badge color="gray">Guest</Badge>}
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ padding: "12px 16px" }}><span style={{ color: "#64748b", fontSize: "0.85rem" }}>{u.email}</span></td>
+                    <td style={{ padding: "12px 16px" }}><span style={{ color: "#64748b", fontSize: "0.85rem" }}>{u.phone || "—"}</span></td>
+                    <td style={{ padding: "12px 16px" }}><Badge color="blue">{u.orderCount || 0}</Badge></td>
+                    <td style={{ padding: "12px 16px" }}>
+                      <div style={{ fontSize: "0.88rem", color: "#a78bfa", fontWeight: 600 }}>₹{(u.totalSpent || 0).toLocaleString()}</div>
+                    </td>
+                    <td style={{ padding: "12px 16px" }}><Badge color={u.isActive ? "green" : "red"}>{u.isActive ? "Active" : "Inactive"}</Badge></td>
+                    <td style={{ padding: "12px 16px" }}><span style={{ color: "#64748b", fontSize: "0.82rem" }}>{new Date(u.createdAt).toLocaleDateString()}</span></td>
+                    <td style={{ padding: "12px 16px" }}>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button onClick={() => setSelectedUser(u)} style={{ background: "rgba(59,130,246,0.15)", border: "1px solid rgba(59,130,246,0.3)", color: "#60a5fa", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: "0.8rem" }}>View</button>
+                        {!u.isGuest && (
+                          <button onClick={() => setConfirm(u._id)} style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", color: "#f87171", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: "0.8rem" }}>Delete</button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {filtered.length === 0 && <p style={{ color: "#64748b", padding: "2rem", textAlign: "center" }}>No users found.</p>}
+        </div>
+      )}
+
+      {/* User Details Modal */}
+      {selectedUser && (
+        <Modal title="User Details" onClose={() => setSelectedUser(null)} width={700}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+            <div>
+              <label style={labelSx}>Full Name</label>
+              <div style={{ color: "#e2e8f0", fontSize: "0.95rem", padding: "10px 0" }}>{selectedUser.name}</div>
+            </div>
+            <div>
+              <label style={labelSx}>Email</label>
+              <div style={{ color: "#e2e8f0", fontSize: "0.95rem", padding: "10px 0" }}>{selectedUser.email}</div>
+            </div>
+            <div>
+              <label style={labelSx}>Phone</label>
+              <div style={{ color: "#e2e8f0", fontSize: "0.95rem", padding: "10px 0" }}>{selectedUser.phone || "—"}</div>
+            </div>
+            <div>
+              <label style={labelSx}>Age</label>
+              <div style={{ color: "#e2e8f0", fontSize: "0.95rem", padding: "10px 0" }}>{selectedUser.age || "—"}</div>
+            </div>
+            <div>
+              <label style={labelSx}>Total Orders</label>
+              <div style={{ color: "#a78bfa", fontSize: "1.1rem", fontWeight: 700, padding: "10px 0" }}>{selectedUser.orderCount || 0}</div>
+            </div>
+            <div>
+              <label style={labelSx}>Total Spent</label>
+              <div style={{ color: "#10b981", fontSize: "1.1rem", fontWeight: 700, padding: "10px 0" }}>₹{(selectedUser.totalSpent || 0).toLocaleString()}</div>
+            </div>
+            <div style={{ gridColumn: "1/-1" }}>
+              <label style={labelSx}>Latest Delivery Address</label>
+              {selectedUser.latestAddress && Object.keys(selectedUser.latestAddress).length > 0 ? (
+                <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "12px", color: "#94a3b8", fontSize: "0.88rem", lineHeight: 1.6 }}>
+                  {selectedUser.latestAddress.flat && <div>{selectedUser.latestAddress.flat}</div>}
+                  {selectedUser.latestAddress.area && <div>{selectedUser.latestAddress.area}</div>}
+                  {selectedUser.latestAddress.landmark && <div>Landmark: {selectedUser.latestAddress.landmark}</div>}
+                  <div>{selectedUser.latestAddress.city}, {selectedUser.latestAddress.state} - {selectedUser.latestAddress.pincode}</div>
+                  <div>{selectedUser.latestAddress.country}</div>
+                </div>
+              ) : (
+                <div style={{ color: "#64748b", fontSize: "0.88rem", padding: "10px 0" }}>No address available</div>
+              )}
+            </div>
+            <div style={{ gridColumn: "1/-1" }}>
+              <label style={labelSx}>Recent Orders</label>
+              {selectedUser.orders && selectedUser.orders.length > 0 ? (
+                <div style={{ maxHeight: 200, overflowY: "auto" }}>
+                  {selectedUser.orders.map((order, i) => (
+                    <div key={i} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8, padding: "10px 12px", marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div>
+                        <div style={{ color: "#e2e8f0", fontSize: "0.85rem", fontWeight: 500 }}>#{order.orderNumber}</div>
+                        <div style={{ color: "#64748b", fontSize: "0.75rem" }}>{new Date(order.createdAt).toLocaleDateString()}</div>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <div style={{ color: "#a78bfa", fontSize: "0.88rem", fontWeight: 600 }}>₹{order.totalAmount?.toLocaleString()}</div>
+                        <Badge color={order.orderStatus === "delivered" ? "green" : order.orderStatus === "cancelled" ? "red" : "yellow"}>{order.orderStatus}</Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ color: "#64748b", fontSize: "0.88rem", padding: "10px 0" }}>No orders yet</div>
+              )}
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Delete Confirmation */}
+      {confirm && (
+        <Modal title="Confirm Delete" onClose={() => setConfirm(null)} width={420}>
+          <p style={{ color: "#e2e8f0", fontSize: "0.95rem", marginBottom: "1.5rem" }}>
+            Are you sure you want to delete this user? This action cannot be undone.
+          </p>
+          <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+            <button onClick={() => setConfirm(null)} style={btnGhost}>Cancel</button>
+            <button onClick={() => handleDelete(confirm)} style={{ ...btnPrimary, background: "linear-gradient(135deg, #ef4444, #f87171)" }}>Delete User</button>
+          </div>
+        </Modal>
+      )}
+
+      {/* Clear All Confirmation */}
+      {clearAllConfirm && (
+        <Modal title="⚠️ Clear All Users" onClose={() => setClearAllConfirm(false)} width={480}>
+          <p style={{ color: "#e2e8f0", fontSize: "1rem", marginBottom: "1rem", fontWeight: 500 }}>
+            Are you absolutely sure you want to delete ALL users?
+          </p>
+          <p style={{ color: "#f87171", fontSize: "0.9rem", marginBottom: "1.5rem", background: "rgba(239,68,68,0.1)", padding: "12px", borderRadius: 8, border: "1px solid rgba(239,68,68,0.3)" }}>
+            ⚠️ This will permanently delete {users.length} users from the database. This action cannot be undone!
+          </p>
+          <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+            <button onClick={() => setClearAllConfirm(false)} style={btnGhost}>Cancel</button>
+            <button onClick={handleClearAll} style={{ ...btnPrimary, background: "linear-gradient(135deg, #ef4444, #f87171)" }}>Yes, Delete All Users</button>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
 // ─── MAIN APP ─────────────────────────────────────────────────
 export default function AdminApp() {
   const [token, setToken] = useState(() => localStorage.getItem("ws_admin_token") || "");
@@ -1136,7 +1406,7 @@ export default function AdminApp() {
     </>
   );
 
-  const pages = { dashboard: Dashboard, products: Products, orders: Orders, customers: Customers, coupons: Coupons, categories: Categories };
+  const pages = { dashboard: Dashboard, products: Products, orders: Orders, customers: Customers, users: ManageUsers, coupons: Coupons, categories: Categories };
   const PageComponent = pages[page] || Dashboard;
 
   return (
