@@ -977,7 +977,9 @@ function ProductPage({ product, onAdd, onWish, wished }) {
 // ─── CART ─────────────────────────────────────────────────────
 function CartPage({ cart, onQty, onRemove, onCheckout }) {
   const [coupon,setCoupon]=useState(""); const [disc,setDisc]=useState(0); const [msg,setMsg]=useState(""); const [applying,setApplying]=useState(false); const [appliedCode,setAppliedCode]=useState("");
-  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0); const ship=sub>=999?0:99; const total=Math.max(0,sub+ship-disc);
+  const [isGift,setIsGift]=useState(false); const [giftMsg,setGiftMsg]=useState("");
+  const GIFT_FEE=50;
+  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0); const ship=sub>=999?0:99; const total=Math.max(0,sub+ship-disc+(isGift?GIFT_FEE:0));
   const iSx={width:"100%",background:`rgba(201,169,110,0.07)`,border:`1px solid ${T.goldD}44`,borderRadius:2,color:T.navy,padding:"10px 12px",fontSize:"0.95rem",outline:"none",boxSizing:"border-box"};
   const lSx={color:"rgba(33,40,66,0.5)",fontSize:"0.63rem",letterSpacing:"0.15em",fontFamily:"'Cinzel',serif",display:"block",marginBottom:5,textTransform:"uppercase"};
 
@@ -1051,17 +1053,59 @@ function CartPage({ cart, onQty, onRemove, onCheckout }) {
                 }
               </div>
               {msg&&<p style={{color:disc>0?"#2d7a5a":"#c0392b",fontSize:"0.78rem",marginBottom:10}}>{msg}</p>}
-              {[["Subtotal",`₹${sub.toLocaleString()}`],["Shipping",ship===0?"FREE":`₹${ship}`],...(disc>0?[["Discount",`-₹${disc}`]]:[])].map(([l,v])=>(
+
+              {/* ── Gift Option ── */}
+              <div style={{border:`1px solid ${T.goldD}33`,borderRadius:6,padding:"1rem",marginBottom:"1rem",background:`rgba(201,169,110,0.05)`,transition:"all 0.3s"}}>
+                <label style={{display:"flex",alignItems:"center",gap:"0.7rem",cursor:"pointer",userSelect:"none"}}>
+                  <div
+                    onClick={()=>setIsGift(p=>!p)}
+                    style={{width:20,height:20,borderRadius:4,border:`2px solid ${isGift?T.goldD:`${T.goldD}66`}`,background:isGift?`linear-gradient(135deg,${T.goldD},${T.gold})`:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.25s",boxShadow:isGift?`0 2px 8px ${T.gold}55`:"none",cursor:"pointer"}}
+                  >
+                    {isGift&&<span style={{color:T.navy,fontSize:12,fontWeight:900,lineHeight:1}}>✓</span>}
+                  </div>
+                  <div onClick={()=>setIsGift(p=>!p)} style={{flex:1}}>
+                    <div style={{display:"flex",alignItems:"center",gap:6}}>
+                      <span style={{fontSize:16}}>🎁</span>
+                      <span style={{fontFamily:"'Cinzel',serif",color:T.navy,fontSize:"0.78rem",letterSpacing:"0.08em",fontWeight:700}}>GIFT WRAPPING</span>
+                      <span style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,color:T.navy,fontSize:"0.6rem",fontFamily:"'Cinzel',serif",fontWeight:800,padding:"2px 7px",borderRadius:10,letterSpacing:"0.06em"}}>+₹50</span>
+                    </div>
+                    <p style={{color:"rgba(33,40,66,0.5)",fontSize:"0.7rem",margin:"3px 0 0",fontStyle:"italic"}}>Premium gift box with ribbon & personal message</p>
+                  </div>
+                </label>
+
+                {/* Gift message input — slides in */}
+                {isGift&&(
+                  <div style={{marginTop:"0.9rem",animation:"fadeIn 0.25s ease"}}>
+                    <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}>
+                      <span style={{fontSize:12}}>✍️</span>
+                      <span style={{color:T.goldD,fontSize:"0.65rem",fontFamily:"'Cinzel',serif",letterSpacing:"0.12em",fontWeight:700}}>YOUR GIFT MESSAGE</span>
+                    </div>
+                    <textarea
+                      value={giftMsg}
+                      onChange={e=>setGiftMsg(e.target.value)}
+                      maxLength={120}
+                      rows={3}
+                      placeholder="Write a heartfelt message for your gift recipient... ✨"
+                      style={{width:"100%",background:"#fff",border:`1.5px solid ${T.goldD}55`,borderRadius:4,color:T.navy,padding:"10px 12px",fontSize:"0.85rem",outline:"none",boxSizing:"border-box",resize:"none",fontFamily:"inherit",lineHeight:1.6,transition:"border-color 0.2s"}}
+                      onFocus={e=>e.target.style.borderColor=T.goldD}
+                      onBlur={e=>e.target.style.borderColor=`${T.goldD}55`}
+                    />
+                    <p style={{color:"rgba(33,40,66,0.35)",fontSize:"0.65rem",textAlign:"right",margin:"3px 0 0"}}>{giftMsg.length}/120</p>
+                  </div>
+                )}
+              </div>
+
+              {[["Subtotal",`₹${sub.toLocaleString()}`],["Shipping",ship===0?"FREE":`₹${ship}`],...(isGift?[["Gift Wrapping","₹50"]]:[]),...(disc>0?[["Discount",`-₹${disc}`]]:[])].map(([l,v])=>(
                 <div key={l} style={{display:"flex",justifyContent:"space-between",marginBottom:9}}>
                   <span style={{color:"rgba(33,40,66,0.6)",fontSize:"0.95rem"}}>{l}</span>
-                  <span style={{color:l==="Discount"?"#2d7a5a":T.navy,fontFamily:"'Cinzel',serif",fontSize:"0.82rem"}}>{v}</span>
+                  <span style={{color:l==="Discount"?"#2d7a5a":l==="Gift Wrapping"?T.goldD:T.navy,fontFamily:"'Cinzel',serif",fontSize:"0.82rem"}}>{v}</span>
                 </div>
               ))}
               <div style={{borderTop:`1px solid ${T.goldD}22`,paddingTop:"0.9rem",marginTop:"0.4rem",display:"flex",justifyContent:"space-between",marginBottom:"1.2rem"}}>
                 <span style={{color:T.navy,fontFamily:"'Cinzel',serif",fontSize:"0.95rem"}}>Total</span>
                 <span style={{color:T.goldD,fontFamily:"'Cinzel',serif",fontSize:"1.2rem",fontWeight:700}}>₹{total.toLocaleString()}</span>
               </div>
-              <button onClick={()=>onCheckout({couponCode:appliedCode,discount:disc})} style={{width:"100%",background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"14px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.16em",cursor:"pointer",fontWeight:800,boxShadow:`0 6px 24px ${T.gold}44`}}>PROCEED TO CHECKOUT</button>
+              <button onClick={()=>onCheckout({couponCode:appliedCode,discount:disc,isGift,giftMessage:giftMsg})} style={{width:"100%",background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"14px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.16em",cursor:"pointer",fontWeight:800,boxShadow:`0 6px 24px ${T.gold}44`}}>PROCEED TO CHECKOUT</button>
             </div>
           </div>
         </div>
@@ -1071,7 +1115,7 @@ function CartPage({ cart, onQty, onRemove, onCheckout }) {
 }
 
 // ─── CHECKOUT ─────────────────────────────────────────────────
-function CheckoutPage({ cart, onPlaceOrder, couponCode="", discount=0 }) {
+function CheckoutPage({ cart, onPlaceOrder, couponCode="", discount=0, isGift=false, giftMessage="" }) {
   const [form,setForm]=useState(()=>{
     // Pre-fill from logged-in user if available
     try{
@@ -1085,7 +1129,7 @@ function CheckoutPage({ cart, onPlaceOrder, couponCode="", discount=0 }) {
   const [error,setError]=useState("");
   const sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
   const ship=sub>=999?0:99;
-  const total=Math.max(0,sub+ship-discount);
+  const total=Math.max(0,sub+ship-discount+(isGift?50:0));
   const iSx={width:"100%",background:`rgba(201,169,110,0.06)`,border:`1px solid ${T.goldD}33`,borderRadius:2,color:T.navy,padding:"10px 12px",fontSize:"0.95rem",outline:"none",boxSizing:"border-box"};
   const lSx={color:"rgba(33,40,66,0.5)",fontSize:"0.63rem",letterSpacing:"0.15em",fontFamily:"'Cinzel',serif",display:"block",marginBottom:5,textTransform:"uppercase"};
 
@@ -1103,6 +1147,7 @@ function CheckoutPage({ cart, onPlaceOrder, couponCode="", discount=0 }) {
         items:cart.map(i=>({productId:String(i.id),name:i.name,price:i.price,quantity:i.qty,image:i.image||""})),
         paymentMethod:form.payment,
         couponCode:couponCode||undefined,
+        gift:isGift?{enabled:true,message:giftMessage||""}:undefined,
       };
       const res=await fetch("http://localhost:5000/api/orders/create",{
         method:"POST",
@@ -1166,12 +1211,21 @@ function CheckoutPage({ cart, onPlaceOrder, couponCode="", discount=0 }) {
               </div>
             ))}
             <div style={{borderTop:`1px solid ${T.goldD}22`,paddingTop:"0.9rem",marginTop:"0.4rem"}}>
-              {[["Subtotal",`₹${sub.toLocaleString()}`],["Shipping",ship===0?"FREE":`₹${ship}`],...(discount>0?[["Coupon ("+couponCode+")",`-₹${discount.toLocaleString()}`]]:[])].map(([l,v])=>(
+              {[["Subtotal",`₹${sub.toLocaleString()}`],["Shipping",ship===0?"FREE":`₹${ship}`],...(isGift?[["Gift Wrapping","₹50"]]:[]),...(discount>0?[["Coupon ("+couponCode+")",`-₹${discount.toLocaleString()}`]]:[])].map(([l,v])=>(
                 <div key={l} style={{display:"flex",justifyContent:"space-between",marginBottom:7}}>
                   <span style={{color:"rgba(33,40,66,0.55)",fontSize:"0.85rem"}}>{l}</span>
-                  <span style={{color:l.startsWith("Coupon")?"#2d7a5a":T.navy,fontFamily:"'Cinzel',serif",fontSize:"0.8rem",fontWeight:l.startsWith("Coupon")?700:400}}>{v}</span>
+                  <span style={{color:l.startsWith("Coupon")?"#2d7a5a":l==="Gift Wrapping"?T.goldD:T.navy,fontFamily:"'Cinzel',serif",fontSize:"0.8rem",fontWeight:l.startsWith("Coupon")||l==="Gift Wrapping"?700:400}}>{v}</span>
                 </div>
               ))}
+              {isGift&&giftMessage&&(
+                <div style={{background:`rgba(201,169,110,0.08)`,border:`1px solid ${T.goldD}33`,borderRadius:4,padding:"8px 10px",marginBottom:8,display:"flex",gap:6,alignItems:"flex-start"}}>
+                  <span style={{fontSize:14,flexShrink:0}}>�</span>
+                  <div>
+                    <p style={{color:T.goldD,fontSize:"0.65rem",fontFamily:"'Cinzel',serif",letterSpacing:"0.1em",margin:"0 0 3px",fontWeight:700}}>GIFT MESSAGE</p>
+                    <p style={{color:"rgba(33,40,66,0.7)",fontSize:"0.78rem",margin:0,fontStyle:"italic",lineHeight:1.5}}>"{giftMessage}"</p>
+                  </div>
+                </div>
+              )}
               {couponCode&&<div style={{background:"rgba(45,122,90,0.08)",border:"1px solid rgba(45,122,90,0.2)",borderRadius:4,padding:"6px 10px",marginBottom:8,display:"flex",alignItems:"center",gap:6}}>
                 <span style={{fontSize:14}}>🎫</span>
                 <span style={{color:"#2d7a5a",fontSize:"0.78rem",fontWeight:600}}>{couponCode} applied</span>
@@ -1578,7 +1632,7 @@ export default function WishstoneApp() {
   const [cart,setCart]=useState([]);
   const [wishlist,setWishlist]=useState([]);
   const [user,setUser]=useState(null);
-  const [checkoutCoupon,setCheckoutCoupon]=useState({couponCode:"",discount:0});
+  const [checkoutCoupon,setCheckoutCoupon]=useState({couponCode:"",discount:0,isGift:false,giftMessage:""});
   const catRef=useRef(null);
   const storyRef=useRef(null);
 
@@ -1668,8 +1722,8 @@ export default function WishstoneApp() {
     if(page==="product"&&selProd) return <ProductPage product={selProd} onAdd={addToCart} onWish={togWish} wished={wishlist.includes(selProd.id)}/>;
     if(page==="category"&&selCat) return <CategoryPage category={selCat} onAdd={addToCart} onWish={togWish} wished={wishlist} onClick={p=>{setSelProd(p);setPage("product");scrollTop();}} cart={cart} onQty={updQty}/>;
     if(page==="products") return <AllProductsPage onAdd={addToCart} onWish={togWish} wished={wishlist} onClick={p=>{setSelProd(p);setPage("product");scrollTop();}} cart={cart} onQty={updQty}/>;
-    if(page==="cart") return <CartPage cart={cart} onQty={updQty} onRemove={rmCart} onCheckout={(couponData)=>{setCheckoutCoupon(couponData||{couponCode:"",discount:0});setPage("checkout");}}/>;
-    if(page==="checkout") return <CheckoutPage cart={cart} onPlaceOrder={()=>{setCart([]);setCheckoutCoupon({couponCode:"",discount:0});setPage("home");scrollTop();}} couponCode={checkoutCoupon.couponCode} discount={checkoutCoupon.discount}/>;
+    if(page==="cart") return <CartPage cart={cart} onQty={updQty} onRemove={rmCart} onCheckout={(couponData)=>{setCheckoutCoupon(couponData||{couponCode:"",discount:0,isGift:false,giftMessage:""});setPage("checkout");}}/>;
+    if(page==="checkout") return <CheckoutPage cart={cart} onPlaceOrder={()=>{setCart([]);setCheckoutCoupon({couponCode:"",discount:0,isGift:false,giftMessage:""});setPage("home");scrollTop();}} couponCode={checkoutCoupon.couponCode} discount={checkoutCoupon.discount} isGift={checkoutCoupon.isGift} giftMessage={checkoutCoupon.giftMessage}/>;
     if(page==="wishlist") return <WishlistPage ids={wishlist} onAdd={addToCart} onWish={togWish} onClick={p=>{setSelProd(p);setPage("product");scrollTop();}} cart={cart} onQty={updQty}/>;
     return <HomePage onCatClick={cat=>{setSelCat(cat);setPage("category");scrollTop();}} onAdd={addToCart} onWish={togWish} wished={wishlist} onProdClick={p=>{setSelProd(p);setPage("product");scrollTop();}} catRef={catRef} storyRef={storyRef} cart={cart} onQty={updQty}/>;
   };
