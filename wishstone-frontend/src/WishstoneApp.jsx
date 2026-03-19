@@ -1335,21 +1335,24 @@ function LoginPage({ onSuccess }) {
 function UserDashboard({ user, onLogout }) {
   const [activeTab,setActiveTab]=useState("profile");
   const [orders,setOrders]=useState([]);
+  const [ordersLoaded,setOrdersLoaded]=useState(false);
   const [profile,setProfile]=useState({name:user.name,email:user.email,phone:user.phone||"",age:user.age||""});
   const [loading,setLoading]=useState(false);
   const [msg,setMsg]=useState("");
   const [trackModal,setTrackModal]=useState(false);
+  const [noOrderModal,setNoOrderModal]=useState(false);
+
+  const fetchOrders=async()=>{
+    try{
+      const token=localStorage.getItem("token");
+      const res=await fetch("http://localhost:5000/api/orders/my-orders",{headers:{"Authorization":`Bearer ${token}`}});
+      const data=await res.json();
+      if(data.success){ setOrders(data.orders||[]); setOrdersLoaded(true); }
+    }catch(err){console.error(err); setOrdersLoaded(true);}
+  };
 
   useEffect(()=>{
-    const fetchOrders=async()=>{
-      try{
-        const token=localStorage.getItem("token");
-        const res=await fetch("http://localhost:5000/api/orders/my-orders",{headers:{"Authorization":`Bearer ${token}`}});
-        const data=await res.json();
-        if(data.success) setOrders(data.orders||[]);
-      }catch(err){console.error(err);}
-    };
-    if(activeTab==="orders") fetchOrders();
+    if(activeTab==="orders"||activeTab==="track") fetchOrders();
   },[activeTab]);
 
   const updateProfile=async()=>{
@@ -1467,7 +1470,12 @@ function UserDashboard({ user, onLogout }) {
                 <div style={{width:120,height:120,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:56,margin:"0 auto 1.5rem",boxShadow:`0 0 50px ${T.gold}66`,animation:"pulse 2s ease-in-out infinite"}}>📦</div>
                 <h2 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"1.8rem",marginBottom:"1rem",fontWeight:900}}>Track Your Order</h2>
                 <p style={{color:"rgba(33,40,66,0.6)",fontSize:"1.05rem",marginBottom:"2.5rem",lineHeight:1.8}}>Click below to view delivery status and estimated arrival time</p>
-                <button onClick={()=>setTrackModal(true)} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:"#fff",padding:"16px 40px",borderRadius:8,fontFamily:"'Cinzel',serif",fontSize:"0.9rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:800,boxShadow:`0 8px 28px ${T.gold}66`,transition:"all 0.3s"}} onMouseEnter={e=>e.target.style.transform="translateY(-2px)"} onMouseLeave={e=>e.target.style.transform="translateY(0)"}>🚚 TRACK ORDER</button>
+                <button
+                  onClick={()=>{ if(ordersLoaded && orders.length===0){ setNoOrderModal(true); } else { setTrackModal(true); } }}
+                  style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:"#fff",padding:"16px 40px",borderRadius:8,fontFamily:"'Cinzel',serif",fontSize:"0.9rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:800,boxShadow:`0 8px 28px ${T.gold}66`,transition:"all 0.3s"}}
+                  onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"}
+                  onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}
+                >🚚 TRACK ORDER</button>
               </div>
             )}
           </div>
@@ -1504,6 +1512,49 @@ function UserDashboard({ user, onLogout }) {
                 ))}
               </div>
               <button onClick={()=>setTrackModal(false)} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:"#fff",padding:"12px 28px",borderRadius:4,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:800,width:"100%"}}>GOT IT</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── No Orders Modal ── */}
+      {noOrderModal&&(
+        <div onClick={()=>setNoOrderModal(false)} style={{position:"fixed",inset:0,zIndex:2000,background:"rgba(0,0,0,0.75)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem",animation:"fadeIn 0.3s ease"}}>
+          <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:16,overflow:"hidden",width:"100%",maxWidth:440,border:`2px solid ${T.goldD}`,boxShadow:`0 40px 100px rgba(0,0,0,0.35)`,animation:"scaleIn 0.3s cubic-bezier(0.34,1.56,0.64,1)"}}>
+            {/* Header */}
+            <div style={{background:`linear-gradient(135deg,${T.navy},${T.navyL})`,padding:"1.5rem",textAlign:"center",position:"relative"}}>
+              <button onClick={()=>setNoOrderModal(false)} style={{position:"absolute",top:12,right:12,background:"rgba(255,255,255,0.12)",border:"none",color:"#fff",width:32,height:32,borderRadius:"50%",cursor:"pointer",fontSize:18,fontWeight:700,lineHeight:1}}>×</button>
+              <div style={{width:72,height:72,background:"rgba(255,255,255,0.1)",border:`2px solid ${T.gold}66`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:34,margin:"0 auto 1rem"}}>🛍️</div>
+              <h2 style={{fontFamily:"'Cinzel Decorative',serif",color:T.cream,fontSize:"1.3rem",margin:0,letterSpacing:"0.04em"}}>No Orders Yet</h2>
+            </div>
+            {/* Body */}
+            <div style={{padding:"2rem",textAlign:"center"}}>
+              <div style={{width:56,height:56,background:`rgba(201,169,110,0.1)`,border:`2px dashed ${T.goldD}`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 1.2rem",fontSize:26}}>📦</div>
+              <h3 style={{fontFamily:"'Cinzel',serif",color:T.navy,fontSize:"1.1rem",marginBottom:"0.7rem",fontWeight:800}}>Nothing to Track</h3>
+              <p style={{color:"rgba(33,40,66,0.6)",fontSize:"0.95rem",lineHeight:1.8,marginBottom:"1.8rem"}}>
+                You haven't placed any orders yet.<br/>
+                Explore our collection and place your first order to track it here.
+              </p>
+              {/* Decorative divider */}
+              <div style={{display:"flex",alignItems:"center",gap:8,margin:"0 auto 1.8rem",width:"fit-content"}}>
+                <div style={{width:40,height:1,background:`linear-gradient(to right,transparent,${T.goldD})`}}/>
+                <span style={{color:T.gold,fontSize:"0.8rem"}}>✦</span>
+                <div style={{width:40,height:1,background:`linear-gradient(to left,transparent,${T.goldD})`}}/>
+              </div>
+              <div style={{display:"flex",gap:"0.8rem",justifyContent:"center",flexWrap:"wrap"}}>
+                <button
+                  onClick={()=>setNoOrderModal(false)}
+                  style={{background:"transparent",border:`2px solid ${T.goldD}`,color:T.goldD,padding:"11px 24px",borderRadius:6,fontFamily:"'Cinzel',serif",fontSize:"0.72rem",letterSpacing:"0.12em",cursor:"pointer",fontWeight:700,transition:"all 0.25s"}}
+                  onMouseEnter={e=>{e.currentTarget.style.background=`rgba(139,105,20,0.08)`;}}
+                  onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}
+                >CLOSE</button>
+                <button
+                  onClick={()=>{ setNoOrderModal(false); window.location.hash=""; /* navigate to shop */ document.dispatchEvent(new CustomEvent("ws-nav",{detail:"products"})); }}
+                  style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"11px 24px",borderRadius:6,fontFamily:"'Cinzel',serif",fontSize:"0.72rem",letterSpacing:"0.12em",cursor:"pointer",fontWeight:800,boxShadow:`0 4px 16px ${T.gold}44`,transition:"all 0.25s"}}
+                  onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow=`0 8px 24px ${T.gold}66`;}}
+                  onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow=`0 4px 16px ${T.gold}44`;}}
+                >🛒 SHOP NOW</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1557,6 +1608,12 @@ export default function WishstoneApp() {
     window.addEventListener("hashchange",handleHash);
     return()=>window.removeEventListener("hashchange",handleHash);
   },[]);
+
+  useEffect(()=>{
+    const handler=(e)=>{ handleNav(e.detail); scrollTop(); };
+    document.addEventListener("ws-nav",handler);
+    return()=>document.removeEventListener("ws-nav",handler);
+  },[user]);
 
   const addToCart=p=>setCart(prev=>{ const e=prev.find(i=>i.id===p.id); return e?prev.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i):[...prev,{...p,qty:1}]; });
   const updQty=(id,qty)=>qty<1?setCart(prev=>prev.filter(i=>i.id!==id)):setCart(prev=>prev.map(i=>i.id===id?{...i,qty}:i));
