@@ -12,6 +12,7 @@ const css = `
   ::-webkit-scrollbar-track{background:#0a0b0d;}
   ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#7c3aed,#a78bfa);border-radius:4px;}
   input,textarea,select{font-family:'Space Grotesk',sans-serif;}
+
   @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
   @keyframes fadeInScale{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:scale(1)}}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
@@ -19,34 +20,116 @@ const css = `
   @keyframes slideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
   @keyframes glow{0%,100%{box-shadow:0 0 20px rgba(124,58,237,0.3)}50%{box-shadow:0 0 40px rgba(124,58,237,0.6)}}
   @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-  .ws-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-  .ws-table-wrap table{min-width:700px;}
+
+  /* ── Table scroll wrapper ── */
+  .ws-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:16px;}
+  .ws-table-wrap table{min-width:700px;width:100%;}
+
+  /* ── Mobile top bar (hidden on desktop) ── */
+  .ws-mobile-bar{
+    display:none;position:fixed;top:0;left:0;right:0;height:56px;
+    background:#0d0f13;border-bottom:1px solid rgba(255,255,255,0.06);
+    z-index:400;align-items:center;padding:0 1rem;gap:12px;
+  }
+
+  /* ── Overlay ── */
+  .ws-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:499;backdrop-filter:blur(2px);}
+  .ws-overlay.ws-open{display:block;}
+
+  /* ── Close btn (hidden on desktop) ── */
+  .ws-close-btn{display:none!important;}
+
+  /* ── Page header flex wrap ── */
+  .ws-page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+
+  /* ── Coupon grid ── */
+  .ws-coupon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;}
+
+  /* ── Category grid ── */
+  .ws-cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;}
+
+  /* ─────────────────────────────────────────
+     BREAKPOINT: 1100px — collapse sidebar to icon-only
+  ───────────────────────────────────────── */
   @media(max-width:1100px){
-    .ws-sidebar{width:68px!important;overflow:hidden;}
+    .ws-sidebar{width:68px!important;}
     .ws-sidebar .ws-sidebar-text{display:none!important;}
     .ws-sidebar .ws-brand-text{display:none!important;}
     .ws-main{margin-left:68px!important;}
   }
+
+  /* ─────────────────────────────────────────
+     BREAKPOINT: 768px — full mobile layout
+  ───────────────────────────────────────── */
   @media(max-width:768px){
-    .ws-sidebar{display:none!important;}
-    .ws-sidebar.ws-open{display:flex!important;z-index:500;}
+    /* Sidebar hidden by default, shown as drawer when open */
+    .ws-sidebar{
+      display:flex!important;
+      transform:translateX(-100%);
+      transition:transform 0.3s ease;
+      width:260px!important;
+      z-index:500;
+    }
+    .ws-sidebar.ws-open{transform:translateX(0)!important;}
+    .ws-sidebar .ws-sidebar-text{display:inline!important;}
+    .ws-sidebar .ws-brand-text{display:block!important;}
+    .ws-close-btn{display:flex!important;align-items:center;justify-content:center;}
+
+    /* Show mobile top bar */
     .ws-mobile-bar{display:flex!important;}
-    .ws-main{margin-left:0!important;padding:1rem!important;padding-top:4.5rem!important;}
+
+    /* Main content full width, padded for top bar */
+    .ws-main{margin-left:0!important;padding:1rem!important;padding-top:4.8rem!important;}
+
+    /* Stat grid: 2 columns */
     .ws-stat-grid{grid-template-columns:1fr 1fr!important;}
+
+    /* Two-col sections collapse */
     .ws-two-col{grid-template-columns:1fr!important;}
+
+    /* Modal grids collapse */
     .ws-modal-grid{grid-template-columns:1fr!important;}
     .ws-customer-grid{grid-template-columns:1fr!important;}
     .ws-order-detail-grid{grid-template-columns:1fr!important;}
+
+    /* Page headers stack */
+    .ws-page-header{flex-direction:column;align-items:flex-start!important;}
+    .ws-page-header button{width:100%;}
+
+    /* Coupon & category grids */
+    .ws-coupon-grid{grid-template-columns:1fr!important;}
+    .ws-cat-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))!important;}
+
+    /* Customer card inner grids */
+    .ws-cust-inner-grid{grid-template-columns:1fr!important;}
+
+    /* Filter tabs scroll */
+    .ws-filter-tabs{overflow-x:auto;padding-bottom:4px;flex-wrap:nowrap!important;}
+    .ws-filter-tabs::-webkit-scrollbar{height:3px;}
+    .ws-filter-tabs::-webkit-scrollbar-thumb{background:#7c3aed;border-radius:2px;}
+
+    /* Stat value font size */
+    .ws-stat-val{font-size:1.5rem!important;}
+
+    /* Action buttons in tables */
+    .ws-action-btns{flex-direction:column!important;gap:4px!important;}
+    .ws-action-btns button{width:100%;}
   }
+
+  /* ─────────────────────────────────────────
+     BREAKPOINT: 480px — small phones
+  ───────────────────────────────────────── */
   @media(max-width:480px){
     .ws-stat-grid{grid-template-columns:1fr!important;}
-    .ws-main{padding:0.75rem!important;padding-top:4.5rem!important;}
-  }
-  .ws-mobile-bar{display:none;position:fixed;top:0;left:0;right:0;height:56px;background:#0d0f13;border-bottom:1px solid rgba(255,255,255,0.06);z-index:400;align-items:center;padding:0 1rem;gap:12px;}
-  .ws-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:499;}
-  .ws-overlay.ws-open{display:block;}
-  @media(max-width:768px){
-    .ws-close-btn{display:block!important;}
+    .ws-main{padding:0.75rem!important;padding-top:4.8rem!important;}
+    .ws-cat-grid{grid-template-columns:1fr!important;}
+    .ws-coupon-grid{grid-template-columns:1fr!important;}
+
+    /* Customer card stats pills stack */
+    .ws-cust-stats{flex-direction:column!important;align-items:flex-start!important;}
+
+    /* Modal padding */
+    .ws-modal-inner{padding:1.2rem!important;}
   }
 `;
 
@@ -113,7 +196,7 @@ const Modal = ({ title, children, onClose, width = 600 }) => (
         <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: "1.1rem", color: "#fff" }}>{title}</h3>
         <button onClick={onClose} style={{ background: "rgba(255,255,255,0.06)", border: "none", color: "#94a3b8", width: 32, height: 32, borderRadius: 8, cursor: "pointer", fontSize: 18 }}>×</button>
       </div>
-      <div style={{ padding: "2rem" }}>{children}</div>
+      <div className="ws-modal-inner" style={{ padding: "2rem" }}>{children}</div>
     </div>
   </div>
 );
@@ -130,7 +213,7 @@ const Stat = ({ icon, label, value, sub, color = "#7c3aed" }) => (
     <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
       <div>
         <p style={{ color: "#64748b", fontSize: "0.78rem", letterSpacing: "0.1em", marginBottom: 8, textTransform: "uppercase" }}>{label}</p>
-        <p style={{ fontFamily: "'Syne', sans-serif", fontSize: "2rem", fontWeight: 800, color: "#fff" }}>{value}</p>
+        <p className="ws-stat-val" style={{ fontFamily: "'Syne', sans-serif", fontSize: "2rem", fontWeight: 800, color: "#fff" }}>{value}</p>
         {sub && <p style={{ color: "#64748b", fontSize: "0.78rem", marginTop: 4 }}>{sub}</p>}
       </div>
       <div style={{ width: 48, height: 48, borderRadius: 12, background: `${color}22`, border: `1px solid ${color}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
@@ -426,7 +509,7 @@ function Products({ token, showToast }) {
 
   return (
     <div style={{ animation: "fadeIn 0.4s ease" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+      <div className="ws-page-header">
         <div>
           <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: "1.6rem", fontWeight: 800, color: "#fff" }}>Products</h1>
           <p style={{ color: "#64748b", fontSize: "0.85rem", marginTop: 4 }}>{products.length} total products</p>
@@ -442,6 +525,7 @@ function Products({ token, showToast }) {
 
       {loading ? <p style={{ color: "#64748b" }}>Loading...</p> : (
         <div style={{ background: "#13151a", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, overflow: "hidden" }}>
+          <div className="ws-table-wrap">
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
@@ -483,6 +567,7 @@ function Products({ token, showToast }) {
               ))}
             </tbody>
           </table>
+          </div>
           {filtered.length === 0 && <p style={{ color: "#64748b", padding: "2rem", textAlign: "center" }}>No products found.</p>}
         </div>
       )}
@@ -588,7 +673,7 @@ function Orders({ token, showToast }) {
       </div>
 
       {/* Filter tabs */}
-      <div style={{ display: "flex", gap: 8, marginBottom: "1.5rem", flexWrap: "wrap" }}>
+      <div className="ws-filter-tabs" style={{ display: "flex", gap: 8, marginBottom: "1.5rem", flexWrap: "wrap" }}>
         {statuses.map(s => (
           <button key={s} onClick={() => setFilter(s)} style={{
             padding: "6px 16px", borderRadius: 8, cursor: "pointer", fontSize: "0.8rem", fontWeight: 500, textTransform: "capitalize",
@@ -787,7 +872,7 @@ function Customers({ token, showToast }) {
   return (
     <div style={{ animation: "fadeIn 0.4s ease" }}>
       {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
+      <div className="ws-page-header" style={{ marginBottom: "1.5rem" }}>
         <div>
           <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: "1.6rem", fontWeight: 800, color: "#fff" }}>Customers</h1>
           <p style={{ color: "#64748b", fontSize: "0.85rem", marginTop: 4 }}>{customers.length} total customers · All delivery details visible below</p>
@@ -843,7 +928,7 @@ function Customers({ token, showToast }) {
                     </div>
                   </div>
                   {/* Stats pills */}
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <div className="ws-cust-stats" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     <div style={{ background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.2)", borderRadius: 8, padding: "6px 12px", textAlign: "center" }}>
                       <div style={{ color: "#a78bfa", fontSize: "1rem", fontWeight: 700 }}>{c.orderCount || 0}</div>
                       <div style={{ color: "#64748b", fontSize: "0.6rem", letterSpacing: "0.08em" }}>ORDERS</div>
@@ -996,7 +1081,7 @@ function Coupons({ token, showToast }) {
 
   return (
     <div style={{ animation: "fadeIn 0.4s ease" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+      <div className="ws-page-header" style={{ marginBottom: "2rem" }}>
         <div>
           <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: "1.6rem", fontWeight: 800, color: "#fff" }}>Coupons</h1>
           <p style={{ color: "#64748b", fontSize: "0.85rem", marginTop: 4 }}>{coupons.length} active coupons</p>
@@ -1005,7 +1090,7 @@ function Coupons({ token, showToast }) {
       </div>
 
       {loading ? <p style={{ color: "#64748b" }}>Loading...</p> : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "1rem" }}>
+        <div className="ws-coupon-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "1rem" }}>
           {coupons.map((c) => (
             <div key={c._id} style={{ background: "#13151a", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "1.5rem", position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: c.isActive ? "linear-gradient(90deg, #7c3aed, #a78bfa)" : "#334155" }} />
@@ -1127,7 +1212,7 @@ function Categories({ token, showToast }) {
       </div>
 
       {loading ? <p style={{ color: "#64748b" }}>Loading...</p> : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "1rem" }}>
+        <div className="ws-cat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "1rem" }}>
           {cats.map((c) => (
             <div key={c._id} style={{ background: "#13151a", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, overflow: "hidden" }}>
               {c.image && <img src={c.image} alt={c.name} style={{ width: "100%", height: 140, objectFit: "cover" }} />}
@@ -1225,7 +1310,7 @@ function ManageUsers({ token, showToast }) {
 
   return (
     <div style={{ animation: "fadeIn 0.4s ease" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+      <div className="ws-page-header">
         <div>
           <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: "1.6rem", fontWeight: 800, color: "#fff" }}>Manage Users</h1>
           <p style={{ color: "#64748b", fontSize: "0.85rem", marginTop: 4 }}>{users.length} registered users</p>
