@@ -621,10 +621,20 @@ function UsesSection() {
 
 
 // ─── PRODUCT CARD ─────────────────────────────────────────────
-function PCard({ product, onAdd, onWish, wished, onClick, dark=false }) {
+function PCard({ product, onAdd, onWish, wished, onClick, dark=false, cart=[], onQty }) {
   const [hov,setHov]=useState(false);
+  const [clicked,setClicked]=useState(false);
   const bg = dark ? `linear-gradient(145deg,rgba(33,40,66,0.8),rgba(22,27,46,0.9))` : `linear-gradient(145deg,${T.creamD},${T.cream})`;
   const border = dark ? `1px solid ${hov?T.gold:`${T.gold}22`}` : `1px solid ${hov?T.goldD:`${T.goldD}44`}`;
+  const cartItem = cart.find(i=>i.id===product.id);
+  const qty = cartItem?.qty || 0;
+
+  const handleAdd = () => {
+    setClicked(true);
+    onAdd(product);
+    setTimeout(()=>setClicked(false), 300);
+  };
+
   return (
     <div onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
       style={{background:bg,border,borderRadius:4,overflow:"hidden",transition:"all 0.4s ease",transform:hov?"translateY(-6px)":"none",boxShadow:hov?`0 20px 50px rgba(0,0,0,${dark?0.5:0.2})`:`0 4px 16px rgba(0,0,0,${dark?0.3:0.1})`}}>
@@ -632,27 +642,91 @@ function PCard({ product, onAdd, onWish, wished, onClick, dark=false }) {
         <img src={product.image} alt={product.name} style={{width:"100%",height:"100%",objectFit:"cover",transform:hov?"scale(1.06)":"scale(1)",transition:"transform 0.55s ease"}}/>
         <div style={{position:"absolute",top:10,left:10,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,color:T.navy,borderRadius:2,padding:"2px 9px",fontSize:"0.62rem",fontWeight:800,letterSpacing:"0.05em",fontFamily:"'Cinzel',serif"}}>-{product.discount}%</div>
         <button onClick={e=>{e.stopPropagation();onWish(product.id);}} style={{position:"absolute",top:8,right:8,background:`rgba(${dark?22:240},${dark?27:231},${dark?46:213},0.7)`,border:`1px solid ${T.gold}44`,borderRadius:"50%",width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:14,transition:"all 0.2s"}}>{wished?"❤️":"🤍"}</button>
+        {qty>0&&(
+          <div style={{position:"absolute",bottom:8,right:8,background:`linear-gradient(135deg,${T.goldD},${T.gold})`,color:T.navy,borderRadius:12,padding:"2px 8px",fontSize:"0.65rem",fontWeight:900,fontFamily:"'Cinzel',serif",boxShadow:`0 2px 8px ${T.gold}66`}}>
+            {qty} in cart
+          </div>
+        )}
         <div style={{position:"absolute",inset:0,background:`linear-gradient(to top,rgba(${dark?22:33},${dark?27:40},${dark?46:66},0.75),transparent)`,opacity:hov?0.8:0.35,transition:"opacity 0.3s"}}/>
       </div>
-      <div style={{padding:"1.1rem"}}>
+      <div style={{padding:"1rem 1.1rem 1.1rem"}}>
         <h4 onClick={()=>{ onClick(product); scrollTop(); }} style={{fontFamily:"'Cinzel',serif",fontSize:"0.83rem",color:dark?T.cream:T.navy,margin:"0 0 5px",cursor:"pointer",letterSpacing:"0.04em",transition:"color 0.2s"}} onMouseEnter={e=>e.target.style.color=dark?T.gold:T.goldD} onMouseLeave={e=>e.target.style.color=dark?T.cream:T.navy}>{product.name}</h4>
-        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:"0.9rem"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:"0.8rem"}}>
           <span style={{fontFamily:"'Cinzel',serif",fontSize:"1rem",color:dark?T.gold:T.goldD,fontWeight:700}}>₹{product.price.toLocaleString()}</span>
           <span style={{color:dark?"rgba(240,231,213,0.3)":"rgba(33,40,66,0.35)",fontSize:"0.78rem",textDecoration:"line-through"}}>₹{product.originalPrice.toLocaleString()}</span>
         </div>
-        <button onClick={()=>onAdd(product)} style={{width:"100%",background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"9px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:700,transition:"opacity 0.2s"}} onMouseEnter={e=>e.target.style.opacity="0.85"} onMouseLeave={e=>e.target.style.opacity="1"}>ADD TO CART</button>
+
+        {qty===0 ? (
+          /* ── ADD TO CART button ── */
+          <button
+            onClick={handleAdd}
+            style={{
+              width:"100%",
+              background:clicked?`linear-gradient(135deg,${T.gold},${T.goldD})`:`linear-gradient(135deg,${T.goldD},${T.gold})`,
+              border:"none",color:T.navy,
+              padding:"8px 10px",borderRadius:2,
+              fontFamily:"'Cinzel',serif",fontSize:"0.62rem",
+              letterSpacing:"0.12em",cursor:"pointer",fontWeight:700,
+              transition:"all 0.15s ease",
+              transform:clicked?"scale(0.95)":"scale(1)",
+              boxShadow:clicked?`0 2px 8px ${T.gold}44`:`0 4px 14px ${T.gold}33`,
+            }}
+          >
+            🛒 ADD TO CART
+          </button>
+        ) : (
+          /* ── QTY COUNTER ── */
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            <div style={{
+              display:"flex",alignItems:"center",
+              border:`1.5px solid ${dark?T.gold:T.goldD}`,
+              borderRadius:2,overflow:"hidden",flex:1,
+              background:dark?"rgba(201,169,110,0.08)":"rgba(139,105,20,0.06)",
+            }}>
+              <button
+                onClick={()=>onQty&&onQty(product.id,qty-1)}
+                style={{background:"none",border:"none",color:dark?T.gold:T.goldD,padding:"7px 10px",cursor:"pointer",fontSize:"1rem",fontWeight:700,lineHeight:1,transition:"background 0.15s",flexShrink:0}}
+                onMouseEnter={e=>e.currentTarget.style.background=dark?"rgba(201,169,110,0.15)":"rgba(139,105,20,0.1)"}
+                onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+              >−</button>
+              <span style={{flex:1,textAlign:"center",fontFamily:"'Cinzel',serif",fontSize:"0.85rem",color:dark?T.cream:T.navy,fontWeight:700}}>{qty}</span>
+              <button
+                onClick={()=>onQty&&onQty(product.id,qty+1)}
+                style={{background:"none",border:"none",color:dark?T.gold:T.goldD,padding:"7px 10px",cursor:"pointer",fontSize:"1rem",fontWeight:700,lineHeight:1,transition:"background 0.15s",flexShrink:0}}
+                onMouseEnter={e=>e.currentTarget.style.background=dark?"rgba(201,169,110,0.15)":"rgba(139,105,20,0.1)"}
+                onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+              >+</button>
+            </div>
+            <button
+              onClick={handleAdd}
+              title="Add one more"
+              style={{
+                background:`linear-gradient(135deg,${T.goldD},${T.gold})`,
+                border:"none",color:T.navy,
+                width:32,height:32,borderRadius:2,
+                cursor:"pointer",fontSize:"0.9rem",
+                display:"flex",alignItems:"center",justifyContent:"center",
+                flexShrink:0,transition:"all 0.15s ease",
+                boxShadow:`0 2px 8px ${T.gold}33`,
+                transform:clicked?"scale(0.9)":"scale(1)",
+              }}
+              onMouseEnter={e=>e.currentTarget.style.boxShadow=`0 4px 14px ${T.gold}66`}
+              onMouseLeave={e=>e.currentTarget.style.boxShadow=`0 2px 8px ${T.gold}33`}
+            >🛒</button>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 // ─── BEST SELLERS — cream bg ──────────────────────────────────
-function BestSellers({ onAdd, onWish, wished, onClick }) {
+function BestSellers({ onAdd, onWish, wished, onClick, cart, onQty }) {
   return (
     <section className="section-pad" style={{padding:"90px clamp(1.5rem,5vw,4rem)",background:T.cream}}>
       <SecHead eye="✦ TRENDING ✦" title="Best Sellers" dark={true}/>
       <div className="prod-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:"1.2rem",maxWidth:1200,margin:"0 auto"}}>
-        {PRODUCTS.filter(p=>p.bestSeller).map(p=><PCard key={p.id} product={p} onAdd={onAdd} onWish={onWish} wished={wished.includes(p.id)} onClick={onClick} dark={false}/>)}
+        {PRODUCTS.filter(p=>p.bestSeller).map(p=><PCard key={p.id} product={p} onAdd={onAdd} onWish={onWish} wished={wished.includes(p.id)} onClick={onClick} dark={false} cart={cart} onQty={onQty}/>)}
       </div>
     </section>
   );
@@ -744,7 +818,7 @@ function Footer() {
 }
 
 // ─── CATEGORY PAGE ────────────────────────────────────────────
-function CategoryPage({ category, onAdd, onWish, wished, onClick }) {
+function CategoryPage({ category, onAdd, onWish, wished, onClick, cart, onQty }) {
   const products = PRODUCTS.filter(p=>p.category===category.id);
   return (
     <div style={{paddingTop:100}}>
@@ -764,7 +838,7 @@ function CategoryPage({ category, onAdd, onWish, wished, onClick }) {
       <div style={{background:T.cream,padding:"clamp(2rem,5vw,4rem)"}}>
         <p style={{fontFamily:"'Cinzel',serif",color:T.goldD,fontSize:"0.68rem",letterSpacing:"0.2em",marginBottom:"1.5rem"}}>{products.length} PRODUCTS</p>
         <div className="prod-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:"1.2rem"}}>
-          {products.map(p=><PCard key={p.id} product={p} onAdd={onAdd} onWish={onWish} wished={wished.includes(p.id)} onClick={onClick} dark={false}/>)}
+          {products.map(p=><PCard key={p.id} product={p} onAdd={onAdd} onWish={onWish} wished={wished.includes(p.id)} onClick={onClick} dark={false} cart={cart} onQty={onQty}/>)}
         </div>
       </div>
     </div>
@@ -1110,7 +1184,7 @@ function CheckoutPage({ cart, onPlaceOrder, couponCode="", discount=0 }) {
 }
 
 // ─── WISHLIST PAGE ────────────────────────────────────────────
-function WishlistPage({ ids, onAdd, onWish, onClick }) {
+function WishlistPage({ ids, onAdd, onWish, onClick, cart, onQty }) {
   const items=PRODUCTS.filter(p=>ids.includes(p.id));
   if(!items.length) return (
     <div style={{paddingTop:130,textAlign:"center",background:T.cream,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:14,padding:"130px 2rem"}}>
@@ -1125,7 +1199,7 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
         <h1 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"clamp(1.5rem,4vw,2rem)",marginBottom:"0.4rem"}}>Your Wishlist</h1>
         <Divider/>
         <div className="prod-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:"1.2rem",marginTop:"1rem"}}>
-          {items.map(p=><PCard key={p.id} product={p} onAdd={onAdd} onWish={onWish} wished={true} onClick={onClick} dark={false}/>)}
+          {items.map(p=><PCard key={p.id} product={p} onAdd={onAdd} onWish={onWish} wished={true} onClick={onClick} dark={false} cart={cart} onQty={onQty}/>)}
         </div>
       </div>
     </div>
@@ -1133,7 +1207,7 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
 }
 
 // ─── ALL PRODUCTS PAGE ────────────────────────────────────────
-function AllProductsPage({ onAdd, onWish, wished, onClick }) {
+function AllProductsPage({ onAdd, onWish, wished, onClick, cart, onQty }) {
   const [filter,setFilter]=useState("all");
   const filtered=filter==="all"?PRODUCTS:PRODUCTS.filter(p=>p.category===filter);
   return (
@@ -1147,7 +1221,7 @@ function AllProductsPage({ onAdd, onWish, wished, onClick }) {
           ))}
         </div>
         <div className="prod-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:"1.2rem"}}>
-          {filtered.map(p=><PCard key={p.id} product={p} onAdd={onAdd} onWish={onWish} wished={wished.includes(p.id)} onClick={onClick} dark={false}/>)}
+          {filtered.map(p=><PCard key={p.id} product={p} onAdd={onAdd} onWish={onWish} wished={wished.includes(p.id)} onClick={onClick} dark={false} cart={cart} onQty={onQty}/>)}
         </div>
       </div>
     </div>
@@ -1155,13 +1229,13 @@ function AllProductsPage({ onAdd, onWish, wished, onClick }) {
 }
 
 // ─── HOME PAGE ────────────────────────────────────────────────
-function HomePage({ onCatClick, onAdd, onWish, wished, onProdClick, catRef, storyRef }) {
+function HomePage({ onCatClick, onAdd, onWish, wished, onProdClick, catRef, storyRef, cart, onQty }) {
   return (
     <>
       <Hero onShop={()=>{}}/>
       <CategorySection onCategoryClick={onCatClick} sectionRef={catRef}/>
       <UsesSection/>
-      <BestSellers onAdd={onAdd} onWish={onWish} wished={wished} onClick={onProdClick}/>
+      <BestSellers onAdd={onAdd} onWish={onWish} wished={wished} onClick={onProdClick} cart={cart} onQty={onQty}/>
       <StorySection sectionRef={storyRef}/>
       <FAQSection/>
       <Footer/>
@@ -1502,12 +1576,12 @@ export default function WishstoneApp() {
     if(page==="login") return <LoginPage onSuccess={handleLogin}/>;
     if(page==="dashboard"&&user) return <UserDashboard user={user} onLogout={handleLogout}/>;
     if(page==="product"&&selProd) return <ProductPage product={selProd} onAdd={addToCart} onWish={togWish} wished={wishlist.includes(selProd.id)}/>;
-    if(page==="category"&&selCat) return <CategoryPage category={selCat} onAdd={addToCart} onWish={togWish} wished={wishlist} onClick={p=>{setSelProd(p);setPage("product");scrollTop();}}/>;
-    if(page==="products") return <AllProductsPage onAdd={addToCart} onWish={togWish} wished={wishlist} onClick={p=>{setSelProd(p);setPage("product");scrollTop();}}/>;
+    if(page==="category"&&selCat) return <CategoryPage category={selCat} onAdd={addToCart} onWish={togWish} wished={wishlist} onClick={p=>{setSelProd(p);setPage("product");scrollTop();}} cart={cart} onQty={updQty}/>;
+    if(page==="products") return <AllProductsPage onAdd={addToCart} onWish={togWish} wished={wishlist} onClick={p=>{setSelProd(p);setPage("product");scrollTop();}} cart={cart} onQty={updQty}/>;
     if(page==="cart") return <CartPage cart={cart} onQty={updQty} onRemove={rmCart} onCheckout={(couponData)=>{setCheckoutCoupon(couponData||{couponCode:"",discount:0});setPage("checkout");}}/>;
     if(page==="checkout") return <CheckoutPage cart={cart} onPlaceOrder={()=>{setCart([]);setCheckoutCoupon({couponCode:"",discount:0});setPage("home");scrollTop();}} couponCode={checkoutCoupon.couponCode} discount={checkoutCoupon.discount}/>;
-    if(page==="wishlist") return <WishlistPage ids={wishlist} onAdd={addToCart} onWish={togWish} onClick={p=>{setSelProd(p);setPage("product");scrollTop();}}/>;
-    return <HomePage onCatClick={cat=>{setSelCat(cat);setPage("category");scrollTop();}} onAdd={addToCart} onWish={togWish} wished={wishlist} onProdClick={p=>{setSelProd(p);setPage("product");scrollTop();}} catRef={catRef} storyRef={storyRef}/>;
+    if(page==="wishlist") return <WishlistPage ids={wishlist} onAdd={addToCart} onWish={togWish} onClick={p=>{setSelProd(p);setPage("product");scrollTop();}} cart={cart} onQty={updQty}/>;
+    return <HomePage onCatClick={cat=>{setSelCat(cat);setPage("category");scrollTop();}} onAdd={addToCart} onWish={togWish} wished={wishlist} onProdClick={p=>{setSelProd(p);setPage("product");scrollTop();}} catRef={catRef} storyRef={storyRef} cart={cart} onQty={updQty}/>;
   };
 
   return (
