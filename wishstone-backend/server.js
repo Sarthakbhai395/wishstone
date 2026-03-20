@@ -87,14 +87,64 @@ app.use(notFound);
 app.use(errorHandler);
 
 // ─── DATABASE ────────────────────────────────────────────────
-const connectDB = async () => {
+const connectDB = async (retryCount = 0) => {
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY = 3000;
+  
+  const mongoOptions = {
+    serverSelectionTimeoutMS: 10000,
+    socketTimeoutMS: 45000,
+    family: 4, // Use IPv4, skip trying IPv6
+  };
+
+  const atlasURI = process.env.MONGO_URI;
+  const localURI = "mongodb://localhost:27017/wishstone";
+  
+  // Try Atlas first if configured
+  if (atlasURI && atlasURI.includes("mongodb+srv")) {
+    try {
+      console.log(`🔄 Attempting MongoDB Atlas connection... (attempt ${retryCount + 1}/${MAX_RETRIES + 1})`);
+      await mongoose.connect(atlasURI, mongoOptions);
+      console.log("✅ MongoDB Atlas Connected Successfully");
+      return;
+    } catch (err) {
+      console.warn(`⚠️  Atlas connection failed: ${err.message}`);
+      
+      if (err.message.includes("ENOTFOUND") || err.message.includes("ETIMEDOUT")) {
+        console.warn("💡 Network issue detected. Check your internet connection.");
+      }
+      if (err.message.includes("authentication failed")) {
+        console.warn("💡 Authentication failed. Check your MongoDB credentials.");
+      }
+      if (err.message.includes("Could not connect to any servers")) {
+        console.warn("💡 IP not whitelisted. Add 0.0.0.0/0 to Atlas IP whitelist or use local MongoDB.");
+      }
+
+      // Retry with exponential backoff
+      if (retryCount < MAX_RETRIES) {
+        const delay = RETRY_DELAY * Math.pow(2, retryCount);
+        console.log(`⏳ Retrying in ${delay / 1000}s...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return connectDB(retryCount + 1);
+      }
+      
+      console.warn("⚠️  All Atlas connection attempts failed. Falling back to local MongoDB...");
+    }
+  }
+
+  // Fallback to local MongoDB
   try {
-    await mongoose.connect(process.env.MONGO_URI || "mongodb://localhost:27017/wishstone", {
-      serverSelectionTimeoutMS: 5000,
-    });
-    console.log("✅ MongoDB Connected");
-  } catch (err) {
-    console.error("❌ MongoDB Error:", err.message);
+    console.log("🔄 Connecting to local MongoDB...");
+    await mongoose.connect(localURI, mongoOptions);
+    console.log("✅ Local MongoDB Connected Successfully");
+    console.log("💡 Using local database. To use Atlas, fix the connection issue and restart.");
+  } catch (localErr) {
+    console.error("❌ Local MongoDB connection also failed:", localErr.message);
+    console.error("\n📋 Troubleshooting steps:");
+    console.error("   1. Install MongoDB locally: https://www.mongodb.com/try/download/community");
+    console.error("   2. Start MongoDB service: 'mongod' or 'sudo systemctl start mongod'");
+    console.error("   3. For Atlas: whitelist your IP at https://cloud.mongodb.com");
+    console.error("   4. For Atlas: add 0.0.0.0/0 to allow all IPs (development only)\n");
     process.exit(1);
   }
 };

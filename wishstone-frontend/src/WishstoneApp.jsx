@@ -1,793 +1,537 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
-// ─── THEME ───────────────────────────────────────────────────
 const T = {
-  navy:"#212842", navyD:"#161B2E", navyL:"#2D3559",
-  cream:"#F0E7D5", creamD:"#E8DCC8",
-  gold:"#C9A96E", goldD:"#8B6914", goldL:"#E2C58A",
-  rose:"#C4747A",
+  bg: "#F5F0E8", bgDark: "#2C3320",
+  text: "#1a1a1a", textMid: "#4a4a4a",
+  orange: "#E8720C", orangeD: "#C45E00", orangeL: "#FF9A3C",
+  white: "#ffffff", border: "rgba(26,26,26,0.12)",
 };
 
-// ─── DATA ────────────────────────────────────────────────────
-const CATEGORIES = [
-  { id:"manifestation", name:"Manifestation", image:"https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=800&q=80", desc:"Crystals & tools to align your energy with the universe" },
-  { id:"therapy",       name:"Therapy",       image:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80", desc:"Natural healing aids for mind, body & soul restoration" },
-  { id:"habit-builder", name:"Habit Builder", image:"https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80", desc:"Daily rituals & tools to build powerful life habits" },
-];
-
 const PRODUCTS = [
-  { id:1, name:"Celestial Rose Quartz",     category:"manifestation", price:1299, originalPrice:1799, discount:28, image:"https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80", shortDesc:"Moon-charged rose quartz to amplify love, compassion, and self-worth energies in your sacred space.", suitableFor:"Beginners, healers, those seeking emotional balance", benefits:["Enhances self-love","Promotes emotional healing","Attracts positive relationships","Clears heart chakra"], bestSeller:true },
-  { id:2, name:"Lunar Amethyst Cluster",    category:"manifestation", price:2199, originalPrice:2999, discount:27, image:"https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=600&q=80", shortDesc:"Premium amethyst cluster from Brazilian mines for meditation and amplifying intuition.", suitableFor:"Meditators, spiritual seekers, healers", benefits:["Deepens meditation","Protects energy field","Enhances intuition","Promotes restful sleep"], bestSeller:true },
-  { id:3, name:"Healing Lavender Bundle",   category:"therapy",       price:699,  originalPrice:999,  discount:30, image:"https://images.unsplash.com/photo-1471943311424-646960669fbc?w=600&q=80", shortDesc:"Hand-harvested organic lavender for cleansing negative energy and deep relaxation.", suitableFor:"Anyone seeking calm, anxiety relief, better sleep", benefits:["Reduces stress","Purifies space","Promotes sleep","Calms the nervous system"], bestSeller:true },
-  { id:4, name:"Moonstone Ritual Kit",      category:"habit-builder", price:1899, originalPrice:2499, discount:24, image:"https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?w=600&q=80", shortDesc:"Complete ritual kit with journal, crystal, and guide for powerful daily moon rituals.", suitableFor:"Anyone building spiritual daily habits", benefits:["Creates daily ritual","Tracks moon cycles","Builds consistency","Deepens self-awareness"], bestSeller:false },
-  { id:5, name:"Obsidian Protection Stone", category:"manifestation", price:899,  originalPrice:1199, discount:25, image:"https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=600&q=80", shortDesc:"Volcanic obsidian known for its powerful protective properties against negative energies.", suitableFor:"Empaths, sensitives, protection seekers", benefits:["Shields from negativity","Grounds energy","Reveals hidden truths","Heals emotional wounds"], bestSeller:true },
-  { id:6, name:"Sacred Sandalwood Incense", category:"therapy",       price:499,  originalPrice:699,  discount:29, image:"https://images.unsplash.com/photo-1545158535-c3f7168c28b6?w=600&q=80", shortDesc:"Premium Mysore sandalwood incense for meditation, yoga, and sacred home spaces.", suitableFor:"Meditators, yoga practitioners, home rituals", benefits:["Deepens focus","Purifies air","Elevates mood","Aids in prayer"], bestSeller:false },
+  { id:1, name:"WishStone — Rose Quartz", category:"manifestation", price:1299, originalPrice:1799, discount:28,
+    image:"https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80",
+    images:["https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80","https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=600&q=80","https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?w=600&q=80","https://images.unsplash.com/photo-1471943311424-646960669fbc?w=600&q=80"],
+    shortDesc:"Moon-charged rose quartz to amplify love, compassion, and self-worth energies in your sacred space.", suitableFor:"Beginners, healers, those seeking emotional balance", benefits:["Enhances self-love","Promotes emotional healing","Attracts positive relationships","Clears heart chakra"], bestSeller:true },
+  { id:2, name:"WishStone — Amethyst", category:"manifestation", price:2199, originalPrice:2999, discount:27,
+    image:"https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=600&q=80",
+    images:["https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=600&q=80","https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80","https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=600&q=80","https://images.unsplash.com/photo-1545158535-c3f7168c28b6?w=600&q=80"],
+    shortDesc:"Premium amethyst from Brazilian mines for deep meditation and amplifying intuition.", suitableFor:"Meditators, spiritual seekers, healers", benefits:["Deepens meditation","Protects energy field","Enhances intuition","Promotes restful sleep"], bestSeller:true },
+  { id:3, name:"WishStone — Obsidian", category:"manifestation", price:899, originalPrice:1199, discount:25,
+    image:"https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=600&q=80",
+    images:["https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=600&q=80","https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?w=600&q=80","https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80","https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=600&q=80"],
+    shortDesc:"Volcanic obsidian known for powerful protective properties against negative energies.", suitableFor:"Empaths, sensitives, protection seekers", benefits:["Shields from negativity","Grounds energy","Reveals hidden truths","Heals emotional wounds"], bestSeller:true },
+  { id:4, name:"Moonstone Ritual Kit", category:"habit-builder", price:1899, originalPrice:2499, discount:24,
+    image:"https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?w=600&q=80",
+    images:["https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?w=600&q=80","https://images.unsplash.com/photo-1471943311424-646960669fbc?w=600&q=80","https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=600&q=80","https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80"],
+    shortDesc:"Complete ritual kit with journal, crystal, and guide for powerful daily moon rituals.", suitableFor:"Anyone building spiritual daily habits", benefits:["Creates daily ritual","Tracks moon cycles","Builds consistency","Deepens self-awareness"], bestSeller:false },
+  { id:5, name:"Healing Lavender Bundle", category:"therapy", price:699, originalPrice:999, discount:30,
+    image:"https://images.unsplash.com/photo-1471943311424-646960669fbc?w=600&q=80",
+    images:["https://images.unsplash.com/photo-1471943311424-646960669fbc?w=600&q=80","https://images.unsplash.com/photo-1545158535-c3f7168c28b6?w=600&q=80","https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?w=600&q=80","https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=600&q=80"],
+    shortDesc:"Hand-harvested organic lavender for cleansing negative energy and deep relaxation.", suitableFor:"Anyone seeking calm, anxiety relief, better sleep", benefits:["Reduces stress","Purifies space","Promotes sleep","Calms the nervous system"], bestSeller:true },
+  { id:6, name:"Sacred Sandalwood Incense", category:"therapy", price:499, originalPrice:699, discount:29,
+    image:"https://images.unsplash.com/photo-1545158535-c3f7168c28b6?w=600&q=80",
+    images:["https://images.unsplash.com/photo-1545158535-c3f7168c28b6?w=600&q=80","https://images.unsplash.com/photo-1471943311424-646960669fbc?w=600&q=80","https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=600&q=80","https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?w=600&q=80"],
+    shortDesc:"Premium Mysore sandalwood incense for meditation, yoga, and sacred home spaces.", suitableFor:"Meditators, yoga practitioners, home rituals", benefits:["Deepens focus","Purifies air","Elevates mood","Aids in prayer"], bestSeller:false },
 ];
 
 const FAQS = [
-  { q:"How do I use the crystals?", a:"Cleanse your crystal under moonlight or with sage smoke. Set your intention by holding it in both hands and breathing deeply. Place it in your space or carry it with you daily." },
-  { q:"How long does it take to see results?", a:"Most customers notice subtle energy shifts within 7–21 days of consistent use. Results vary by individual, intention clarity, and usage consistency." },
-  { q:"Are all products 100% natural?", a:"Yes. Every Wishstone product is ethically sourced, 100% natural, and free from synthetic treatments or artificial enhancements." },
-  { q:"What are your shipping timelines?", a:"Standard delivery: 5–7 business days. Express delivery: 2–3 business days. Free shipping on orders above ₹999." },
-  { q:"What is your return policy?", a:"We offer hassle-free returns within 7 days of delivery. Product must be unused and in original packaging. Refund processed within 3–5 business days." },
+  { q:"WishStone kaise use karein?", a:"Apne stone ko moonlight ya sage smoke se cleanse karein. Dono haathon mein pakad ke apni intention set karein. Isse apne paas rakhein ya sacred space mein place karein." },
+  { q:"Results kitne time mein dikhte hain?", a:"Zyaadatar customers 7-21 din ke consistent use mein subtle energy shifts notice karte hain. Results individual, intention clarity, aur usage consistency pe depend karte hain." },
+  { q:"Kya saare products 100% natural hain?", a:"Haan. Har WishStone product ethically sourced, 100% natural, aur synthetic treatments se free hai." },
+  { q:"Shipping kitne time mein hoti hai?", a:"Standard delivery: 5-7 business days. Express delivery: 2-3 business days. Rs.999 se upar ke orders pe free shipping." },
+  { q:"Return policy kya hai?", a:"Delivery ke 7 din ke andar hassle-free returns. Product unused aur original packaging mein hona chahiye. Refund 3-5 business days mein process hota hai." },
 ];
 
-const VIDEOS = [
-  { title:"Crystal Cleansing Ritual", thumb:"https://images.pexels.com/photos/29858947/pexels-photo-29858947.jpeg", tag:"Manifestation", src:"https://www.pexels.com/download/video/854228/" },
-  { title:"Moon Water Preparation",   thumb:"https://images.pexels.com/photos/19824838/pexels-photo-19824838.jpeg", tag:"Therapy",       src:"https://videos.pexels.com/video-files/3571264/3571264-hd_1920_1080_30fps.mp4" },
-  { title:"Morning Habit Ritual",     thumb:"https://images.pexels.com/photos/920534/pexels-photo-920534.jpeg",    tag:"Habit Builder", src:"https://www.pexels.com/download/video/854739/" },
-  { title:"Sacred Space Setup",       thumb:"https://images.pexels.com/photos/6498990/pexels-photo-6498990.jpeg", tag:"Therapy",       src:"https://www.pexels.com/download/video/1093662/" },
+const QUOTES = [
+  { text:"Imagination is everything. It is the preview of life's coming attractions.", author:"Albert Einstein" },
+  { text:"Whatever the mind can conceive and believe, it can achieve.", author:"Napoleon Hill" },
+  { text:"You are the creator of your own reality.", author:"Abraham Hicks" },
+  { text:"Ask for what you want and be prepared to get it.", author:"Maya Angelou" },
+  { text:"The universe is not outside of you. Look inside yourself.", author:"Rumi" },
+  { text:"जो तुम खोज रहे हो, वह भी तुम्हें खोज रहा है।", author:"Rumi" },
 ];
 
-// ─── SCROLL TO TOP UTILITY ────────────────────────────────────
-const scrollTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+const MARQUEE_ITEMS = [
+  "शुभ संकल्प","Manifest with Intention","विश्वास करो, पाओ","You Are The Creator",
+  "ब्रह्माण्ड पर भरोसा करो","Abundance Is Your Birthright","WishStone","अपनी नियति बनाओ",
+  "शुभ संकल्प","Manifest with Intention","विश्वास करो, पाओ","You Are The Creator",
+  "ब्रह्माण्ड पर भरोसा करो","Abundance Is Your Birthright","WishStone","अपनी नियति बनाओ",
+];
 
-// ─── GLOBAL CSS ───────────────────────────────────────────────
-const CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Cinzel:wght@400;500;600;700;900&family=Cinzel+Decorative:wght@400;700;900&display=swap');
+const POWERS = [
+  { num:"01", iconBg:"#fff0e8", icon:"🎯", title:"Intention Anchoring", desc:"Stone ka physical weight ek somatic anchor create karta hai — ek tangible connection apni conscious wish aur physical duniya ke beech.", tag:"NEUROSCIENCE-BACKED" },
+  { num:"02", iconBg:"#f0f0e8", icon:"✦",  title:"Sacred Yantra",       desc:"Har WishStone pe hand-designed manifestation yantra — ancient geometric symbol jo focused intention ko amplify karta hai.", tag:"ANCIENT WISDOM" },
+  { num:"03", iconBg:"#e8f0e8", icon:"🌿", title:"Earth Grounding",     desc:"Natural stone compounds carry prithvi ki stabilizing frequency — calm, centered, aur aligned raho apni highest desires ke saath.", tag:"EARTH ENERGY" },
+  { num:"04", iconBg:"#fff4e0", icon:"📜", title:"365 Oracle Cards",    desc:"Har subah ek fresh manifestation message — ancient wisdom se modern psychology tak. Apna daily reset to belief.", tag:"DAILY PRACTICE" },
+  { num:"05", iconBg:"#f0e8f8", icon:"🔮", title:"Frequency Activation",desc:"Specific crystal formations jo apni personal energy field ko tune karti hain — clarity, abundance, aur love attract karo.", tag:"CRYSTAL SCIENCE" },
+  { num:"06", iconBg:"#e8f0ff", icon:"💫", title:"Moon Cycle Sync",     desc:"Har WishStone moon cycles ke saath aligned hai — new moon intentions set karo, full moon pe release karo.", tag:"LUNAR WISDOM" },
+];
+
+const GLOBAL_CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,900&family=Noto+Serif+Devanagari:wght@700;900&display=swap');
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
   html{scroll-behavior:smooth;}
-  body{background:#161B2E;color:#F0E7D5;font-family:'Cormorant Garamond',serif;}
+  body{background:#F5F0E8;color:#1a1a1a;font-family:'Inter',sans-serif;}
   ::-webkit-scrollbar{width:5px;}
-  ::-webkit-scrollbar-track{background:#161B2E;}
-  ::-webkit-scrollbar-thumb{background:#C9A96E;border-radius:3px;}
-  input,select,textarea,button{font-family:'Cormorant Garamond',serif;}
-
-  @keyframes twinkle{0%,100%{opacity:0;transform:scale(0.3);}50%{opacity:1;transform:scale(1);}}
-  @keyframes floatUp{0%{transform:translateY(0) rotate(0deg);opacity:0.8;}100%{transform:translateY(-105vh) rotate(360deg);opacity:0;}}
-  @keyframes moonGlow{0%,100%{box-shadow:0 0 50px rgba(240,231,213,0.2),0 0 100px rgba(201,169,110,0.12);}50%{box-shadow:0 0 80px rgba(240,231,213,0.38),0 0 150px rgba(201,169,110,0.25);}}
-  @keyframes orbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-  @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-33.33%)}}
+  ::-webkit-scrollbar-track{background:#F5F0E8;}
+  ::-webkit-scrollbar-thumb{background:#E8720C;border-radius:3px;}
+  @keyframes autoScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .scroll-hide::-webkit-scrollbar{display:none;}
+  .scroll-hide{-ms-overflow-style:none;scrollbar-width:none;}
+  @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
   @keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes fadeDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
-  @keyframes shimmer{0%{background-position:-300% center}100%{background-position:300% center}}
-  @keyframes scrollPulse{0%,100%{transform:translateX(-50%) scaleY(1);opacity:0.7;}50%{transform:translateX(-50%) scaleY(1.3);opacity:1;}}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-  @keyframes scaleIn{from{opacity:0;transform:scale(0.85)}to{opacity:1;transform:scale(1)}}
-  @keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
-
-  /* ─── RESPONSIVE ─── */
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+  @keyframes quoteIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes cardIn{from{opacity:0;transform:translateY(30px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes shimmerBar{from{width:0%}to{width:100%}}
+  @keyframes stone3d{
+    0%   { transform: rotateY(-18deg) rotateX(6deg) translateY(0px); }
+    25%  { transform: rotateY(8deg)  rotateX(-4deg) translateY(-10px); }
+    50%  { transform: rotateY(22deg) rotateX(6deg)  translateY(-18px); }
+    75%  { transform: rotateY(6deg)  rotateX(-3deg) translateY(-8px); }
+    100% { transform: rotateY(-18deg) rotateX(6deg) translateY(0px); }
+  }
+  @keyframes badgeFloat1{0%,100%{transform:translateY(0px)}50%{transform:translateY(-7px)}}
+  @keyframes badgeFloat2{0%,100%{transform:translateY(0px)}50%{transform:translateY(-10px)}}
+  @keyframes badgeFloat3{0%,100%{transform:translateY(0px)}50%{transform:translateY(-6px)}}
+  .nav-link{background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#1a1a1a;padding:4px 0;transition:color 0.2s;}
+  .nav-link:hover,.nav-link.active{color:#E8720C;}
+  .prod-card{background:#fff;border-radius:14px;overflow:hidden;border:1px solid rgba(26,26,26,0.08);transition:all 0.3s;cursor:pointer;}
+  .prod-card:hover{transform:translateY(-5px);box-shadow:0 16px 48px rgba(26,26,26,0.12);}
+  .btn-orange{background:linear-gradient(135deg,#C45E00,#E8720C);border:none;color:#fff;cursor:pointer;font-family:'Inter',sans-serif;font-weight:700;letter-spacing:0.06em;transition:all 0.3s;}
+  .btn-orange:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(232,114,12,0.4);}
+  .btn-outline{background:transparent;border:1.5px solid rgba(26,26,26,0.25);color:#1a1a1a;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:0.06em;transition:all 0.2s;}
+  .btn-outline:hover{border-color:#E8720C;color:#E8720C;}
+  .max-w{max-width:1200px;margin:0 auto;}
+  .power-card{background:#fff;border-radius:16px;padding:1.8rem 1.6rem;border:1px solid rgba(26,26,26,0.07);transition:all 0.3s;}
+  .power-card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(232,114,12,0.1);border-color:rgba(232,114,12,0.18);}
+  .show-mobile-flex{display:none !important;}
   @media(max-width:1024px){
-    .footer-grid{grid-template-columns:1fr 1fr !important;}
-    .cat-grid{grid-template-columns:repeat(2,1fr) !important;}
+    .hero-grid{grid-template-columns:1fr !important;}
+    .hero-right{display:none !important;}
+    .powers-layout{grid-template-columns:1fr !important;}
+    .powers-center-col{display:none !important;}
+    .checkout-grid{grid-template-columns:1fr !important;}
+    .prod-detail-grid{grid-template-columns:1fr !important;}
+    .dashboard-grid{grid-template-columns:1fr !important;}
+    .dashboard-stats{grid-template-columns:repeat(2,1fr) !important;}
   }
   @media(max-width:768px){
-    .hero-title{font-size:clamp(1.8rem,7vw,3rem) !important;}
-    .hero-stats{gap:1.2rem !important;flex-wrap:wrap;justify-content:center;}
-    .hero-btns{flex-direction:column;align-items:center;}
-    .hero-btns button{width:100%;max-width:280px;}
-    .cat-grid{grid-template-columns:1fr !important;}
+    .hero-grid{grid-template-columns:1fr !important; gap:0 !important;}
+    .hero-right{display:flex !important;}
     .prod-grid{grid-template-columns:repeat(2,1fr) !important;}
-    .story-grid{grid-template-columns:1fr !important;gap:2rem !important;}
-    .story-grid img{max-width:100%;}
     .footer-grid{grid-template-columns:1fr 1fr !important;}
-    .checkout-grid{grid-template-columns:1fr !important;}
-    .cart-grid{grid-template-columns:1fr !important;}
-    .prod-detail-grid{grid-template-columns:1fr !important;}
-    .vid-thumbs{grid-template-columns:repeat(2,1fr) !important;}
-    .section-pad{padding:70px 1.5rem !important;}
+    .stats-row{flex-wrap:wrap !important;gap:1.5rem !important;}
     .header-nav{display:none !important;}
-    .header-auth{display:none !important;}
-    .header-icons{display:none !important;}
-    .mobile-menu-btn{display:flex !important;}
-    .cart-item-row{flex-wrap:wrap;}
-    .dashboard-grid{grid-template-columns:1fr !important;}
-    .dashboard-sidebar{position:static !important;height:auto !important;}
-    .checkout-form-grid{grid-template-columns:1fr !important;}
-    .checkout-city-grid{grid-template-columns:1fr 1fr !important;}
-    .profile-grid{grid-template-columns:1fr !important;}
-    .order-detail-grid{grid-template-columns:1fr !important;}
-    .payment-btns{flex-direction:column !important;}
-    .payment-btns button{flex:none !important;width:100% !important;}
-    .prod-benefits-grid{grid-template-columns:1fr !important;}
-    .cart-summary{position:static !important;top:auto !important;}
+    .hero-badge{transform:scale(0.85) !important; transform-origin:left center !important;}
+    .show-mobile-flex{display:flex !important;}
+    .dashboard-stats{grid-template-columns:repeat(2,1fr) !important;}
   }
-  @media(max-width:480px){
+  @media(max-width:600px){
     .prod-grid{grid-template-columns:1fr !important;}
     .footer-grid{grid-template-columns:1fr !important;}
-    .section-pad{padding:60px 1rem !important;}
-    .hero-stats{gap:0.8rem !important;}
-    .checkout-city-grid{grid-template-columns:1fr !important;}
-    .vid-thumbs{grid-template-columns:repeat(2,1fr) !important;}
-    .cart-item-row{gap:0.8rem !important;}
-    .cart-item-row img{width:64px !important;height:64px !important;}
-    .signup-card{padding:1.5rem 1.2rem !important;}
-    .login-card{padding:1.5rem 1.2rem !important;}
-    .dashboard-content{padding:1.5rem !important;}
-    .track-modal-inner{padding:1.2rem !important;}
-    .track-steps{gap:0.5rem !important;}
-    .track-steps>div{min-width:0 !important;}
-    .track-steps p{font-size:0.58rem !important;}
+    .stats-row > div{flex:1 1 45% !important;}
+    .hero-badge{transform:scale(0.78) !important;}
+    .dashboard-stats{grid-template-columns:repeat(2,1fr) !important;}
+  }
+  @media(max-width:480px){
+    .stats-row > div{flex:1 1 100% !important;}
+    .dashboard-stats{grid-template-columns:1fr 1fr !important;}
   }
 `;
 
-// ─── HELPERS ─────────────────────────────────────────────────
-const Divider = () => (
-  <div style={{display:"flex",alignItems:"center",gap:10,margin:"0.9rem auto",width:"fit-content"}}>
-    <div style={{width:32,height:1,background:`linear-gradient(to right,transparent,${T.gold})`}}/>
-    <span style={{color:T.gold,fontSize:"0.85rem"}}>✦</span>
-    <div style={{width:6,height:6,border:`1px solid ${T.gold}`,transform:"rotate(45deg)"}}/>
-    <span style={{color:T.gold,fontSize:"0.85rem"}}>✦</span>
-    <div style={{width:32,height:1,background:`linear-gradient(to left,transparent,${T.gold})`}}/>
-  </div>
-);
-
-const SecHead = ({ eye, title, dark=false }) => (
-  <div style={{textAlign:"center",marginBottom:"3rem"}}>
-    <p style={{color:dark?T.goldD:T.gold,fontSize:"0.65rem",letterSpacing:"0.38em",fontFamily:"'Cinzel',serif",marginBottom:8,textTransform:"uppercase"}}>{eye}</p>
-    <h2 style={{fontFamily:"'Cinzel Decorative',serif",fontSize:"clamp(1.6rem,3.5vw,2.6rem)",color:dark?T.navy:T.cream,fontWeight:700,lineHeight:1.25}}>{title}</h2>
-    <Divider/>
-  </div>
-);
-
-// ─── STARS ───────────────────────────────────────────────────
-function Stars() {
-  const s = Array.from({length:110},(_,i)=>({id:i,x:Math.random()*100,y:Math.random()*100,sz:Math.random()*2+0.4,dl:Math.random()*5,dr:Math.random()*3+2}));
-  return (
-    <div style={{position:"absolute",inset:0,overflow:"hidden",pointerEvents:"none"}}>
-      {s.map(x=><div key={x.id} style={{position:"absolute",left:`${x.x}%`,top:`${x.y}%`,width:x.sz,height:x.sz,borderRadius:"50%",background:x.sz>1.5?T.gold:T.cream,opacity:0,animation:`twinkle ${x.dr}s ${x.dl}s infinite ease-in-out`}}/>)}
-    </div>
-  );
-}
-
-function Particles() {
-  const p = Array.from({length:14},(_,i)=>({id:i,x:Math.random()*100,sz:Math.random()*4+2,dl:Math.random()*10,dr:Math.random()*12+14}));
-  return (
-    <div style={{position:"absolute",inset:0,overflow:"hidden",pointerEvents:"none"}}>
-      {p.map(x=><div key={x.id} style={{position:"absolute",left:`${x.x}%`,bottom:"-10px",width:x.sz,height:x.sz,borderRadius:"50%",background:`radial-gradient(circle,${T.gold}cc,${T.goldD}22)`,animation:`floatUp ${x.dr}s ${x.dl}s infinite linear`}}/>)}
-    </div>
-  );
-}
-
-// ─── MOBILE MENU ─────────────────────────────────────────────
-function MobileMenu({ open, onClose, onNav, categoryRef, storyRef, cartCount, wishCount, user, onLogout }) {
-  if (!open) return null;
-  const go = (key) => {
-    onClose();
-    if (key === "category") { onNav("home"); setTimeout(()=>categoryRef.current?.scrollIntoView({behavior:"smooth"}),160); }
-    else if (key === "our-story") { onNav("home"); setTimeout(()=>storyRef.current?.scrollIntoView({behavior:"smooth"}),160); }
-    else onNav(key);
-  };
-  return (
-    <div style={{position:"fixed",inset:0,zIndex:2000,background:"rgba(22,27,46,0.98)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"1.4rem",animation:"fadeIn 0.2s ease",overflowY:"auto",padding:"2rem 1rem"}}>
-      <button onClick={onClose} style={{position:"absolute",top:20,right:20,background:"none",border:"none",color:T.cream,fontSize:28,cursor:"pointer",lineHeight:1}}>✕</button>
-      
-      {/* Logo */}
-      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:"0.5rem"}}>
-        <div style={{width:32,height:32,borderRadius:"50%",background:`linear-gradient(135deg,${T.gold},${T.goldD})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15}}>💎</div>
-        <span style={{fontFamily:"'Cinzel',serif",fontWeight:700,fontSize:"1.1rem",letterSpacing:"0.14em",color:T.cream}}>WISHSTONE</span>
-      </div>
-
-      {/* Nav links */}
-      {[["Home","home"],["Category","category"],["Products","products"],["Our Story","our-story"]].map(([l,k])=>(
-        <button key={k} onClick={()=>go(k)} style={{background:"none",border:"none",color:T.cream,fontFamily:"'Cinzel',serif",fontSize:"1.1rem",letterSpacing:"0.2em",cursor:"pointer",padding:"0.6rem 2rem",borderBottom:`1px solid ${T.gold}22`,width:240,textAlign:"center",transition:"color 0.2s"}}
-          onMouseEnter={e=>e.target.style.color=T.gold} onMouseLeave={e=>e.target.style.color=T.cream}>{l}</button>
-      ))}
-
-      {/* Cart + Wishlist */}
-      <div style={{display:"flex",gap:"1rem",marginTop:"0.5rem"}}>
-        <button onClick={()=>go("wishlist")} style={{background:`rgba(201,169,110,0.1)`,border:`1px solid ${T.gold}44`,color:T.cream,borderRadius:8,padding:"10px 20px",cursor:"pointer",fontFamily:"'Cinzel',serif",fontSize:"0.8rem",letterSpacing:"0.1em",display:"flex",alignItems:"center",gap:6}}>
-          🤍 Wishlist {wishCount>0&&<span style={{background:T.gold,color:T.navy,borderRadius:"50%",width:18,height:18,fontSize:10,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center"}}>{wishCount}</span>}
-        </button>
-        <button onClick={()=>go("cart")} style={{background:`rgba(196,116,122,0.15)`,border:`1px solid ${T.rose}44`,color:T.cream,borderRadius:8,padding:"10px 20px",cursor:"pointer",fontFamily:"'Cinzel',serif",fontSize:"0.8rem",letterSpacing:"0.1em",display:"flex",alignItems:"center",gap:6}}>
-          🛒 Cart {cartCount>0&&<span style={{background:T.rose,color:"#fff",borderRadius:"50%",width:18,height:18,fontSize:10,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center"}}>{cartCount}</span>}
-        </button>
-      </div>
-
-      {/* Auth */}
-      <div style={{display:"flex",flexDirection:"column",gap:"0.7rem",width:240,marginTop:"0.5rem"}}>
-        {user ? (
-          <>
-            <button onClick={()=>go("dashboard")} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"12px",borderRadius:6,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:800,width:"100%"}}>👤 DASHBOARD</button>
-            <button onClick={()=>{onClose();onLogout();}} style={{background:"transparent",border:`1px solid ${T.rose}66`,color:T.rose,padding:"12px",borderRadius:6,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.14em",cursor:"pointer",width:"100%"}}>🚪 LOGOUT</button>
-          </>
-        ) : (
-          <>
-            <button onClick={()=>{onClose();window.location.hash="login";onNav("login");}} style={{background:"transparent",border:`1px solid ${T.gold}66`,color:T.cream,padding:"12px",borderRadius:6,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.14em",cursor:"pointer",width:"100%"}}>LOGIN</button>
-            <button onClick={()=>{onClose();window.location.hash="signup";onNav("signup");}} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"12px",borderRadius:6,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:800,width:"100%"}}>SIGN UP</button>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
-
 // ─── HEADER ───────────────────────────────────────────────────
-function Header({ cartCount, wishCount, onNav, currentPage, categoryRef, storyRef, user, onLogout }) {
-  const [scrolled,setScrolled]=useState(false);
-  const [mOpen,setMOpen]=useState(false);
-  useEffect(()=>{ const h=()=>setScrolled(window.scrollY>50); window.addEventListener("scroll",h); return()=>window.removeEventListener("scroll",h); },[]);
+function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  const go = (link) => {
-    const key = link.toLowerCase().replace(" ","-");
-    if (key==="category") { onNav("home"); setTimeout(()=>categoryRef.current?.scrollIntoView({behavior:"smooth"}),160); }
-    else if (key==="our-story") { onNav("home"); setTimeout(()=>storyRef.current?.scrollIntoView({behavior:"smooth"}),160); }
-    else onNav(key);
-  };
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 30);
+    window.addEventListener("scroll", fn);
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
+
+  const links = [["products","Shop"],["rituals","The Ritual"],["benefits","Benefits"],["stories","Stories"]];
+
+  const navTo = (k) => { onNav(k); setMobileOpen(false); };
 
   return (
-    <>
-      <MobileMenu open={mOpen} onClose={()=>setMOpen(false)} onNav={onNav} categoryRef={categoryRef} storyRef={storyRef} cartCount={cartCount} wishCount={wishCount} user={user} onLogout={onLogout}/>
-      <header style={{position:"fixed",top:0,left:0,right:0,zIndex:1000,padding:"0 clamp(1rem,4vw,3rem)",height:68,display:"flex",alignItems:"center",justifyContent:"space-between",background:`rgba(33,40,66,${scrolled?0.98:0.92})`,backdropFilter:"blur(18px)",borderBottom:`1px solid rgba(201,169,110,${scrolled?0.2:0.08})`,transition:"all 0.35s ease"}}>
+    <header style={{
+      position:"fixed", top:0, left:0, right:0, zIndex:1000,
+      background: scrolled ? "rgba(245,240,232,0.97)" : "rgba(245,240,232,0.92)",
+      backdropFilter:"blur(14px)",
+      borderBottom: scrolled ? `1px solid ${T.border}` : "1px solid transparent",
+      transition:"all 0.3s",
+    }}>
+      <div className="max-w" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", height:64, padding:"0 clamp(1rem,4vw,2.5rem)" }}>
         {/* Logo */}
-        <div onClick={()=>{onNav("home");scrollTop();}} style={{cursor:"pointer",display:"flex",alignItems:"center",gap:9,flexShrink:0}}>
-          <div style={{width:36,height:36,borderRadius:"50%",background:`linear-gradient(135deg,${T.gold},${T.goldD})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,boxShadow:`0 0 18px ${T.gold}44`}}>💎</div>
-          <span style={{fontFamily:"'Cinzel',serif",fontWeight:700,fontSize:"clamp(1rem,3vw,1.3rem)",letterSpacing:"0.14em",color:T.cream,textShadow:`0 0 20px ${T.gold}55`}}>WISHSTONE</span>
-        </div>
+        <button onClick={() => navTo("home")} style={{ background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:9, flexShrink:0 }}>
+          <div style={{ width:32, height:32, borderRadius:8, background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>💎</div>
+          <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.15rem", fontWeight:900, color:T.text }}>WishStone</span>
+        </button>
 
         {/* Desktop Nav */}
-        <nav className="header-nav" style={{display:"flex",gap:"2.5rem"}}>
-          {["Home","Category","Products","Our Story"].map(link=>{
-            const key=link.toLowerCase().replace(" ","-");
-            const active=currentPage===key;
-            return <button key={link} onClick={()=>go(link)} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"'Cinzel',serif",fontSize:"0.7rem",letterSpacing:"0.18em",textTransform:"uppercase",color:active?T.gold:T.cream,opacity:active?1:0.75,borderBottom:active?`1px solid ${T.gold}`:"1px solid transparent",padding:"4px 0",transition:"all 0.25s"}} onMouseEnter={e=>{e.target.style.color=T.gold;e.target.style.opacity="1";}} onMouseLeave={e=>{if(!active){e.target.style.color=T.cream;e.target.style.opacity="0.75";}}}>{link}</button>;
-          })}
+        <nav className="header-nav" style={{ display:"flex", gap:"2.2rem", alignItems:"center" }}>
+          {links.map(([k,l]) => (
+            <button key={k} className={`nav-link${currentPage===k?" active":""}`} onClick={() => navTo(k)}>{l}</button>
+          ))}
+          <button onClick={() => navTo("cart")} style={{ background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:5, fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.1em", textTransform:"uppercase", color:T.text, position:"relative" }}>
+            🛒 Cart
+            {cartCount > 0 && <span style={{ background:T.orange, color:"#fff", borderRadius:"50%", width:16, height:16, fontSize:"0.58rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700, position:"absolute", top:-6, right:-8 }}>{cartCount}</span>}
+          </button>
         </nav>
 
-        {/* Right side: icons + auth + hamburger */}
-        <div style={{display:"flex",gap:"0.6rem",alignItems:"center"}}>
-          {/* Cart + Wishlist icons — hidden on mobile via CSS */}
-          <div className="header-icons" style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
-            {[["wishlist","🤍",wishCount,T.gold],["cart","🛒",cartCount,T.rose]].map(([pg,ic,cnt,bc])=>(
-              <button key={pg} onClick={()=>{onNav(pg);scrollTop();}} style={{background:"none",border:"none",cursor:"pointer",position:"relative",padding:4}}>
-                <span style={{fontSize:20}}>{ic}</span>
-                {cnt>0&&<span style={{position:"absolute",top:-2,right:-2,background:bc,color:T.navy,borderRadius:"50%",width:15,height:15,fontSize:8,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center"}}>{cnt}</span>}
+        {/* Right actions */}
+        <div style={{ display:"flex", alignItems:"center", gap:"0.7rem" }}>
+          {/* Wishlist — always visible */}
+          <button onClick={() => navTo("wishlist")} style={{ background:"none", border:"none", cursor:"pointer", position:"relative", fontSize:18, padding:"4px 5px" }}>
+            🤍
+            {wishCount > 0 && <span style={{ position:"absolute", top:0, right:0, background:T.orange, color:"#fff", borderRadius:"50%", width:15, height:15, fontSize:"0.55rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700 }}>{wishCount}</span>}
+          </button>
+          {/* Cart icon on mobile */}
+          <button onClick={() => navTo("cart")} className="show-mobile-flex" style={{ display:"none", background:"none", border:"none", cursor:"pointer", position:"relative", fontSize:18, padding:"4px 5px" }}>
+            🛒
+            {cartCount > 0 && <span style={{ position:"absolute", top:0, right:0, background:T.orange, color:"#fff", borderRadius:"50%", width:15, height:15, fontSize:"0.55rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700 }}>{cartCount}</span>}
+          </button>
+          {/* Desktop auth */}
+          {user ? (
+            <>
+              <button onClick={() => navTo("dashboard")} style={{ width:34, height:34, borderRadius:"50%", background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, border:"none", color:"#fff", cursor:"pointer", fontWeight:700, fontSize:"0.85rem", flexShrink:0 }}>
+                {(user.name||user.email||"U")[0].toUpperCase()}
               </button>
-            ))}
-          </div>
+              <button className="btn-outline header-nav" style={{ padding:"7px 14px", fontSize:"0.72rem", borderRadius:6 }} onClick={onLogout}>Sign Out</button>
+            </>
+          ) : (
+            <>
+              <button className="btn-orange header-nav" onClick={() => navTo("products")} style={{ padding:"9px 18px", fontSize:"0.72rem", borderRadius:6 }}>ORDER NOW</button>
+              <button className="nav-link header-nav" onClick={() => navTo("auth")} style={{ fontSize:"0.72rem" }}>LOGIN</button>
+            </>
+          )}
+          {/* Hamburger */}
+          <button onClick={() => setMobileOpen(!mobileOpen)} style={{ display:"none", background:"none", border:"none", cursor:"pointer", padding:"6px", flexDirection:"column", gap:5, alignItems:"center", justifyContent:"center" }} className="show-mobile-flex">
+            <span style={{ display:"block", width:22, height:2, background:T.text, borderRadius:2, transition:"all 0.3s", transform: mobileOpen ? "rotate(45deg) translate(5px,5px)" : "none" }} />
+            <span style={{ display:"block", width:22, height:2, background:T.text, borderRadius:2, transition:"all 0.3s", opacity: mobileOpen ? 0 : 1 }} />
+            <span style={{ display:"block", width:22, height:2, background:T.text, borderRadius:2, transition:"all 0.3s", transform: mobileOpen ? "rotate(-45deg) translate(5px,-5px)" : "none" }} />
+          </button>
+        </div>
+      </div>
 
-          {/* Auth Buttons — hidden on mobile via CSS */}
-          <div className="header-auth" style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
+      {/* Mobile Menu */}
+      {mobileOpen && (
+        <div style={{ background:T.white, borderTop:`1px solid ${T.border}`, padding:"1rem clamp(1rem,4vw,2.5rem) 1.5rem", boxShadow:"0 8px 32px rgba(0,0,0,0.08)" }}>
+          {links.map(([k,l]) => (
+            <button key={k} onClick={() => navTo(k)} style={{ display:"block", width:"100%", textAlign:"left", background:"none", border:"none", cursor:"pointer", padding:"12px 0", fontSize:"0.95rem", fontWeight:600, color: currentPage===k ? T.orange : T.text, borderBottom:`1px solid ${T.border}`, fontFamily:"'Inter',sans-serif" }}>{l}</button>
+          ))}
+          <div style={{ marginTop:"1rem", display:"flex", gap:"0.8rem", flexWrap:"wrap" }}>
             {user ? (
               <>
-                <button onClick={()=>{onNav("dashboard");scrollTop();}} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"8px 14px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:700}}>DASHBOARD</button>
-                <button onClick={onLogout} style={{background:"transparent",border:`1px solid ${T.cream}44`,color:T.cream,padding:"8px 14px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.14em",cursor:"pointer",transition:"all 0.25s"}} onMouseEnter={e=>{e.target.style.borderColor=T.rose;e.target.style.color=T.rose;}} onMouseLeave={e=>{e.target.style.borderColor=`${T.cream}44`;e.target.style.color=T.cream;}}>LOGOUT</button>
+                <button className="btn-orange" onClick={() => navTo("dashboard")} style={{ padding:"10px 20px", fontSize:"0.8rem", borderRadius:7, flex:1 }}>My Account</button>
+                <button className="btn-outline" onClick={() => { onLogout(); setMobileOpen(false); }} style={{ padding:"10px 20px", fontSize:"0.8rem", borderRadius:7, flex:1 }}>Sign Out</button>
               </>
             ) : (
               <>
-                <button onClick={()=>window.location.hash="login"} style={{background:"transparent",border:`1px solid ${T.cream}44`,color:T.cream,padding:"8px 14px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.14em",cursor:"pointer",transition:"all 0.25s"}} onMouseEnter={e=>{e.target.style.borderColor=T.gold;e.target.style.color=T.gold;}} onMouseLeave={e=>{e.target.style.borderColor=`${T.cream}44`;e.target.style.color=T.cream;}}>LOGIN</button>
-                <button onClick={()=>window.location.hash="signup"} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"8px 14px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:700}}>SIGNUP</button>
+                <button className="btn-orange" onClick={() => navTo("products")} style={{ padding:"10px 20px", fontSize:"0.8rem", borderRadius:7, flex:1 }}>Order Now</button>
+                <button className="btn-outline" onClick={() => navTo("auth")} style={{ padding:"10px 20px", fontSize:"0.8rem", borderRadius:7, flex:1 }}>Login</button>
               </>
             )}
           </div>
-
-          {/* Hamburger — shown on mobile */}
-          <button className="mobile-menu-btn" onClick={()=>setMOpen(true)} style={{display:"none",background:"none",border:`1px solid ${T.gold}55`,borderRadius:6,padding:"6px 8px",cursor:"pointer",flexDirection:"column",gap:4,alignItems:"center"}}>
-            {[0,1,2].map(i=><div key={i} style={{width:20,height:2,background:T.cream,borderRadius:1}}/>)}
-          </button>
         </div>
-      </header>
-    </>
+      )}
+    </header>
   );
 }
 
-// ─── OFFER BANNER ─────────────────────────────────────────────
-function OfferBanner() {
-  const txt = ["✦ Flat ₹300 OFF — coupon WOW300","✦ Free shipping above ₹999","✦ New Moon Collection","✦ Buy 2 Get 1 Free on Manifestation","✦ 100% Natural & Ethically Sourced"].join("     ");
+// ─── HERO ─────────────────────────────────────────────────────
+function Hero({ onShop, onRitual }) {
+  const [rot, setRot] = useState({ x: 6, y: -18 });
+  const [dragging, setDragging] = useState(false);
+  const [last, setLast] = useState({ x: 0, y: 0 });
+  const [autoAnim, setAutoAnim] = useState(true);
+
+  const onMouseDown = e => {
+    setDragging(true);
+    setAutoAnim(false);
+    setLast({ x: e.clientX, y: e.clientY });
+  };
+  const onMouseMove = e => {
+    if (!dragging) return;
+    const dx = e.clientX - last.x;
+    const dy = e.clientY - last.y;
+    setRot(r => ({ x: Math.max(-40, Math.min(40, r.x - dy * 0.4)), y: r.y + dx * 0.5 }));
+    setLast({ x: e.clientX, y: e.clientY });
+  };
+  const onMouseUp = () => setDragging(false);
+
+  const onTouchStart = e => {
+    setDragging(true);
+    setAutoAnim(false);
+    setLast({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+  };
+  const onTouchMove = e => {
+    if (!dragging) return;
+    const dx = e.touches[0].clientX - last.x;
+    const dy = e.touches[0].clientY - last.y;
+    setRot(r => ({ x: Math.max(-40, Math.min(40, r.x - dy * 0.4)), y: r.y + dx * 0.5 }));
+    setLast({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+  };
+  const onTouchEnd = () => setDragging(false);
+
   return (
-    <div style={{position:"fixed",top:68,left:0,right:0,zIndex:999,background:`linear-gradient(90deg,${T.navyD},${T.goldD}55,${T.navyD})`,borderBottom:`1px solid ${T.gold}33`,height:32,overflow:"hidden",display:"flex",alignItems:"center"}}>
-      <div style={{display:"flex",animation:"marquee 30s linear infinite",whiteSpace:"nowrap"}}>
-        {[0,1,2].map(i=><span key={i} style={{color:T.goldL,fontSize:"0.65rem",letterSpacing:"0.14em",fontFamily:"'Cinzel',serif",paddingRight:"5rem"}}>{txt}</span>)}
+    <section style={{
+      minHeight:"100vh", background:T.bg, display:"flex", alignItems:"center",
+      paddingTop:80, paddingBottom:40, paddingLeft:"clamp(1rem,5vw,3.5rem)", paddingRight:"clamp(1rem,5vw,3.5rem)",
+      position:"relative", overflow:"hidden"
+    }}>
+      {/* bg dots */}
+      <div style={{ position:"absolute", top:"18%", right:"6%", width:8, height:8, borderRadius:"50%", background:T.orange, opacity:0.5 }} />
+      <div style={{ position:"absolute", bottom:"28%", right:"32%", width:6, height:6, borderRadius:"50%", background:T.orange, opacity:0.4 }} />
+
+      <div className="max-w hero-grid" style={{ width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2.5rem", alignItems:"center" }}>
+
+        {/* ── LEFT: Text ── */}
+        <div style={{ animation:"fadeUp 0.8s ease both" }}>
+          <div style={{ display:"inline-flex", alignItems:"center", gap:7, background:"rgba(232,114,12,0.08)", border:`1px solid rgba(232,114,12,0.22)`, borderRadius:20, paddingTop:5, paddingBottom:5, paddingLeft:14, paddingRight:14, marginBottom:"1.6rem" }}>
+            <span style={{ color:T.orange, fontSize:10 }}>✦</span>
+            <span style={{ fontSize:"0.65rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase" }}>India's Sacred Manifestation Stone</span>
+          </div>
+
+          <h1 style={{ fontFamily:"'Noto Serif Devanagari','Playfair Display',serif", fontSize:"clamp(2.2rem,5.5vw,4.2rem)", fontWeight:900, lineHeight:1.1, marginBottom:"0.3rem", color:T.text }}>
+            अपनी इच्छाएँ,
+          </h1>
+          <h1 style={{ fontFamily:"'Noto Serif Devanagari','Playfair Display',serif", fontSize:"clamp(2.2rem,5.5vw,4.2rem)", fontWeight:900, lineHeight:1.1, marginBottom:"1rem", color:T.orange, fontStyle:"italic" }}>
+            अपनी नियति।
+          </h1>
+
+          <p style={{ fontSize:"clamp(0.7rem,1.2vw,0.88rem)", fontWeight:600, letterSpacing:"0.22em", textTransform:"uppercase", color:T.text, marginBottom:"1.2rem", borderBottom:`2px solid ${T.text}`, paddingBottom:"0.8rem", display:"inline-block" }}>
+            Manifest with WishStone
+          </p>
+
+          <blockquote style={{ fontSize:"clamp(0.8rem,1.4vw,0.88rem)", color:T.textMid, lineHeight:1.7, marginBottom:"2rem", borderLeft:`3px solid ${T.orange}`, paddingLeft:"1rem", fontStyle:"italic", maxWidth:440 }}>
+            "जो तुम खोज रहे हो, वह भी तुम्हें खोज रहा है — WishStone उस रास्ते को छोटा करता है।"
+          </blockquote>
+
+          <div style={{ display:"flex", gap:"0.8rem", flexWrap:"wrap" }}>
+            <button className="btn-orange" onClick={onShop} style={{ paddingTop:13, paddingBottom:13, paddingLeft:26, paddingRight:26, fontSize:"0.82rem", borderRadius:8 }}>
+              अभी शुरू करें
+            </button>
+            <button className="btn-outline" onClick={onRitual} style={{ paddingTop:13, paddingBottom:13, paddingLeft:26, paddingRight:26, fontSize:"0.82rem", borderRadius:8 }}>
+              The Ritual
+            </button>
+          </div>
+        </div>
+
+        {/* ── RIGHT: 3D Interactive Stone ── */}
+        <div style={{ position:"relative", display:"flex", alignItems:"center", justifyContent:"center", minHeight:"clamp(320px,45vw,520px)", perspective:"900px" }}
+          onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}
+        >
+          {/* Hint label */}
+          <div style={{ position:"absolute", bottom:8, left:"50%", transform:"translateX(-50%)", fontSize:"0.62rem", color:T.textMid, letterSpacing:"0.1em", textTransform:"uppercase", fontWeight:600, opacity:0.6, whiteSpace:"nowrap", zIndex:10 }}>
+            ↔ Drag to rotate
+          </div>
+
+          {/* 3D Stone — draggable */}
+          <div
+            onMouseDown={onMouseDown}
+            onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
+            style={{
+              position:"relative", zIndex:2, transformStyle:"preserve-3d",
+              transform: autoAnim ? undefined : `rotateX(${rot.x}deg) rotateY(${rot.y}deg)`,
+              animation: autoAnim ? "stone3d 8s ease-in-out infinite" : "none",
+              cursor: dragging ? "grabbing" : "grab",
+              transition: dragging ? "none" : "transform 0.4s ease",
+              userSelect:"none",
+            }}
+          >
+            <div style={{
+              width:"clamp(190px,24vw,300px)",
+              height:"clamp(230px,30vw,360px)",
+              borderRadius:"50% 50% 48% 52% / 55% 55% 45% 45%",
+              background:"radial-gradient(ellipse at 32% 28%, #f5b070 0%, #d06818 40%, #c85a10 65%, #7a3008 100%)",
+              boxShadow:"0 40px 100px rgba(200,90,16,0.5), 0 0 0 1px rgba(200,90,16,0.1), inset 0 -25px 50px rgba(0,0,0,0.25), inset 0 12px 35px rgba(255,210,130,0.35)",
+              position:"relative", overflow:"hidden",
+            }}>
+              <div style={{ position:"absolute", top:"18%", left:"22%", width:"35%", height:"28%", borderRadius:"50%", background:"radial-gradient(circle, rgba(255,230,180,0.75) 0%, transparent 70%)", filter:"blur(6px)" }} />
+              <div style={{ position:"absolute", top:"10%", left:"15%", width:"20%", height:"14%", borderRadius:"50%", background:"rgba(255,245,220,0.45)", filter:"blur(4px)" }} />
+              <div style={{ position:"absolute", bottom:0, left:0, right:0, height:"35%", background:"linear-gradient(to top, rgba(0,0,0,0.3), transparent)", borderRadius:"0 0 50% 50%" }} />
+            </div>
+            {/* Ground shadow */}
+            <div style={{ position:"absolute", bottom:-18, left:"50%", transform:"translateX(-50%)", width:"70%", height:20, borderRadius:"50%", background:"rgba(200,90,16,0.22)", filter:"blur(10px)" }} />
+          </div>
+
+          {/* Badge: Set Intentions */}
+          <div className="hero-badge" style={{ position:"absolute", top:"14%", left:"0%", background:T.white, borderRadius:14, paddingTop:10, paddingBottom:10, paddingLeft:14, paddingRight:14, boxShadow:"0 8px 32px rgba(0,0,0,0.12)", display:"flex", alignItems:"center", gap:10, minWidth:148, zIndex:3, animation:"badgeFloat1 4s ease-in-out infinite" }}>
+            <div style={{ width:36, height:36, borderRadius:9, background:"linear-gradient(135deg,#ff6b6b,#ee5a24)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>🎯</div>
+            <div>
+              <div style={{ fontSize:"0.78rem", fontWeight:700, color:T.text, whiteSpace:"nowrap" }}>Set Intentions</div>
+              <div style={{ fontSize:"0.63rem", color:T.textMid }}>Daily Ritual</div>
+            </div>
+          </div>
+
+          {/* Badge: Energy Aligned */}
+          <div className="hero-badge" style={{ position:"absolute", top:"40%", right:"-4%", background:T.white, borderRadius:14, paddingTop:10, paddingBottom:10, paddingLeft:14, paddingRight:14, boxShadow:"0 8px 32px rgba(0,0,0,0.12)", display:"flex", alignItems:"center", gap:10, minWidth:158, zIndex:3, animation:"badgeFloat2 4.5s ease-in-out infinite" }}>
+            <div style={{ width:36, height:36, borderRadius:9, background:"linear-gradient(135deg,#f9ca24,#f0932b)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>✨</div>
+            <div>
+              <div style={{ fontSize:"0.78rem", fontWeight:700, color:T.text, whiteSpace:"nowrap" }}>Energy Aligned</div>
+              <div style={{ fontSize:"0.63rem", color:T.textMid }}>Natural Stone</div>
+            </div>
+          </div>
+
+          {/* Badge: Inner Peace */}
+          <div className="hero-badge" style={{ position:"absolute", bottom:"12%", left:"4%", background:T.white, borderRadius:14, paddingTop:10, paddingBottom:10, paddingLeft:14, paddingRight:14, boxShadow:"0 8px 32px rgba(0,0,0,0.12)", display:"flex", alignItems:"center", gap:10, minWidth:148, zIndex:3, animation:"badgeFloat3 5s ease-in-out infinite" }}>
+            <div style={{ width:36, height:36, borderRadius:9, background:"linear-gradient(135deg,#6ab04c,#2ecc71)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>🌿</div>
+            <div>
+              <div style={{ fontSize:"0.78rem", fontWeight:700, color:T.text, whiteSpace:"nowrap" }}>Inner Peace</div>
+              <div style={{ fontSize:"0.63rem", color:T.textMid }}>Grounding</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
+// ─── STATS BAR ────────────────────────────────────────────────
+function StatsBar() {
+  return (
+    <div style={{ background:T.bg, borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}`, padding:"28px clamp(1.5rem,5vw,3.5rem)" }}>
+      <div className="max-w">
+        <div className="stats-row" style={{ display:"flex", gap:"3rem", alignItems:"center", flexWrap:"wrap" }}>
+          {[["12K+","DREAMERS"],["4.9★","RATING"],["100%","NATURAL"],["21","DAY SHIFT"]].map(([n,l]) => (
+            <div key={l} style={{ minWidth:80 }}>
+              <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.3rem,2.5vw,1.8rem)", fontWeight:900, color:T.text, lineHeight:1 }}>{n}</div>
+              <div style={{ fontSize:"0.62rem", fontWeight:700, color:T.textMid, letterSpacing:"0.14em", marginTop:4 }}>{l}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
-// ─── HERO ────────────────────────────────────────────────────
-function Hero({ onShop }) {
-  const [mouse,setMouse]=useState({x:0.5,y:0.5});
+// ─── MARQUEE ──────────────────────────────────────────────────
+function MarqueeSection() {
+  const doubled = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
   return (
-    <section onMouseMove={e=>setMouse({x:e.clientX/window.innerWidth,y:e.clientY/window.innerHeight})}
-      style={{minHeight:"100vh",position:"relative",display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",background:`radial-gradient(ellipse at ${mouse.x*100}% ${mouse.y*100}%, #2A3465 0%, ${T.navy} 40%, ${T.navyD} 100%)`,transition:"background 0.5s ease",paddingTop:100}}>
-      <Stars/><Particles/>
-
-      {/* Corner ornaments */}
-      {[{top:16,left:16},{top:16,right:16},{bottom:16,left:16},{bottom:16,right:16}].map((pos,i)=>(
-        <div key={i} style={{position:"absolute",...pos,width:44,height:44,borderTop:pos.top!==undefined?`1px solid ${T.gold}55`:"none",borderBottom:pos.bottom!==undefined?`1px solid ${T.gold}55`:"none",borderLeft:pos.left!==undefined?`1px solid ${T.gold}55`:"none",borderRight:pos.right!==undefined?`1px solid ${T.gold}55`:"none",pointerEvents:"none"}}/>
-      ))}
-
-      {/* Moon — hidden on small mobile */}
-      <div style={{position:"absolute",top:"6%",right:"8%",width:"clamp(100px,14vw,170px)",height:"clamp(100px,14vw,170px)",borderRadius:"50%",background:"radial-gradient(circle at 32% 30%,#FAF5EC,#E8D8B4,#B8A078)",boxShadow:"0 0 60px rgba(240,231,213,0.28),0 0 120px rgba(201,169,110,0.18),inset -25px -20px 50px rgba(0,0,0,0.45)",animation:"moonGlow 7s ease-in-out infinite"}}>
-        {[[30,40,16],[65,25,9],[50,65,7]].map(([x,y,s],i)=><div key={i} style={{position:"absolute",left:`${x}%`,top:`${y}%`,width:s,height:s,borderRadius:"50%",background:"rgba(0,0,0,0.11)"}}/>)}
-      </div>
-
-      {/* Orbits */}
-      {[{sz:240,dur:20,off:{top:"1%",right:"4%"}},{sz:330,dur:32,off:{top:"-5%",right:"-1%"},rev:true}].map((o,i)=>(
-        <div key={i} style={{position:"absolute",...o.off,width:o.sz,height:o.sz,borderRadius:"50%",border:`1px solid rgba(201,169,110,${i===0?0.22:0.1})`,animation:`orbit ${o.dur}s linear infinite ${o.rev?"reverse":""}`,display:i===0?"block":"none"}}>
-          {i===0&&<div style={{position:"absolute",top:-4,left:"50%",width:8,height:8,borderRadius:"50%",background:T.gold,boxShadow:`0 0 12px ${T.gold}`}}/>}
-        </div>
-      ))}
-
-      {/* Content */}
-      <div style={{textAlign:"center",position:"relative",zIndex:10,padding:"0 clamp(1rem,5vw,2rem)",maxWidth:820,width:"100%"}}>
-        <div style={{display:"inline-flex",alignItems:"center",gap:10,border:`1px solid ${T.gold}44`,borderRadius:100,padding:"6px 20px",marginBottom:"1.5rem",background:`rgba(201,169,110,0.07)`,animation:"fadeDown 0.9s ease both"}}>
-          <div style={{width:4,height:4,borderRadius:"50%",background:T.gold}}/>
-          <span style={{color:T.goldL,fontSize:"0.63rem",letterSpacing:"0.32em",fontFamily:"'Cinzel',serif"}}>ALIGN WITH THE UNIVERSE</span>
-          <div style={{width:4,height:4,borderRadius:"50%",background:T.gold}}/>
-        </div>
-
-        <h1 className="hero-title" style={{fontFamily:"'Cinzel Decorative',serif",fontSize:"clamp(2.2rem,6vw,5rem)",fontWeight:900,color:T.cream,lineHeight:1.1,marginBottom:"0.8rem",animation:"fadeUp 1s 0.15s ease both"}}>
-          Manifest Your<br/>
-          <span style={{background:`linear-gradient(135deg,${T.cream},${T.gold},${T.goldL},${T.gold})`,backgroundSize:"300% auto",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",animation:"shimmer 5s linear infinite"}}>Destiny</span>
-        </h1>
-
-        <Divider/>
-
-        <p style={{color:"rgba(240,231,213,0.65)",fontSize:"clamp(0.95rem,2.5vw,1.08rem)",lineHeight:1.9,maxWidth:480,margin:"0 auto 2.2rem",fontStyle:"italic",animation:"fadeUp 1s 0.3s ease both"}}>
-          Premium natural crystals, healing tools & ritual kits crafted to align your energy with the cosmos.
-        </p>
-
-        <div className="hero-btns" style={{display:"flex",gap:"1rem",justifyContent:"center",flexWrap:"wrap",animation:"fadeUp 1s 0.5s ease both"}}>
-          <button onClick={onShop} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:`1px solid ${T.gold}`,color:T.navy,padding:"13px 36px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.75rem",letterSpacing:"0.2em",cursor:"pointer",fontWeight:700,boxShadow:`0 8px 28px ${T.gold}44`,transition:"all 0.3s"}} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=`0 14px 38px ${T.gold}66`;}} onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow=`0 8px 28px ${T.gold}44`;}}>EXPLORE COLLECTION</button>
-          <button style={{background:"transparent",border:`1px solid ${T.cream}44`,color:T.cream,padding:"13px 36px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.75rem",letterSpacing:"0.2em",cursor:"pointer",transition:"all 0.3s"}} onMouseEnter={e=>{e.currentTarget.style.borderColor=T.gold;e.currentTarget.style.color=T.gold;}} onMouseLeave={e=>{e.currentTarget.style.borderColor=`${T.cream}44`;e.currentTarget.style.color=T.cream;}}>OUR STORY</button>
-        </div>
-
-        <div className="hero-stats" style={{display:"flex",gap:"2.5rem",justifyContent:"center",marginTop:"3.5rem",animation:"fadeUp 1s 0.7s ease both"}}>
-          {[["12K+","Happy Souls"],["100%","Natural"],["3+","Collections"]].map(([v,l])=>(
-            <div key={l} style={{textAlign:"center"}}>
-              <div style={{fontFamily:"'Cinzel',serif",fontSize:"clamp(1.2rem,3vw,1.6rem)",color:T.gold,fontWeight:700}}>{v}</div>
-              <div style={{color:"rgba(240,231,213,0.35)",fontSize:"0.62rem",letterSpacing:"0.16em",fontFamily:"'Cinzel',serif"}}>{l}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Scroll cue */}
-      <div style={{position:"absolute",bottom:"1.5rem",left:"50%",display:"flex",flexDirection:"column",alignItems:"center",gap:5,animation:"scrollPulse 2.5s ease-in-out infinite"}}>
-        <div style={{width:1,height:44,background:`linear-gradient(to bottom,transparent,${T.gold}99)`}}/>
-        <span style={{color:T.gold,fontSize:"0.55rem",letterSpacing:"0.28em",fontFamily:"'Cinzel',serif"}}>SCROLL</span>
-      </div>
-    </section>
-  );
-}
-
-// ─── CATEGORY SECTION — cream bg ─────────────────────────────
-function CategorySection({ onCategoryClick, sectionRef }) {
-  const [hov,setHov]=useState(null);
-  return (
-    <section ref={sectionRef} className="section-pad" style={{padding:"90px clamp(1.5rem,5vw,4rem)",background:T.cream,position:"relative",overflow:"hidden"}}>
-      {/* Subtle pattern */}
-      <div style={{position:"absolute",inset:0,backgroundImage:`radial-gradient(circle,${T.gold}18 1px,transparent 1px)`,backgroundSize:"32px 32px",pointerEvents:"none"}}/>
-      <SecHead eye="✦ DISCOVER ✦" title="Explore Our Range" dark={true}/>
-      <div className="cat-grid" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"1.5rem",maxWidth:1080,margin:"0 auto"}}>
-        {CATEGORIES.map(cat=>(
-          <div key={cat.id} onClick={()=>{onCategoryClick(cat);scrollTop();}} onMouseEnter={()=>setHov(cat.id)} onMouseLeave={()=>setHov(null)}
-            style={{position:"relative",borderRadius:4,overflow:"hidden",cursor:"pointer",aspectRatio:"4/5",border:`1px solid ${hov===cat.id?T.goldD:T.gold+"55"}`,transform:hov===cat.id?"translateY(-8px) scale(1.01)":"translateY(0) scale(1)",boxShadow:hov===cat.id?`0 28px 70px rgba(33,40,66,0.35),0 0 0 2px ${T.goldD}55`:`0 6px 24px rgba(33,40,66,0.15)`,transition:"all 0.42s cubic-bezier(0.34,1.56,0.64,1)"}}>
-            <img src={cat.image} alt={cat.name} style={{width:"100%",height:"100%",objectFit:"cover",transform:hov===cat.id?"scale(1.07)":"scale(1)",transition:"transform 0.6s ease"}}/>
-            <div style={{position:"absolute",inset:0,background:`linear-gradient(to top,rgba(33,40,66,0.95) 0%,rgba(33,40,66,0.25) 55%,transparent 100%)`}}/>
-            <div style={{position:"absolute",top:12,left:12,border:`1px solid ${T.gold}88`,borderRadius:2,padding:"2px 10px",background:"rgba(33,40,66,0.7)"}}>
-              <span style={{color:T.gold,fontSize:"0.58rem",letterSpacing:"0.22em",fontFamily:"'Cinzel',serif"}}>COLLECTION</span>
-            </div>
-            <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"1.5rem 1.2rem 1.2rem"}}>
-              <h3 style={{fontFamily:"'Cinzel',serif",fontSize:"clamp(1rem,2.5vw,1.2rem)",color:T.cream,margin:"0 0 6px",letterSpacing:"0.07em"}}>{cat.name}</h3>
-              <p style={{color:"rgba(240,231,213,0.65)",fontSize:"0.8rem",lineHeight:1.6,margin:0,fontStyle:"italic"}}>{cat.desc}</p>
-              <div style={{marginTop:10,color:T.gold,fontSize:"0.68rem",letterSpacing:"0.16em",fontFamily:"'Cinzel',serif",opacity:hov===cat.id?1:0.5,transform:hov===cat.id?"translateX(5px)":"translateX(0)",transition:"all 0.3s"}}>EXPLORE →</div>
-            </div>
-          </div>
+    <div style={{ background:T.bgDark, padding:"13px 0", overflow:"hidden" }}>
+      <div style={{ display:"flex", animation:"marquee 32s linear infinite", width:"max-content" }}>
+        {doubled.map((t, i) => (
+          <span key={i} style={{ color: t==="WishStone" ? T.orange : "rgba(255,255,255,0.65)", fontSize:"0.75rem", fontWeight:600, letterSpacing:"0.12em", fontStyle:"italic", padding:"0 1.8rem", whiteSpace:"nowrap", fontFamily:"'Playfair Display',serif" }}>
+            {t === "WishStone" ? t : t}
+            {i < doubled.length - 1 && <span style={{ color:T.orange, margin:"0 0.5rem" }}>•</span>}
+          </span>
         ))}
       </div>
-    </section>
+    </div>
   );
 }
 
-// ─── USES SECTION — navy, auto-looping video ──────────────────
-function UsesSection() {
-  const [active, setActive] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const videoRef = useRef(null);
-  const progressRef = useRef(null);
-
-  // When active changes, play the new video from start
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.currentTime = 0;
-    v.play().catch(() => {}); // autoplay may be blocked silently
-  }, [active]);
-
-  const MAX_SEC = 5;
-
-  // Track progress bar — capped at MAX_SEC
-  const handleTimeUpdate = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    if (v.currentTime >= MAX_SEC) {
-      setProgress(100);
-      setActive(prev => (prev + 1) % VIDEOS.length);
-      return;
-    }
-    setProgress((v.currentTime / MAX_SEC) * 100);
-  };
-
-  // When video ends naturally, go to next
-  const handleEnded = () => {
-    setProgress(0);
-    setActive(prev => (prev + 1) % VIDEOS.length);
-  };
-
-  // Fallback: if video fails to load, still auto-advance after 5s
-  const handleError = () => {
-    setTimeout(() => setActive(prev => (prev + 1) % VIDEOS.length), 5000);
-  };
-
-  const goTo = (i) => {
-    setProgress(0);
-    setActive(i);
-  };
-
+// ─── POWERS SECTION ───────────────────────────────────────────
+function PowersSection() {
+  const left  = POWERS.slice(0, 3);
+  const right = POWERS.slice(3, 6);
   return (
-    <section
-      className="section-pad"
-      style={{
-        padding: "90px clamp(1.5rem,5vw,4rem)",
-        background: T.navy,
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      {/* Grid texture */}
-      <div style={{
-        position: "absolute", inset: 0, pointerEvents: "none",
-        backgroundImage: `repeating-linear-gradient(0deg,transparent,transparent 48px,rgba(201,169,110,0.025) 48px,rgba(201,169,110,0.025) 49px),
-          repeating-linear-gradient(90deg,transparent,transparent 48px,rgba(201,169,110,0.025) 48px,rgba(201,169,110,0.025) 49px)`,
-      }} />
+    <section style={{ background:T.bg, padding:"90px clamp(1.5rem,5vw,3.5rem)" }}>
+      <div className="max-w">
+        {/* Heading */}
+        <div style={{ textAlign:"center", marginBottom:"3.5rem" }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:14 }}>
+            <div style={{ height:1, width:40, background:T.orange }} />
+            <span style={{ fontSize:"0.65rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase" }}>WishStone की शक्ति</span>
+            <div style={{ height:1, width:40, background:T.orange }} />
+          </div>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.8rem,4vw,2.8rem)", fontWeight:900, color:T.text, lineHeight:1.2 }}>
+            Six Powers to <em style={{ color:T.orange, fontStyle:"italic" }}>Amplify</em><br />Your Manifestation
+          </h2>
+        </div>
 
-      <SecHead eye="✦ IMPACT ✦" title="Our Uses & Impact" />
-
-      <div style={{ maxWidth: 960, margin: "0 auto" }}>
-
-        {/* ── Main Video Player ── */}
-        <div style={{
-          borderRadius: 4, overflow: "hidden", position: "relative",
-          aspectRatio: "16/7", marginBottom: "0.5rem",
-          boxShadow: `0 30px 70px rgba(0,0,0,0.55)`,
-          border: `1px solid ${T.gold}33`,
-          background: "#000",
-        }}>
-          {/* Actual video element */}
-          <video
-            ref={videoRef}
-            key={active} // remounts on change so src reloads cleanly
-            src={VIDEOS[active].src}
-            autoPlay
-            muted
-            playsInline
-            onTimeUpdate={handleTimeUpdate}
-            onEnded={handleEnded}
-            onError={handleError}
-            style={{
-              width: "100%", height: "100%",
-              objectFit: "cover",
-              display: "block",
-            }}
-          />
-
-          {/* Gradient overlay */}
-          <div style={{
-            position: "absolute", inset: 0, pointerEvents: "none",
-            background: `linear-gradient(to top, rgba(22,27,46,0.85) 0%, transparent 55%)`,
-          }} />
-
-          {/* Video info bottom-left */}
-          <div style={{ position: "absolute", bottom: 20, left: 20 }}>
-            <div style={{
-              border: `1px solid ${T.gold}77`, borderRadius: 2,
-              padding: "2px 10px", display: "inline-block", marginBottom: 6,
-              background: "rgba(22,27,46,0.75)",
-            }}>
-              <span style={{
-                color: T.gold, fontSize: "0.58rem",
-                letterSpacing: "0.2em", fontFamily: "'Cinzel',serif",
-              }}>
-                {VIDEOS[active].tag}
-              </span>
-            </div>
-            <h3 style={{
-              color: T.cream, fontFamily: "'Cinzel',serif",
-              fontSize: "clamp(0.88rem,2.5vw,1.1rem)", margin: 0,
-            }}>
-              {VIDEOS[active].title}
-            </h3>
+        {/* 3-column layout: cards | stone | cards */}
+        <div className="powers-layout" style={{ display:"grid", gridTemplateColumns:"1fr 340px 1fr", gap:"1.5rem", alignItems:"start" }}>
+          {/* Left cards */}
+          <div style={{ display:"flex", flexDirection:"column", gap:"1.2rem" }}>
+            {left.map(p => (
+              <div key={p.num} className="power-card">
+                <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:"1rem" }}>
+                  <div style={{ width:44, height:44, borderRadius:10, background:p.iconBg, border:`1px solid ${T.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}>{p.icon}</div>
+                  <span style={{ fontSize:"2rem", fontWeight:900, color:"rgba(26,26,26,0.06)", fontFamily:"'Playfair Display',serif", lineHeight:1 }}>{p.num}</span>
+                </div>
+                <h3 style={{ fontSize:"0.95rem", fontWeight:700, color:T.text, marginBottom:"0.5rem" }}>{p.title}</h3>
+                <p style={{ fontSize:"0.8rem", color:T.textMid, lineHeight:1.65, marginBottom:"0.9rem" }}>{p.desc}</p>
+                <span style={{ fontSize:"0.6rem", fontWeight:700, color:T.textMid, letterSpacing:"0.14em", border:`1px solid ${T.border}`, borderRadius:3, padding:"3px 8px" }}>{p.tag}</span>
+              </div>
+            ))}
           </div>
 
-          {/* Dot indicators bottom-right */}
-          <div style={{
-            position: "absolute", bottom: 22, right: 20,
-            display: "flex", gap: 6, alignItems: "center",
-          }}>
-            {VIDEOS.map((_, i) => (
-              <div
-                key={i}
-                onClick={() => goTo(i)}
-                style={{
-                  width: i === active ? 28 : 8, height: 8,
-                  borderRadius: 4,
-                  background: i === active ? T.gold : `${T.gold}44`,
-                  transition: "all 0.35s ease",
-                  cursor: "pointer",
-                }}
-              />
+          {/* Center stone */}
+          <div className="powers-center-col" style={{ borderRadius:20, overflow:"hidden", background:T.bgDark, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"3rem 2rem", gap:"1.5rem", position:"sticky", top:80 }}>
+            <div style={{ animation:"float 5s ease-in-out infinite" }}>
+              <div style={{ width:200, height:240, borderRadius:"50% 50% 48% 52% / 55% 55% 45% 45%", background:"radial-gradient(ellipse at 35% 30%, #f0a060, #c85a10 55%, #7a3008)", boxShadow:"0 20px 60px rgba(200,90,16,0.5), inset 0 -15px 30px rgba(0,0,0,0.2), inset 0 8px 20px rgba(255,200,120,0.3)" }}>
+              </div>
+            </div>
+            <div style={{ textAlign:"center" }}>
+              <div style={{ fontSize:"0.72rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", marginBottom:6 }}>✦ WishStone ✦</div>
+              <p style={{ fontSize:"0.78rem", color:"rgba(255,255,255,0.55)", fontStyle:"italic", lineHeight:1.6 }}>Hand-crafted natural stone<br />engraved with sacred yantra</p>
+            </div>
+          </div>
+
+          {/* Right cards */}
+          <div style={{ display:"flex", flexDirection:"column", gap:"1.2rem" }}>
+            {right.map(p => (
+              <div key={p.num} className="power-card">
+                <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:"1rem" }}>
+                  <div style={{ width:44, height:44, borderRadius:10, background:p.iconBg, border:`1px solid ${T.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}>{p.icon}</div>
+                  <span style={{ fontSize:"2rem", fontWeight:900, color:"rgba(26,26,26,0.06)", fontFamily:"'Playfair Display',serif", lineHeight:1 }}>{p.num}</span>
+                </div>
+                <h3 style={{ fontSize:"0.95rem", fontWeight:700, color:T.text, marginBottom:"0.5rem" }}>{p.title}</h3>
+                <p style={{ fontSize:"0.8rem", color:T.textMid, lineHeight:1.65, marginBottom:"0.9rem" }}>{p.desc}</p>
+                <span style={{ fontSize:"0.6rem", fontWeight:700, color:T.textMid, letterSpacing:"0.14em", border:`1px solid ${T.border}`, borderRadius:3, padding:"3px 8px" }}>{p.tag}</span>
+              </div>
             ))}
           </div>
         </div>
-
-        {/* ── Progress bar ── */}
-        <div style={{
-          height: 3, background: `${T.gold}22`,
-          borderRadius: 2, marginBottom: "1rem",
-          overflow: "hidden",
-        }}>
-          <div style={{
-            height: "100%", width: `${progress}%`,
-            background: `linear-gradient(90deg, ${T.goldD}, ${T.gold})`,
-            transition: "width 0.25s linear",
-            borderRadius: 2,
-          }} />
-        </div>
-
-        {/* ── Thumbnail strip ── */}
-        <div
-          className="vid-thumbs"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4,1fr)",
-            gap: "0.8rem",
-          }}
-        >
-          {VIDEOS.map((v, i) => (
-            <div
-              key={i}
-              onClick={() => goTo(i)}
-              style={{
-                borderRadius: 4, overflow: "hidden", cursor: "pointer",
-                aspectRatio: "16/9",
-                border: `2px solid ${active === i ? T.gold : `${T.gold}22`}`,
-                opacity: active === i ? 1 : 0.48,
-                transition: "all 0.3s ease",
-                position: "relative",
-              }}
-            >
-              <img
-                src={v.thumb}
-                alt={v.title}
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-              {/* Overlay */}
-              <div style={{
-                position: "absolute", inset: 0,
-                background: `rgba(22,27,46,${active === i ? 0.1 : 0.38})`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                transition: "background 0.3s",
-              }}>
-                {active === i ? (
-                  // Playing indicator — animated bars
-                  <div style={{ display: "flex", gap: 3, alignItems: "flex-end", height: 16 }}>
-                    {[0, 1, 2].map(b => (
-                      <div key={b} style={{
-                        width: 3, background: T.gold, borderRadius: 2,
-                        animation: `playBar${b} 0.8s ${b * 0.15}s ease-in-out infinite alternate`,
-                        height: b === 1 ? 16 : 10,
-                      }} />
-                    ))}
-                  </div>
-                ) : (
-                  <span style={{ fontSize: 11, color: T.gold, opacity: 0.9 }}>▶</span>
-                )}
-              </div>
-
-              {/* Title tooltip */}
-              <div style={{
-                position: "absolute", bottom: 0, left: 0, right: 0,
-                padding: "4px 6px",
-                background: "linear-gradient(to top, rgba(22,27,46,0.85), transparent)",
-              }}>
-                <p style={{
-                  color: T.cream, fontSize: "0.6rem", margin: 0,
-                  fontFamily: "'Cinzel',serif", letterSpacing: "0.06em",
-                  whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-                  opacity: 0.85,
-                }}>
-                  {v.title}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Inline keyframes for the playing bars animation */}
-      <style>{`
-        @keyframes playBar0 { from { height: 6px } to { height: 14px } }
-        @keyframes playBar1 { from { height: 14px } to { height: 5px } }
-        @keyframes playBar2 { from { height: 8px } to { height: 16px } }
-      `}</style>
-    </section>
-  );
-}
-
-
-// ─── PRODUCT CARD ─────────────────────────────────────────────
-function PCard({ product, onAdd, onWish, wished, onClick, dark=false, cart=[], onQty }) {
-  const [hov,setHov]=useState(false);
-  const [clicked,setClicked]=useState(false);
-  const bg = dark ? `linear-gradient(145deg,rgba(33,40,66,0.8),rgba(22,27,46,0.9))` : `linear-gradient(145deg,${T.creamD},${T.cream})`;
-  const border = dark ? `1px solid ${hov?T.gold:`${T.gold}22`}` : `1px solid ${hov?T.goldD:`${T.goldD}44`}`;
-  const cartItem = cart.find(i=>i.id===product.id);
-  const qty = cartItem?.qty || 0;
-
-  const handleAdd = () => {
-    setClicked(true);
-    onAdd(product);
-    setTimeout(()=>setClicked(false), 300);
-  };
-
-  return (
-    <div onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
-      style={{background:bg,border,borderRadius:4,overflow:"hidden",transition:"all 0.4s ease",transform:hov?"translateY(-6px)":"none",boxShadow:hov?`0 20px 50px rgba(0,0,0,${dark?0.5:0.2})`:`0 4px 16px rgba(0,0,0,${dark?0.3:0.1})`}}>
-      <div onClick={()=>{ onClick(product); scrollTop(); }} style={{position:"relative",aspectRatio:"4/3",overflow:"hidden",cursor:"pointer"}}>
-        <img src={product.image} alt={product.name} style={{width:"100%",height:"100%",objectFit:"cover",transform:hov?"scale(1.06)":"scale(1)",transition:"transform 0.55s ease"}}/>
-        <div style={{position:"absolute",top:10,left:10,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,color:T.navy,borderRadius:2,padding:"2px 9px",fontSize:"0.62rem",fontWeight:800,letterSpacing:"0.05em",fontFamily:"'Cinzel',serif"}}>-{product.discount}%</div>
-        <button onClick={e=>{e.stopPropagation();onWish(product.id);}} style={{position:"absolute",top:8,right:8,background:`rgba(${dark?22:240},${dark?27:231},${dark?46:213},0.7)`,border:`1px solid ${T.gold}44`,borderRadius:"50%",width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:14,transition:"all 0.2s"}}>{wished?"❤️":"🤍"}</button>
-        {qty>0&&(
-          <div style={{position:"absolute",bottom:8,right:8,background:`linear-gradient(135deg,${T.goldD},${T.gold})`,color:T.navy,borderRadius:12,padding:"2px 8px",fontSize:"0.65rem",fontWeight:900,fontFamily:"'Cinzel',serif",boxShadow:`0 2px 8px ${T.gold}66`}}>
-            {qty} in cart
-          </div>
-        )}
-        <div style={{position:"absolute",inset:0,background:`linear-gradient(to top,rgba(${dark?22:33},${dark?27:40},${dark?46:66},0.75),transparent)`,opacity:hov?0.8:0.35,transition:"opacity 0.3s"}}/>
-      </div>
-      <div style={{padding:"1rem 1.1rem 1.1rem"}}>
-        <h4 onClick={()=>{ onClick(product); scrollTop(); }} style={{fontFamily:"'Cinzel',serif",fontSize:"0.83rem",color:dark?T.cream:T.navy,margin:"0 0 5px",cursor:"pointer",letterSpacing:"0.04em",transition:"color 0.2s"}} onMouseEnter={e=>e.target.style.color=dark?T.gold:T.goldD} onMouseLeave={e=>e.target.style.color=dark?T.cream:T.navy}>{product.name}</h4>
-        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:"0.8rem"}}>
-          <span style={{fontFamily:"'Cinzel',serif",fontSize:"1rem",color:dark?T.gold:T.goldD,fontWeight:700}}>₹{product.price.toLocaleString()}</span>
-          <span style={{color:dark?"rgba(240,231,213,0.3)":"rgba(33,40,66,0.35)",fontSize:"0.78rem",textDecoration:"line-through"}}>₹{product.originalPrice.toLocaleString()}</span>
-        </div>
-
-        {qty===0 ? (
-          /* ── ADD TO CART button ── */
-          <button
-            onClick={handleAdd}
-            style={{
-              width:"100%",
-              background:clicked?`linear-gradient(135deg,${T.gold},${T.goldD})`:`linear-gradient(135deg,${T.goldD},${T.gold})`,
-              border:"none",color:T.navy,
-              padding:"8px 10px",borderRadius:2,
-              fontFamily:"'Cinzel',serif",fontSize:"0.62rem",
-              letterSpacing:"0.12em",cursor:"pointer",fontWeight:700,
-              transition:"all 0.15s ease",
-              transform:clicked?"scale(0.95)":"scale(1)",
-              boxShadow:clicked?`0 2px 8px ${T.gold}44`:`0 4px 14px ${T.gold}33`,
-            }}
-          >
-            🛒 ADD TO CART
-          </button>
-        ) : (
-          /* ── QTY COUNTER ── */
-          <div style={{display:"flex",alignItems:"center",gap:6}}>
-            <div style={{
-              display:"flex",alignItems:"center",
-              border:`1.5px solid ${dark?T.gold:T.goldD}`,
-              borderRadius:2,overflow:"hidden",flex:1,
-              background:dark?"rgba(201,169,110,0.08)":"rgba(139,105,20,0.06)",
-            }}>
-              <button
-                onClick={()=>onQty&&onQty(product.id,qty-1)}
-                style={{background:"none",border:"none",color:dark?T.gold:T.goldD,padding:"7px 10px",cursor:"pointer",fontSize:"1rem",fontWeight:700,lineHeight:1,transition:"background 0.15s",flexShrink:0}}
-                onMouseEnter={e=>e.currentTarget.style.background=dark?"rgba(201,169,110,0.15)":"rgba(139,105,20,0.1)"}
-                onMouseLeave={e=>e.currentTarget.style.background="transparent"}
-              >−</button>
-              <span style={{flex:1,textAlign:"center",fontFamily:"'Cinzel',serif",fontSize:"0.85rem",color:dark?T.cream:T.navy,fontWeight:700}}>{qty}</span>
-              <button
-                onClick={()=>onQty&&onQty(product.id,qty+1)}
-                style={{background:"none",border:"none",color:dark?T.gold:T.goldD,padding:"7px 10px",cursor:"pointer",fontSize:"1rem",fontWeight:700,lineHeight:1,transition:"background 0.15s",flexShrink:0}}
-                onMouseEnter={e=>e.currentTarget.style.background=dark?"rgba(201,169,110,0.15)":"rgba(139,105,20,0.1)"}
-                onMouseLeave={e=>e.currentTarget.style.background="transparent"}
-              >+</button>
-            </div>
-            <button
-              onClick={handleAdd}
-              title="Add one more"
-              style={{
-                background:`linear-gradient(135deg,${T.goldD},${T.gold})`,
-                border:"none",color:T.navy,
-                width:32,height:32,borderRadius:2,
-                cursor:"pointer",fontSize:"0.9rem",
-                display:"flex",alignItems:"center",justifyContent:"center",
-                flexShrink:0,transition:"all 0.15s ease",
-                boxShadow:`0 2px 8px ${T.gold}33`,
-                transform:clicked?"scale(0.9)":"scale(1)",
-              }}
-              onMouseEnter={e=>e.currentTarget.style.boxShadow=`0 4px 14px ${T.gold}66`}
-              onMouseLeave={e=>e.currentTarget.style.boxShadow=`0 2px 8px ${T.gold}33`}
-            >🛒</button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ─── BEST SELLERS — cream bg ──────────────────────────────────
-function BestSellers({ onAdd, onWish, wished, onClick, cart, onQty }) {
-  return (
-    <section className="section-pad" style={{padding:"90px clamp(1.5rem,5vw,4rem)",background:T.cream}}>
-      <SecHead eye="✦ TRENDING ✦" title="Best Sellers" dark={true}/>
-      <div className="prod-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:"1.2rem",maxWidth:1200,margin:"0 auto"}}>
-        {PRODUCTS.filter(p=>p.bestSeller).map(p=><PCard key={p.id} product={p} onAdd={onAdd} onWish={onWish} wished={wished.includes(p.id)} onClick={onClick} dark={false} cart={cart} onQty={onQty}/>)}
       </div>
     </section>
   );
 }
 
-// ─── OUR STORY — navy bg ──────────────────────────────────────
-function StorySection({ sectionRef }) {
+// ─── QUOTE SECTION ────────────────────────────────────────────
+function QuoteSection() {
+  const [idx, setIdx] = useState(0);
+  const [key, setKey] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => { setIdx(i => (i+1) % QUOTES.length); setKey(k => k+1); }, 4500);
+    return () => clearInterval(t);
+  }, []);
+  const q = QUOTES[idx];
   return (
-    <section ref={sectionRef} className="section-pad" style={{padding:"90px clamp(1.5rem,5vw,4rem)",background:T.navy,position:"relative",overflow:"hidden"}}>
-      <div style={{position:"absolute",inset:0,background:`radial-gradient(ellipse at 50% 50%,rgba(201,169,110,0.06),transparent 70%)`,pointerEvents:"none"}}/>
-      <div className="story-grid" style={{maxWidth:1080,margin:"0 auto",display:"grid",gridTemplateColumns:"1fr 1fr",gap:"4rem",alignItems:"center"}}>
-        <div style={{position:"relative"}}>
-          <div style={{position:"absolute",inset:-14,border:`1px solid ${T.gold}22`,borderRadius:4,pointerEvents:"none"}}/>
-          <div style={{position:"absolute",inset:-28,border:`1px solid ${T.gold}0d`,borderRadius:4,pointerEvents:"none"}}/>
-          <img src="https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=600&q=80" alt="Our Story" style={{width:"100%",borderRadius:4,boxShadow:`0 36px 70px rgba(0,0,0,0.55),0 0 0 1px ${T.gold}33`,position:"relative",display:"block"}}/>
-          <div style={{position:"absolute",bottom:-18,right:-18,background:`linear-gradient(135deg,${T.goldD},${T.gold})`,borderRadius:4,padding:"1rem 1.4rem",textAlign:"center",boxShadow:`0 10px 32px ${T.gold}44`}}>
-            <div style={{fontFamily:"'Cinzel',serif",fontSize:"1.7rem",color:T.navy,fontWeight:900}}>2020</div>
-            <div style={{color:T.navy,fontSize:"0.58rem",letterSpacing:"0.16em",fontFamily:"'Cinzel',serif",opacity:0.65}}>FOUNDED</div>
-          </div>
+    <section style={{ background:T.bgDark, padding:"90px clamp(1.5rem,5vw,3.5rem)", textAlign:"center", position:"relative", overflow:"hidden" }}>
+      {/* Subtle bg texture */}
+      <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at 50% 50%, rgba(232,114,12,0.06) 0%, transparent 70%)", pointerEvents:"none" }} />
+      <div className="max-w" style={{ maxWidth:760, position:"relative" }}>
+        <div style={{ fontSize:"0.62rem", fontWeight:700, color:T.orange, letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:"1.5rem", display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
+          <span>✦</span> Daily Manifestation Oracle <span>✦</span>
         </div>
-        <div>
-          <p style={{color:T.gold,fontSize:"0.64rem",letterSpacing:"0.36em",fontFamily:"'Cinzel',serif",marginBottom:12,textTransform:"uppercase"}}>✦ OUR STORY ✦</p>
-          <h2 style={{fontFamily:"'Cinzel Decorative',serif",fontSize:"clamp(1.4rem,3vw,2.2rem)",color:T.cream,margin:"0 0 0.8rem",lineHeight:1.3}}>Born from the Earth,<br/><span style={{color:T.gold}}>Guided by the Stars</span></h2>
-          <Divider/>
-          <p style={{color:"rgba(240,231,213,0.65)",fontSize:"clamp(0.95rem,2vw,1.05rem)",lineHeight:1.95,fontStyle:"italic",marginBottom:"1rem"}}>Wishstone was born from a deep belief that nature holds the answers to our modern struggles. Founded in 2020 by a group of healers and naturalists, we source every crystal, herb, and ritual tool with intention and reverence.</p>
-          <p style={{color:"rgba(240,231,213,0.6)",fontSize:"clamp(0.95rem,2vw,1.05rem)",lineHeight:1.95,marginBottom:"1.8rem"}}>Our mission: to make ancient healing wisdom accessible to the modern soul — ethically sourced, energetically cleansed, delivered with love.</p>
-          {[["Ethically Sourced","💎"],["Moon-Charged","🌙"],["Nature-Inspired","🌿"]].map(([text,icon])=>(
-            <div key={text} style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
-              <div style={{width:32,height:32,background:`rgba(201,169,110,0.1)`,border:`1px solid ${T.gold}44`,borderRadius:2,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,flexShrink:0}}>{icon}</div>
-              <span style={{color:T.creamD,fontFamily:"'Cinzel',serif",fontSize:"0.74rem",letterSpacing:"0.1em"}}>{text}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+        <div style={{ fontSize:"3rem", color:"rgba(232,114,12,0.35)", lineHeight:1, marginBottom:"1.5rem", fontFamily:"Georgia,serif" }}>"</div>
+        <blockquote key={key} style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.2rem,2.8vw,1.7rem)", fontWeight:700, color:T.white, lineHeight:1.55, marginBottom:"1.5rem", fontStyle:"italic", animation:"quoteIn 0.5s ease both" }}>
+          {q.text}
+        </blockquote>
+        <cite style={{ fontSize:"0.72rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase", fontStyle:"normal" }}>
+          — {q.author}
+        </cite>
 
-// ─── FAQ — cream bg ───────────────────────────────────────────
-function FAQSection() {
-  const [open,setOpen]=useState(null);
-  return (
-    <section className="section-pad" style={{padding:"90px clamp(1.5rem,5vw,4rem)",background:T.cream}}>
-      <SecHead eye="✦ SUPPORT ✦" title="Frequently Asked" dark={true}/>
-      <div style={{maxWidth:700,margin:"0 auto"}}>
-        {FAQS.map((faq,i)=>(
-          <div key={i} style={{borderBottom:`1px solid ${T.goldD}33`}}>
-            <button onClick={()=>setOpen(open===i?null:i)} style={{width:"100%",background:"none",border:"none",padding:"1.2rem 0",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",textAlign:"left",gap:14}}>
-              <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.84rem",color:open===i?T.goldD:T.navy,letterSpacing:"0.05em",transition:"color 0.3s"}}>{faq.q}</span>
-              <span style={{color:T.goldD,fontSize:"1.2rem",transform:open===i?"rotate(45deg)":"rotate(0)",transition:"transform 0.3s",flexShrink:0}}>+</span>
-            </button>
-            {open===i&&<p style={{color:"rgba(33,40,66,0.7)",fontSize:"0.95rem",lineHeight:1.85,fontStyle:"italic",paddingBottom:"1.2rem",margin:0,animation:"fadeUp 0.3s ease"}}>{faq.a}</p>}
+        {/* Progress bar + arrows */}
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"1rem", marginTop:"2.5rem" }}>
+          <button onClick={() => { setIdx(i => (i-1+QUOTES.length)%QUOTES.length); setKey(k=>k+1); }} style={{ width:28, height:28, borderRadius:"50%", border:`1px solid rgba(255,255,255,0.2)`, background:"none", color:"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:12, display:"flex", alignItems:"center", justifyContent:"center" }}>‹</button>
+          <div style={{ width:180, height:2, background:"rgba(255,255,255,0.1)", borderRadius:1, position:"relative" }}>
+            <div style={{ position:"absolute", left:0, top:0, height:"100%", background:T.orange, borderRadius:1, width:`${((idx+1)/QUOTES.length)*100}%`, transition:"width 0.4s ease" }} />
           </div>
-        ))}
+          <div style={{ display:"flex", gap:5 }}>
+            {QUOTES.map((_,i) => (
+              <button key={i} onClick={() => { setIdx(i); setKey(k=>k+1); }} style={{ width: i===idx ? 18 : 7, height:7, borderRadius:4, background: i===idx ? T.orange : "rgba(255,255,255,0.2)", border:"none", cursor:"pointer", transition:"all 0.3s", padding:0 }} />
+            ))}
+          </div>
+          <button onClick={() => { setIdx(i => (i+1)%QUOTES.length); setKey(k=>k+1); }} style={{ width:28, height:28, borderRadius:"50%", border:`1px solid rgba(255,255,255,0.2)`, background:"none", color:"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:12, display:"flex", alignItems:"center", justifyContent:"center" }}>›</button>
+        </div>
       </div>
     </section>
   );
@@ -796,316 +540,260 @@ function FAQSection() {
 // ─── FOOTER ───────────────────────────────────────────────────
 function Footer() {
   return (
-    <footer style={{background:T.navyD,borderTop:`1px solid ${T.gold}22`,padding:"3.5rem clamp(1.5rem,5vw,4rem) 1.8rem"}}>
-      <div className="footer-grid" style={{maxWidth:1080,margin:"0 auto",display:"grid",gridTemplateColumns:"2fr 1fr 1fr 1fr",gap:"2.5rem",marginBottom:"2.5rem"}}>
-        <div>
-          <div style={{display:"flex",alignItems:"center",gap:9,marginBottom:"0.8rem"}}>
-            <div style={{width:34,height:34,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>💎</div>
-            <span style={{fontFamily:"'Cinzel',serif",fontSize:"1.05rem",color:T.cream,letterSpacing:"0.14em"}}>WISHSTONE</span>
+    <footer style={{ background:T.bgDark, padding:"60px clamp(1.5rem,5vw,3.5rem) 30px", borderTop:`3px solid ${T.orange}` }}>
+      <div className="max-w">
+        <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", gap:"3rem", marginBottom:"3rem" }} className="footer-grid">
+          <div>
+            <div style={{ display:"flex", alignItems:"center", gap:9, marginBottom:"1rem" }}>
+              <div style={{ width:30, height:30, borderRadius:7, background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:14 }}>💎</div>
+              <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", fontWeight:900, color:T.white }}>WishStone</span>
+            </div>
+            <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.5)", lineHeight:1.7, maxWidth:240 }}>India's sacred manifestation stone — hand-crafted with ancient yantra to help you manifest your deepest desires.</p>
           </div>
-          <Divider/>
-          <p style={{color:"rgba(240,231,213,0.35)",fontSize:"0.85rem",lineHeight:1.85,fontStyle:"italic",maxWidth:220}}>Premium natural crystals and healing products aligned with the universe's energy.</p>
-          <div style={{display:"flex",gap:8,marginTop:"1.2rem"}}>
-            {["📸","📘","▶️"].map((ic,i)=><div key={i} style={{width:34,height:34,background:`rgba(201,169,110,0.07)`,border:`1px solid ${T.gold}2a`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:13}} onMouseEnter={e=>e.currentTarget.style.borderColor=T.gold} onMouseLeave={e=>e.currentTarget.style.borderColor=`${T.gold}2a`}>{ic}</div>)}
-          </div>
+          {[
+            { title:"Shop", links:["WishStone Original","Ritual Kits","Bundles","Best Sellers","New Arrivals"] },
+            { title:"Learn", links:["The Ritual","Benefits","Stories","Crystal Guide","FAQ"] },
+            { title:"Support", links:["Contact Us","Shipping","Returns","Track Order","Privacy Policy"] },
+          ].map(col => (
+            <div key={col.title}>
+              <h4 style={{ fontSize:"0.65rem", fontWeight:700, color:T.orange, letterSpacing:"0.15em", textTransform:"uppercase", marginBottom:"1rem" }}>{col.title}</h4>
+              {col.links.map(l => (
+                <div key={l} style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.45)", marginBottom:8, cursor:"pointer", transition:"color 0.2s" }}
+                  onMouseEnter={e => e.target.style.color=T.orange}
+                  onMouseLeave={e => e.target.style.color="rgba(255,255,255,0.45)"}
+                >{l}</div>
+              ))}
+            </div>
+          ))}
         </div>
-        {[["Policies",["Terms & Conditions","Privacy Policy","Shipping Policy","Refund Policy"]],["Shop",["All Products","Manifestation","Therapy","Habit Builder"]],["Support",["Contact Us","Track Order","FAQ","About Us"]]].map(([title,links])=>(
-          <div key={title}>
-            <h4 style={{fontFamily:"'Cinzel',serif",fontSize:"0.68rem",color:T.gold,letterSpacing:"0.22em",margin:"0 0 1.2rem",textTransform:"uppercase"}}>{title}</h4>
-            {links.map(l=><div key={l} style={{marginBottom:8}}><a href="#" style={{color:"rgba(240,231,213,0.32)",fontSize:"0.85rem",textDecoration:"none",fontStyle:"italic",transition:"color 0.2s"}} onMouseEnter={e=>e.target.style.color=T.gold} onMouseLeave={e=>e.target.style.color="rgba(240,231,213,0.32)"}>{l}</a></div>)}
-          </div>
-        ))}
-      </div>
-      <div style={{borderTop:`1px solid ${T.gold}12`,paddingTop:"1.5rem",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
-        <span style={{color:"rgba(240,231,213,0.25)",fontSize:"0.68rem",fontFamily:"'Cinzel',serif",letterSpacing:"0.1em"}}>© 2025 WISHSTONE. ALL RIGHTS RESERVED.</span>
-        <span style={{color:"rgba(240,231,213,0.25)",fontSize:"0.78rem",fontStyle:"italic"}}>Crafted with 💛 for the universe</span>
+        <div style={{ borderTop:"1px solid rgba(255,255,255,0.08)", paddingTop:"1.5rem", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:10 }}>
+          <p style={{ fontSize:"0.72rem", color:"rgba(255,255,255,0.3)" }}>© 2024 WishStone. All rights reserved.</p>
+          <p style={{ fontSize:"0.72rem", color:"rgba(255,255,255,0.3)" }}>Made with 💎 for conscious souls across India</p>
+        </div>
       </div>
     </footer>
   );
 }
 
-// ─── CATEGORY PAGE ────────────────────────────────────────────
-function CategoryPage({ category, onAdd, onWish, wished, onClick, cart, onQty }) {
-  const products = PRODUCTS.filter(p=>p.category===category.id);
+// ─── HOME PAGE ────────────────────────────────────────────────
+function HomePage({ onShop, onRitual }) {
+  const [openFaq, setOpenFaq] = useState(null);
   return (
-    <div style={{paddingTop:100}}>
-      {/* Banner */}
-      <div style={{position:"relative",height:"clamp(220px,35vw,340px)",overflow:"hidden"}}>
-        <img src={category.image} alt={category.name} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-        <div style={{position:"absolute",inset:0,background:`linear-gradient(to right,rgba(33,40,66,0.92),rgba(33,40,66,0.45))`,display:"flex",alignItems:"center",padding:"0 clamp(1.5rem,5vw,4rem)"}}>
-          <div>
-            <p style={{color:T.gold,fontSize:"0.63rem",letterSpacing:"0.36em",fontFamily:"'Cinzel',serif",marginBottom:8}}>COLLECTION</p>
-            <h1 style={{fontFamily:"'Cinzel Decorative',serif",fontSize:"clamp(1.8rem,5vw,3rem)",color:T.cream,margin:"0 0 0.4rem"}}>{category.name}</h1>
-            <Divider/>
-            <p style={{color:"rgba(240,231,213,0.65)",fontStyle:"italic",fontSize:"clamp(0.9rem,2vw,1.05rem)"}}>{category.desc}</p>
+    <div>
+      <Hero onShop={onShop} onRitual={onRitual} />
+      <StatsBar />
+      <MarqueeSection />
+      <PowersSection />
+      <QuoteSection />
+
+      {/* Auto-Scrolling Products Strip */}
+      <section style={{ background:"#fff", paddingTop:"70px", paddingBottom:"70px", overflow:"hidden" }}>
+        <div className="max-w" style={{ paddingLeft:"clamp(1.5rem,5vw,3.5rem)", paddingRight:"clamp(1.5rem,5vw,3.5rem)", marginBottom:"2rem" }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
+            <div>
+              <div style={{ fontSize:"0.65rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase", marginBottom:8 }}>BEST SELLERS</div>
+              <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3.5vw,2.2rem)", fontWeight:900, color:T.text, margin:0 }}>Most Loved Stones</h2>
+            </div>
+            <button className="btn-outline" onClick={onShop} style={{ padding:"10px 24px", fontSize:"0.78rem", borderRadius:8 }}>View All →</button>
           </div>
         </div>
-      </div>
-      {/* Products on cream bg */}
-      <div style={{background:T.cream,padding:"clamp(2rem,5vw,4rem)"}}>
-        <p style={{fontFamily:"'Cinzel',serif",color:T.goldD,fontSize:"0.68rem",letterSpacing:"0.2em",marginBottom:"1.5rem"}}>{products.length} PRODUCTS</p>
-        <div className="prod-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:"1.2rem"}}>
-          {products.map(p=><PCard key={p.id} product={p} onAdd={onAdd} onWish={onWish} wished={wished.includes(p.id)} onClick={onClick} dark={false} cart={cart} onQty={onQty}/>)}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── PRODUCT PAGE ─────────────────────────────────────────────
-function ProductPage({ product, onAdd, onWish, wished }) {
-  const [qty,setQty]=useState(1);
-  const [added,setAdded]=useState(false);
-  const [videoOpen,setVideoOpen]=useState(false);
-  const handle=()=>{ for(let i=0;i<qty;i++) onAdd(product); setAdded(true); setTimeout(()=>setAdded(false),2000); };
-
-  return (
-    <div style={{paddingTop:100,background:T.cream,minHeight:"100vh"}}>
-      <div style={{maxWidth:1160,margin:"0 auto",padding:"clamp(1.5rem,4vw,3.5rem)"}}>
-        <div className="prod-detail-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"clamp(2rem,5vw,4rem)"}}>
-
-          {/* Left */}
-          <div>
-            <div style={{borderRadius:4,overflow:"hidden",marginBottom:"1rem",boxShadow:`0 24px 50px rgba(33,40,66,0.2),0 0 0 1px ${T.goldD}44`}}>
-              <img src={product.image} alt={product.name} style={{width:"100%",display:"block"}}/>
-            </div>
-
-            {/* Small video popup trigger — like Nytarra */}
-            <div onClick={()=>setVideoOpen(true)} style={{borderRadius:4,overflow:"hidden",border:`1px solid ${T.goldD}44`,cursor:"pointer",position:"relative",height:72,background:T.creamD,display:"flex",alignItems:"center",gap:14,padding:"0 16px",boxShadow:`0 4px 16px rgba(33,40,66,0.1)`,transition:"all 0.25s"}} onMouseEnter={e=>{e.currentTarget.style.borderColor=T.goldD;e.currentTarget.style.boxShadow=`0 6px 22px rgba(33,40,66,0.18)`;}} onMouseLeave={e=>{e.currentTarget.style.borderColor=`${T.goldD}44`;e.currentTarget.style.boxShadow=`0 4px 16px rgba(33,40,66,0.1)`;}}>
-              <div style={{width:50,height:50,borderRadius:4,overflow:"hidden",flexShrink:0,position:"relative"}}>
-                <img src={product.image} alt="preview" style={{width:"100%",height:"100%",objectFit:"cover",opacity:0.8}}/>
-              </div>
-              <div style={{flex:1}}>
-                <p style={{fontFamily:"'Cinzel',serif",fontSize:"0.72rem",color:T.navy,margin:"0 0 3px",letterSpacing:"0.06em"}}>Product Preview</p>
-                <p style={{color:"rgba(33,40,66,0.55)",fontSize:"0.75rem",margin:0,fontStyle:"italic"}}>Click to watch</p>
-              </div>
-              <div style={{width:36,height:36,borderRadius:"50%",background:`linear-gradient(135deg,${T.gold},${T.goldD})`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,boxShadow:`0 0 16px ${T.gold}55`}}>
-                <span style={{fontSize:13,marginLeft:2,color:T.navy}}>▶</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Right */}
-          <div>
-            <div style={{display:"inline-block",border:`1px solid ${T.goldD}55`,borderRadius:2,padding:"3px 14px",marginBottom:"0.8rem",background:`rgba(201,169,110,0.1)`}}>
-              <span style={{color:T.goldD,fontSize:"0.63rem",letterSpacing:"0.22em",fontFamily:"'Cinzel',serif"}}>{product.category.toUpperCase()}</span>
-            </div>
-            <h1 style={{fontFamily:"'Cinzel Decorative',serif",fontSize:"clamp(1.4rem,3.5vw,1.9rem)",color:T.navy,margin:"0 0 0.4rem",lineHeight:1.3}}>{product.name}</h1>
-            <Divider/>
-            <p style={{color:"rgba(33,40,66,0.7)",fontSize:"clamp(0.95rem,2vw,1.05rem)",lineHeight:1.85,marginBottom:"1.2rem",fontStyle:"italic"}}>{product.shortDesc}</p>
-
-            <div style={{marginBottom:"1rem"}}>
-              <p style={{color:T.goldD,fontSize:"0.63rem",letterSpacing:"0.22em",fontFamily:"'Cinzel',serif",marginBottom:5}}>SUITABLE FOR</p>
-              <p style={{color:"rgba(33,40,66,0.65)",fontSize:"0.92rem"}}>{product.suitableFor}</p>
-            </div>
-            <div style={{marginBottom:"1.5rem"}}>
-              <p style={{color:T.goldD,fontSize:"0.63rem",letterSpacing:"0.22em",fontFamily:"'Cinzel',serif",marginBottom:8}}>BENEFITS</p>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:7}} className="prod-benefits-grid">
-                {product.benefits.map(b=>(
-                  <div key={b} style={{display:"flex",alignItems:"center",gap:7}}>
-                    <div style={{width:4,height:4,background:T.goldD,transform:"rotate(45deg)",flexShrink:0}}/>
-                    <span style={{color:"rgba(33,40,66,0.7)",fontSize:"0.85rem"}}>{b}</span>
+        {/* Infinite scroll strip */}
+        <div style={{ overflow:"hidden", position:"relative" }}>
+          {/* fade edges */}
+          <div style={{ position:"absolute", left:0, top:0, bottom:0, width:80, background:"linear-gradient(to right,#fff,transparent)", zIndex:2, pointerEvents:"none" }} />
+          <div style={{ position:"absolute", right:0, top:0, bottom:0, width:80, background:"linear-gradient(to left,#fff,transparent)", zIndex:2, pointerEvents:"none" }} />
+          <div style={{ display:"flex", animation:"autoScroll 28s linear infinite", width:"max-content" }}>
+            {[...PRODUCTS, ...PRODUCTS].map((p, i) => (
+              <div key={i} onClick={onShop} style={{ width:220, flexShrink:0, marginRight:"1.2rem", cursor:"pointer" }}>
+                <div style={{ borderRadius:14, overflow:"hidden", border:`1px solid ${T.border}`, background:T.bg, transition:"transform 0.3s, box-shadow 0.3s" }}
+                  onMouseEnter={e => { e.currentTarget.style.transform="translateY(-5px)"; e.currentTarget.style.boxShadow="0 16px 40px rgba(0,0,0,0.1)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="none"; }}>
+                  <div style={{ position:"relative", aspectRatio:"1", overflow:"hidden" }}>
+                    <img src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                    <div style={{ position:"absolute", top:8, left:8, background:T.orange, color:"#fff", borderRadius:4, padding:"2px 8px", fontSize:"0.6rem", fontWeight:800 }}>-{p.discount}%</div>
+                    {p.bestSeller && <div style={{ position:"absolute", bottom:6, left:6, background:T.bgDark, color:T.orange, borderRadius:4, padding:"2px 7px", fontSize:"0.58rem", fontWeight:700 }}>BEST SELLER</div>}
                   </div>
-                ))}
-              </div>
-            </div>
-
-            <div style={{border:`1px solid ${T.goldD}33`,borderRadius:4,padding:"1.2rem",marginBottom:"1.2rem",background:`rgba(201,169,110,0.06)`}}>
-              <div style={{display:"flex",alignItems:"baseline",gap:10,marginBottom:5}}>
-                <span style={{fontFamily:"'Cinzel',serif",fontSize:"1.8rem",color:T.goldD,fontWeight:700}}>₹{product.price.toLocaleString()}</span>
-                <span style={{color:"rgba(33,40,66,0.3)",fontSize:"0.95rem",textDecoration:"line-through"}}>₹{product.originalPrice.toLocaleString()}</span>
-                <span style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,color:T.navy,borderRadius:2,padding:"2px 9px",fontSize:"0.63rem",fontWeight:800,fontFamily:"'Cinzel',serif"}}>SAVE {product.discount}%</span>
-              </div>
-              <p style={{color:"rgba(33,40,66,0.4)",fontSize:"0.74rem",margin:0}}>Inclusive of all taxes · Free shipping above ₹999</p>
-            </div>
-
-            <div style={{display:"flex",gap:10,marginBottom:"0.8rem",alignItems:"center",flexWrap:"wrap"}}>
-              <div style={{display:"flex",alignItems:"center",border:`1px solid ${T.goldD}44`,borderRadius:2,overflow:"hidden"}}>
-                <button onClick={()=>setQty(Math.max(1,qty-1))} style={{background:"none",border:"none",color:T.navy,padding:"10px 14px",cursor:"pointer",fontSize:17}}>−</button>
-                <span style={{color:T.navy,padding:"10px 10px",fontFamily:"'Cinzel',serif",minWidth:30,textAlign:"center"}}>{qty}</span>
-                <button onClick={()=>setQty(qty+1)} style={{background:"none",border:"none",color:T.navy,padding:"10px 14px",cursor:"pointer",fontSize:17}}>+</button>
-              </div>
-              <button onClick={handle} style={{flex:1,minWidth:160,border:"none",color:added?"#fff":T.navy,padding:"12px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.75rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:700,transition:"all 0.3s",background:added?`linear-gradient(135deg,#2d7a5a,#3aaa7a)`:`linear-gradient(135deg,${T.goldD},${T.gold})`}}>{added?"✓ ADDED TO CART":"ADD TO CART"}</button>
-              <button onClick={()=>onWish(product.id)} style={{background:`rgba(201,169,110,0.1)`,border:`1px solid ${T.goldD}44`,color:T.navy,padding:"12px 14px",borderRadius:2,cursor:"pointer",fontSize:18}}>{wished?"❤️":"🤍"}</button>
-            </div>
-          </div>
-        </div>
-
-        {/* How to use */}
-        <div style={{marginTop:"3rem"}}>
-          <p style={{fontFamily:"'Cinzel',serif",color:T.goldD,fontSize:"0.68rem",letterSpacing:"0.22em",marginBottom:"1.2rem"}}>HOW TO USE</p>
-          <div style={{borderRadius:4,overflow:"hidden",border:`1px solid ${T.goldD}33`,aspectRatio:"16/6",display:"flex",alignItems:"center",justifyContent:"center",position:"relative",cursor:"pointer"}} onClick={()=>setVideoOpen(true)}>
-            <img src={product.image} alt="usage" style={{width:"100%",height:"100%",objectFit:"cover",opacity:0.25,position:"absolute",inset:0}}/>
-            <div style={{position:"relative",textAlign:"center"}}>
-              <div style={{width:70,height:70,borderRadius:"50%",background:`linear-gradient(135deg,${T.gold},${T.goldD})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24,boxShadow:`0 0 40px ${T.gold}55`,margin:"0 auto 12px"}}>
-                <span style={{color:T.navy}}>▶</span>
-              </div>
-              <p style={{fontFamily:"'Cinzel',serif",color:T.navy,fontSize:"0.8rem",letterSpacing:"0.12em"}}>WATCH HOW TO USE</p>
-            </div>
-          </div>
-        </div>
-
-        {/* FAQ inline */}
-        <div style={{marginTop:"3rem"}}><FAQSection/></div>
-      </div>
-
-      {/* Video popup modal */}
-      {videoOpen&&(
-        <div onClick={()=>setVideoOpen(false)} style={{position:"fixed",inset:0,zIndex:2000,background:"rgba(0,0,0,0.85)",display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem",animation:"fadeIn 0.2s ease"}}>
-          <div onClick={e=>e.stopPropagation()} style={{background:T.navyD,borderRadius:8,overflow:"hidden",width:"100%",maxWidth:640,border:`1px solid ${T.gold}44`,boxShadow:`0 40px 80px rgba(0,0,0,0.6)`,animation:"scaleIn 0.2s ease"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px",borderBottom:`1px solid ${T.gold}22`}}>
-              <span style={{fontFamily:"'Cinzel',serif",fontSize:"0.78rem",color:T.cream,letterSpacing:"0.12em"}}>PRODUCT PREVIEW</span>
-              <button onClick={()=>setVideoOpen(false)} style={{background:"none",border:"none",color:T.cream,fontSize:20,cursor:"pointer"}}>✕</button>
-            </div>
-            <div style={{aspectRatio:"16/9",background:"#000",position:"relative"}}>
-              <img src={product.image} alt="video" style={{width:"100%",height:"100%",objectFit:"cover",opacity:0.5}}/>
-              <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
-                <div style={{textAlign:"center"}}>
-                  <div style={{width:60,height:60,borderRadius:"50%",background:`linear-gradient(135deg,${T.gold},${T.goldD})`,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 10px",boxShadow:`0 0 30px ${T.gold}66`}}><span style={{fontSize:20,color:T.navy}}>▶</span></div>
-                  <p style={{color:T.cream,fontFamily:"'Cinzel',serif",fontSize:"0.75rem",letterSpacing:"0.1em",opacity:0.7}}>Video will appear here</p>
-                  <p style={{color:"rgba(240,231,213,0.45)",fontSize:"0.75rem",fontStyle:"italic",marginTop:4}}>Upload your product video via Admin Panel</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── CART ─────────────────────────────────────────────────────
-function CartPage({ cart, onQty, onRemove, onCheckout }) {
-  const [coupon,setCoupon]=useState(""); const [disc,setDisc]=useState(0); const [msg,setMsg]=useState(""); const [applying,setApplying]=useState(false); const [appliedCode,setAppliedCode]=useState("");
-  const [isGift,setIsGift]=useState(false); const [giftMsg,setGiftMsg]=useState("");
-  const GIFT_FEE=50;
-  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0); const ship=sub>=999?0:99; const total=Math.max(0,sub+ship-disc+(isGift?GIFT_FEE:0));
-  const iSx={width:"100%",background:`rgba(201,169,110,0.07)`,border:`1px solid ${T.goldD}44`,borderRadius:2,color:T.navy,padding:"10px 12px",fontSize:"0.95rem",outline:"none",boxSizing:"border-box"};
-  const lSx={color:"rgba(33,40,66,0.5)",fontSize:"0.63rem",letterSpacing:"0.15em",fontFamily:"'Cinzel',serif",display:"block",marginBottom:5,textTransform:"uppercase"};
-
-  const applyC=async()=>{
-    if(!coupon.trim()) return;
-    setApplying(true); setMsg("");
-    try{
-      const res=await fetch(`http://localhost:5000/api/coupons/validate`,{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({code:coupon.trim().toUpperCase(),orderTotal:sub}),
-      });
-      const data=await res.json();
-      if(!data.success) throw new Error(data.message||"Invalid coupon");
-      setDisc(data.discount);
-      setAppliedCode(coupon.trim().toUpperCase());
-      setMsg(`✅ ${data.message||"Coupon applied!"}`);
-    }catch(err){
-      setDisc(0); setAppliedCode("");
-      setMsg(`❌ ${err.message}`);
-    }
-    setApplying(false);
-  };
-
-  const removeC=()=>{ setDisc(0); setAppliedCode(""); setCoupon(""); setMsg(""); };
-
-  if(!cart.length) return (
-    <div style={{paddingTop:130,textAlign:"center",background:T.cream,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:14,padding:"130px 2rem"}}>
-      <div style={{fontSize:56}}>🛒</div>
-      <h2 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy}}>Your Cart is Empty</h2>
-      <Divider/>
-      <p style={{color:"rgba(33,40,66,0.55)",fontStyle:"italic",fontSize:"1.05rem"}}>Add some magical products to begin your journey</p>
-    </div>
-  );
-
-  return (
-    <div style={{paddingTop:100,background:T.cream,minHeight:"100vh"}}>
-      <div style={{maxWidth:1080,margin:"0 auto",padding:"clamp(1.5rem,4vw,3rem)"}}>
-        <h1 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"clamp(1.6rem,4vw,2rem)",marginBottom:"0.4rem"}}>Your Cart</h1>
-        <Divider/>
-        <div className="cart-grid" style={{display:"grid",gridTemplateColumns:"1fr 360px",gap:"1.8rem",marginTop:"1rem"}}>
-          <div>
-            {cart.map(item=>(
-              <div key={item.id} className="cart-item-row" style={{display:"flex",gap:"1.2rem",border:`1px solid ${T.goldD}22`,borderRadius:4,padding:"1.2rem",marginBottom:"0.9rem",alignItems:"center",background:`rgba(201,169,110,0.04)`}}>
-                <img src={item.image} alt={item.name} style={{width:80,height:80,objectFit:"cover",borderRadius:4,border:`1px solid ${T.goldD}33`,flexShrink:0}}/>
-                <div style={{flex:1,minWidth:0}}>
-                  <h4 style={{fontFamily:"'Cinzel',serif",color:T.navy,margin:"0 0 4px",fontSize:"0.84rem",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.name}</h4>
-                  <p style={{color:T.goldD,fontFamily:"'Cinzel',serif",fontSize:"0.95rem",margin:0}}>₹{item.price.toLocaleString()}</p>
-                </div>
-                <div style={{display:"flex",alignItems:"center",border:`1px solid ${T.goldD}44`,borderRadius:2,flexShrink:0}}>
-                  <button onClick={()=>onQty(item.id,item.qty-1)} style={{background:"none",border:"none",color:T.navy,padding:"7px 11px",cursor:"pointer"}}>−</button>
-                  <span style={{color:T.navy,padding:"7px",fontFamily:"'Cinzel',serif",minWidth:26,textAlign:"center",fontSize:"0.9rem"}}>{item.qty}</span>
-                  <button onClick={()=>onQty(item.id,item.qty+1)} style={{background:"none",border:"none",color:T.navy,padding:"7px 11px",cursor:"pointer"}}>+</button>
-                </div>
-                <div style={{textAlign:"right",minWidth:70,flexShrink:0}}>
-                  <div style={{fontFamily:"'Cinzel',serif",color:T.navy,fontSize:"0.9rem",marginBottom:6}}>₹{(item.price*item.qty).toLocaleString()}</div>
-                  <button onClick={()=>onRemove(item.id)} style={{background:"none",border:"none",color:"rgba(33,40,66,0.3)",cursor:"pointer",fontSize:16}}>🗑</button>
+                  <div style={{ padding:"0.9rem" }}>
+                    <div style={{ fontSize:"0.8rem", fontWeight:700, color:T.text, marginBottom:4, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{p.name}</div>
+                    <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                      <span style={{ fontSize:"0.9rem", color:T.orange, fontWeight:700 }}>Rs.{p.price.toLocaleString()}</span>
+                      <span style={{ color:T.textMid, fontSize:"0.7rem", textDecoration:"line-through" }}>Rs.{p.originalPrice.toLocaleString()}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section style={{ background:"#fff", padding:"80px clamp(1.5rem,5vw,3.5rem)" }}>
+        <div className="max-w" style={{ maxWidth:720 }}>
+          <div style={{ textAlign:"center", marginBottom:"2.5rem" }}>
+            <div style={{ fontSize:"0.65rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase", marginBottom:10 }}>FAQ</div>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.5rem,3vw,2rem)", fontWeight:900, color:T.text }}>Frequently Asked Questions</h2>
+          </div>
+          {FAQS.map((f, i) => (
+            <div key={i} style={{ borderBottom:`1px solid ${T.border}` }}>
+              <button onClick={() => setOpenFaq(openFaq===i ? null : i)} style={{ width:"100%", background:"none", border:"none", cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center", padding:"1.1rem 0", textAlign:"left" }}>
+                <span style={{ fontSize:"0.9rem", fontWeight:600, color:T.text }}>{f.q}</span>
+                <span style={{ color:T.orange, fontSize:20, transition:"transform 0.3s", transform: openFaq===i ? "rotate(45deg)" : "rotate(0)", flexShrink:0, marginLeft:12 }}>+</span>
+              </button>
+              {openFaq===i && <p style={{ fontSize:"0.84rem", color:T.textMid, lineHeight:1.7, paddingBottom:"1rem" }}>{f.a}</p>}
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+// ─── PRODUCTS PAGE ────────────────────────────────────────────
+function ProductsPage({ onAdd, onWish, wished, onClick, cart }) {
+  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  // track per-product qty in cart for inline counter
+  const getQty = (id) => cart.filter(i => i.id === id).reduce((s,i) => s + i.qty, 0);
+
+  const filtered = PRODUCTS.filter(p => (filter==="all" || p.category===filter) && p.name.toLowerCase().includes(search.toLowerCase()));
+  return (
+    <div style={{ paddingTop:90, background:T.bg, minHeight:"100vh" }}>
+      <div className="max-w" style={{ padding:"clamp(1.5rem,4vw,3rem)" }}>
+        <h1 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"clamp(1.6rem,4vw,2.2rem)", fontWeight:900, marginBottom:"0.4rem" }}>Sacred Collection</h1>
+        <div style={{ width:60, height:3, background:`linear-gradient(90deg,${T.orange},transparent)`, marginBottom:"1.5rem" }} />
+        <div style={{ display:"flex", gap:"1rem", marginBottom:"1.5rem", flexWrap:"wrap", alignItems:"center" }}>
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..." style={{ flex:1, minWidth:180, padding:"10px 14px", border:`1.5px solid ${T.border}`, borderRadius:8, fontSize:"0.85rem", background:"#fff", color:T.text, outline:"none" }}
+            onFocus={e => e.target.style.borderColor=T.orange} onBlur={e => e.target.style.borderColor=T.border} />
+          <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+            {[["all","All"],["manifestation","Manifestation"],["therapy","Therapy"],["habit-builder","Habit Builder"]].map(([v,l]) => (
+              <button key={v} onClick={() => setFilter(v)} style={{ padding:"8px 16px", borderRadius:20, border:`1.5px solid ${filter===v ? T.orange : T.border}`, background: filter===v ? T.orange : "#fff", color: filter===v ? "#fff" : T.textMid, fontSize:"0.75rem", fontWeight:600, cursor:"pointer", transition:"all 0.2s" }}>{l}</button>
+            ))}
+          </div>
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"1.5rem" }} className="prod-grid">
+          {filtered.map(p => {
+            const qty = getQty(p.id);
+            return (
+              <div key={p.id} className="prod-card" onClick={() => onClick(p)}>
+                <div style={{ position:"relative", aspectRatio:"4/3", overflow:"hidden" }}>
+                  <img src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.4s" }}
+                    onMouseEnter={e => e.currentTarget.style.transform="scale(1.06)"}
+                    onMouseLeave={e => e.currentTarget.style.transform="scale(1)"} />
+                  <div style={{ position:"absolute", top:10, left:10, background:T.orange, color:"#fff", borderRadius:4, padding:"3px 10px", fontSize:"0.65rem", fontWeight:800 }}>-{p.discount}%</div>
+                  <button onClick={e => { e.stopPropagation(); onWish(p.id); }} style={{ position:"absolute", top:8, right:8, background:"rgba(255,255,255,0.9)", border:"none", borderRadius:"50%", width:32, height:32, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:14, transition:"transform 0.2s" }}
+                    onMouseEnter={e => e.currentTarget.style.transform="scale(1.15)"} onMouseLeave={e => e.currentTarget.style.transform="scale(1)"}
+                  >{wished.includes(p.id) ? "❤️" : "🤍"}</button>
+                  {p.bestSeller && <div style={{ position:"absolute", bottom:8, left:8, background:T.bgDark, color:T.orange, borderRadius:4, padding:"2px 8px", fontSize:"0.6rem", fontWeight:700, letterSpacing:"0.08em" }}>BEST SELLER</div>}
+                </div>
+                <div style={{ padding:"1.2rem" }}>
+                  <h4 style={{ fontSize:"0.92rem", fontWeight:700, color:T.text, marginBottom:"0.4rem" }}>{p.name}</h4>
+                  <p style={{ fontSize:"0.76rem", color:T.textMid, marginBottom:"0.7rem", lineHeight:1.5 }}>{p.shortDesc.slice(0,65)}...</p>
+                  <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:"0.8rem" }}>
+                    <span style={{ fontSize:"1rem", color:T.orange, fontWeight:700 }}>Rs.{p.price.toLocaleString()}</span>
+                    <span style={{ color:T.textMid, fontSize:"0.75rem", textDecoration:"line-through" }}>Rs.{p.originalPrice.toLocaleString()}</span>
+                  </div>
+                  {/* Inline qty counter after add */}
+                  {qty > 0 ? (
+                    <div onClick={e => e.stopPropagation()} style={{ display:"flex", alignItems:"center", gap:0, border:`1.5px solid ${T.orange}`, borderRadius:8, overflow:"hidden", width:"100%" }}>
+                      <button onClick={() => onAdd({ ...p, qty:-1 })} style={{ flex:1, height:38, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.orange, fontWeight:700, transition:"background 0.15s" }}
+                        onMouseEnter={e => e.currentTarget.style.background="rgba(232,114,12,0.08)"} onMouseLeave={e => e.currentTarget.style.background="none"}>−</button>
+                      <span style={{ flex:1, textAlign:"center", fontWeight:800, color:T.orange, fontSize:"0.95rem" }}>{qty}</span>
+                      <button onClick={() => onAdd(p)} style={{ flex:1, height:38, background:T.orange, border:"none", cursor:"pointer", fontSize:18, color:"#fff", fontWeight:700, transition:"background 0.15s" }}
+                        onMouseEnter={e => e.currentTarget.style.background=T.orangeD} onMouseLeave={e => e.currentTarget.style.background=T.orange}>+</button>
+                    </div>
+                  ) : (
+                    <button className="btn-orange" onClick={e => { e.stopPropagation(); onAdd(p); }} style={{ width:"100%", padding:"10px", fontSize:"0.72rem", borderRadius:7 }}>Add to Cart</button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        {filtered.length===0 && <div style={{ textAlign:"center", padding:"4rem", color:T.textMid }}><div style={{ fontSize:48, marginBottom:12 }}>🔍</div><p>No products found.</p></div>}
+      </div>
+    </div>
+  );
+}
+
+// ─── PRODUCT DETAIL ───────────────────────────────────────────
+function ProductPage({ product: p, onAdd, onWish, wished, cart }) {
+  const [qty, setQty] = useState(1);
+  const [tab, setTab] = useState("desc");
+  const [activeImg, setActiveImg] = useState(0);
+  const cartQty = cart ? cart.filter(i => i.id === p?.id).reduce((s,i) => s + i.qty, 0) : 0;
+
+  if (!p) return null;
+  const imgs = p.images || [p.image];
+
+  return (
+    <div style={{ paddingTop:90, background:T.bg, minHeight:"100vh" }}>
+      <div className="max-w" style={{ padding:"clamp(1.5rem,4vw,3rem)" }}>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"3rem", alignItems:"start" }} className="prod-detail-grid">
+
+          {/* ── Image Gallery ── */}
           <div>
-            <div style={{border:`1px solid ${T.goldD}33`,borderRadius:4,padding:"1.8rem",position:"sticky",top:110,background:`rgba(201,169,110,0.04)`}} className="cart-summary">
-              <h3 style={{fontFamily:"'Cinzel',serif",color:T.navy,fontSize:"0.85rem",letterSpacing:"0.18em",marginTop:0}}>ORDER SUMMARY</h3>
-              <Divider/>
-              <div style={{display:"flex",gap:8,marginBottom:6}}>
-                <input value={coupon} onChange={e=>{setCoupon(e.target.value);if(appliedCode){removeC();}}} placeholder="Coupon code" style={{...iSx,flex:1}} onKeyDown={e=>e.key==="Enter"&&applyC()}/>
-                {appliedCode
-                  ? <button onClick={removeC} style={{background:"rgba(192,57,43,0.1)",border:"1px solid rgba(192,57,43,0.3)",color:"#c0392b",borderRadius:2,padding:"0 12px",cursor:"pointer",fontFamily:"'Cinzel',serif",fontSize:"0.65rem",fontWeight:800,whiteSpace:"nowrap"}}>REMOVE</button>
-                  : <button onClick={applyC} disabled={applying} style={{background:applying?"#aaa":`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,borderRadius:2,padding:"0 14px",cursor:applying?"not-allowed":"pointer",fontFamily:"'Cinzel',serif",fontSize:"0.65rem",fontWeight:800,letterSpacing:"0.1em",whiteSpace:"nowrap"}}>{applying?"...":"APPLY"}</button>
-                }
+            {/* Main image */}
+            <div style={{ borderRadius:16, overflow:"hidden", boxShadow:"0 8px 40px rgba(0,0,0,0.1)", marginBottom:"0.9rem", aspectRatio:"1", background:"#f0ece4" }}>
+              <img src={imgs[activeImg]} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover", transition:"opacity 0.3s" }} />
+            </div>
+            {/* Thumbnails */}
+            <div style={{ display:"flex", gap:"0.6rem", overflowX:"auto" }} className="scroll-hide">
+              {imgs.map((img, i) => (
+                <button key={i} onClick={() => setActiveImg(i)} style={{
+                  flexShrink:0, width:72, height:72, borderRadius:10, overflow:"hidden", padding:0, border:`2.5px solid ${activeImg===i ? T.orange : "transparent"}`,
+                  cursor:"pointer", transition:"border-color 0.2s", boxShadow: activeImg===i ? `0 0 0 1px ${T.orange}` : "0 2px 8px rgba(0,0,0,0.08)"
+                }}>
+                  <img src={img} alt={`view ${i+1}`} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Info ── */}
+          <div>
+            {p.bestSeller && <div style={{ display:"inline-block", background:T.orange, color:"#fff", borderRadius:4, padding:"3px 12px", fontSize:"0.65rem", fontWeight:800, letterSpacing:"0.1em", marginBottom:"0.8rem" }}>BEST SELLER</div>}
+            <h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.4rem,3vw,2rem)", fontWeight:900, color:T.text, marginBottom:"0.4rem" }}>{p.name}</h1>
+            <p style={{ fontSize:"0.72rem", color:T.textMid, marginBottom:"1rem", textTransform:"uppercase", letterSpacing:"0.1em" }}>{p.category}</p>
+            <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:"1.5rem" }}>
+              <span style={{ fontSize:"1.5rem", color:T.orange, fontWeight:800 }}>Rs.{p.price.toLocaleString()}</span>
+              <span style={{ color:T.textMid, fontSize:"0.95rem", textDecoration:"line-through" }}>Rs.{p.originalPrice.toLocaleString()}</span>
+              <span style={{ background:"rgba(232,114,12,0.1)", color:T.orange, borderRadius:4, padding:"3px 10px", fontSize:"0.72rem", fontWeight:700 }}>{p.discount}% OFF</span>
+            </div>
+
+            {/* Tabs */}
+            <div style={{ display:"flex", gap:8, marginBottom:"1.2rem" }}>
+              {["desc","benefits","suitable"].map(t => (
+                <button key={t} onClick={() => setTab(t)} style={{ padding:"7px 14px", borderRadius:20, border:`1.5px solid ${tab===t ? T.orange : T.border}`, background: tab===t ? T.orange : "#fff", color: tab===t ? "#fff" : T.textMid, fontSize:"0.72rem", fontWeight:600, cursor:"pointer", transition:"all 0.2s" }}>
+                  {t==="desc" ? "Description" : t==="benefits" ? "Benefits" : "Suitable For"}
+                </button>
+              ))}
+            </div>
+            <div style={{ background:"#fff", borderRadius:12, padding:"1.2rem", marginBottom:"1.5rem", border:`1px solid ${T.border}`, minHeight:90 }}>
+              {tab==="desc" && <p style={{ fontSize:"0.86rem", color:T.textMid, lineHeight:1.7 }}>{p.shortDesc}</p>}
+              {tab==="benefits" && <ul style={{ paddingLeft:"1.2rem" }}>{p.benefits.map(b => <li key={b} style={{ fontSize:"0.86rem", color:T.textMid, marginBottom:6, lineHeight:1.6 }}>{b}</li>)}</ul>}
+              {tab==="suitable" && <p style={{ fontSize:"0.86rem", color:T.textMid, lineHeight:1.7 }}>{p.suitableFor}</p>}
+            </div>
+
+            {/* Qty + Add to Cart */}
+            <div style={{ display:"flex", gap:"1rem", alignItems:"center", marginBottom:"1rem" }}>
+              <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.border}`, borderRadius:8, overflow:"hidden" }}>
+                <button onClick={() => setQty(q => Math.max(1,q-1))} style={{ width:36, height:40, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.text }}>−</button>
+                <span style={{ width:40, textAlign:"center", fontWeight:700, color:T.text }}>{qty}</span>
+                <button onClick={() => setQty(q => q+1)} style={{ width:36, height:40, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.text }}>+</button>
               </div>
-              {msg&&<p style={{color:disc>0?"#2d7a5a":"#c0392b",fontSize:"0.78rem",marginBottom:10}}>{msg}</p>}
+              <button className="btn-orange" onClick={() => { for(let i=0;i<qty;i++) onAdd(p); }} style={{ flex:1, padding:"12px", fontSize:"0.8rem", borderRadius:8 }}>
+                Add to Cart {cartQty > 0 && <span style={{ background:"rgba(255,255,255,0.25)", borderRadius:10, padding:"1px 7px", marginLeft:6, fontSize:"0.72rem" }}>{cartQty} in cart</span>}
+              </button>
+              <button onClick={() => onWish(p.id)} style={{ width:44, height:44, borderRadius:8, border:`1.5px solid ${T.border}`, background:"#fff", cursor:"pointer", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center" }}>{wished.includes(p.id) ? "❤️" : "🤍"}</button>
+            </div>
 
-              {/* ── Gift Option ── */}
-              <div style={{border:`1px solid ${T.goldD}33`,borderRadius:6,padding:"1rem",marginBottom:"1rem",background:`rgba(201,169,110,0.05)`,transition:"all 0.3s"}}>
-                <label style={{display:"flex",alignItems:"center",gap:"0.7rem",cursor:"pointer",userSelect:"none"}}>
-                  <div
-                    onClick={()=>setIsGift(p=>!p)}
-                    style={{width:20,height:20,borderRadius:4,border:`2px solid ${isGift?T.goldD:`${T.goldD}66`}`,background:isGift?`linear-gradient(135deg,${T.goldD},${T.gold})`:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.25s",boxShadow:isGift?`0 2px 8px ${T.gold}55`:"none",cursor:"pointer"}}
-                  >
-                    {isGift&&<span style={{color:T.navy,fontSize:12,fontWeight:900,lineHeight:1}}>✓</span>}
-                  </div>
-                  <div onClick={()=>setIsGift(p=>!p)} style={{flex:1}}>
-                    <div style={{display:"flex",alignItems:"center",gap:6}}>
-                      <span style={{fontSize:16}}>🎁</span>
-                      <span style={{fontFamily:"'Cinzel',serif",color:T.navy,fontSize:"0.78rem",letterSpacing:"0.08em",fontWeight:700}}>GIFT WRAPPING</span>
-                      <span style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,color:T.navy,fontSize:"0.6rem",fontFamily:"'Cinzel',serif",fontWeight:800,padding:"2px 7px",borderRadius:10,letterSpacing:"0.06em"}}>+₹50</span>
-                    </div>
-                    <p style={{color:"rgba(33,40,66,0.5)",fontSize:"0.7rem",margin:"3px 0 0",fontStyle:"italic"}}>Premium gift box with ribbon & personal message</p>
-                  </div>
-                </label>
-
-                {/* Gift message input — slides in */}
-                {isGift&&(
-                  <div style={{marginTop:"0.9rem",animation:"fadeIn 0.25s ease"}}>
-                    <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:6}}>
-                      <span style={{fontSize:12}}>✍️</span>
-                      <span style={{color:T.goldD,fontSize:"0.65rem",fontFamily:"'Cinzel',serif",letterSpacing:"0.12em",fontWeight:700}}>YOUR GIFT MESSAGE</span>
-                    </div>
-                    <textarea
-                      value={giftMsg}
-                      onChange={e=>setGiftMsg(e.target.value)}
-                      maxLength={120}
-                      rows={3}
-                      placeholder="Write a heartfelt message for your gift recipient... ✨"
-                      style={{width:"100%",background:"#fff",border:`1.5px solid ${T.goldD}55`,borderRadius:4,color:T.navy,padding:"10px 12px",fontSize:"0.85rem",outline:"none",boxSizing:"border-box",resize:"none",fontFamily:"inherit",lineHeight:1.6,transition:"border-color 0.2s"}}
-                      onFocus={e=>e.target.style.borderColor=T.goldD}
-                      onBlur={e=>e.target.style.borderColor=`${T.goldD}55`}
-                    />
-                    <p style={{color:"rgba(33,40,66,0.35)",fontSize:"0.65rem",textAlign:"right",margin:"3px 0 0"}}>{giftMsg.length}/120</p>
-                  </div>
-                )}
-              </div>
-
-              {[["Subtotal",`₹${sub.toLocaleString()}`],["Shipping",ship===0?"FREE":`₹${ship}`],...(isGift?[["Gift Wrapping","₹50"]]:[]),...(disc>0?[["Discount",`-₹${disc}`]]:[])].map(([l,v])=>(
-                <div key={l} style={{display:"flex",justifyContent:"space-between",marginBottom:9}}>
-                  <span style={{color:"rgba(33,40,66,0.6)",fontSize:"0.95rem"}}>{l}</span>
-                  <span style={{color:l==="Discount"?"#2d7a5a":l==="Gift Wrapping"?T.goldD:T.navy,fontFamily:"'Cinzel',serif",fontSize:"0.82rem"}}>{v}</span>
+            <div style={{ display:"flex", gap:"1.2rem", flexWrap:"wrap" }}>
+              {["Free shipping above Rs.999","7-day returns","100% natural"].map(f => (
+                <div key={f} style={{ display:"flex", alignItems:"center", gap:5, fontSize:"0.7rem", color:T.textMid }}>
+                  <span style={{ color:T.orange }}>✓</span> {f}
                 </div>
               ))}
-              <div style={{borderTop:`1px solid ${T.goldD}22`,paddingTop:"0.9rem",marginTop:"0.4rem",display:"flex",justifyContent:"space-between",marginBottom:"1.2rem"}}>
-                <span style={{color:T.navy,fontFamily:"'Cinzel',serif",fontSize:"0.95rem"}}>Total</span>
-                <span style={{color:T.goldD,fontFamily:"'Cinzel',serif",fontSize:"1.2rem",fontWeight:700}}>₹{total.toLocaleString()}</span>
-              </div>
-              <button onClick={()=>onCheckout({couponCode:appliedCode,discount:disc,isGift,giftMessage:giftMsg})} style={{width:"100%",background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"14px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.16em",cursor:"pointer",fontWeight:800,boxShadow:`0 6px 24px ${T.gold}44`}}>PROCEED TO CHECKOUT</button>
             </div>
           </div>
         </div>
@@ -1114,129 +802,257 @@ function CartPage({ cart, onQty, onRemove, onCheckout }) {
   );
 }
 
-// ─── CHECKOUT ─────────────────────────────────────────────────
-function CheckoutPage({ cart, onPlaceOrder, couponCode="", discount=0, isGift=false, giftMessage="" }) {
-  const [form,setForm]=useState(()=>{
-    // Pre-fill from logged-in user if available
-    try{
-      const u=JSON.parse(localStorage.getItem("user")||"null");
-      if(u) return {name:u.name||"",age:u.age||"",email:u.email||"",phone:u.phone||"",flat:"",area:"",landmark:"",city:"",state:"",country:"India",payment:"cod"};
-    }catch(e){}
-    return {name:"",age:"",email:"",phone:"",flat:"",area:"",landmark:"",city:"",state:"",country:"India",payment:"cod"};
-  });
-  const [placed,setPlaced]=useState(false);
-  const [loading,setLoading]=useState(false);
-  const [error,setError]=useState("");
-  const sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
-  const ship=sub>=999?0:99;
-  const total=Math.max(0,sub+ship-discount+(isGift?50:0));
-  const iSx={width:"100%",background:`rgba(201,169,110,0.06)`,border:`1px solid ${T.goldD}33`,borderRadius:2,color:T.navy,padding:"10px 12px",fontSize:"0.95rem",outline:"none",boxSizing:"border-box"};
-  const lSx={color:"rgba(33,40,66,0.5)",fontSize:"0.63rem",letterSpacing:"0.15em",fontFamily:"'Cinzel',serif",display:"block",marginBottom:5,textTransform:"uppercase"};
+// ─── RITUALS PAGE ─────────────────────────────────────────────
+function RitualsPage() {
+  const rituals = [
+    { icon:"🌙", title:"New Moon Ritual", time:"30 min", desc:"Set powerful intentions with your WishStone under the new moon. Write your desires, charge your stone, and visualize your manifestation.", steps:["Apne space ko sage se cleanse karein","WishStone ko dono haathon mein pakdein","3 intentions paper pe likhein","Stone ko paper pe raat bhar rakhein","10 minute meditation karein"] },
+    { icon:"☀️", title:"Morning Activation", time:"10 min", desc:"Har subah WishStone activation ritual se apni energy align karein aur din ko positive tone dein.", steps:["WishStone ko dono haathon mein pakdein","5 gehri sansein lein","Apni intention zor se bolein","Stone ko apne dil pe rakhein","Isse poore din saath rakhein"] },
+    { icon:"🌿", title:"Cleansing Ceremony", time:"20 min", desc:"Regular cleansing se accumulated energies remove hoti hain aur WishStone apni natural vibrational state mein wapas aata hai.", steps:["Stone ko thande paani se dhoyein","Sage smoke se pass karein","1 ghante ke liye sunlight mein rakhein","Nayi intention set karein","Sacred space mein store karein"] },
+  ];
+  return (
+    <div style={{ paddingTop:90, background:T.bg, minHeight:"100vh" }}>
+      <div className="max-w" style={{ padding:"clamp(1.5rem,4vw,3rem)" }}>
+        <h1 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"clamp(1.6rem,4vw,2.2rem)", fontWeight:900, marginBottom:"0.4rem" }}>Sacred Rituals</h1>
+        <div style={{ width:60, height:3, background:`linear-gradient(90deg,${T.orange},transparent)`, marginBottom:"0.8rem" }} />
+        <p style={{ color:T.textMid, fontSize:"0.88rem", marginBottom:"2.5rem", maxWidth:580 }}>Ancient practices adapted for modern life. Follow these rituals to deepen your connection with WishStone and amplify your manifestations.</p>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"1.5rem" }} className="prod-grid">
+          {rituals.map(r => (
+            <div key={r.title} style={{ background:"#fff", borderRadius:16, padding:"1.8rem", border:`1px solid ${T.border}`, boxShadow:"0 4px 20px rgba(0,0,0,0.04)" }}>
+              <div style={{ fontSize:38, marginBottom:"1rem" }}>{r.icon}</div>
+              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:"0.8rem" }}>
+                <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.05rem", fontWeight:700, color:T.text }}>{r.title}</h3>
+                <span style={{ background:"rgba(232,114,12,0.08)", color:T.orange, borderRadius:20, padding:"2px 10px", fontSize:"0.65rem", fontWeight:700 }}>{r.time}</span>
+              </div>
+              <p style={{ fontSize:"0.8rem", color:T.textMid, lineHeight:1.65, marginBottom:"1.2rem" }}>{r.desc}</p>
+              {r.steps.map((s,i) => (
+                <div key={i} style={{ display:"flex", gap:10, alignItems:"flex-start", marginBottom:8 }}>
+                  <span style={{ width:20, height:20, borderRadius:"50%", background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, color:"#fff", fontSize:"0.6rem", fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, marginTop:1 }}>{i+1}</span>
+                  <span style={{ fontSize:"0.78rem", color:T.textMid, lineHeight:1.5 }}>{s}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
-  const handlePlaceOrder=async()=>{
-    if(!form.name||!form.email||!form.phone||!form.flat||!form.city||!form.state){
-      setError("Please fill in all required fields (name, email, phone, address).");
-      return;
-    }
+// ─── BENEFITS PAGE ────────────────────────────────────────────
+function BenefitsPage() {
+  const benefits = [
+    { icon:"🧘", title:"Mental Clarity", desc:"WishStone ki sacred yantra aur crystal energy mental chatter ko quiet karti hai, focus improve karti hai, aur decision-making mein clarity laati hai." },
+    { icon:"💚", title:"Emotional Healing", desc:"Rose quartz aur moonstone gently emotional blockages release karte hain, self-love promote karte hain, aur past wounds se healing support karte hain." },
+    { icon:"⚡", title:"Energy Amplification", desc:"WishStone ki frequency motivation, creativity, aur life force energy boost karti hai — goals manifest karne aur action lene ke liye perfect." },
+    { icon:"🛡️", title:"Protection", desc:"Obsidian aur black tourmaline powerful energetic shields create karte hain, aapke aura ko negative influences se protect karte hain." },
+    { icon:"😴", title:"Better Sleep", desc:"Amethyst aur selenite nervous system ko calm karte hain, anxiety reduce karte hain, aur deep restorative sleep promote karte hain." },
+    { icon:"🌟", title:"Spiritual Growth", desc:"WishStone ki sacred yantra third eye open karti hai, intuition enhance karti hai, aur aapki spiritual awakening journey accelerate karti hai." },
+  ];
+  return (
+    <div style={{ paddingTop:90, background:T.bg, minHeight:"100vh" }}>
+      <div className="max-w" style={{ padding:"clamp(1.5rem,4vw,3rem)" }}>
+        <h1 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"clamp(1.6rem,4vw,2.2rem)", fontWeight:900, marginBottom:"0.4rem" }}>WishStone Benefits</h1>
+        <div style={{ width:60, height:3, background:`linear-gradient(90deg,${T.orange},transparent)`, marginBottom:"0.8rem" }} />
+        <p style={{ color:T.textMid, fontSize:"0.88rem", marginBottom:"2.5rem", maxWidth:580 }}>Discover how WishStone can transform every area of your life — from mental clarity to spiritual awakening.</p>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"1.5rem" }} className="prod-grid">
+          {benefits.map(b => (
+            <div key={b.title} className="power-card">
+              <div style={{ fontSize:34, marginBottom:"1rem" }}>{b.icon}</div>
+              <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"1rem", fontWeight:700, color:T.text, marginBottom:"0.5rem" }}>{b.title}</h3>
+              <p style={{ fontSize:"0.8rem", color:T.textMid, lineHeight:1.65 }}>{b.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── STORIES PAGE ─────────────────────────────────────────────
+function StoriesPage() {
+  const stories = [
+    { name:"Priya S.", city:"Mumbai", rating:5, text:"Pehle mujhe yakeen nahi tha, lekin Rose Quartz use karne ke 3 hafte baad, main genuinely zyada peaceful feel karti hoon. Apne aap ke saath mera rishta bilkul badal gaya hai.", product:"WishStone — Rose Quartz", avatar:"P" },
+    { name:"Rahul M.", city:"Delhi", rating:5, text:"Amethyst WishStone ne meri meditation practice completely change kar di. Main deeper jaata hoon, zyada der rukta hoon, aur genuinely refreshed uthta hoon. Har rupaye ki value hai.", product:"WishStone — Amethyst", avatar:"R" },
+    { name:"Ananya K.", city:"Bangalore", rating:5, text:"2 mahine pehle morning ritual shuru kiya WishStone ke saath. Meri productivity double ho gayi aur main apne dino ke baare mein bahut zyada intentional feel karti hoon.", product:"Moonstone Ritual Kit", avatar:"A" },
+    { name:"Vikram T.", city:"Pune", rating:5, text:"Obsidian WishStone mere desk pe hai aur meri workspace ki energy shift ho gayi hai. Kam stress, zyada focus. Mere team ne bhi difference notice kiya.", product:"WishStone — Obsidian", avatar:"V" },
+    { name:"Meera J.", city:"Chennai", rating:5, text:"Lavender Bundle bilkul divine hai. Ghar ki khushboo incredible hai aur energy bahut lighter feel hoti hai. Main 3 baar order kar chuki hoon!", product:"Healing Lavender Bundle", avatar:"M" },
+    { name:"Arjun P.", city:"Hyderabad", rating:5, text:"Apni maa ko Sandalwood Incense gift kiya aur ab yeh unka daily ritual hai. Quality exceptional hai — baaki jagah milne wali sasti cheez se bilkul alag.", product:"Sacred Sandalwood Incense", avatar:"A" },
+  ];
+  return (
+    <div style={{ paddingTop:90, background:T.bg, minHeight:"100vh" }}>
+      <div className="max-w" style={{ padding:"clamp(1.5rem,4vw,3rem)" }}>
+        <h1 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"clamp(1.6rem,4vw,2.2rem)", fontWeight:900, marginBottom:"0.4rem" }}>Customer Stories</h1>
+        <div style={{ width:60, height:3, background:`linear-gradient(90deg,${T.orange},transparent)`, marginBottom:"0.8rem" }} />
+        <p style={{ color:T.textMid, fontSize:"0.88rem", marginBottom:"2.5rem" }}>Real transformations from our community of conscious souls across India.</p>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"1.5rem" }} className="prod-grid">
+          {stories.map((s,i) => (
+            <div key={i} style={{ background:"#fff", borderRadius:16, padding:"1.5rem", border:`1px solid ${T.border}`, boxShadow:"0 4px 20px rgba(0,0,0,0.04)" }}>
+              <div style={{ display:"flex", gap:3, marginBottom:"1rem" }}>
+                {Array(s.rating).fill(0).map((_,j) => <span key={j} style={{ color:T.orange, fontSize:13 }}>★</span>)}
+              </div>
+              <p style={{ fontSize:"0.84rem", color:T.textMid, lineHeight:1.7, marginBottom:"1.2rem", fontStyle:"italic" }}>"{s.text}"</p>
+              <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                <div style={{ width:36, height:36, borderRadius:"50%", background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700, fontSize:"0.85rem" }}>{s.avatar}</div>
+                <div>
+                  <div style={{ fontWeight:700, color:T.text, fontSize:"0.82rem" }}>{s.name}</div>
+                  <div style={{ fontSize:"0.68rem", color:T.textMid }}>{s.city} · {s.product}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── CART PAGE ────────────────────────────────────────────────
+function CartPage({ cart, onQty, onRemove, onCheckout }) {
+  const sub = cart.reduce((s,i) => s + i.price*i.qty, 0);
+  const ship = sub >= 999 ? 0 : 99;
+  const total = sub + ship;
+  if (cart.length===0) return (
+    <div style={{ paddingTop:130, paddingBottom:40, paddingLeft:"2rem", paddingRight:"2rem", background:T.bg, minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, textAlign:"center" }}>
+      <div style={{ fontSize:56 }}>🛒</div>
+      <h2 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.8rem", fontWeight:900 }}>Your Cart is Empty</h2>
+      <p style={{ color:T.textMid, fontSize:"0.88rem" }}>Add some sacred stones to get started.</p>
+    </div>
+  );
+  return (
+    <div style={{ paddingTop:90, background:T.bg, minHeight:"100vh" }}>
+      <div className="max-w" style={{ padding:"clamp(1.5rem,4vw,3rem)" }}>
+        <h1 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"clamp(1.5rem,4vw,2rem)", fontWeight:900, marginBottom:"0.4rem" }}>Your Cart</h1>
+        <div style={{ width:60, height:3, background:`linear-gradient(90deg,${T.orange},transparent)`, marginBottom:"1.5rem" }} />
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 320px", gap:"2rem", alignItems:"start" }} className="checkout-grid">
+          <div>
+            {cart.map(item => (
+              <div key={item.id} style={{ background:"#fff", borderRadius:12, padding:"1.2rem", marginBottom:"1rem", display:"flex", gap:"1rem", alignItems:"center", border:`1px solid ${T.border}` }}>
+                <img src={item.image} alt={item.name} style={{ width:76, height:76, objectFit:"cover", borderRadius:8, flexShrink:0 }} />
+                <div style={{ flex:1 }}>
+                  <h4 style={{ fontSize:"0.88rem", fontWeight:700, color:T.text, marginBottom:4 }}>{item.name}</h4>
+                  <p style={{ fontSize:"0.78rem", color:T.textMid, marginBottom:8 }}>Rs.{item.price.toLocaleString()} each</p>
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.border}`, borderRadius:6, overflow:"hidden" }}>
+                      <button onClick={() => onQty(item.id,-1)} style={{ width:30, height:30, background:"none", border:"none", cursor:"pointer", fontSize:16, color:T.text }}>-</button>
+                      <span style={{ width:30, textAlign:"center", fontSize:"0.85rem", fontWeight:700, color:T.text }}>{item.qty}</span>
+                      <button onClick={() => onQty(item.id,1)} style={{ width:30, height:30, background:"none", border:"none", cursor:"pointer", fontSize:16, color:T.text }}>+</button>
+                    </div>
+                    <button onClick={() => onRemove(item.id)} style={{ background:"none", border:"none", cursor:"pointer", color:"#c0392b", fontSize:"0.72rem", fontWeight:600 }}>Remove</button>
+                  </div>
+                </div>
+                <div style={{ fontWeight:800, color:T.orange, fontSize:"0.95rem", flexShrink:0 }}>Rs.{(item.price*item.qty).toLocaleString()}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ background:"#fff", borderRadius:16, padding:"1.5rem", border:`1px solid ${T.border}`, position:"sticky", top:90 }}>
+            <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.05rem", fontWeight:700, marginBottom:"1.2rem" }}>Order Summary</h3>
+            {[["Subtotal","Rs."+sub.toLocaleString()],["Shipping",ship===0?"FREE":"Rs."+ship]].map(([l,v]) => (
+              <div key={l} style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
+                <span style={{ color:T.textMid, fontSize:"0.82rem" }}>{l}</span>
+                <span style={{ color:T.text, fontSize:"0.82rem", fontWeight:600 }}>{v}</span>
+              </div>
+            ))}
+            {ship===0 && <p style={{ fontSize:"0.7rem", color:"#2d7a5a", marginBottom:8 }}>You qualify for free shipping!</p>}
+            <div style={{ borderTop:`1px solid ${T.border}`, paddingTop:"0.9rem", display:"flex", justifyContent:"space-between", marginBottom:"1.2rem" }}>
+              <span style={{ color:T.text, fontWeight:700 }}>Total</span>
+              <span style={{ color:T.orange, fontSize:"1.1rem", fontWeight:800 }}>Rs.{total.toLocaleString()}</span>
+            </div>
+            <button className="btn-orange" onClick={onCheckout} style={{ width:"100%", padding:"13px", fontSize:"0.8rem", borderRadius:8 }}>Proceed to Checkout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── CHECKOUT PAGE ────────────────────────────────────────────
+function CheckoutPage({ cart, onPlaceOrder }) {
+  const [form, setForm] = useState({ name:"", email:"", phone:"", address:"", city:"", state:"", pincode:"" });
+  const [coupon, setCoupon] = useState("");
+  const [discount, setDiscount] = useState(0);
+  const [couponMsg, setCouponMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const sub = cart.reduce((s,i) => s + i.price*i.qty, 0);
+  const ship = sub >= 999 ? 0 : 99;
+  const total = sub + ship - discount;
+
+  const applyCoupon = () => {
+    if (coupon.toUpperCase()==="WISH10") { setDiscount(Math.round(sub*0.1)); setCouponMsg("10% discount applied!"); }
+    else if (coupon.toUpperCase()==="FIRST20") { setDiscount(Math.round(sub*0.2)); setCouponMsg("20% discount applied!"); }
+    else { setDiscount(0); setCouponMsg("Invalid coupon code."); }
+  };
+
+  const handleSubmit = async e => {
+    e.preventDefault(); setError("");
+    if (!form.name||!form.email||!form.phone||!form.address||!form.city||!form.pincode) return setError("Please fill all required fields.");
     setLoading(true);
-    setError("");
-    try{
-      const orderPayload={
-        customer:{name:form.name,email:form.email,phone:form.phone,age:form.age||""},
-        shippingAddress:{flat:form.flat,area:form.area,landmark:form.landmark,city:form.city,state:form.state,country:form.country},
-        items:cart.map(i=>({productId:String(i.id),name:i.name,price:i.price,quantity:i.qty,image:i.image||""})),
-        paymentMethod:form.payment,
-        couponCode:couponCode||undefined,
-        gift:isGift?{enabled:true,message:giftMessage||""}:undefined,
-      };
-      const res=await fetch("http://localhost:5000/api/orders/create",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify(orderPayload),
-      });
-      const data=await res.json();
-      if(!data.success) throw new Error(data.message||"Order failed");
-      setPlaced(true);
-      setTimeout(()=>onPlaceOrder(),2500);
-    }catch(err){
-      setError(err.message||"Something went wrong. Please try again.");
-    }
+    await new Promise(r => setTimeout(r,1200));
+    onPlaceOrder({ items:cart, address:form, totalAmount:total, coupon, discount });
     setLoading(false);
   };
 
-  if(placed) return (
-    <div style={{paddingTop:130,textAlign:"center",background:T.cream,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:14,padding:"130px 2rem"}}>
-      <div style={{fontSize:58}}>✨</div>
-      <h2 style={{fontFamily:"'Cinzel Decorative',serif",color:T.goldD,fontSize:"clamp(1.5rem,4vw,2rem)"}}>Order Placed!</h2>
-      <Divider/>
-      <p style={{color:"rgba(33,40,66,0.65)",fontStyle:"italic",fontSize:"1.1rem",maxWidth:400}}>Thank you, {form.name||"dear soul"}! Your magical order is on its way. 🌙</p>
+  const inp = (key, label, type="text", half=false) => (
+    <div style={{ gridColumn: half ? "span 1" : "span 2" }}>
+      <label style={{ display:"block", fontSize:"0.68rem", fontWeight:700, color:T.textMid, marginBottom:5, letterSpacing:"0.08em", textTransform:"uppercase" }}>{label}</label>
+      <input type={type} value={form[key]} onChange={e => setForm({...form,[key]:e.target.value})} placeholder={label}
+        style={{ width:"100%", padding:"11px 13px", border:`1.5px solid ${T.border}`, borderRadius:8, fontSize:"0.86rem", background:"#fff", color:T.text, outline:"none", boxSizing:"border-box" }}
+        onFocus={e => e.target.style.borderColor=T.orange} onBlur={e => e.target.style.borderColor=T.border} />
     </div>
   );
 
   return (
-    <div style={{paddingTop:100,background:T.cream,minHeight:"100vh"}}>
-      <div style={{maxWidth:880,margin:"0 auto",padding:"clamp(1.5rem,4vw,3rem)"}}>
-        <h1 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"clamp(1.5rem,4vw,2rem)",marginBottom:"0.4rem"}}>Checkout</h1>
-        <Divider/>
-        <div className="checkout-grid" style={{display:"grid",gridTemplateColumns:"1fr 320px",gap:"1.8rem",marginTop:"1rem"}}>
-          <div style={{border:`1px solid ${T.goldD}22`,borderRadius:4,padding:"1.8rem",background:`rgba(201,169,110,0.03)`}}>
-            <h3 style={{fontFamily:"'Cinzel',serif",color:T.goldD,fontSize:"0.74rem",letterSpacing:"0.22em",marginTop:0}}>DELIVERY INFORMATION</h3>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.9rem",marginBottom:"0.9rem"}} className="checkout-form-grid">
-              {[["Full Name","name","text"],["Age","age","number"],["Email","email","email"],["Phone","phone","tel"]].map(([l,k,t])=>(
-                <div key={k}><label style={lSx}>{l}</label><input type={t} value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} style={iSx}/></div>
-              ))}
+    <div style={{ paddingTop:90, background:T.bg, minHeight:"100vh" }}>
+      <div className="max-w" style={{ padding:"clamp(1.5rem,4vw,3rem)" }}>
+        <h1 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"clamp(1.5rem,4vw,2rem)", fontWeight:900, marginBottom:"0.4rem" }}>Checkout</h1>
+        <div style={{ width:60, height:3, background:`linear-gradient(90deg,${T.orange},transparent)`, marginBottom:"1.5rem" }} />
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 320px", gap:"2rem", alignItems:"start" }} className="checkout-grid">
+          <form onSubmit={handleSubmit}>
+            <div style={{ background:"#fff", borderRadius:16, padding:"1.5rem", border:`1px solid ${T.border}`, marginBottom:"1.2rem" }}>
+              <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1rem", fontWeight:700, marginBottom:"1.2rem" }}>Delivery Details</h3>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1rem" }}>
+                {inp("name","Full Name")} {inp("email","Email Address","email")}
+                {inp("phone","Phone Number","tel")} {inp("address","Street Address")}
+                {inp("city","City","text",true)} {inp("state","State","text",true)}
+                {inp("pincode","Pincode","text",true)}
+              </div>
             </div>
-            {[["Flat / House No.","flat"],["Area / Street","area"],["Landmark","landmark"]].map(([l,k])=>(
-              <div key={k} style={{marginBottom:"0.9rem"}}><label style={lSx}>{l}</label><input value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} style={iSx}/></div>
-            ))}
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"0.9rem",marginBottom:"1.5rem"}} className="checkout-city-grid">
-              {[["City","city"],["State","state"],["Country","country"]].map(([l,k])=>(
-                <div key={k}><label style={lSx}>{l}</label><input value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} style={iSx}/></div>
-              ))}
+            <div style={{ background:"#fff", borderRadius:16, padding:"1.5rem", border:`1px solid ${T.border}`, marginBottom:"1.2rem" }}>
+              <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1rem", fontWeight:700, marginBottom:"1rem" }}>Coupon Code</h3>
+              <div style={{ display:"flex", gap:8 }}>
+                <input value={coupon} onChange={e => setCoupon(e.target.value)} placeholder="Enter coupon code"
+                  style={{ flex:1, padding:"10px 13px", border:`1.5px solid ${T.border}`, borderRadius:8, fontSize:"0.84rem", background:"#fff", color:T.text, outline:"none" }}
+                  onFocus={e => e.target.style.borderColor=T.orange} onBlur={e => e.target.style.borderColor=T.border} />
+                <button type="button" className="btn-orange" onClick={applyCoupon} style={{ padding:"10px 18px", fontSize:"0.76rem", borderRadius:8 }}>Apply</button>
+              </div>
+              {couponMsg && <p style={{ fontSize:"0.76rem", marginTop:6, color: discount>0 ? "#2d7a5a" : "#c0392b" }}>{couponMsg}</p>}
+              <p style={{ fontSize:"0.68rem", color:T.textMid, marginTop:6 }}>Try: WISH10 (10% off) or FIRST20 (20% off)</p>
             </div>
-            <h3 style={{fontFamily:"'Cinzel',serif",color:T.goldD,fontSize:"0.74rem",letterSpacing:"0.22em",marginBottom:"0.9rem"}}>PAYMENT METHOD</h3>
-            <div style={{display:"flex",gap:"0.8rem",flexWrap:"wrap"}} className="payment-btns">
-              {[["cod","💵 Cash on Delivery"],["prepaid","💳 Online Payment"],["qr","📱 QR Code"]].map(([v,l])=>(
-                <button key={v} onClick={()=>setForm({...form,payment:v})} style={{flex:1,minWidth:100,background:form.payment===v?`rgba(139,105,20,0.12)`:`rgba(201,169,110,0.04)`,border:`1px solid ${form.payment===v?T.goldD:`${T.goldD}33`}`,color:form.payment===v?T.goldD:"rgba(33,40,66,0.5)",borderRadius:2,padding:"10px 6px",cursor:"pointer",fontFamily:"'Cinzel',serif",fontSize:"0.63rem",letterSpacing:"0.06em",transition:"all 0.25s"}}>{l}</button>
-              ))}
-            </div>
-          </div>
-          <div style={{border:`1px solid ${T.goldD}22`,borderRadius:4,padding:"1.8rem",height:"fit-content",background:`rgba(201,169,110,0.03)`}}>
-            <h3 style={{fontFamily:"'Cinzel',serif",color:T.navy,fontSize:"0.82rem",letterSpacing:"0.16em",marginTop:0}}>ORDER</h3>
-            <Divider/>
-            {cart.map(item=>(
-              <div key={item.id} style={{display:"flex",justifyContent:"space-between",marginBottom:9}}>
-                <div><p style={{color:"rgba(33,40,66,0.7)",margin:0,fontSize:"0.9rem",fontStyle:"italic"}}>{item.name}</p><p style={{color:"rgba(33,40,66,0.35)",fontSize:"0.72rem",margin:"2px 0 0"}}>Qty: {item.qty}</p></div>
-                <span style={{color:T.navy,fontFamily:"'Cinzel',serif",fontSize:"0.82rem",flexShrink:0}}>₹{(item.price*item.qty).toLocaleString()}</span>
+            {error && <p style={{ color:"#c0392b", fontSize:"0.78rem", marginBottom:"1rem", padding:"8px 12px", background:"rgba(192,57,43,0.06)", borderRadius:6, border:"1px solid rgba(192,57,43,0.2)" }}>{error}</p>}
+            <button type="submit" className="btn-orange" disabled={loading} style={{ width:"100%", padding:"14px", fontSize:"0.84rem", borderRadius:9, opacity:loading?0.7:1 }}>
+              {loading ? "Placing Order..." : "Place Order"}
+            </button>
+          </form>
+          <div style={{ background:"#fff", borderRadius:16, padding:"1.5rem", border:`1px solid ${T.border}`, position:"sticky", top:90 }}>
+            <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.05rem", fontWeight:700, marginBottom:"1.2rem" }}>Order Summary</h3>
+            {cart.map(i => (
+              <div key={i.id} style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
+                <span style={{ fontSize:"0.8rem", color:T.textMid }}>{i.name} x{i.qty}</span>
+                <span style={{ fontSize:"0.8rem", fontWeight:600, color:T.text }}>Rs.{(i.price*i.qty).toLocaleString()}</span>
               </div>
             ))}
-            <div style={{borderTop:`1px solid ${T.goldD}22`,paddingTop:"0.9rem",marginTop:"0.4rem"}}>
-              {[["Subtotal",`₹${sub.toLocaleString()}`],["Shipping",ship===0?"FREE":`₹${ship}`],...(isGift?[["Gift Wrapping","₹50"]]:[]),...(discount>0?[["Coupon ("+couponCode+")",`-₹${discount.toLocaleString()}`]]:[])].map(([l,v])=>(
-                <div key={l} style={{display:"flex",justifyContent:"space-between",marginBottom:7}}>
-                  <span style={{color:"rgba(33,40,66,0.55)",fontSize:"0.85rem"}}>{l}</span>
-                  <span style={{color:l.startsWith("Coupon")?"#2d7a5a":l==="Gift Wrapping"?T.goldD:T.navy,fontFamily:"'Cinzel',serif",fontSize:"0.8rem",fontWeight:l.startsWith("Coupon")||l==="Gift Wrapping"?700:400}}>{v}</span>
+            <div style={{ borderTop:`1px solid ${T.border}`, paddingTop:"0.8rem", marginTop:"0.8rem" }}>
+              {[["Subtotal","Rs."+sub.toLocaleString()],["Shipping",ship===0?"FREE":"Rs."+ship],...(discount>0?[["Coupon","-Rs."+discount.toLocaleString()]]:[])].map(([l,v]) => (
+                <div key={l} style={{ display:"flex", justifyContent:"space-between", marginBottom:7 }}>
+                  <span style={{ color:T.textMid, fontSize:"0.8rem" }}>{l}</span>
+                  <span style={{ color:l==="Coupon"?"#2d7a5a":T.text, fontSize:"0.8rem", fontWeight:600 }}>{v}</span>
                 </div>
               ))}
-              {isGift&&giftMessage&&(
-                <div style={{background:`rgba(201,169,110,0.08)`,border:`1px solid ${T.goldD}33`,borderRadius:4,padding:"8px 10px",marginBottom:8,display:"flex",gap:6,alignItems:"flex-start"}}>
-                  <span style={{fontSize:14,flexShrink:0}}>�</span>
-                  <div>
-                    <p style={{color:T.goldD,fontSize:"0.65rem",fontFamily:"'Cinzel',serif",letterSpacing:"0.1em",margin:"0 0 3px",fontWeight:700}}>GIFT MESSAGE</p>
-                    <p style={{color:"rgba(33,40,66,0.7)",fontSize:"0.78rem",margin:0,fontStyle:"italic",lineHeight:1.5}}>"{giftMessage}"</p>
-                  </div>
-                </div>
-              )}
-              {couponCode&&<div style={{background:"rgba(45,122,90,0.08)",border:"1px solid rgba(45,122,90,0.2)",borderRadius:4,padding:"6px 10px",marginBottom:8,display:"flex",alignItems:"center",gap:6}}>
-                <span style={{fontSize:14}}>🎫</span>
-                <span style={{color:"#2d7a5a",fontSize:"0.78rem",fontWeight:600}}>{couponCode} applied</span>
-              </div>}
             </div>
-            <div style={{borderTop:`1px solid ${T.goldD}22`,paddingTop:"0.9rem",display:"flex",justifyContent:"space-between",marginBottom:"1.2rem"}}>
-              <span style={{color:T.navy,fontFamily:"'Cinzel',serif"}}>Total</span>
-              <span style={{color:T.goldD,fontFamily:"'Cinzel',serif",fontSize:"1.15rem",fontWeight:700}}>₹{total.toLocaleString()}</span>
+            <div style={{ borderTop:`1px solid ${T.border}`, paddingTop:"0.9rem", display:"flex", justifyContent:"space-between", marginTop:"0.5rem" }}>
+              <span style={{ color:T.text, fontWeight:700 }}>Total</span>
+              <span style={{ color:T.orange, fontSize:"1.1rem", fontWeight:800 }}>Rs.{total.toLocaleString()}</span>
             </div>
-            {error&&<p style={{color:"#c0392b",fontSize:"0.8rem",marginBottom:"0.8rem",background:"rgba(192,57,43,0.08)",padding:"8px 10px",borderRadius:4,border:"1px solid rgba(192,57,43,0.2)"}}>{error}</p>}
-            <button onClick={handlePlaceOrder} disabled={loading} style={{width:"100%",background:loading?"#aaa":`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"14px",borderRadius:2,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.16em",cursor:loading?"not-allowed":"pointer",fontWeight:800,boxShadow:loading?"none":`0 6px 24px ${T.gold}44`,transition:"all 0.3s"}}>{loading?"PLACING ORDER...":"PLACE ORDER ✨"}</button>
           </div>
         </div>
       </div>
@@ -1245,497 +1061,355 @@ function CheckoutPage({ cart, onPlaceOrder, couponCode="", discount=0, isGift=fa
 }
 
 // ─── WISHLIST PAGE ────────────────────────────────────────────
-function WishlistPage({ ids, onAdd, onWish, onClick, cart, onQty }) {
-  const items=PRODUCTS.filter(p=>ids.includes(p.id));
-  if(!items.length) return (
-    <div style={{paddingTop:130,textAlign:"center",background:T.cream,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:14,padding:"130px 2rem"}}>
-      <div style={{fontSize:56}}>🤍</div>
-      <h2 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy}}>Your Wishlist is Empty</h2>
-      <Divider/>
+function WishlistPage({ ids, onAdd, onWish, onClick }) {
+  const items = PRODUCTS.filter(p => ids.includes(p.id));
+  if (!items.length) return (
+    <div style={{ paddingTop:130, paddingBottom:40, paddingLeft:"2rem", paddingRight:"2rem", background:T.bg, minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, textAlign:"center" }}>
+      <div style={{ fontSize:56 }}>🤍</div>
+      <h2 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.8rem", fontWeight:900 }}>Your Wishlist is Empty</h2>
+      <p style={{ color:T.textMid, fontSize:"0.88rem" }}>Heart the products you love to save them here.</p>
     </div>
   );
   return (
-    <div style={{paddingTop:100,background:T.cream,minHeight:"100vh"}}>
-      <div style={{maxWidth:1200,margin:"0 auto",padding:"clamp(1.5rem,4vw,3rem)"}}>
-        <h1 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"clamp(1.5rem,4vw,2rem)",marginBottom:"0.4rem"}}>Your Wishlist</h1>
-        <Divider/>
-        <div className="prod-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:"1.2rem",marginTop:"1rem"}}>
-          {items.map(p=><PCard key={p.id} product={p} onAdd={onAdd} onWish={onWish} wished={true} onClick={onClick} dark={false} cart={cart} onQty={onQty}/>)}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── ALL PRODUCTS PAGE ────────────────────────────────────────
-function AllProductsPage({ onAdd, onWish, wished, onClick, cart, onQty }) {
-  const [filter,setFilter]=useState("all");
-  const filtered=filter==="all"?PRODUCTS:PRODUCTS.filter(p=>p.category===filter);
-  return (
-    <div style={{paddingTop:100,background:T.cream,minHeight:"100vh"}}>
-      <div style={{maxWidth:1200,margin:"0 auto",padding:"clamp(1.5rem,4vw,3rem)"}}>
-        <h1 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"clamp(1.5rem,4vw,2rem)",marginBottom:"0.4rem"}}>All Products</h1>
-        <Divider/>
-        <div style={{display:"flex",gap:8,marginBottom:"1.8rem",flexWrap:"wrap",marginTop:"1rem"}}>
-          {[["all","All"],...CATEGORIES.map(c=>[c.id,c.name])].map(([v,l])=>(
-            <button key={v} onClick={()=>setFilter(v)} style={{background:filter===v?`linear-gradient(135deg,${T.goldD},${T.gold})`:`rgba(201,169,110,0.08)`,border:`1px solid ${filter===v?"transparent":`${T.goldD}33`}`,color:filter===v?T.navy:"rgba(33,40,66,0.6)",borderRadius:2,padding:"7px 18px",fontFamily:"'Cinzel',serif",fontSize:"0.65rem",letterSpacing:"0.12em",cursor:"pointer",transition:"all 0.25s",fontWeight:filter===v?800:400}}>{l}</button>
+    <div style={{ paddingTop:90, background:T.bg, minHeight:"100vh" }}>
+      <div className="max-w" style={{ padding:"clamp(1.5rem,4vw,3rem)" }}>
+        <h1 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"clamp(1.5rem,4vw,2rem)", fontWeight:900, marginBottom:"0.4rem" }}>Your Wishlist</h1>
+        <div style={{ width:60, height:3, background:`linear-gradient(90deg,${T.orange},transparent)`, marginBottom:"1.5rem" }} />
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"1.5rem" }} className="prod-grid">
+          {items.map(p => (
+            <div key={p.id} className="prod-card" onClick={() => onClick(p)}>
+              <div style={{ position:"relative", aspectRatio:"4/3", overflow:"hidden" }}>
+                <img src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                <div style={{ position:"absolute", top:10, left:10, background:T.orange, color:"#fff", borderRadius:4, padding:"3px 10px", fontSize:"0.65rem", fontWeight:800 }}>-{p.discount}%</div>
+                <button onClick={e => { e.stopPropagation(); onWish(p.id); }} style={{ position:"absolute", top:8, right:8, background:"rgba(255,255,255,0.9)", border:"none", borderRadius:"50%", width:32, height:32, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:14 }}>❤️</button>
+              </div>
+              <div style={{ padding:"1.2rem" }}>
+                <h4 style={{ fontSize:"0.92rem", fontWeight:700, color:T.text, marginBottom:"0.4rem" }}>{p.name}</h4>
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:"0.8rem" }}>
+                  <span style={{ fontSize:"1rem", color:T.orange, fontWeight:700 }}>Rs.{p.price.toLocaleString()}</span>
+                  <span style={{ color:T.textMid, fontSize:"0.75rem", textDecoration:"line-through" }}>Rs.{p.originalPrice.toLocaleString()}</span>
+                </div>
+                <button className="btn-orange" onClick={e => { e.stopPropagation(); onAdd(p); }} style={{ width:"100%", padding:"10px", fontSize:"0.72rem", borderRadius:7 }}>Add to Cart</button>
+              </div>
+            </div>
           ))}
         </div>
-        <div className="prod-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:"1.2rem"}}>
-          {filtered.map(p=><PCard key={p.id} product={p} onAdd={onAdd} onWish={onWish} wished={wished.includes(p.id)} onClick={onClick} dark={false} cart={cart} onQty={onQty}/>)}
-        </div>
       </div>
     </div>
   );
 }
 
-// ─── HOME PAGE ────────────────────────────────────────────────
-function HomePage({ onCatClick, onAdd, onWish, wished, onProdClick, catRef, storyRef, cart, onQty }) {
-  return (
-    <>
-      <Hero onShop={()=>{}}/>
-      <CategorySection onCategoryClick={onCatClick} sectionRef={catRef}/>
-      <UsesSection/>
-      <BestSellers onAdd={onAdd} onWish={onWish} wished={wished} onClick={onProdClick} cart={cart} onQty={onQty}/>
-      <StorySection sectionRef={storyRef}/>
-      <FAQSection/>
-      <Footer/>
-    </>
-  );
-}
+// ─── AUTH PAGES ───────────────────────────────────────────────
+function SignupPage({ onSignup, onSwitch }) {
+  const [form, setForm] = useState({ name:"", email:"", password:"", confirm:"" });
+  const [showPw, setShowPw] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-// ─── SIGNUP PAGE ──────────────────────────────────────────────
-function SignupPage({ onSignupSuccess }) {
-  const [form,setForm]=useState({name:"",email:"",password:"",phone:"",age:""});
-  const [error,setError]=useState("");
-  const [loading,setLoading]=useState(false);
-  const iSx={width:"100%",background:"#fff",border:`2px solid ${T.goldD}`,borderRadius:4,color:T.navy,padding:"12px 14px",fontSize:"0.95rem",outline:"none",boxSizing:"border-box",fontWeight:500};
-  const lSx={color:T.navy,fontSize:"0.75rem",letterSpacing:"0.08em",fontFamily:"'Cinzel',serif",display:"block",marginBottom:6,textTransform:"uppercase",fontWeight:600};
-
-  const handleSubmit=async(e)=>{
-    e.preventDefault();
-    setError("");
-    if(!form.name||!form.email||!form.password) return setError("Name, email and password are required");
+  const handle = async e => {
+    e.preventDefault(); setError("");
+    if (!form.name||!form.email||!form.password) return setError("All fields are required.");
+    if (form.password!==form.confirm) return setError("Passwords do not match.");
+    if (form.password.length<6) return setError("Password must be at least 6 characters.");
     setLoading(true);
-    try{
-      const res=await fetch("http://localhost:5000/api/auth/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(form)});
-      const data=await res.json();
-      if(!data.success) throw new Error(data.message);
-      // Don't store token yet - redirect to login
-      onSignupSuccess();
-    }catch(err){setError(err.message);setLoading(false);}
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/register", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ name:form.name, email:form.email, password:form.password }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message||"Registration failed");
+      // Show success then redirect to login
+      setSuccess(true);
+      setTimeout(() => onSwitch(), 2000);
+    } catch(err) { setError(err.message); }
+    finally { setLoading(false); }
   };
-
   return (
-    <div style={{paddingTop:100,background:T.cream,minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:"100px 1.5rem 3rem"}}>
-      <div style={{maxWidth:460,width:"100%",border:`2px solid ${T.goldD}`,borderRadius:8,padding:"2.5rem 2rem",background:"#fff",boxShadow:`0 20px 60px rgba(139,105,20,0.25)`}} className="signup-card">
-        <div style={{textAlign:"center",marginBottom:"2rem"}}>
-          <div style={{width:60,height:60,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,margin:"0 auto 12px",boxShadow:`0 0 30px ${T.gold}66`}}>💎</div>
-          <h1 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"2rem",margin:"0 0 6px",fontWeight:900}}>Create Account</h1>
-          <Divider/>
-          <p style={{color:T.goldD,fontSize:"1rem",fontStyle:"italic",fontWeight:500}}>Join the Wishstone family</p>
-        </div>
-        <form onSubmit={handleSubmit}>
-          {[["Full Name","name","text"],["Email","email","email"],["Password","password","password"],["Phone","phone","tel"],["Age","age","number"]].map(([l,k,t])=>(
-            <div key={k} style={{marginBottom:"1rem"}}><label style={lSx}>{l}{k==="age"?" (Optional)":""}</label><input type={t} value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} style={iSx} required={k!=="age"&&k!=="phone"}/></div>
-          ))}
-          {error&&<p style={{color:"#c0392b",fontSize:"0.9rem",marginBottom:"1rem",textAlign:"center",fontWeight:600,background:"rgba(192,57,43,0.1)",padding:"10px",borderRadius:4}}>{error}</p>}
-          <button type="submit" disabled={loading} style={{width:"100%",background:loading?"#999":`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:"#fff",padding:"14px",borderRadius:4,fontFamily:"'Cinzel',serif",fontSize:"0.85rem",letterSpacing:"0.16em",cursor:loading?"not-allowed":"pointer",fontWeight:800,marginBottom:"1rem",boxShadow:`0 8px 28px ${T.gold}66`,transition:"transform 0.2s"}}>{loading?"CREATING...":"CREATE ACCOUNT"}</button>
-        </form>
-        <p style={{textAlign:"center",color:T.navy,fontSize:"0.92rem",fontWeight:500}}>Already have an account? <button onClick={()=>window.location.hash="login"} style={{background:"none",border:"none",color:T.goldD,cursor:"pointer",textDecoration:"underline",fontFamily:"inherit",fontSize:"inherit",fontWeight:700}}>Login</button></p>
+    <div style={{ minHeight:"100vh", background:T.bg, display:"flex", alignItems:"center", justifyContent:"center", paddingTop:100, paddingBottom:"2rem", paddingLeft:"2rem", paddingRight:"2rem" }}>
+      <div style={{ background:"#fff", borderRadius:16, padding:"2.5rem", width:"100%", maxWidth:420, boxShadow:"0 8px 40px rgba(0,0,0,0.1)", border:`1px solid ${T.border}`, animation:"cardIn 0.5s ease both" }}>
+        {success ? (
+          <div style={{ textAlign:"center", padding:"1rem 0" }}>
+            <div style={{ fontSize:52, marginBottom:16 }}>🎉</div>
+            <h2 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.4rem", fontWeight:900, marginBottom:8 }}>Account Created!</h2>
+            <p style={{ color:T.textMid, fontSize:"0.85rem", lineHeight:1.6 }}>Welcome to WishStone. Redirecting you to sign in...</p>
+            <div style={{ marginTop:16, width:"100%", height:3, background:T.border, borderRadius:2, overflow:"hidden" }}>
+              <div style={{ height:"100%", background:T.orange, borderRadius:2, animation:"shimmerBar 2s linear forwards" }} />
+            </div>
+          </div>
+        ) : (
+          <>
+            <div style={{ textAlign:"center", marginBottom:"2rem" }}>
+              <div style={{ fontSize:38, marginBottom:8 }}>💎</div>
+              <h2 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.5rem", fontWeight:900, margin:0 }}>Create Account</h2>
+              <p style={{ color:T.textMid, fontSize:"0.82rem", marginTop:6 }}>Join the WishStone community</p>
+            </div>
+            <form onSubmit={handle}>
+              {[["name","Full Name","text"],["email","Email Address","email"],["password","Password","password"],["confirm","Confirm Password","password"]].map(([k,l,t]) => (
+                <div key={k} style={{ marginBottom:"1rem" }}>
+                  <label style={{ display:"block", fontSize:"0.68rem", fontWeight:700, color:T.textMid, marginBottom:5, letterSpacing:"0.08em", textTransform:"uppercase" }}>{l}</label>
+                  <input type={k==="password"||k==="confirm"?(showPw?"text":t):t} placeholder={l} value={form[k]} onChange={e => setForm({...form,[k]:e.target.value})}
+                    style={{ width:"100%", padding:"11px 13px", border:`1.5px solid ${T.border}`, borderRadius:8, fontSize:"0.88rem", background:"#fff", color:T.text, outline:"none", boxSizing:"border-box" }}
+                    onFocus={e => e.target.style.borderColor=T.orange} onBlur={e => e.target.style.borderColor=T.border} />
+                </div>
+              ))}
+              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:"1rem", cursor:"pointer" }} onClick={() => setShowPw(!showPw)}>
+                <div style={{ width:17, height:17, border:`2px solid ${T.orange}`, borderRadius:4, background:showPw?T.orange:"transparent", display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.2s" }}>
+                  {showPw && <span style={{ color:"#fff", fontSize:10 }}>✓</span>}
+                </div>
+                <span style={{ fontSize:"0.78rem", color:T.textMid }}>Show passwords</span>
+              </div>
+              {error && <p style={{ color:"#c0392b", fontSize:"0.78rem", marginBottom:"1rem", padding:"8px 12px", background:"rgba(192,57,43,0.06)", borderRadius:6, border:"1px solid rgba(192,57,43,0.2)" }}>{error}</p>}
+              <button type="submit" className="btn-orange" disabled={loading} style={{ width:"100%", padding:"13px", fontSize:"0.82rem", borderRadius:8, opacity:loading?0.7:1 }}>{loading?"Creating Account...":"Create Account"}</button>
+            </form>
+            <p style={{ textAlign:"center", marginTop:"1.5rem", fontSize:"0.82rem", color:T.textMid }}>
+              Already have an account?{" "}
+              <button onClick={onSwitch} style={{ background:"none", border:"none", cursor:"pointer", color:T.orange, fontWeight:700, fontSize:"0.82rem" }}>Sign In</button>
+            </p>
+          </>
+        )}
       </div>
     </div>
   );
 }
 
-// ─── LOGIN PAGE ───────────────────────────────────────────────
-function LoginPage({ onSuccess }) {
-  const [form,setForm]=useState({email:"",password:""});
-  const [error,setError]=useState("");
-  const [loading,setLoading]=useState(false);
-  const iSx={width:"100%",background:"#fff",border:`2px solid ${T.goldD}`,borderRadius:4,color:T.navy,padding:"12px 14px",fontSize:"0.95rem",outline:"none",boxSizing:"border-box",fontWeight:500};
-  const lSx={color:T.navy,fontSize:"0.75rem",letterSpacing:"0.08em",fontFamily:"'Cinzel',serif",display:"block",marginBottom:6,textTransform:"uppercase",fontWeight:600};
-
-  const handleSubmit=async(e)=>{
-    e.preventDefault();
-    setError("");
+function LoginPage({ onLogin, onSwitch }) {
+  const [form, setForm] = useState({ email:"", password:"" });
+  const [showPw, setShowPw] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const handle = async e => {
+    e.preventDefault(); setError("");
+    if (!form.email||!form.password) return setError("Email and password are required.");
     setLoading(true);
-    try{
-      const res=await fetch("http://localhost:5000/api/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(form)});
-      const data=await res.json();
-      if(!data.success) throw new Error(data.message);
-      localStorage.setItem("token",data.token);
-      localStorage.setItem("user",JSON.stringify(data.user));
-      onSuccess(data.user);
-    }catch(err){setError(err.message);setLoading(false);}
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/login", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ email:form.email, password:form.password }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message||"Login failed");
+      localStorage.setItem("token", data.token);
+      onLogin(data.user||{ email:form.email });
+    } catch(err) { setError(err.message); }
+    finally { setLoading(false); }
   };
-
   return (
-    <div style={{paddingTop:100,background:T.cream,minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",padding:"100px 1.5rem 3rem"}}>
-      <div style={{maxWidth:460,width:"100%",border:`2px solid ${T.goldD}`,borderRadius:8,padding:"2.5rem 2rem",background:"#fff",boxShadow:`0 20px 60px rgba(139,105,20,0.25)`}} className="login-card">
-        <div style={{textAlign:"center",marginBottom:"2rem"}}>
-          <div style={{width:60,height:60,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,margin:"0 auto 12px",boxShadow:`0 0 30px ${T.gold}66`}}>💎</div>
-          <h1 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"2rem",margin:"0 0 6px",fontWeight:900}}>Welcome Back</h1>
-          <Divider/>
-          <p style={{color:T.goldD,fontSize:"1rem",fontStyle:"italic",fontWeight:500}}>Login to your account</p>
+    <div style={{ minHeight:"100vh", background:T.bg, display:"flex", alignItems:"center", justifyContent:"center", paddingTop:100, paddingBottom:"2rem", paddingLeft:"2rem", paddingRight:"2rem" }}>
+      <div style={{ background:"#fff", borderRadius:16, padding:"2.5rem", width:"100%", maxWidth:400, boxShadow:"0 8px 40px rgba(0,0,0,0.1)", border:`1px solid ${T.border}`, animation:"cardIn 0.5s ease both" }}>
+        <div style={{ textAlign:"center", marginBottom:"2rem" }}>
+          <div style={{ fontSize:38, marginBottom:8 }}>🔮</div>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.5rem", fontWeight:900, margin:0 }}>Welcome Back</h2>
+          <p style={{ color:T.textMid, fontSize:"0.82rem", marginTop:6 }}>Sign in to your account</p>
         </div>
-        <form onSubmit={handleSubmit}>
-          {[["Email","email","email"],["Password","password","password"]].map(([l,k,t])=>(
-            <div key={k} style={{marginBottom:"1.2rem"}}><label style={lSx}>{l}</label><input type={t} value={form[k]} onChange={e=>setForm({...form,[k]:e.target.value})} style={iSx} required/></div>
-          ))}
-          {error&&<p style={{color:"#c0392b",fontSize:"0.9rem",marginBottom:"1rem",textAlign:"center",fontWeight:600,background:"rgba(192,57,43,0.1)",padding:"10px",borderRadius:4}}>{error}</p>}
-          <button type="submit" disabled={loading} style={{width:"100%",background:loading?"#999":`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:"#fff",padding:"14px",borderRadius:4,fontFamily:"'Cinzel',serif",fontSize:"0.85rem",letterSpacing:"0.16em",cursor:loading?"not-allowed":"pointer",fontWeight:800,marginBottom:"1rem",boxShadow:`0 8px 28px ${T.gold}66`,transition:"transform 0.2s"}}>{loading?"LOGGING IN...":"LOGIN"}</button>
+        <form onSubmit={handle}>
+          <div style={{ marginBottom:"1rem" }}>
+            <label style={{ display:"block", fontSize:"0.68rem", fontWeight:700, color:T.textMid, marginBottom:5, letterSpacing:"0.08em", textTransform:"uppercase" }}>Email Address</label>
+            <input type="email" placeholder="your@email.com" value={form.email} onChange={e => setForm({...form,email:e.target.value})}
+              style={{ width:"100%", padding:"11px 13px", border:`1.5px solid ${T.border}`, borderRadius:8, fontSize:"0.88rem", background:"#fff", color:T.text, outline:"none", boxSizing:"border-box" }}
+              onFocus={e => e.target.style.borderColor=T.orange} onBlur={e => e.target.style.borderColor=T.border} />
+          </div>
+          <div style={{ marginBottom:"1rem" }}>
+            <label style={{ display:"block", fontSize:"0.68rem", fontWeight:700, color:T.textMid, marginBottom:5, letterSpacing:"0.08em", textTransform:"uppercase" }}>Password</label>
+            <div style={{ position:"relative" }}>
+              <input type={showPw?"text":"password"} placeholder="Enter your password" value={form.password} onChange={e => setForm({...form,password:e.target.value})}
+                style={{ width:"100%", padding:"11px 42px 11px 13px", border:`1.5px solid ${T.border}`, borderRadius:8, fontSize:"0.88rem", background:"#fff", color:T.text, outline:"none", boxSizing:"border-box" }}
+                onFocus={e => e.target.style.borderColor=T.orange} onBlur={e => e.target.style.borderColor=T.border} />
+              <button type="button" onClick={() => setShowPw(!showPw)} style={{ position:"absolute", right:11, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", fontSize:15, color:T.textMid }}>{showPw?"🙈":"👁"}</button>
+            </div>
+          </div>
+          {error && <p style={{ color:"#c0392b", fontSize:"0.78rem", marginBottom:"1rem", padding:"8px 12px", background:"rgba(192,57,43,0.06)", borderRadius:6, border:"1px solid rgba(192,57,43,0.2)" }}>{error}</p>}
+          <button type="submit" className="btn-orange" disabled={loading} style={{ width:"100%", padding:"13px", fontSize:"0.82rem", borderRadius:8, opacity:loading?0.7:1 }}>{loading?"Signing In...":"Sign In"}</button>
         </form>
-        <p style={{textAlign:"center",color:T.navy,fontSize:"0.92rem",fontWeight:500}}>Don't have an account? <button onClick={()=>window.location.hash="signup"} style={{background:"none",border:"none",color:T.goldD,cursor:"pointer",textDecoration:"underline",fontFamily:"inherit",fontSize:"inherit",fontWeight:700}}>Sign up</button></p>
+        <p style={{ textAlign:"center", marginTop:"1.5rem", fontSize:"0.82rem", color:T.textMid }}>
+          New to WishStone?{" "}
+          <button onClick={onSwitch} style={{ background:"none", border:"none", cursor:"pointer", color:T.orange, fontWeight:700, fontSize:"0.82rem" }}>Create Account</button>
+        </p>
       </div>
     </div>
   );
 }
 
 // ─── USER DASHBOARD ───────────────────────────────────────────
-function UserDashboard({ user, onLogout }) {
-  const [activeTab,setActiveTab]=useState("profile");
-  const [orders,setOrders]=useState([]);
-  const [ordersLoaded,setOrdersLoaded]=useState(false);
-  const [profile,setProfile]=useState({name:user.name,email:user.email,phone:user.phone||"",age:user.age||""});
-  const [loading,setLoading]=useState(false);
-  const [msg,setMsg]=useState("");
-  const [trackModal,setTrackModal]=useState(false);
-  const [noOrderModal,setNoOrderModal]=useState(false);
+function UserDashboard({ user, orders, onLogout, onNav }) {
+  const [activeTab, setActiveTab] = useState("orders");
 
-  const fetchOrders=async()=>{
-    try{
-      const token=localStorage.getItem("token");
-      const res=await fetch("http://localhost:5000/api/orders/my-orders",{headers:{"Authorization":`Bearer ${token}`}});
-      const data=await res.json();
-      if(data.success){ setOrders(data.orders||[]); setOrdersLoaded(true); }
-    }catch(err){console.error(err); setOrdersLoaded(true);}
-  };
+  const tabs = [
+    { key:"orders",  icon:"📦", label:"My Orders" },
+    { key:"profile", icon:"👤", label:"Profile" },
+    { key:"wishlist",icon:"🤍", label:"Wishlist" },
+  ];
 
-  useEffect(()=>{
-    if(activeTab==="orders"||activeTab==="track") fetchOrders();
-  },[activeTab]);
-
-  const updateProfile=async()=>{
-    setLoading(true);
-    setMsg("");
-    try{
-      const token=localStorage.getItem("token");
-      const res=await fetch("http://localhost:5000/api/auth/update-profile",{method:"PUT",headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`},body:JSON.stringify(profile)});
-      const data=await res.json();
-      if(!data.success) throw new Error(data.message);
-      
-      // Update localStorage with new user data
-      const updatedUser = {...user, name: profile.name, phone: profile.phone, age: profile.age};
-      localStorage.setItem("user",JSON.stringify(updatedUser));
-      
-      setMsg("✅ Profile updated successfully!");
-      setTimeout(()=>setMsg(""),3000);
-    }catch(err){setMsg("❌ "+err.message);}
-    setLoading(false);
-  };
-
-  const iSx={width:"100%",background:"#fff",border:`2px solid ${T.goldD}`,borderRadius:4,color:T.navy,padding:"12px 14px",fontSize:"0.95rem",outline:"none",boxSizing:"border-box",fontWeight:500};
-  const lSx={color:T.navy,fontSize:"0.75rem",letterSpacing:"0.08em",fontFamily:"'Cinzel',serif",display:"block",marginBottom:6,textTransform:"uppercase",fontWeight:600};
+  const statCards = [
+    { icon:"📦", label:"Total Orders",   value: orders.length },
+    { icon:"💰", label:"Total Spent",    value: "Rs." + orders.reduce((s,o) => s+(o.totalAmount||0), 0).toLocaleString() },
+    { icon:"🌟", label:"Member Since",   value: "2024" },
+    { icon:"🎯", label:"Manifestations", value: orders.length * 3 || 0 },
+  ];
 
   return (
-    <div style={{position:"fixed",inset:0,top:68,background:T.cream,overflow:"auto"}}>
-      <div style={{maxWidth:1200,margin:"0 auto",padding:"2rem clamp(1.5rem,4vw,3rem)",minHeight:"100%"}}>
-        <h1 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"clamp(1.6rem,4vw,2rem)",marginBottom:"0.4rem"}}>My Dashboard</h1>
-        <Divider/>
-        <div className="dashboard-grid" style={{display:"grid",gridTemplateColumns:"260px 1fr",gap:"2rem",marginTop:"1.5rem"}}>
-          <div className="dashboard-sidebar" style={{border:`2px solid ${T.goldD}`,borderRadius:8,padding:"1.8rem",height:"fit-content",background:"#fff",position:"sticky",top:"2rem",boxShadow:`0 8px 24px rgba(139,105,20,0.15)`}}>
-            <div style={{textAlign:"center",marginBottom:"1.5rem"}}>
-              <div style={{width:90,height:90,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:40,margin:"0 auto 14px",boxShadow:`0 0 30px ${T.gold}66`,border:"3px solid #fff"}}>👤</div>
-              <h3 style={{fontFamily:"'Cinzel',serif",color:T.navy,fontSize:"1.1rem",margin:"0 0 6px",fontWeight:800}}>{user.name}</h3>
-              <p style={{color:T.goldD,fontSize:"0.85rem",margin:0,fontWeight:500}}>{user.email}</p>
+    <div style={{ paddingTop:90, background:T.bg, minHeight:"100vh" }}>
+      <div className="max-w" style={{ padding:"clamp(1.5rem,4vw,2.5rem)" }}>
+
+        {/* Profile Header Card */}
+        <div style={{ background:`linear-gradient(135deg, ${T.bgDark} 0%, #3a4a28 100%)`, borderRadius:20, padding:"clamp(1.5rem,4vw,2.5rem)", marginBottom:"1.5rem", position:"relative", overflow:"hidden" }}>
+          <div style={{ position:"absolute", top:-40, right:-40, width:200, height:200, borderRadius:"50%", background:"rgba(232,114,12,0.08)", pointerEvents:"none" }} />
+          <div style={{ position:"absolute", bottom:-60, left:-20, width:160, height:160, borderRadius:"50%", background:"rgba(232,114,12,0.05)", pointerEvents:"none" }} />
+          <div style={{ display:"flex", alignItems:"center", gap:"1.5rem", flexWrap:"wrap", position:"relative" }}>
+            <div style={{ width:72, height:72, borderRadius:"50%", background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:28, color:"#fff", fontWeight:900, flexShrink:0, boxShadow:"0 8px 24px rgba(232,114,12,0.4)" }}>
+              {(user.name||user.email||"U")[0].toUpperCase()}
             </div>
-            <Divider/>
-            {[["profile","👤 Profile"],["orders","📦 My Orders"],["track","🚚 Track Order"]].map(([k,l])=>(
-              <button key={k} onClick={()=>setActiveTab(k)} style={{width:"100%",background:activeTab===k?`linear-gradient(135deg,${T.goldD},${T.gold})`:"transparent",border:activeTab===k?"none":`1px solid ${T.goldD}33`,color:activeTab===k?"#fff":T.navy,padding:"14px 16px",borderRadius:6,cursor:"pointer",fontFamily:"'Cinzel',serif",fontSize:"0.8rem",letterSpacing:"0.08em",textAlign:"left",marginBottom:"0.6rem",transition:"all 0.3s",fontWeight:activeTab===k?800:600,boxShadow:activeTab===k?`0 4px 12px ${T.gold}44`:"none"}}>{l}</button>
-            ))}
-          </div>
-          <div style={{border:`2px solid ${T.goldD}`,borderRadius:8,padding:"2.5rem",background:"#fff",minHeight:"600px",boxShadow:`0 8px 24px rgba(139,105,20,0.15)`}} className="dashboard-content">
-            {activeTab==="profile"&&(
-              <div>
-                <div style={{display:"flex",alignItems:"center",gap:"1rem",marginBottom:"2rem"}}>
-                  <div style={{width:60,height:60,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,boxShadow:`0 0 20px ${T.gold}44`}}>✨</div>
-                  <div>
-                    <h2 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"1.4rem",margin:"0 0 4px",fontWeight:900}}>Profile Information</h2>
-                    <p style={{color:T.goldD,fontSize:"0.9rem",margin:0,fontWeight:500}}>Manage your personal details</p>
-                  </div>
-                </div>
-                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1.5rem",marginBottom:"2rem"}} className="profile-grid">
-                  {[["Full Name","name","text"],["Email Address","email","email"],["Phone Number","phone","tel"],["Age","age","number"]].map(([l,k,t])=>(
-                    <div key={k}>
-                      <label style={lSx}>{l}</label>
-                      <input type={t} value={profile[k]} onChange={e=>setProfile({...profile,[k]:e.target.value})} style={iSx} disabled={k==="email"}/>
-                    </div>
-                  ))}
-                </div>
-                {msg&&<div style={{background:msg.includes("✅")?"rgba(45,122,90,0.1)":"rgba(192,57,43,0.1)",border:`2px solid ${msg.includes("✅")?"#2d7a5a":"#c0392b"}`,borderRadius:6,padding:"14px 18px",marginBottom:"1.5rem",display:"flex",alignItems:"center",gap:"12px"}}>
-                  <span style={{fontSize:24}}>{msg.includes("✅")?"✅":"❌"}</span>
-                  <p style={{color:msg.includes("✅")?"#2d7a5a":"#c0392b",fontSize:"0.95rem",margin:0,fontWeight:600}}>{msg.replace("✅ ","").replace("❌ ","")}</p>
-                </div>}
-                <div style={{display:"flex",gap:"1rem"}}>
-                  <button onClick={updateProfile} disabled={loading} style={{background:loading?"#999":`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:"#fff",padding:"14px 32px",borderRadius:6,fontFamily:"'Cinzel',serif",fontSize:"0.85rem",letterSpacing:"0.14em",cursor:loading?"not-allowed":"pointer",fontWeight:800,boxShadow:loading?"none":`0 6px 20px ${T.gold}55`,transition:"all 0.3s"}}>{loading?"UPDATING...":"💾 SAVE CHANGES"}</button>
-                  <button onClick={onLogout} style={{background:"transparent",border:`2px solid #c0392b`,color:"#c0392b",padding:"14px 32px",borderRadius:6,fontFamily:"'Cinzel',serif",fontSize:"0.85rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:800,transition:"all 0.3s"}} onMouseEnter={e=>{e.target.style.background="#c0392b";e.target.style.color="#fff";}} onMouseLeave={e=>{e.target.style.background="transparent";e.target.style.color="#c0392b";}}>🚪 LOGOUT</button>
-                </div>
+            <div style={{ flex:1, minWidth:0 }}>
+              <h2 style={{ fontFamily:"'Playfair Display',serif", color:"#fff", fontSize:"clamp(1.1rem,3vw,1.5rem)", fontWeight:900, margin:"0 0 4px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{user.name||"WishStone Member"}</h2>
+              <p style={{ color:"rgba(255,255,255,0.55)", fontSize:"0.82rem", margin:"0 0 8px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{user.email}</p>
+              <div style={{ display:"inline-flex", alignItems:"center", gap:6, background:"rgba(232,114,12,0.2)", border:"1px solid rgba(232,114,12,0.3)", borderRadius:20, padding:"3px 12px" }}>
+                <span style={{ color:T.orange, fontSize:10 }}>✦</span>
+                <span style={{ fontSize:"0.65rem", fontWeight:700, color:T.orange, letterSpacing:"0.1em" }}>SACRED MEMBER</span>
               </div>
-            )}
-            {activeTab==="orders"&&(
-              <div>
-                <div style={{display:"flex",alignItems:"center",gap:"1rem",marginBottom:"2rem"}}>
-                  <div style={{width:60,height:60,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,boxShadow:`0 0 20px ${T.gold}44`}}>📦</div>
-                  <div>
-                    <h2 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"1.4rem",margin:"0 0 4px",fontWeight:900}}>My Orders</h2>
-                    <p style={{color:T.goldD,fontSize:"0.9rem",margin:0,fontWeight:500}}>{orders.length} orders placed</p>
-                  </div>
-                </div>
-                {orders.length===0?<div style={{textAlign:"center",padding:"3rem 2rem"}}>
-                  <div style={{fontSize:64,marginBottom:"1rem"}}>🛍️</div>
-                  <p style={{color:"rgba(33,40,66,0.6)",fontStyle:"italic",fontSize:"1.1rem"}}>No orders yet. Start shopping!</p>
-                </div>:orders.map(order=>(
-                  <div key={order._id} style={{border:`2px solid ${T.goldD}33`,borderRadius:8,padding:"1.6rem",marginBottom:"1.5rem",background:"rgba(255,255,255,0.5)",transition:"all 0.3s"}} onMouseEnter={e=>e.currentTarget.style.boxShadow=`0 8px 24px rgba(139,105,20,0.2)`} onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
-                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:"1rem",paddingBottom:"1rem",borderBottom:`1px solid ${T.goldD}22`}}>
+            </div>
+            <div style={{ display:"flex", gap:"0.7rem", flexShrink:0 }}>
+              <button className="btn-orange" onClick={() => onNav("products")} style={{ padding:"9px 18px", fontSize:"0.75rem", borderRadius:8 }}>Shop Now</button>
+              <button onClick={onLogout} style={{ padding:"9px 18px", fontSize:"0.75rem", borderRadius:8, background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.2)", color:"rgba(255,255,255,0.8)", cursor:"pointer", fontFamily:"'Inter',sans-serif", fontWeight:600, transition:"all 0.2s" }}
+                onMouseEnter={e => e.currentTarget.style.background="rgba(255,255,255,0.18)"}
+                onMouseLeave={e => e.currentTarget.style.background="rgba(255,255,255,0.1)"}
+              >Sign Out</button>
+            </div>
+          </div>
+        </div>
+
+        {/* Stat Cards */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"1rem", marginBottom:"1.5rem" }} className="dashboard-stats">
+          {statCards.map(s => (
+            <div key={s.label} style={{ background:"#fff", borderRadius:14, padding:"1.2rem", border:`1px solid ${T.border}`, textAlign:"center" }}>
+              <div style={{ fontSize:26, marginBottom:6 }}>{s.icon}</div>
+              <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.3rem", fontWeight:900, color:T.text, lineHeight:1 }}>{s.value}</div>
+              <div style={{ fontSize:"0.68rem", color:T.textMid, fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", marginTop:4 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Tabs */}
+        <div style={{ display:"flex", gap:"0.5rem", marginBottom:"1.5rem", background:"#fff", borderRadius:12, padding:"0.4rem", border:`1px solid ${T.border}`, width:"fit-content" }}>
+          {tabs.map(t => (
+            <button key={t.key} onClick={() => { if(t.key==="wishlist") onNav("wishlist"); else setActiveTab(t.key); }}
+              style={{ padding:"9px 18px", borderRadius:9, border:"none", cursor:"pointer", fontSize:"0.78rem", fontWeight:600, fontFamily:"'Inter',sans-serif", display:"flex", alignItems:"center", gap:6, transition:"all 0.2s",
+                background: activeTab===t.key ? T.orange : "transparent",
+                color: activeTab===t.key ? "#fff" : T.textMid,
+                boxShadow: activeTab===t.key ? "0 4px 12px rgba(232,114,12,0.3)" : "none",
+              }}>
+              <span>{t.icon}</span> {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Orders Tab */}
+        {activeTab==="orders" && (
+          <div>
+            <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.1rem", fontWeight:900, marginBottom:"1rem" }}>Order History</h3>
+            {(!orders||orders.length===0) ? (
+              <div style={{ background:"#fff", borderRadius:16, padding:"3.5rem 2rem", textAlign:"center", border:`1px solid ${T.border}` }}>
+                <div style={{ fontSize:52, marginBottom:14 }}>📦</div>
+                <h4 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.1rem", fontWeight:700, marginBottom:8 }}>No Orders Yet</h4>
+                <p style={{ color:T.textMid, fontSize:"0.85rem", marginBottom:"1.5rem" }}>Start your manifestation journey with your first WishStone.</p>
+                <button className="btn-orange" onClick={() => onNav("products")} style={{ padding:"12px 28px", fontSize:"0.82rem", borderRadius:8 }}>Shop Now</button>
+              </div>
+            ) : (
+              <div style={{ display:"flex", flexDirection:"column", gap:"1rem" }}>
+                {orders.map((o,i) => (
+                  <div key={i} style={{ background:"#fff", borderRadius:14, padding:"1.4rem", border:`1px solid ${T.border}`, boxShadow:"0 2px 12px rgba(0,0,0,0.04)" }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:10, marginBottom:"0.8rem" }}>
                       <div>
-                        <p style={{fontFamily:"'Cinzel',serif",color:T.navy,fontSize:"1rem",margin:"0 0 6px",fontWeight:700}}>Order #{order.orderNumber}</p>
-                        <p style={{color:"rgba(33,40,66,0.5)",fontSize:"0.85rem",margin:0}}>📅 {new Date(order.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}</p>
+                        <div style={{ fontWeight:700, color:T.text, fontSize:"0.9rem", marginBottom:3 }}>Order #{o._id ? o._id.slice(-6).toUpperCase() : String(i+1).padStart(6,"0")}</div>
+                        {o.createdAt && <div style={{ fontSize:"0.72rem", color:T.textMid }}>{new Date(o.createdAt).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"})}</div>}
                       </div>
-                      <div style={{textAlign:"right"}}>
-                        <p style={{fontFamily:"'Cinzel',serif",color:T.goldD,fontSize:"1.2rem",margin:"0 0 8px",fontWeight:800}}>₹{order.totalAmount?.toLocaleString()}</p>
-                        <span style={{background:order.orderStatus==="delivered"?"#2d7a5a":order.orderStatus==="cancelled"?"#c0392b":T.goldD,color:"#fff",padding:"4px 14px",borderRadius:4,fontSize:"0.7rem",fontFamily:"'Cinzel',serif",letterSpacing:"0.08em",fontWeight:800}}>{order.orderStatus?.toUpperCase()}</span>
-                      </div>
+                      <span style={{ background:"rgba(45,122,90,0.1)", color:"#2d7a5a", padding:"4px 14px", borderRadius:20, fontSize:"0.7rem", fontWeight:700, letterSpacing:"0.06em", border:"1px solid rgba(45,122,90,0.2)" }}>{o.status||"Confirmed"}</span>
                     </div>
-                    {order.items&&order.items.length>0&&(
-                      <div>
-                        <p style={{fontFamily:"'Cinzel',serif",color:T.goldD,fontSize:"0.75rem",letterSpacing:"0.1em",marginBottom:"1rem",fontWeight:700}}>📦 ORDER ITEMS ({order.items.length})</p>
-                        {order.items.map((item,idx)=>(
-                          <div key={idx} style={{display:"flex",gap:"1rem",marginBottom:"1rem",alignItems:"center",background:"rgba(255,255,255,0.8)",padding:"1rem",borderRadius:6,border:`1px solid ${T.goldD}22`}}>
-                            <div style={{width:60,height:60,borderRadius:6,background:`linear-gradient(135deg,${T.gold}22,${T.goldD}22)`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,flexShrink:0,border:`1px solid ${T.goldD}33`}}>💎</div>
-                            <div style={{flex:1}}>
-                              <p style={{color:T.navy,fontSize:"0.95rem",margin:"0 0 4px",fontWeight:600}}>{item.name||"Product"}</p>
-                              <p style={{color:"rgba(33,40,66,0.5)",fontSize:"0.82rem",margin:0}}>Qty: {item.quantity} × ₹{item.price?.toLocaleString()}</p>
-                            </div>
-                            <p style={{color:T.goldD,fontSize:"1rem",fontWeight:800}}>₹{((item.price||0)*(item.quantity||0)).toLocaleString()}</p>
+                    {o.items && o.items.length > 0 && (
+                      <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginBottom:"0.8rem" }}>
+                        {o.items.slice(0,3).map((item,j) => (
+                          <div key={j} style={{ display:"flex", alignItems:"center", gap:6, background:T.bg, borderRadius:8, padding:"5px 10px" }}>
+                            <img src={item.image} alt={item.name} style={{ width:28, height:28, borderRadius:5, objectFit:"cover" }} />
+                            <span style={{ fontSize:"0.72rem", color:T.text, fontWeight:500 }}>{item.name} x{item.qty}</span>
                           </div>
                         ))}
+                        {o.items.length > 3 && <div style={{ display:"flex", alignItems:"center", padding:"5px 10px", fontSize:"0.72rem", color:T.textMid }}>+{o.items.length-3} more</div>}
                       </div>
                     )}
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", paddingTop:"0.7rem", borderTop:`1px solid ${T.border}` }}>
+                      <span style={{ fontSize:"0.78rem", color:T.textMid }}>Total Amount</span>
+                      <span style={{ fontWeight:800, color:T.orange, fontSize:"1rem" }}>Rs.{o.totalAmount ? o.totalAmount.toLocaleString() : "—"}</span>
+                    </div>
                   </div>
                 ))}
               </div>
             )}
-            {activeTab==="track"&&(
-              <div style={{textAlign:"center",padding:"3rem 2rem"}}>
-                <div style={{width:120,height:120,background:`linear-gradient(135deg,${T.gold},${T.goldD})`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:56,margin:"0 auto 1.5rem",boxShadow:`0 0 50px ${T.gold}66`,animation:"pulse 2s ease-in-out infinite"}}>📦</div>
-                <h2 style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"1.8rem",marginBottom:"1rem",fontWeight:900}}>Track Your Order</h2>
-                <p style={{color:"rgba(33,40,66,0.6)",fontSize:"1.05rem",marginBottom:"2.5rem",lineHeight:1.8}}>Click below to view delivery status and estimated arrival time</p>
-                <button
-                  onClick={()=>{ if(ordersLoaded && orders.length===0){ setNoOrderModal(true); } else { setTrackModal(true); } }}
-                  style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:"#fff",padding:"16px 40px",borderRadius:8,fontFamily:"'Cinzel',serif",fontSize:"0.9rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:800,boxShadow:`0 8px 28px ${T.gold}66`,transition:"all 0.3s"}}
-                  onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"}
-                  onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}
-                >🚚 TRACK ORDER</button>
-              </div>
-            )}
           </div>
-        </div>
-      </div>
+        )}
 
-      {/* Track Order Modal */}
-      {trackModal&&(
-        <div onClick={()=>setTrackModal(false)} style={{position:"fixed",inset:0,zIndex:2000,background:"rgba(0,0,0,0.75)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem",animation:"fadeIn 0.3s ease"}}>
-          <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:12,overflow:"hidden",width:"100%",maxWidth:500,border:`2px solid ${T.goldD}`,boxShadow:`0 40px 100px rgba(0,0,0,0.4)`,animation:"scaleIn 0.3s cubic-bezier(0.34,1.56,0.64,1)"}}>
-            <div style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,padding:"1.5rem",textAlign:"center",position:"relative"}}>
-              <button onClick={()=>setTrackModal(false)} style={{position:"absolute",top:12,right:12,background:"rgba(255,255,255,0.2)",border:"none",color:"#fff",width:32,height:32,borderRadius:"50%",cursor:"pointer",fontSize:18,fontWeight:700}}>×</button>
-              <div style={{width:70,height:70,background:"#fff",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32,margin:"0 auto 1rem",boxShadow:"0 8px 24px rgba(0,0,0,0.2)"}}>🚚</div>
-              <h2 style={{fontFamily:"'Cinzel Decorative',serif",color:"#fff",fontSize:"1.6rem",margin:0,textShadow:"0 2px 8px rgba(0,0,0,0.2)"}}>Order Tracking</h2>
-            </div>
-            <div style={{padding:"2rem",textAlign:"center"}} className="track-modal-inner">
-              <div style={{marginBottom:"1.5rem"}}>
-                <div style={{width:60,height:60,background:`rgba(139,105,20,0.1)`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 1rem",border:`2px solid ${T.goldD}`}}>
-                  <span style={{fontSize:28}}>✨</span>
+        {/* Profile Tab */}
+        {activeTab==="profile" && (
+          <div style={{ background:"#fff", borderRadius:16, padding:"2rem", border:`1px solid ${T.border}` }}>
+            <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.1rem", fontWeight:900, marginBottom:"1.5rem" }}>Profile Information</h3>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1.2rem" }} className="checkout-grid">
+              {[["Full Name", user.name||"—"],["Email Address", user.email||"—"],["Member Since","2024"],["Account Type","Sacred Member"]].map(([l,v]) => (
+                <div key={l} style={{ padding:"1rem", background:T.bg, borderRadius:10, border:`1px solid ${T.border}` }}>
+                  <div style={{ fontSize:"0.65rem", fontWeight:700, color:T.textMid, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:5 }}>{l}</div>
+                  <div style={{ fontSize:"0.9rem", fontWeight:600, color:T.text }}>{v}</div>
                 </div>
-                <h3 style={{fontFamily:"'Cinzel',serif",color:T.navy,fontSize:"1.2rem",marginBottom:"0.8rem",fontWeight:700}}>Your Order is On The Way!</h3>
-                <p style={{color:"rgba(33,40,66,0.7)",fontSize:"1rem",lineHeight:1.8,marginBottom:"1rem"}}>Your magical products are being carefully prepared and will be delivered to your doorstep soon.</p>
-              </div>
-              <div style={{background:`rgba(139,105,20,0.08)`,border:`1px solid ${T.goldD}33`,borderRadius:8,padding:"1.2rem",marginBottom:"1.5rem"}}>
-                <p style={{fontFamily:"'Cinzel',serif",color:T.goldD,fontSize:"0.75rem",letterSpacing:"0.12em",marginBottom:"0.5rem",fontWeight:600}}>ESTIMATED DELIVERY</p>
-                <p style={{fontFamily:"'Cinzel Decorative',serif",color:T.navy,fontSize:"1.8rem",fontWeight:900,margin:0}}>4-5 Days</p>
-              </div>
-              <div style={{display:"flex",justifyContent:"space-around",marginBottom:"1.5rem"}} className="track-steps">
-                {[["📦","Order Placed"],["🔄","Processing"],["🚚","Shipped"],["✅","Delivered"]].map(([ic,txt],i)=>(
-                  <div key={i} style={{textAlign:"center"}}>
-                    <div style={{width:44,height:44,background:i<2?`linear-gradient(135deg,${T.goldD},${T.gold})`:i===2?"rgba(139,105,20,0.2)":"rgba(33,40,66,0.1)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,margin:"0 auto 6px",border:i===2?`2px solid ${T.goldD}`:"none"}}>{ic}</div>
-                    <p style={{color:i<2?T.goldD:"rgba(33,40,66,0.5)",fontSize:"0.7rem",fontFamily:"'Cinzel',serif",letterSpacing:"0.05em",fontWeight:i<2?700:500}}>{txt}</p>
-                  </div>
-                ))}
-              </div>
-              <button onClick={()=>setTrackModal(false)} style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:"#fff",padding:"12px 28px",borderRadius:4,fontFamily:"'Cinzel',serif",fontSize:"0.78rem",letterSpacing:"0.14em",cursor:"pointer",fontWeight:800,width:"100%"}}>GOT IT</button>
+              ))}
+            </div>
+            <div style={{ marginTop:"1.5rem", padding:"1rem 1.2rem", background:"rgba(232,114,12,0.05)", borderRadius:10, border:"1px solid rgba(232,114,12,0.15)", display:"flex", alignItems:"center", gap:10 }}>
+              <span style={{ fontSize:18 }}>💡</span>
+              <p style={{ fontSize:"0.8rem", color:T.textMid, lineHeight:1.5 }}>To update your profile details, please contact our support team at <strong style={{ color:T.orange }}>support@wishstone.in</strong></p>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* ── No Orders Modal ── */}
-      {noOrderModal&&(
-        <div onClick={()=>setNoOrderModal(false)} style={{position:"fixed",inset:0,zIndex:2000,background:"rgba(0,0,0,0.75)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem",animation:"fadeIn 0.3s ease"}}>
-          <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:16,overflow:"hidden",width:"100%",maxWidth:440,border:`2px solid ${T.goldD}`,boxShadow:`0 40px 100px rgba(0,0,0,0.35)`,animation:"scaleIn 0.3s cubic-bezier(0.34,1.56,0.64,1)"}}>
-            {/* Header */}
-            <div style={{background:`linear-gradient(135deg,${T.navy},${T.navyL})`,padding:"1.5rem",textAlign:"center",position:"relative"}}>
-              <button onClick={()=>setNoOrderModal(false)} style={{position:"absolute",top:12,right:12,background:"rgba(255,255,255,0.12)",border:"none",color:"#fff",width:32,height:32,borderRadius:"50%",cursor:"pointer",fontSize:18,fontWeight:700,lineHeight:1}}>×</button>
-              <div style={{width:72,height:72,background:"rgba(255,255,255,0.1)",border:`2px solid ${T.gold}66`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:34,margin:"0 auto 1rem"}}>🛍️</div>
-              <h2 style={{fontFamily:"'Cinzel Decorative',serif",color:T.cream,fontSize:"1.3rem",margin:0,letterSpacing:"0.04em"}}>No Orders Yet</h2>
-            </div>
-            {/* Body */}
-            <div style={{padding:"2rem",textAlign:"center"}}>
-              <div style={{width:56,height:56,background:`rgba(201,169,110,0.1)`,border:`2px dashed ${T.goldD}`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 1.2rem",fontSize:26}}>📦</div>
-              <h3 style={{fontFamily:"'Cinzel',serif",color:T.navy,fontSize:"1.1rem",marginBottom:"0.7rem",fontWeight:800}}>Nothing to Track</h3>
-              <p style={{color:"rgba(33,40,66,0.6)",fontSize:"0.95rem",lineHeight:1.8,marginBottom:"1.8rem"}}>
-                You haven't placed any orders yet.<br/>
-                Explore our collection and place your first order to track it here.
-              </p>
-              {/* Decorative divider */}
-              <div style={{display:"flex",alignItems:"center",gap:8,margin:"0 auto 1.8rem",width:"fit-content"}}>
-                <div style={{width:40,height:1,background:`linear-gradient(to right,transparent,${T.goldD})`}}/>
-                <span style={{color:T.gold,fontSize:"0.8rem"}}>✦</span>
-                <div style={{width:40,height:1,background:`linear-gradient(to left,transparent,${T.goldD})`}}/>
-              </div>
-              <div style={{display:"flex",gap:"0.8rem",justifyContent:"center",flexWrap:"wrap"}}>
-                <button
-                  onClick={()=>setNoOrderModal(false)}
-                  style={{background:"transparent",border:`2px solid ${T.goldD}`,color:T.goldD,padding:"11px 24px",borderRadius:6,fontFamily:"'Cinzel',serif",fontSize:"0.72rem",letterSpacing:"0.12em",cursor:"pointer",fontWeight:700,transition:"all 0.25s"}}
-                  onMouseEnter={e=>{e.currentTarget.style.background=`rgba(139,105,20,0.08)`;}}
-                  onMouseLeave={e=>{e.currentTarget.style.background="transparent";}}
-                >CLOSE</button>
-                <button
-                  onClick={()=>{ setNoOrderModal(false); window.location.hash=""; /* navigate to shop */ document.dispatchEvent(new CustomEvent("ws-nav",{detail:"products"})); }}
-                  style={{background:`linear-gradient(135deg,${T.goldD},${T.gold})`,border:"none",color:T.navy,padding:"11px 24px",borderRadius:6,fontFamily:"'Cinzel',serif",fontSize:"0.72rem",letterSpacing:"0.12em",cursor:"pointer",fontWeight:800,boxShadow:`0 4px 16px ${T.gold}44`,transition:"all 0.25s"}}
-                  onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow=`0 8px 24px ${T.gold}66`;}}
-                  onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow=`0 4px 16px ${T.gold}44`;}}
-                >🛒 SHOP NOW</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
 
 // ─── MAIN APP ─────────────────────────────────────────────────
 export default function WishstoneApp() {
-  const [page,setPage]=useState("home");
-  const [selCat,setSelCat]=useState(null);
-  const [selProd,setSelProd]=useState(null);
-  const [cart,setCart]=useState([]);
-  const [wishlist,setWishlist]=useState([]);
-  const [user,setUser]=useState(null);
-  const [checkoutCoupon,setCheckoutCoupon]=useState({couponCode:"",discount:0,isGift:false,giftMessage:""});
-  const catRef=useRef(null);
-  const storyRef=useRef(null);
+  const [page, setPage] = useState("home");
+  const [cart, setCart] = useState([]);
+  const [wished, setWished] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [user, setUser] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [authMode, setAuthMode] = useState("login");
 
-  useEffect(()=>{
-    const hash=window.location.hash.slice(1);
-    if(hash==="signup"||hash==="login") setPage(hash);
-
-    // Validate token on mount — if user was deleted or token is invalid, clear session
-    const stored=localStorage.getItem("user");
-    const token=localStorage.getItem("token");
-    if(stored && token){
-      fetch("http://localhost:5000/api/auth/me",{
-        headers:{"Authorization":`Bearer ${token}`}
-      }).then(r=>r.json()).then(data=>{
-        if(data.success){
-          setUser(JSON.parse(stored));
-        } else {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          setUser(null);
-        }
-      }).catch(()=>{
-        // Network error — still load from localStorage so app works offline
-        setUser(JSON.parse(stored));
-      });
+  const addToCart = p => {
+    // support decrement: pass { ...p, qty:-1 } to remove one
+    if (p.qty === -1) {
+      setCart(c => c.map(i => i.id===p.id ? {...i, qty:i.qty-1} : i).filter(i => i.qty > 0));
+    } else {
+      setCart(c => { const ex=c.find(i=>i.id===p.id); if(ex) return c.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i); return [...c,{...p,qty:1}]; });
     }
-  },[]);
-
-  useEffect(()=>{
-    const handleHash=()=>{
-      const hash=window.location.hash.slice(1);
-      if(hash==="signup"||hash==="login") setPage(hash);
-    };
-    window.addEventListener("hashchange",handleHash);
-    return()=>window.removeEventListener("hashchange",handleHash);
-  },[]);
-
-  useEffect(()=>{
-    const handler=(e)=>{ handleNav(e.detail); scrollTop(); };
-    document.addEventListener("ws-nav",handler);
-    return()=>document.removeEventListener("ws-nav",handler);
-  },[user]);
-
-  const addToCart=p=>setCart(prev=>{ const e=prev.find(i=>i.id===p.id); return e?prev.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i):[...prev,{...p,qty:1}]; });
-  const updQty=(id,qty)=>qty<1?setCart(prev=>prev.filter(i=>i.id!==id)):setCart(prev=>prev.map(i=>i.id===id?{...i,qty}:i));
-  const rmCart=id=>setCart(prev=>prev.filter(i=>i.id!==id));
-  const togWish=id=>setWishlist(prev=>prev.includes(id)?prev.filter(i=>i!==id):[...prev,id]);
-
-  const handleNav=nav=>{
-    setSelProd(null); setSelCat(null);
-    if(nav==="dashboard" && !user){
-      window.location.hash="signup";
-      setPage("signup");
-      return;
-    }
-    setPage(["cart","wishlist","products","dashboard"].includes(nav)?nav:"home");
   };
-
-  const handleSignupSuccess=()=>{
-    // After signup, redirect to login page
-    window.location.hash="login";
-    setPage("login");
-  };
-
-  const handleLogin=(userData)=>{
-    setUser(userData);
-    setPage("home");
-    window.location.hash="";
-  };
-
-  const handleLogout=()=>{
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
-    setPage("home");
-  };
-
-  const cartCount=cart.reduce((s,i)=>s+i.qty,0);
-
-  const renderPage=()=>{
-    if(page==="signup") return <SignupPage onSignupSuccess={handleSignupSuccess}/>;
-    if(page==="login") return <LoginPage onSuccess={handleLogin}/>;
-    if(page==="dashboard"){
-      if(!user){ return <SignupPage onSignupSuccess={handleSignupSuccess}/>; }
-      return <UserDashboard user={user} onLogout={handleLogout}/>;
-    }
-    if(page==="product"&&selProd) return <ProductPage product={selProd} onAdd={addToCart} onWish={togWish} wished={wishlist.includes(selProd.id)}/>;
-    if(page==="category"&&selCat) return <CategoryPage category={selCat} onAdd={addToCart} onWish={togWish} wished={wishlist} onClick={p=>{setSelProd(p);setPage("product");scrollTop();}} cart={cart} onQty={updQty}/>;
-    if(page==="products") return <AllProductsPage onAdd={addToCart} onWish={togWish} wished={wishlist} onClick={p=>{setSelProd(p);setPage("product");scrollTop();}} cart={cart} onQty={updQty}/>;
-    if(page==="cart") return <CartPage cart={cart} onQty={updQty} onRemove={rmCart} onCheckout={(couponData)=>{setCheckoutCoupon(couponData||{couponCode:"",discount:0,isGift:false,giftMessage:""});setPage("checkout");}}/>;
-    if(page==="checkout") return <CheckoutPage cart={cart} onPlaceOrder={()=>{setCart([]);setCheckoutCoupon({couponCode:"",discount:0,isGift:false,giftMessage:""});setPage("home");scrollTop();}} couponCode={checkoutCoupon.couponCode} discount={checkoutCoupon.discount} isGift={checkoutCoupon.isGift} giftMessage={checkoutCoupon.giftMessage}/>;
-    if(page==="wishlist") return <WishlistPage ids={wishlist} onAdd={addToCart} onWish={togWish} onClick={p=>{setSelProd(p);setPage("product");scrollTop();}} cart={cart} onQty={updQty}/>;
-    return <HomePage onCatClick={cat=>{setSelCat(cat);setPage("category");scrollTop();}} onAdd={addToCart} onWish={togWish} wished={wishlist} onProdClick={p=>{setSelProd(p);setPage("product");scrollTop();}} catRef={catRef} storyRef={storyRef} cart={cart} onQty={updQty}/>;
-  };
+  const toggleWish = id => setWished(w => w.includes(id)?w.filter(x=>x!==id):[...w,id]);
+  const updateQty = (id,delta) => setCart(c => c.map(i=>i.id===id?{...i,qty:Math.max(0,i.qty+delta)}:i).filter(i=>i.qty>0));
+  const removeFromCart = id => setCart(c => c.filter(i=>i.id!==id));
+  const handlePlaceOrder = data => { setOrders(o=>[{...data,_id:Date.now().toString(),status:"Confirmed",createdAt:new Date().toISOString()},...o]); setCart([]); nav("home"); };
+  const handleLogout = () => { setUser(null); localStorage.removeItem("token"); nav("home"); };
+  const nav = p => { setPage(p); window.scrollTo(0,0); };
+  const cartCount = cart.reduce((s,i)=>s+i.qty,0);
 
   return (
-    <>
-      <style>{CSS}</style>
-      <div style={{fontFamily:"'Cormorant Garamond',serif",background:T.navyD,minHeight:"100vh"}}>
-        <Header cartCount={cartCount} wishCount={wishlist.length} onNav={handleNav} currentPage={page} categoryRef={catRef} storyRef={storyRef} user={user} onLogout={handleLogout}/>
-        <OfferBanner/>
-        <main>{renderPage()}</main>
-      </div>
-    </>
+    <div style={{ fontFamily:"'Inter',sans-serif", background:T.bg, minHeight:"100vh" }}>
+      <style>{GLOBAL_CSS}</style>
+      <Header cartCount={cartCount} wishCount={wished.length} onNav={nav} currentPage={page} user={user} onLogout={handleLogout} />
+
+      {page==="home"      && <HomePage onShop={()=>nav("products")} onRitual={()=>nav("rituals")} />}
+      {page==="products"  && <ProductsPage onAdd={addToCart} onWish={toggleWish} wished={wished} onClick={p=>{setSelectedProduct(p);nav("product");}} cart={cart} />}
+      {page==="product"   && selectedProduct && <ProductPage product={selectedProduct} onAdd={addToCart} onWish={toggleWish} wished={wished} cart={cart} />}
+      {page==="rituals"   && <RitualsPage />}
+      {page==="benefits"  && <BenefitsPage />}
+      {page==="stories"   && <StoriesPage />}
+      {page==="cart"      && <CartPage cart={cart} onQty={updateQty} onRemove={removeFromCart} onCheckout={()=>nav("checkout")} />}
+      {page==="checkout"  && <CheckoutPage cart={cart} onPlaceOrder={handlePlaceOrder} />}
+      {page==="wishlist"  && <WishlistPage ids={wished} onAdd={addToCart} onWish={toggleWish} onClick={p=>{setSelectedProduct(p);nav("product");}} />}
+      {page==="auth" && authMode==="signup" && <SignupPage onSignup={u=>{setUser(u);nav("home");}} onSwitch={()=>setAuthMode("login")} />}
+      {page==="auth" && authMode==="login"  && <LoginPage  onLogin={u=>{setUser(u);nav("home");}} onSwitch={()=>setAuthMode("signup")} />}
+      {page==="dashboard" && user && <UserDashboard user={user} orders={orders} onLogout={handleLogout} onNav={nav} />}
+
+      {page!=="auth" && <Footer />}
+    </div>
   );
 }
