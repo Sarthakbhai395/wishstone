@@ -40,6 +40,33 @@ router.post("/admin/login", async (req, res) => {
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
+// Google OAuth — verify credential from frontend, find/create user
+router.post("/google", async (req, res) => {
+  try {
+    const { credential } = req.body;
+    if (!credential) return res.status(400).json({ success: false, message: "Google credential required." });
+
+    // Decode the Google JWT (id_token) — no library needed, just base64 decode the payload
+    const payload = JSON.parse(Buffer.from(credential.split(".")[1], "base64url").toString("utf8"));
+    const { sub: googleId, email, name, picture } = payload;
+
+    if (!email) return res.status(400).json({ success: false, message: "Could not get email from Google." });
+
+    // Find existing user by googleId or email
+    let user = await User.findOne({ $or: [{ googleId }, { email }] });
+
+    if (user) {
+      // Update googleId and avatar if missing
+      if (!user.googleId) { user.googleId = googleId; user.avatar = picture || ""; await user.save(); }
+    } else {
+      // Create new Google user (no password)
+      user = await User.create({ name, email, googleId, avatar: picture || "", password: "" });
+    }
+
+    res.json({ success: true, token: sign(user._id), user: { id: user._id, name: user.name, email: user.email, avatar: user.avatar, role: user.role } });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
 // Me
 router.get("/me", protect, (req, res) => res.json({ success: true, user: req.user }));
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 
 const T = {
   bg: "#F5F0E8", bgDark: "#2C3320",
@@ -62,9 +62,6 @@ const POWERS = [
   { num:"01", iconBg:"#fff0e8", icon:"🎯", title:"Intention Anchoring", desc:"Stone ka physical weight ek somatic anchor create karta hai — ek tangible connection apni conscious wish aur physical duniya ke beech.", tag:"NEUROSCIENCE-BACKED" },
   { num:"02", iconBg:"#f0f0e8", icon:"✦",  title:"Sacred Yantra",       desc:"Har WishStone pe hand-designed manifestation yantra — ancient geometric symbol jo focused intention ko amplify karta hai.", tag:"ANCIENT WISDOM" },
   { num:"03", iconBg:"#e8f0e8", icon:"🌿", title:"Earth Grounding",     desc:"Natural stone compounds carry prithvi ki stabilizing frequency — calm, centered, aur aligned raho apni highest desires ke saath.", tag:"EARTH ENERGY" },
-  { num:"04", iconBg:"#fff4e0", icon:"📜", title:"365 Oracle Cards",    desc:"Har subah ek fresh manifestation message — ancient wisdom se modern psychology tak. Apna daily reset to belief.", tag:"DAILY PRACTICE" },
-  { num:"05", iconBg:"#f0e8f8", icon:"🔮", title:"Frequency Activation",desc:"Specific crystal formations jo apni personal energy field ko tune karti hain — clarity, abundance, aur love attract karo.", tag:"CRYSTAL SCIENCE" },
-  { num:"06", iconBg:"#e8f0ff", icon:"💫", title:"Moon Cycle Sync",     desc:"Har WishStone moon cycles ke saath aligned hai — new moon intentions set karo, full moon pe release karo.", tag:"LUNAR WISDOM" },
 ];
 
 const GLOBAL_CSS = `
@@ -84,6 +81,7 @@ const GLOBAL_CSS = `
   @keyframes quoteIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
   @keyframes cardIn{from{opacity:0;transform:translateY(30px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
   @keyframes shimmerBar{from{width:0%}to{width:100%}}
+  @keyframes spin{to{transform:rotate(360deg)}}
   @keyframes stone3d{
     0%   { transform: rotateY(-18deg) rotateX(6deg) translateY(0px); }
     25%  { transform: rotateY(8deg)  rotateX(-4deg) translateY(-10px); }
@@ -94,6 +92,10 @@ const GLOBAL_CSS = `
   @keyframes badgeFloat1{0%,100%{transform:translateY(0px)}50%{transform:translateY(-7px)}}
   @keyframes badgeFloat2{0%,100%{transform:translateY(0px)}50%{transform:translateY(-10px)}}
   @keyframes badgeFloat3{0%,100%{transform:translateY(0px)}50%{transform:translateY(-6px)}}
+  @keyframes sacredShine{0%{background-position:-200% center}100%{background-position:200% center}}
+  @keyframes sacredGlow{0%,100%{box-shadow:0 0 0px rgba(232,114,12,0),0 0 0px rgba(255,200,80,0)}50%{box-shadow:0 0 14px rgba(232,114,12,0.55),0 0 28px rgba(255,200,80,0.25)}}
+  .sacred-badge{position:relative;overflow:hidden;}
+  .sacred-badge::after{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(105deg,transparent 30%,rgba(255,220,120,0.55) 50%,transparent 70%);background-size:200% 100%;animation:sacredShine 2.8s ease-in-out infinite;pointer-events:none;border-radius:20px;}
   .nav-link{background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#1a1a1a;padding:4px 0;transition:color 0.2s;}
   .nav-link:hover,.nav-link.active{color:#E8720C;}
   .prod-card{background:#fff;border-radius:14px;overflow:hidden;border:1px solid rgba(26,26,26,0.08);transition:all 0.3s;cursor:pointer;}
@@ -110,7 +112,7 @@ const GLOBAL_CSS = `
     .hero-grid{grid-template-columns:1fr !important;}
     .hero-right{display:none !important;}
     .powers-layout{grid-template-columns:1fr !important;}
-    .powers-center-col{display:none !important;}
+    .powers-center-col{display:flex !important;width:100% !important;max-width:400px !important;margin:0 auto !important;position:static !important;order:-1 !important;}
     .checkout-grid{grid-template-columns:1fr !important;}
     .prod-detail-grid{grid-template-columns:1fr !important;}
     .dashboard-grid{grid-template-columns:1fr !important;}
@@ -133,11 +135,30 @@ const GLOBAL_CSS = `
     .stats-row > div{flex:1 1 45% !important;}
     .hero-badge{transform:scale(0.78) !important;}
     .dashboard-stats{grid-template-columns:repeat(2,1fr) !important;}
+    .hero-text{text-align:center !important;display:flex !important;flex-direction:column !important;align-items:center !important;}
+    .hero-text h1{text-align:center !important;}
+    .hero-text p{text-align:center !important;}
+    .hero-text blockquote{text-align:left !important;margin:0 auto 2rem auto !important;}
+    .sacred-badge-wrap{justify-content:center !important;}
   }
   @media(max-width:480px){
-    .stats-row > div{flex:1 1 100% !important;}
+    .stats-row > div{flex:1 1 45% !important;}
     .dashboard-stats{grid-template-columns:1fr 1fr !important;}
   }
+  .ugc-track{display:flex;gap:1rem;width:max-content;animation:ugcScroll 32s linear infinite;}
+  .ugc-track:hover{animation-play-state:paused;}
+  @keyframes ugcScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .ugc-card{position:relative;width:200px;flex-shrink:0;border-radius:18px;overflow:hidden;cursor:pointer;background:#000;}
+  .ugc-card video{width:100%;height:320px;object-fit:cover;display:block;transition:transform 0.4s ease;}
+  .ugc-card:hover video{transform:scale(1.04);}
+  .ugc-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.72) 0%,transparent 55%);pointer-events:none;}
+  .ugc-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.18);backdrop-filter:blur(6px);border:1.5px solid rgba(255,255,255,0.35);display:flex;align-items:center;justify-content:center;transition:all 0.3s;pointer-events:none;}
+  .ugc-card:hover .ugc-play{background:rgba(232,114,12,0.85);border-color:transparent;transform:translate(-50%,-50%) scale(1.1);}
+  .ugc-badge{position:absolute;top:10px;left:10px;background:rgba(232,114,12,0.9);color:#fff;font-size:0.55rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:3px 8px;border-radius:20px;}
+  .ugc-info{position:absolute;bottom:0;left:0;right:0;padding:12px 12px 14px;}
+  .ugc-name{font-size:0.72rem;font-weight:700;color:#fff;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ugc-handle{font-size:0.6rem;color:rgba(255,255,255,0.6);}
+  @media(max-width:600px){.ugc-card{width:155px;}.ugc-card video{height:250px;}}
 `;
 
 // ─── HEADER ───────────────────────────────────────────────────
@@ -165,9 +186,9 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
     }}>
       <div className="max-w" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", height:64, padding:"0 clamp(1rem,4vw,2.5rem)" }}>
         {/* Logo */}
-        <button onClick={() => navTo("home")} style={{ background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:9, flexShrink:0 }}>
-          <div style={{ width:32, height:32, borderRadius:8, background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>💎</div>
-          <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.15rem", fontWeight:900, color:T.text }}>WishStone</span>
+        <button onClick={() => navTo("home")} style={{ background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:10, flexShrink:0 }}>
+          <svg width="36" height="40" viewBox="0 0 36 40" fill="none" xmlns="http://www.w3.org/2000/svg" style={{flexShrink:0}}><defs><linearGradient id="wsg" x1="0" y1="0" x2="36" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0%" stopColor="#f5c842"/><stop offset="100%" stopColor="#c87d10"/></linearGradient></defs><polygon points="13,1 23,1 35,10 35,30 23,39 13,39 1,30 1,10" fill="none" stroke="url(#wsg)" strokeWidth="2.2" strokeLinejoin="round"/><line x1="13" y1="1" x2="18" y2="13" stroke="url(#wsg)" strokeWidth="1.6"/><line x1="23" y1="1" x2="18" y2="13" stroke="url(#wsg)" strokeWidth="1.6"/><line x1="1" y1="10" x2="18" y2="13" stroke="url(#wsg)" strokeWidth="1.6"/><line x1="35" y1="10" x2="18" y2="13" stroke="url(#wsg)" strokeWidth="1.6"/><line x1="18" y1="13" x2="18" y2="39" stroke="url(#wsg)" strokeWidth="1.6"/><line x1="1" y1="30" x2="18" y2="13" stroke="url(#wsg)" strokeWidth="1.2" strokeOpacity="0.6"/><line x1="35" y1="30" x2="18" y2="13" stroke="url(#wsg)" strokeWidth="1.2" strokeOpacity="0.6"/></svg>
+          <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.15rem", fontWeight:900, color:T.text, letterSpacing:"0.02em" }}>WishStone</span>
         </button>
 
         {/* Desktop Nav */}
@@ -289,12 +310,13 @@ function Hero({ onShop, onRitual }) {
       <div className="max-w hero-grid" style={{ width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2.5rem", alignItems:"center" }}>
 
         {/* ── LEFT: Text ── */}
-        <div style={{ animation:"fadeUp 0.8s ease both" }}>
-          <div style={{ display:"inline-flex", alignItems:"center", gap:7, background:"rgba(232,114,12,0.08)", border:`1px solid rgba(232,114,12,0.22)`, borderRadius:20, paddingTop:5, paddingBottom:5, paddingLeft:14, paddingRight:14, marginBottom:"1.6rem" }}>
-            <span style={{ color:T.orange, fontSize:10 }}>✦</span>
-            <span style={{ fontSize:"0.65rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase" }}>India's Sacred Manifestation Stone</span>
+        <div className="hero-text" style={{ animation:"fadeUp 0.8s ease both" }}>
+          <div className="sacred-badge-wrap" style={{ display:"inline-flex", marginBottom:"1.6rem" }}>
+            <div className="sacred-badge" style={{ display:"inline-flex", alignItems:"center", gap:7, background:"rgba(232,114,12,0.08)", border:`1px solid rgba(232,114,12,0.22)`, borderRadius:20, paddingTop:5, paddingBottom:5, paddingLeft:14, paddingRight:14, animation:"sacredGlow 2.8s ease-in-out infinite" }}>
+              <span style={{ color:T.orange, fontSize:10 }}>✦</span>
+              <span style={{ fontSize:"0.65rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase" }}>India's Sacred Manifestation Stone</span>
+            </div>
           </div>
-
           <h1 style={{ fontFamily:"'Noto Serif Devanagari','Playfair Display',serif", fontSize:"clamp(2.2rem,5.5vw,4.2rem)", fontWeight:900, lineHeight:1.1, marginBottom:"0.3rem", color:T.text }}>
             अपनी इच्छाएँ,
           </h1>
@@ -426,10 +448,77 @@ function MarqueeSection() {
   );
 }
 
+
+// ─── UGC VIDEO SECTION ─────────────────────────────────────────
+const UGC_VIDEOS = [
+  { src:"https://www.w3schools.com/html/mov_bbb.mp4",    name:"Priya S.",    handle:"@priya.manifests",  badge:"⭐ 5 Stars",   label:"Rose Quartz" },
+  { src:"https://www.w3schools.com/html/movie.mp4",      name:"Ananya R.",   handle:"@ananya.crystals",  badge:"✦ Verified",  label:"Amethyst" },
+  { src:"https://www.w3schools.com/html/mov_bbb.mp4",    name:"Kavya M.",    handle:"@kavya.rituals",    badge:"🔥 Trending",  label:"Obsidian" },
+  { src:"https://www.w3schools.com/html/movie.mp4",      name:"Sneha T.",    handle:"@sneha.wishstone",  badge:"⭐ 5 Stars",   label:"Clear Quartz" },
+  { src:"https://www.w3schools.com/html/mov_bbb.mp4",    name:"Riya K.",     handle:"@riya.manifests",   badge:"✦ Verified",  label:"Citrine" },
+  { src:"https://www.w3schools.com/html/movie.mp4",      name:"Meera D.",    handle:"@meera.crystals",   badge:"🔥 Trending",  label:"Lapis Lazuli" },
+];
+
+function UGCSection() {
+  const doubled = [...UGC_VIDEOS, ...UGC_VIDEOS];
+  return (
+    <section style={{ background:T.bg, padding:"70px 0 60px", overflow:"hidden" }}>
+      {/* Heading */}
+      <div style={{ textAlign:"center", marginBottom:"2.5rem", paddingLeft:"clamp(1.5rem,5vw,3.5rem)", paddingRight:"clamp(1.5rem,5vw,3.5rem)" }}>
+        <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(232,114,12,0.08)", border:"1px solid rgba(232,114,12,0.2)", borderRadius:20, padding:"5px 16px", marginBottom:14 }}>
+          <span style={{ color:T.orange, fontSize:11 }}>▶</span>
+          <span style={{ fontSize:"0.62rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase" }}>Real People · Real Results</span>
+        </div>
+        <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3.5vw,2.4rem)", fontWeight:900, color:T.text, margin:"0 0 0.5rem" }}>
+          Most Loved Stones
+        </h2>
+        <p style={{ fontSize:"0.82rem", color:T.textMid, margin:0 }}>See how WishStone is changing lives — one intention at a time</p>
+      </div>
+
+      {/* Scrolling video strip */}
+      <div style={{ position:"relative", overflow:"hidden" }}>
+        {/* Fade edges */}
+        <div style={{ position:"absolute", left:0, top:0, bottom:0, width:80, background:`linear-gradient(to right,${T.bg},transparent)`, zIndex:3, pointerEvents:"none" }} />
+        <div style={{ position:"absolute", right:0, top:0, bottom:0, width:80, background:`linear-gradient(to left,${T.bg},transparent)`, zIndex:3, pointerEvents:"none" }} />
+
+        <div className="ugc-track">
+          {doubled.map((v, i) => (
+            <div key={i} className="ugc-card"
+              onMouseEnter={e => { const vid = e.currentTarget.querySelector("video"); if(vid){ vid.muted=true; vid.play().catch(()=>{}); } }}
+              onMouseLeave={e => { const vid = e.currentTarget.querySelector("video"); if(vid){ vid.pause(); vid.currentTime=0; } }}
+            >
+              <video src={v.src} muted playsInline loop preload="metadata" />
+              <div className="ugc-overlay" />
+              <div className="ugc-play">
+                <svg width="14" height="16" viewBox="0 0 14 16" fill="none"><path d="M1 1l12 7-12 7V1z" fill="#fff"/></svg>
+              </div>
+              <span className="ugc-badge">{v.badge}</span>
+              <div className="ugc-info">
+                <div className="ugc-name">{v.label}</div>
+                <div className="ugc-handle">{v.name} · {v.handle}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Trust row */}
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:0, marginTop:'2.5rem', flexWrap:'wrap', paddingLeft:'1rem', paddingRight:'1rem' }}>
+        {[['12K+','Happy Customers'],['4.9★','Average Rating'],['100%','Authentic Reviews']].map(([n,l], i, arr) => (
+          <div key={l} style={{ display:'flex', alignItems:'center', gap:'0.6rem', padding:'0 clamp(1rem,3vw,2rem)' }}>
+            <span style={{ fontFamily:"'Inter',sans-serif", fontSize:"clamp(1.1rem,2.2vw,1.4rem)", fontWeight:900, color:T.text, lineHeight:1 }}>{n}</span>
+            <span style={{ fontFamily:"'Inter',sans-serif", fontSize:"0.65rem", fontWeight:600, color:T.textMid, letterSpacing:"0.1em", textTransform:"uppercase", lineHeight:1.3, maxWidth:80 }}>{l}</span>
+            {i < arr.length-1 && <div style={{ width:1, height:28, background:"rgba(26,26,26,0.15)", marginLeft:"clamp(1rem,3vw,2rem)" }} />}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 // ─── POWERS SECTION ───────────────────────────────────────────
 function PowersSection() {
-  const left  = POWERS.slice(0, 3);
-  const right = POWERS.slice(3, 6);
+  const cards = POWERS;
   return (
     <section style={{ background:T.bg, padding:"90px clamp(1.5rem,5vw,3.5rem)" }}>
       <div className="max-w">
@@ -441,15 +530,15 @@ function PowersSection() {
             <div style={{ height:1, width:40, background:T.orange }} />
           </div>
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.8rem,4vw,2.8rem)", fontWeight:900, color:T.text, lineHeight:1.2 }}>
-            Six Powers to <em style={{ color:T.orange, fontStyle:"italic" }}>Amplify</em><br />Your Manifestation
+            Three Powers to <em style={{ color:T.orange, fontStyle:"italic" }}>Amplify</em><br />Your Manifestation
           </h2>
         </div>
 
         {/* 3-column layout: cards | stone | cards */}
-        <div className="powers-layout" style={{ display:"grid", gridTemplateColumns:"1fr 340px 1fr", gap:"1.5rem", alignItems:"start" }}>
+        <div className="powers-layout" style={{ display:"grid", gridTemplateColumns:"1fr 340px", gap:"1.5rem", alignItems:"start" }}>
           {/* Left cards */}
           <div style={{ display:"flex", flexDirection:"column", gap:"1.2rem" }}>
-            {left.map(p => (
+            {cards.map(p => (
               <div key={p.num} className="power-card">
                 <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:"1rem" }}>
                   <div style={{ width:44, height:44, borderRadius:10, background:p.iconBg, border:`1px solid ${T.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}>{p.icon}</div>
@@ -474,20 +563,6 @@ function PowersSection() {
             </div>
           </div>
 
-          {/* Right cards */}
-          <div style={{ display:"flex", flexDirection:"column", gap:"1.2rem" }}>
-            {right.map(p => (
-              <div key={p.num} className="power-card">
-                <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:"1rem" }}>
-                  <div style={{ width:44, height:44, borderRadius:10, background:p.iconBg, border:`1px solid ${T.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}>{p.icon}</div>
-                  <span style={{ fontSize:"2rem", fontWeight:900, color:"rgba(26,26,26,0.06)", fontFamily:"'Playfair Display',serif", lineHeight:1 }}>{p.num}</span>
-                </div>
-                <h3 style={{ fontSize:"0.95rem", fontWeight:700, color:T.text, marginBottom:"0.5rem" }}>{p.title}</h3>
-                <p style={{ fontSize:"0.8rem", color:T.textMid, lineHeight:1.65, marginBottom:"0.9rem" }}>{p.desc}</p>
-                <span style={{ fontSize:"0.6rem", fontWeight:700, color:T.textMid, letterSpacing:"0.14em", border:`1px solid ${T.border}`, borderRadius:3, padding:"3px 8px" }}>{p.tag}</span>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </section>
@@ -498,21 +573,28 @@ function PowersSection() {
 function QuoteSection() {
   const [idx, setIdx] = useState(0);
   const [key, setKey] = useState(0);
+  const timerRef = useRef(null);
+  const advance = (next) => { setIdx(next); setKey(k => k+1); };
+  const resetTimer = (next) => {
+    advance(next);
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => { setIdx(v => (v+1) % QUOTES.length); setKey(k => k+1); }, 4500);
+  };
   useEffect(() => {
-    const t = setInterval(() => { setIdx(i => (i+1) % QUOTES.length); setKey(k => k+1); }, 4500);
-    return () => clearInterval(t);
+    timerRef.current = setInterval(() => { setIdx(i => (i+1) % QUOTES.length); setKey(k => k+1); }, 4500);
+    return () => clearInterval(timerRef.current);
   }, []);
   const q = QUOTES[idx];
   return (
-    <section style={{ background:T.bgDark, padding:"90px clamp(1.5rem,5vw,3.5rem)", textAlign:"center", position:"relative", overflow:"hidden" }}>
+    <section style={{ background:T.bgDark, padding:"52px clamp(1.5rem,5vw,3.5rem)", textAlign:"center", position:"relative", overflow:"hidden" }}>
       {/* Subtle bg texture */}
       <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at 50% 50%, rgba(232,114,12,0.06) 0%, transparent 70%)", pointerEvents:"none" }} />
       <div className="max-w" style={{ maxWidth:760, position:"relative" }}>
-        <div style={{ fontSize:"0.62rem", fontWeight:700, color:T.orange, letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:"1.5rem", display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
+        <div style={{ fontSize:"0.62rem", fontWeight:700, color:T.orange, letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:"1rem", display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
           <span>✦</span> Daily Manifestation Oracle <span>✦</span>
         </div>
-        <div style={{ fontSize:"3rem", color:"rgba(232,114,12,0.35)", lineHeight:1, marginBottom:"1.5rem", fontFamily:"Georgia,serif" }}>"</div>
-        <blockquote key={key} style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.2rem,2.8vw,1.7rem)", fontWeight:700, color:T.white, lineHeight:1.55, marginBottom:"1.5rem", fontStyle:"italic", animation:"quoteIn 0.5s ease both" }}>
+        <div style={{ fontSize:"2.4rem", color:"rgba(232,114,12,0.35)", lineHeight:1, marginBottom:"1rem", fontFamily:"Georgia,serif" }}>"</div>
+        <blockquote key={key} style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1rem,2.4vw,1.45rem)", fontWeight:700, color:T.white, lineHeight:1.5, marginBottom:"1rem", fontStyle:"italic", animation:"quoteIn 0.5s ease both", minHeight:"4.5rem" }}>
           {q.text}
         </blockquote>
         <cite style={{ fontSize:"0.72rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase", fontStyle:"normal" }}>
@@ -520,17 +602,17 @@ function QuoteSection() {
         </cite>
 
         {/* Progress bar + arrows */}
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"1rem", marginTop:"2.5rem" }}>
-          <button onClick={() => { setIdx(i => (i-1+QUOTES.length)%QUOTES.length); setKey(k=>k+1); }} style={{ width:28, height:28, borderRadius:"50%", border:`1px solid rgba(255,255,255,0.2)`, background:"none", color:"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:12, display:"flex", alignItems:"center", justifyContent:"center" }}>‹</button>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"1rem", marginTop:"1.5rem" }}>
+          <button onClick={() => resetTimer((idx-1+QUOTES.length)%QUOTES.length)} style={{ width:28, height:28, borderRadius:"50%", border:`1px solid rgba(255,255,255,0.2)`, background:"none", color:"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:12, display:"flex", alignItems:"center", justifyContent:"center" }}>‹</button>
           <div style={{ width:180, height:2, background:"rgba(255,255,255,0.1)", borderRadius:1, position:"relative" }}>
             <div style={{ position:"absolute", left:0, top:0, height:"100%", background:T.orange, borderRadius:1, width:`${((idx+1)/QUOTES.length)*100}%`, transition:"width 0.4s ease" }} />
           </div>
           <div style={{ display:"flex", gap:5 }}>
             {QUOTES.map((_,i) => (
-              <button key={i} onClick={() => { setIdx(i); setKey(k=>k+1); }} style={{ width: i===idx ? 18 : 7, height:7, borderRadius:4, background: i===idx ? T.orange : "rgba(255,255,255,0.2)", border:"none", cursor:"pointer", transition:"all 0.3s", padding:0 }} />
+              <button key={i} onClick={() => resetTimer(i)} style={{ width: i===idx ? 18 : 7, height:7, borderRadius:4, background: i===idx ? T.orange : "rgba(255,255,255,0.2)", border:"none", cursor:"pointer", transition:"all 0.3s", padding:0 }} />
             ))}
           </div>
-          <button onClick={() => { setIdx(i => (i+1)%QUOTES.length); setKey(k=>k+1); }} style={{ width:28, height:28, borderRadius:"50%", border:`1px solid rgba(255,255,255,0.2)`, background:"none", color:"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:12, display:"flex", alignItems:"center", justifyContent:"center" }}>›</button>
+          <button onClick={() => resetTimer((idx+1)%QUOTES.length)} style={{ width:28, height:28, borderRadius:"50%", border:`1px solid rgba(255,255,255,0.2)`, background:"none", color:"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:12, display:"flex", alignItems:"center", justifyContent:"center" }}>›</button>
         </div>
       </div>
     </section>
@@ -545,7 +627,7 @@ function Footer() {
         <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", gap:"3rem", marginBottom:"3rem" }} className="footer-grid">
           <div>
             <div style={{ display:"flex", alignItems:"center", gap:9, marginBottom:"1rem" }}>
-              <div style={{ width:30, height:30, borderRadius:7, background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:14 }}>💎</div>
+              <svg width="28" height="32" viewBox="0 0 36 40" fill="none" xmlns="http://www.w3.org/2000/svg" style={{flexShrink:0}}><defs><linearGradient id="wsgf" x1="0" y1="0" x2="36" y2="40" gradientUnits="userSpaceOnUse"><stop offset="0%" stopColor="#f5c842"/><stop offset="100%" stopColor="#c87d10"/></linearGradient></defs><polygon points="13,1 23,1 35,10 35,30 23,39 13,39 1,30 1,10" fill="none" stroke="url(#wsgf)" strokeWidth="2.2" strokeLinejoin="round"/><line x1="13" y1="1" x2="18" y2="13" stroke="url(#wsgf)" strokeWidth="1.6"/><line x1="23" y1="1" x2="18" y2="13" stroke="url(#wsgf)" strokeWidth="1.6"/><line x1="1" y1="10" x2="18" y2="13" stroke="url(#wsgf)" strokeWidth="1.6"/><line x1="35" y1="10" x2="18" y2="13" stroke="url(#wsgf)" strokeWidth="1.6"/><line x1="18" y1="13" x2="18" y2="39" stroke="url(#wsgf)" strokeWidth="1.6"/><line x1="1" y1="30" x2="18" y2="13" stroke="url(#wsgf)" strokeWidth="1.2" strokeOpacity="0.6"/><line x1="35" y1="30" x2="18" y2="13" stroke="url(#wsgf)" strokeWidth="1.2" strokeOpacity="0.6"/></svg>
               <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", fontWeight:900, color:T.white }}>WishStone</span>
             </div>
             <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.5)", lineHeight:1.7, maxWidth:240 }}>India's sacred manifestation stone — hand-crafted with ancient yantra to help you manifest your deepest desires.</p>
@@ -583,6 +665,7 @@ function HomePage({ onShop, onRitual }) {
       <Hero onShop={onShop} onRitual={onRitual} />
       <StatsBar />
       <MarqueeSection />
+      <UGCSection />
       <PowersSection />
       <QuoteSection />
 
@@ -717,7 +800,7 @@ function ProductsPage({ onAdd, onWish, wished, onClick, cart }) {
 }
 
 // ─── PRODUCT DETAIL ───────────────────────────────────────────
-function ProductPage({ product: p, onAdd, onWish, wished, cart }) {
+function ProductPage({ product: p, onAdd, onWish, wished, cart, onClick, onShop }) {
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState("desc");
   const [activeImg, setActiveImg] = useState(0);
@@ -798,6 +881,45 @@ function ProductPage({ product: p, onAdd, onWish, wished, cart }) {
           </div>
         </div>
       </div>
+
+      {/* ── Most Loved Stones Strip ── */}
+      <section style={{ background:"#fff", paddingTop:"60px", paddingBottom:"60px", overflow:"hidden", marginTop:"2rem" }}>
+        <div className="max-w" style={{ paddingLeft:"clamp(1.5rem,5vw,3.5rem)", paddingRight:"clamp(1.5rem,5vw,3.5rem)", marginBottom:"2rem" }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
+            <div>
+              <div style={{ fontSize:"0.65rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase", marginBottom:8 }}>BEST SELLERS</div>
+              <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.4rem,3vw,2rem)", fontWeight:900, color:T.text, margin:0 }}>Most Loved Stones</h2>
+            </div>
+            <button className="btn-outline" onClick={onShop} style={{ padding:"10px 24px", fontSize:"0.78rem", borderRadius:8 }}>View All →</button>
+          </div>
+        </div>
+        <div style={{ overflow:"hidden", position:"relative" }}>
+          <div style={{ position:"absolute", left:0, top:0, bottom:0, width:80, background:"linear-gradient(to right,#fff,transparent)", zIndex:2, pointerEvents:"none" }} />
+          <div style={{ position:"absolute", right:0, top:0, bottom:0, width:80, background:"linear-gradient(to left,#fff,transparent)", zIndex:2, pointerEvents:"none" }} />
+          <div style={{ display:"flex", animation:"autoScroll 28s linear infinite", width:"max-content" }}>
+            {[...PRODUCTS, ...PRODUCTS].map((prod, i) => (
+              <div key={i} onClick={() => onClick && onClick(prod)} style={{ width:220, flexShrink:0, marginRight:"1.2rem", cursor:"pointer" }}>
+                <div style={{ borderRadius:14, overflow:"hidden", border:`1px solid ${T.border}`, background:T.bg, transition:"transform 0.3s, box-shadow 0.3s" }}
+                  onMouseEnter={e => { e.currentTarget.style.transform="translateY(-5px)"; e.currentTarget.style.boxShadow="0 16px 40px rgba(0,0,0,0.1)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="none"; }}>
+                  <div style={{ position:"relative", aspectRatio:"1", overflow:"hidden" }}>
+                    <img src={prod.image} alt={prod.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                    <div style={{ position:"absolute", top:8, left:8, background:T.orange, color:"#fff", borderRadius:4, padding:"2px 8px", fontSize:"0.6rem", fontWeight:800 }}>-{prod.discount}%</div>
+                    {prod.bestSeller && <div style={{ position:"absolute", bottom:6, left:6, background:T.bgDark, color:T.orange, borderRadius:4, padding:"2px 7px", fontSize:"0.58rem", fontWeight:700 }}>BEST SELLER</div>}
+                  </div>
+                  <div style={{ padding:"0.9rem" }}>
+                    <div style={{ fontSize:"0.8rem", fontWeight:700, color:T.text, marginBottom:4, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{prod.name}</div>
+                    <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                      <span style={{ fontSize:"0.9rem", color:T.orange, fontWeight:700 }}>Rs.{prod.price.toLocaleString()}</span>
+                      <span style={{ color:T.textMid, fontSize:"0.7rem", textDecoration:"line-through" }}>Rs.{prod.originalPrice.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
@@ -966,21 +1088,53 @@ function CartPage({ cart, onQty, onRemove, onCheckout }) {
 }
 
 // ─── CHECKOUT PAGE ────────────────────────────────────────────
+// ─── CHECKOUT PAGE ────────────────────────────────────────────
 function CheckoutPage({ cart, onPlaceOrder }) {
   const [form, setForm] = useState({ name:"", email:"", phone:"", address:"", city:"", state:"", pincode:"" });
   const [coupon, setCoupon] = useState("");
-  const [discount, setDiscount] = useState(0);
-  const [couponMsg, setCouponMsg] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState(null); // { code, discount, discountType, discountValue, message }
+  const [couponMsg, setCouponMsg] = useState({ text:"", ok:false });
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [gift, setGift] = useState(false);
+  const [giftMsg, setGiftMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const sub = cart.reduce((s,i) => s + i.price*i.qty, 0);
   const ship = sub >= 999 ? 0 : 99;
-  const total = sub + ship - discount;
+  const totalItems = cart.reduce((s,i) => s + i.qty, 0);
+  const giftFee = gift ? 50 * totalItems : 0;
+  const discountAmt = appliedCoupon ? appliedCoupon.discount : 0;
+  const total = sub + ship + giftFee - discountAmt;
 
-  const applyCoupon = () => {
-    if (coupon.toUpperCase()==="WISH10") { setDiscount(Math.round(sub*0.1)); setCouponMsg("10% discount applied!"); }
-    else if (coupon.toUpperCase()==="FIRST20") { setDiscount(Math.round(sub*0.2)); setCouponMsg("20% discount applied!"); }
-    else { setDiscount(0); setCouponMsg("Invalid coupon code."); }
+  const applyCoupon = async () => {
+    if (!coupon.trim()) return;
+    setCouponLoading(true);
+    setCouponMsg({ text:"", ok:false });
+    setAppliedCoupon(null);
+    try {
+      const res = await fetch("http://localhost:5000/api/coupons/validate", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ code: coupon.trim(), orderTotal: sub }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAppliedCoupon({ code: coupon.trim().toUpperCase(), discount: data.discount, discountType: data.discountType, discountValue: data.discountValue });
+        setCouponMsg({ text: data.message || `✓ Coupon applied! You save Rs.${data.discount}`, ok:true });
+      } else {
+        setCouponMsg({ text: data.message || "Invalid coupon code.", ok:false });
+      }
+    } catch {
+      setCouponMsg({ text:"Could not connect to server. Please try again.", ok:false });
+    }
+    setCouponLoading(false);
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCoupon("");
+    setCouponMsg({ text:"", ok:false });
   };
 
   const handleSubmit = async e => {
@@ -988,7 +1142,7 @@ function CheckoutPage({ cart, onPlaceOrder }) {
     if (!form.name||!form.email||!form.phone||!form.address||!form.city||!form.pincode) return setError("Please fill all required fields.");
     setLoading(true);
     await new Promise(r => setTimeout(r,1200));
-    onPlaceOrder({ items:cart, address:form, totalAmount:total, coupon, discount });
+    onPlaceOrder({ items:cart, address:form, totalAmount:total, coupon: appliedCoupon?.code||"", discount:discountAmt, gift, giftMessage:giftMsg });
     setLoading(false);
   };
 
@@ -1006,10 +1160,13 @@ function CheckoutPage({ cart, onPlaceOrder }) {
       <div className="max-w" style={{ padding:"clamp(1.5rem,4vw,3rem)" }}>
         <h1 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"clamp(1.5rem,4vw,2rem)", fontWeight:900, marginBottom:"0.4rem" }}>Checkout</h1>
         <div style={{ width:60, height:3, background:`linear-gradient(90deg,${T.orange},transparent)`, marginBottom:"1.5rem" }} />
+
         <div style={{ display:"grid", gridTemplateColumns:"1fr 320px", gap:"2rem", alignItems:"start" }} className="checkout-grid">
           <form onSubmit={handleSubmit}>
+
+            {/* Delivery Details */}
             <div style={{ background:"#fff", borderRadius:16, padding:"1.5rem", border:`1px solid ${T.border}`, marginBottom:"1.2rem" }}>
-              <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1rem", fontWeight:700, marginBottom:"1.2rem" }}>Delivery Details</h3>
+              <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1rem", fontWeight:700, marginBottom:"1.2rem" }}>📦 Delivery Details</h3>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1rem" }}>
                 {inp("name","Full Name")} {inp("email","Email Address","email")}
                 {inp("phone","Phone Number","tel")} {inp("address","Street Address")}
@@ -1017,35 +1174,104 @@ function CheckoutPage({ cart, onPlaceOrder }) {
                 {inp("pincode","Pincode","text",true)}
               </div>
             </div>
+
+            {/* Coupon Code */}
             <div style={{ background:"#fff", borderRadius:16, padding:"1.5rem", border:`1px solid ${T.border}`, marginBottom:"1.2rem" }}>
-              <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1rem", fontWeight:700, marginBottom:"1rem" }}>Coupon Code</h3>
-              <div style={{ display:"flex", gap:8 }}>
-                <input value={coupon} onChange={e => setCoupon(e.target.value)} placeholder="Enter coupon code"
-                  style={{ flex:1, padding:"10px 13px", border:`1.5px solid ${T.border}`, borderRadius:8, fontSize:"0.84rem", background:"#fff", color:T.text, outline:"none" }}
-                  onFocus={e => e.target.style.borderColor=T.orange} onBlur={e => e.target.style.borderColor=T.border} />
-                <button type="button" className="btn-orange" onClick={applyCoupon} style={{ padding:"10px 18px", fontSize:"0.76rem", borderRadius:8 }}>Apply</button>
-              </div>
-              {couponMsg && <p style={{ fontSize:"0.76rem", marginTop:6, color: discount>0 ? "#2d7a5a" : "#c0392b" }}>{couponMsg}</p>}
-              <p style={{ fontSize:"0.68rem", color:T.textMid, marginTop:6 }}>Try: WISH10 (10% off) or FIRST20 (20% off)</p>
+              <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1rem", fontWeight:700, marginBottom:"1rem" }}>🏷️ Coupon Code</h3>
+              {appliedCoupon ? (
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:"rgba(45,122,90,0.06)", border:"1.5px solid rgba(45,122,90,0.25)", borderRadius:10, padding:"12px 14px" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                    <span style={{ fontSize:18 }}>✅</span>
+                    <div>
+                      <div style={{ fontWeight:700, color:"#2d7a5a", fontSize:"0.88rem" }}>{appliedCoupon.code}</div>
+                      <div style={{ fontSize:"0.72rem", color:"#2d7a5a" }}>You save Rs.{appliedCoupon.discount.toLocaleString()}</div>
+                    </div>
+                  </div>
+                  <button type="button" onClick={removeCoupon} style={{ background:"none", border:"none", cursor:"pointer", color:"#c0392b", fontSize:"0.72rem", fontWeight:700, padding:"4px 8px", borderRadius:5 }}>✕ Remove</button>
+                </div>
+              ) : (
+                <>
+                  <div style={{ display:"flex", gap:8 }}>
+                    <input value={coupon} onChange={e => setCoupon(e.target.value)}
+                      onKeyDown={e => e.key==="Enter" && (e.preventDefault(), applyCoupon())}
+                      placeholder="Enter coupon code"
+                      style={{ flex:1, padding:"10px 13px", border:`1.5px solid ${T.border}`, borderRadius:8, fontSize:"0.84rem", background:"#fff", color:T.text, outline:"none", textTransform:"uppercase" }}
+                      onFocus={e => e.target.style.borderColor=T.orange} onBlur={e => e.target.style.borderColor=T.border} />
+                    <button type="button" className="btn-orange" onClick={applyCoupon} disabled={couponLoading||!coupon.trim()} style={{ padding:"10px 18px", fontSize:"0.76rem", borderRadius:8, opacity:couponLoading?0.7:1, minWidth:80 }}>
+                      {couponLoading ? "..." : "Apply"}
+                    </button>
+                  </div>
+                  {couponMsg.text && (
+                    <p style={{ fontSize:"0.76rem", marginTop:7, color: couponMsg.ok ? "#2d7a5a" : "#c0392b", display:"flex", alignItems:"center", gap:5 }}>
+                      {couponMsg.ok ? "✓" : "✕"} {couponMsg.text}
+                    </p>
+                  )}
+                </>
+              )}
             </div>
+
+            {/* Gift Wrapping */}
+            <div style={{ background:"#fff", borderRadius:16, padding:"1.5rem", border:`1px solid ${gift ? T.orange : T.border}`, marginBottom:"1.2rem", transition:"border-color 0.2s" }}>
+              <label style={{ display:"flex", alignItems:"center", gap:14, cursor:"pointer" }}>
+                {/* Custom checkbox */}
+                <div onClick={() => setGift(g => !g)} style={{
+                  width:22, height:22, borderRadius:6, border:`2px solid ${gift ? T.orange : T.border}`,
+                  background: gift ? T.orange : "#fff", display:"flex", alignItems:"center", justifyContent:"center",
+                  flexShrink:0, transition:"all 0.2s", cursor:"pointer"
+                }}>
+                  {gift && <span style={{ color:"#fff", fontSize:13, fontWeight:900, lineHeight:1 }}>✓</span>}
+                </div>
+                <div style={{ flex:1 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
+                    <span style={{ fontSize:"0.95rem", fontWeight:700, color:T.text }}>🎁 Gift Wrapping</span>
+                    <span style={{ background:"rgba(232,114,12,0.1)", color:T.orange, borderRadius:20, padding:"2px 10px", fontSize:"0.68rem", fontWeight:700 }}>+Rs.50 per item</span>
+                  </div>
+                  <p style={{ fontSize:"0.74rem", color:T.textMid, marginTop:3 }}>Premium gift wrap with a handwritten message card</p>
+                </div>
+              </label>
+
+              {/* Gift message input — slides in when checked */}
+              {gift && (
+                <div style={{ marginTop:"1rem", animation:"fadeUp 0.25s ease both" }}>
+                  <label style={{ display:"block", fontSize:"0.68rem", fontWeight:700, color:T.textMid, marginBottom:5, letterSpacing:"0.08em", textTransform:"uppercase" }}>Gift Message (optional)</label>
+                  <textarea value={giftMsg} onChange={e => setGiftMsg(e.target.value)} placeholder="Write a personal message for the recipient..."
+                    rows={3} maxLength={200}
+                    style={{ width:"100%", padding:"11px 13px", border:`1.5px solid ${T.border}`, borderRadius:8, fontSize:"0.84rem", background:"#fff", color:T.text, outline:"none", resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter',sans-serif" }}
+                    onFocus={e => e.target.style.borderColor=T.orange} onBlur={e => e.target.style.borderColor=T.border} />
+                  <div style={{ textAlign:"right", fontSize:"0.65rem", color:T.textMid, marginTop:3 }}>{giftMsg.length}/200</div>
+                </div>
+              )}
+            </div>
+
             {error && <p style={{ color:"#c0392b", fontSize:"0.78rem", marginBottom:"1rem", padding:"8px 12px", background:"rgba(192,57,43,0.06)", borderRadius:6, border:"1px solid rgba(192,57,43,0.2)" }}>{error}</p>}
             <button type="submit" className="btn-orange" disabled={loading} style={{ width:"100%", padding:"14px", fontSize:"0.84rem", borderRadius:9, opacity:loading?0.7:1 }}>
-              {loading ? "Placing Order..." : "Place Order"}
+              {loading ? "Placing Order..." : `Place Order — Rs.${total.toLocaleString()}`}
             </button>
           </form>
+
+          {/* Order Summary */}
           <div style={{ background:"#fff", borderRadius:16, padding:"1.5rem", border:`1px solid ${T.border}`, position:"sticky", top:90 }}>
             <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.05rem", fontWeight:700, marginBottom:"1.2rem" }}>Order Summary</h3>
             {cart.map(i => (
-              <div key={i.id} style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
-                <span style={{ fontSize:"0.8rem", color:T.textMid }}>{i.name} x{i.qty}</span>
-                <span style={{ fontSize:"0.8rem", fontWeight:600, color:T.text }}>Rs.{(i.price*i.qty).toLocaleString()}</span>
+              <div key={i.id} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
+                <img src={i.image} alt={i.name} style={{ width:44, height:44, borderRadius:8, objectFit:"cover", flexShrink:0 }} />
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ fontSize:"0.78rem", fontWeight:600, color:T.text, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{i.name}</div>
+                  <div style={{ fontSize:"0.7rem", color:T.textMid }}>x{i.qty}</div>
+                </div>
+                <span style={{ fontSize:"0.8rem", fontWeight:600, color:T.text, flexShrink:0 }}>Rs.{(i.price*i.qty).toLocaleString()}</span>
               </div>
             ))}
-            <div style={{ borderTop:`1px solid ${T.border}`, paddingTop:"0.8rem", marginTop:"0.8rem" }}>
-              {[["Subtotal","Rs."+sub.toLocaleString()],["Shipping",ship===0?"FREE":"Rs."+ship],...(discount>0?[["Coupon","-Rs."+discount.toLocaleString()]]:[])].map(([l,v]) => (
+            <div style={{ borderTop:`1px solid ${T.border}`, paddingTop:"0.9rem", marginTop:"0.5rem" }}>
+              {[
+                ["Subtotal", `Rs.${sub.toLocaleString()}`],
+                ["Shipping", ship===0 ? "FREE" : `Rs.${ship}`],
+                ...(gift ? [[`Gift Wrapping 🎁 (×${totalItems})`, `+Rs.${giftFee}`]] : []),
+                ...(discountAmt>0 ? [["Coupon ("+appliedCoupon.code+")", `-Rs.${discountAmt.toLocaleString()}`]] : []),
+              ].map(([l,v]) => (
                 <div key={l} style={{ display:"flex", justifyContent:"space-between", marginBottom:7 }}>
                   <span style={{ color:T.textMid, fontSize:"0.8rem" }}>{l}</span>
-                  <span style={{ color:l==="Coupon"?"#2d7a5a":T.text, fontSize:"0.8rem", fontWeight:600 }}>{v}</span>
+                  <span style={{ color: l.startsWith("Coupon") ? "#2d7a5a" : T.text, fontSize:"0.8rem", fontWeight:600 }}>{v}</span>
                 </div>
               ))}
             </div>
@@ -1053,6 +1279,11 @@ function CheckoutPage({ cart, onPlaceOrder }) {
               <span style={{ color:T.text, fontWeight:700 }}>Total</span>
               <span style={{ color:T.orange, fontSize:"1.1rem", fontWeight:800 }}>Rs.{total.toLocaleString()}</span>
             </div>
+            {discountAmt > 0 && (
+              <div style={{ marginTop:"0.7rem", background:"rgba(45,122,90,0.06)", borderRadius:8, padding:"8px 12px", textAlign:"center" }}>
+                <span style={{ fontSize:"0.74rem", color:"#2d7a5a", fontWeight:600 }}>🎉 You're saving Rs.{discountAmt.toLocaleString()} on this order!</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -1100,6 +1331,150 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
 }
 
 // ─── AUTH PAGES ───────────────────────────────────────────────
+
+// Google Client ID — set REACT_APP_GOOGLE_CLIENT_ID in .env
+const G_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || "";
+
+// Load Google Identity Services script once
+let gisLoaded = false;
+function loadGIS() {
+  if (gisLoaded || document.getElementById("gis-script")) { gisLoaded = true; return; }
+  const s = document.createElement("script");
+  s.id = "gis-script";
+  s.src = "https://accounts.google.com/gsi/client";
+  s.async = true; s.defer = true;
+  document.head.appendChild(s);
+  gisLoaded = true;
+}
+
+// Shared Google sign-in handler
+async function googleAuthHandler(credential, onSuccess, setError) {
+  try {
+    const res = await fetch("http://localhost:5000/api/auth/google", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Google sign-in failed.");
+    localStorage.setItem("token", data.token);
+    onSuccess(data.user);
+  } catch (err) {
+    setError(err.message);
+  }
+}
+
+// Custom Google button — no library, direct GIS API
+function GoogleAuthBlock({ onSuccess, setError }) {
+  const [gLoading, setGLoading] = useState(false);
+  const [noClientId, setNoClientId] = useState(!G_CLIENT_ID);
+
+  const handleGoogleClick = () => {
+    if (!G_CLIENT_ID) { setNoClientId(true); return; }
+    if (!window.google?.accounts?.id) {
+      setError("Google SDK not loaded yet. Please wait a moment and try again.");
+      return;
+    }
+    setGLoading(true);
+    // Initialize fresh each click to avoid stale state
+    window.google.accounts.id.initialize({
+      client_id: G_CLIENT_ID,
+      callback: async (resp) => {
+        await googleAuthHandler(resp.credential, onSuccess, setError);
+        setGLoading(false);
+      },
+      cancel_on_tap_outside: true,
+    });
+    window.google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+        // Prompt blocked — fall back to popup
+        window.google.accounts.id.renderButton(
+          document.getElementById("g-btn-container"),
+          { theme:"outline", size:"large", width:340, text:"continue_with" }
+        );
+        setGLoading(false);
+      }
+    });
+  };
+
+  useEffect(() => { loadGIS(); }, []);
+
+  return (
+    <>
+      <div style={{ display:"flex", alignItems:"center", gap:12, margin:"1.4rem 0" }}>
+        <div style={{ flex:1, height:1, background:T.border }} />
+        <span style={{ fontSize:"0.7rem", color:T.textMid, fontWeight:600, letterSpacing:"0.08em", whiteSpace:"nowrap" }}>OR CONTINUE WITH</span>
+        <div style={{ flex:1, height:1, background:T.border }} />
+      </div>
+
+      {noClientId ? (
+        <button
+          type="button"
+          onClick={() => window.open("https://console.cloud.google.com/apis/credentials", "_blank")}
+          style={{
+            width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:10,
+            padding:"11px 16px", borderRadius:8, border:`1.5px solid #dadce0`,
+            background:"#fff", cursor:"pointer", fontSize:"0.84rem", fontWeight:600, color:"#3c4043",
+            fontFamily:"'Inter',sans-serif", transition:"all 0.2s",
+            boxShadow:"0 1px 4px rgba(0,0,0,0.08)",
+          }}
+          onMouseEnter={e => e.currentTarget.style.boxShadow="0 2px 12px rgba(0,0,0,0.14)"}
+          onMouseLeave={e => e.currentTarget.style.boxShadow="0 1px 4px rgba(0,0,0,0.08)"}
+        >
+          <svg width="18" height="18" viewBox="0 0 18 18" style={{ flexShrink:0 }}>
+            <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
+            <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+            <path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/>
+            <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/>
+          </svg>
+          <span>Continue with Google</span>
+          <span style={{ fontSize:"0.65rem", color:"#c0392b", background:"rgba(192,57,43,0.08)", borderRadius:4, padding:"2px 6px", marginLeft:2 }}>Setup needed</span>
+        </button>
+      ) : (
+        <>
+          {/* Hidden GIS rendered button container (fallback) */}
+          <div id="g-btn-container" style={{ display:"none" }} />
+
+          {/* Custom styled Google button */}
+          <button
+            type="button"
+            onClick={handleGoogleClick}
+            disabled={gLoading}
+            style={{
+              width:"100%", display:"flex", alignItems:"center", justifyContent:"center", gap:10,
+              padding:"11px 16px", borderRadius:8, border:`1.5px solid ${T.border}`,
+              background:"#fff", cursor: gLoading ? "not-allowed" : "pointer",
+              fontSize:"0.84rem", fontWeight:600, color:"#3c4043",
+              fontFamily:"'Inter',sans-serif", transition:"all 0.2s",
+              boxShadow:"0 1px 4px rgba(0,0,0,0.08)", opacity: gLoading ? 0.7 : 1,
+            }}
+            onMouseEnter={e => { if(!gLoading) e.currentTarget.style.boxShadow="0 2px 12px rgba(0,0,0,0.14)"; }}
+            onMouseLeave={e => { e.currentTarget.style.boxShadow="0 1px 4px rgba(0,0,0,0.08)"; }}
+          >
+            {gLoading ? (
+              <>
+                <div style={{ width:18, height:18, border:"2.5px solid #e0e0e0", borderTopColor:"#4285F4", borderRadius:"50%", animation:"spin 0.7s linear infinite", flexShrink:0 }} />
+                <span>Connecting to Google...</span>
+              </>
+            ) : (
+              <>
+                {/* Official Google G logo SVG */}
+                <svg width="18" height="18" viewBox="0 0 18 18" style={{ flexShrink:0 }}>
+                  <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
+                  <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+                  <path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/>
+                  <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/>
+                </svg>
+                <span>Continue with Google</span>
+              </>
+            )}
+          </button>
+        </>
+      )}
+    </>
+  );
+}
+
 function SignupPage({ onSignup, onSwitch }) {
   const [form, setForm] = useState({ name:"", email:"", password:"", confirm:"" });
   const [showPw, setShowPw] = useState(false);
@@ -1160,7 +1535,8 @@ function SignupPage({ onSignup, onSwitch }) {
               {error && <p style={{ color:"#c0392b", fontSize:"0.78rem", marginBottom:"1rem", padding:"8px 12px", background:"rgba(192,57,43,0.06)", borderRadius:6, border:"1px solid rgba(192,57,43,0.2)" }}>{error}</p>}
               <button type="submit" className="btn-orange" disabled={loading} style={{ width:"100%", padding:"13px", fontSize:"0.82rem", borderRadius:8, opacity:loading?0.7:1 }}>{loading?"Creating Account...":"Create Account"}</button>
             </form>
-            <p style={{ textAlign:"center", marginTop:"1.5rem", fontSize:"0.82rem", color:T.textMid }}>
+            <GoogleAuthBlock onSuccess={onSignup} setError={setError} />
+            <p style={{ textAlign:"center", marginTop:"1.2rem", fontSize:"0.82rem", color:T.textMid }}>
               Already have an account?{" "}
               <button onClick={onSwitch} style={{ background:"none", border:"none", cursor:"pointer", color:T.orange, fontWeight:700, fontSize:"0.82rem" }}>Sign In</button>
             </p>
@@ -1216,7 +1592,8 @@ function LoginPage({ onLogin, onSwitch }) {
           {error && <p style={{ color:"#c0392b", fontSize:"0.78rem", marginBottom:"1rem", padding:"8px 12px", background:"rgba(192,57,43,0.06)", borderRadius:6, border:"1px solid rgba(192,57,43,0.2)" }}>{error}</p>}
           <button type="submit" className="btn-orange" disabled={loading} style={{ width:"100%", padding:"13px", fontSize:"0.82rem", borderRadius:8, opacity:loading?0.7:1 }}>{loading?"Signing In...":"Sign In"}</button>
         </form>
-        <p style={{ textAlign:"center", marginTop:"1.5rem", fontSize:"0.82rem", color:T.textMid }}>
+        <GoogleAuthBlock onSuccess={onLogin} setError={setError} />
+        <p style={{ textAlign:"center", marginTop:"1.2rem", fontSize:"0.82rem", color:T.textMid }}>
           New to WishStone?{" "}
           <button onClick={onSwitch} style={{ background:"none", border:"none", cursor:"pointer", color:T.orange, fontWeight:700, fontSize:"0.82rem" }}>Create Account</button>
         </p>
@@ -1398,7 +1775,7 @@ export default function WishstoneApp() {
 
       {page==="home"      && <HomePage onShop={()=>nav("products")} onRitual={()=>nav("rituals")} />}
       {page==="products"  && <ProductsPage onAdd={addToCart} onWish={toggleWish} wished={wished} onClick={p=>{setSelectedProduct(p);nav("product");}} cart={cart} />}
-      {page==="product"   && selectedProduct && <ProductPage product={selectedProduct} onAdd={addToCart} onWish={toggleWish} wished={wished} cart={cart} />}
+      {page==="product"   && selectedProduct && <ProductPage product={selectedProduct} onAdd={addToCart} onWish={toggleWish} wished={wished} cart={cart} onClick={p=>{setSelectedProduct(p);nav("product");}} onShop={()=>nav("products")} />}
       {page==="rituals"   && <RitualsPage />}
       {page==="benefits"  && <BenefitsPage />}
       {page==="stories"   && <StoriesPage />}

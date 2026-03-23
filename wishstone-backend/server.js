@@ -1,4 +1,5 @@
 require("dotenv").config();
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -54,6 +55,15 @@ app.use(mongoSanitize());
 // ─── STATIC FILES ────────────────────────────────────────────
 app.use("/uploads", express.static("uploads"));
 
+// Serve frontend build if it exists
+const frontendBuild = path.join(__dirname, "../wishstone-frontend/build");
+if (require("fs").existsSync(frontendBuild)) {
+  app.use(express.static(frontendBuild));
+}
+
+// Silence favicon 404
+app.get("/favicon.ico", (req, res) => res.status(204).end());
+
 // ─── RATE LIMITING ───────────────────────────────────────────
 app.use("/api/", apiLimiter);
 app.use("/api/auth/login", authLimiter);
@@ -82,70 +92,51 @@ app.use("/api/admin",      require("./routes/admin"));
 
 app.get("/", (req, res) => res.json({ status: "🔮 Wishstone API Running", version: "1.0.0" }));
 
+// ─── FRONTEND CATCH-ALL (SPA) ─────────────────────────────────
+const frontendIndex = path.join(__dirname, "../wishstone-frontend/build/index.html");
+if (require("fs").existsSync(frontendIndex)) {
+  app.get(/^(?!\/api|\/uploads|\/health).*/, (req, res) => res.sendFile(frontendIndex));
+}
+
 // ─── 404 + ERROR HANDLERS ────────────────────────────────────
 app.use(notFound);
 app.use(errorHandler);
 
 // ─── DATABASE ────────────────────────────────────────────────
-const connectDB = async (retryCount = 0) => {
-  const MAX_RETRIES = 3;
-  const RETRY_DELAY = 3000;
-  
+const connectDB = async () => {
   const mongoOptions = {
-    serverSelectionTimeoutMS: 10000,
+    serverSelectionTimeoutMS: 8000,
     socketTimeoutMS: 45000,
-    family: 4, // Use IPv4, skip trying IPv6
+    family: 4,
   };
 
   const atlasURI = process.env.MONGO_URI;
   const localURI = "mongodb://localhost:27017/wishstone";
-  
-  // Try Atlas first if configured
+
+  // Try Atlas
   if (atlasURI && atlasURI.includes("mongodb+srv")) {
     try {
-      console.log(`🔄 Attempting MongoDB Atlas connection... (attempt ${retryCount + 1}/${MAX_RETRIES + 1})`);
+      console.log("🔄 Connecting to MongoDB Atlas...");
       await mongoose.connect(atlasURI, mongoOptions);
-      console.log("✅ MongoDB Atlas Connected Successfully");
+      console.log("✅ MongoDB Atlas Connected");
       return;
     } catch (err) {
-      console.warn(`⚠️  Atlas connection failed: ${err.message}`);
-      
-      if (err.message.includes("ENOTFOUND") || err.message.includes("ETIMEDOUT")) {
-        console.warn("💡 Network issue detected. Check your internet connection.");
+      console.warn("⚠️  Atlas failed:", err.message.split("\n")[0]);
+      if (err.message.includes("Could not connect") || err.message.includes("ENOTFOUND")) {
+        console.warn("💡 Fix: Go to https://cloud.mongodb.com → Network Access → Add 0.0.0.0/0");
       }
-      if (err.message.includes("authentication failed")) {
-        console.warn("💡 Authentication failed. Check your MongoDB credentials.");
-      }
-      if (err.message.includes("Could not connect to any servers")) {
-        console.warn("💡 IP not whitelisted. Add 0.0.0.0/0 to Atlas IP whitelist or use local MongoDB.");
-      }
-
-      // Retry with exponential backoff
-      if (retryCount < MAX_RETRIES) {
-        const delay = RETRY_DELAY * Math.pow(2, retryCount);
-        console.log(`⏳ Retrying in ${delay / 1000}s...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-        return connectDB(retryCount + 1);
-      }
-      
-      console.warn("⚠️  All Atlas connection attempts failed. Falling back to local MongoDB...");
+      console.warn("🔄 Falling back to local MongoDB...");
     }
   }
 
-  // Fallback to local MongoDB
+  // Fallback to local MongoDB — server stays running
   try {
-    console.log("🔄 Connecting to local MongoDB...");
-    await mongoose.connect(localURI, mongoOptions);
-    console.log("✅ Local MongoDB Connected Successfully");
-    console.log("💡 Using local database. To use Atlas, fix the connection issue and restart.");
-  } catch (localErr) {
-    console.error("❌ Local MongoDB connection also failed:", localErr.message);
-    console.error("\n📋 Troubleshooting steps:");
-    console.error("   1. Install MongoDB locally: https://www.mongodb.com/try/download/community");
-    console.error("   2. Start MongoDB service: 'mongod' or 'sudo systemctl start mongod'");
-    console.error("   3. For Atlas: whitelist your IP at https://cloud.mongodb.com");
-    console.error("   4. For Atlas: add 0.0.0.0/0 to allow all IPs (development only)\n");
-    process.exit(1);
+    await mongoose.connect(localURI, { ...mongoOptions, serverSelectionTimeoutMS: 3000 });
+    console.log("✅ Local MongoDB Connected (localhost:27017)");
+  } catch {
+    // No local MongoDB either — run without DB (limited functionality)
+    console.warn("⚠️  No MongoDB available. Server running without database.");
+    console.warn("   → Fix Atlas: https://cloud.mongodb.com → Network Access → Add 0.0.0.0/0");
   }
 };
 
