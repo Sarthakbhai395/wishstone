@@ -24,6 +24,18 @@ router.post("/apply", async (req, res) => {
   } catch (e) { res.status(400).json({ success: false, message: e.message }); }
 });
 
+// GET /api/coupons  (public - active coupons for promo modal)
+router.get("/", async (req, res) => {
+  try {
+    const now = new Date();
+    const coupons = await Coupon.find({
+      isActive: true,
+      $or: [{ expiresAt: { $exists: false } }, { expiresAt: null }, { expiresAt: { $gt: now } }]
+    }).select("code discountType discountValue minOrderValue description expiresAt").sort({ createdAt: -1 });
+    res.json({ success: true, coupons });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
 // POST /api/coupons/validate  (alias used by frontend cart)
 router.post("/validate", async (req, res) => {
   try {

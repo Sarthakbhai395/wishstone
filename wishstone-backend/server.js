@@ -25,17 +25,23 @@ const allowedOrigins = [
   "http://localhost:3001",
 ].filter(Boolean);
 
-app.use(cors({
+const corsOptions = {
   origin: (origin, cb) => {
     // Allow requests with no origin (mobile apps, curl, Postman)
     if (!origin) return cb(null, true);
+    // Always allow localhost for development
+    if (origin.startsWith("http://localhost") || origin.startsWith("http://127.0.0.1")) return cb(null, true);
     if (!isProd || allowedOrigins.includes(origin)) return cb(null, true);
     cb(new Error(`CORS: origin ${origin} not allowed`));
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-}));
+};
+
+// Handle preflight OPTIONS requests for all routes
+app.options("*", cors(corsOptions));
+app.use(cors(corsOptions));
 
 // ─── COMPRESSION ─────────────────────────────────────────────
 app.use(compression());
@@ -54,12 +60,6 @@ app.use(mongoSanitize());
 
 // ─── STATIC FILES ────────────────────────────────────────────
 app.use("/uploads", express.static("uploads"));
-
-// Serve frontend build if it exists
-const frontendBuild = path.join(__dirname, "../wishstone-frontend/build");
-if (require("fs").existsSync(frontendBuild)) {
-  app.use(express.static(frontendBuild));
-}
 
 // Silence favicon 404
 app.get("/favicon.ico", (req, res) => res.status(204).end());
@@ -89,6 +89,12 @@ app.use("/api/wishlist",   require("./routes/wishlist"));
 app.use("/api/orders",     require("./routes/orders"));
 app.use("/api/coupons",    require("./routes/coupons"));
 app.use("/api/admin",      require("./routes/admin"));
+
+// ─── STATIC FILES (after API routes) ─────────────────────────
+const frontendBuild = path.join(__dirname, "../wishstone-frontend/build");
+if (require("fs").existsSync(frontendBuild)) {
+  app.use(express.static(frontendBuild));
+}
 
 app.get("/", (req, res) => res.json({ status: "🔮 Wishstone API Running", version: "1.0.0" }));
 
