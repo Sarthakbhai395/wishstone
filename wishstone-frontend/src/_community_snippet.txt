@@ -1,0 +1,112 @@
+function CommunityVideoSection() {
+  const videoRefs = useRef([]);
+  const [activeVideo, setActiveVideo] = useState(null);
+
+  const VIDEOS = COMMUNITY_VIDEOS;
+
+  const playVideo = (idx) => {
+    videoRefs.current.forEach((v, i) => { if (v && i !== idx) { v.pause(); v.currentTime = 0; } });
+    const vid = videoRefs.current[idx];
+    if (!vid) return;
+    vid.play().catch(() => {});
+    setActiveVideo(idx);
+  };
+
+  const handleEnded = (idx) => {
+    const next = (idx + 1) % VIDEOS.length;
+    playVideo(next);
+  };
+
+  const togglePlay = (idx) => {
+    const vid = videoRefs.current[idx];
+    if (!vid) return;
+    if (vid.paused) { playVideo(idx); }
+    else { vid.pause(); setActiveVideo(null); }
+  };
+
+  return (
+    <section style={{ background:T.bgDark, paddingTop:"80px", paddingBottom:"80px", overflow:"hidden", position:"relative" }}>
+      <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at 50% 0%, rgba(232,114,12,0.08) 0%, transparent 60%)", pointerEvents:"none" }} />
+
+      {/* Header */}
+      <div style={{ textAlign:"center", marginBottom:"3rem", position:"relative" }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:12, marginBottom:14 }}>
+          <div style={{ height:1, width:50, background:"linear-gradient(to right, transparent, #E8720C)" }} />
+          <span style={{ fontSize:"0.6rem", fontWeight:700, color:T.orange, letterSpacing:"0.28em", textTransform:"uppercase" }}>From Our Community</span>
+          <div style={{ height:1, width:50, background:"linear-gradient(to left, transparent, #E8720C)" }} />
+        </div>
+        <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2rem,5vw,3rem)", fontWeight:900, color:T.white, lineHeight:1.15, letterSpacing:"-0.01em" }}>
+          Poetry by the<br /><em style={{ color:T.orange, fontStyle:"italic" }}>Community</em>
+        </h2>
+        <p style={{ color:"rgba(255,255,255,0.45)", fontSize:"0.84rem", marginTop:"0.8rem", fontStyle:"italic" }}>Real moments. Real intention. Real transformation.</p>
+      </div>
+
+      {/* Video Strip — horizontal scroll, no autoscroll */}
+      <div style={{ overflowX:"auto", overflowY:"hidden", scrollSnapType:"x mandatory", WebkitOverflowScrolling:"touch", display:"flex", gap:"1.2rem", paddingLeft:"clamp(1rem,4vw,3rem)", paddingRight:"clamp(1rem,4vw,3rem)", paddingBottom:8, scrollbarWidth:"none" }}>
+        {VIDEOS.map((v, i) => (
+          <div
+            key={v.id}
+            onClick={() => togglePlay(i)}
+            style={{
+              flex:"0 0 220px",
+              aspectRatio:"9/16",
+              borderRadius:20,
+              overflow:"hidden",
+              position:"relative",
+              cursor:"pointer",
+              scrollSnapAlign:"start",
+              boxShadow: activeVideo === i ? "0 0 0 3px #E8720C, 0 16px 48px rgba(232,114,12,0.35)" : "0 8px 32px rgba(0,0,0,0.4)",
+              transition:"box-shadow 0.3s ease, transform 0.3s ease",
+              transform: activeVideo === i ? "scale(1.03)" : "scale(1)",
+            }}
+            onMouseEnter={e => { if (activeVideo !== i) e.currentTarget.style.transform = "scale(1.02)"; }}
+            onMouseLeave={e => { if (activeVideo !== i) e.currentTarget.style.transform = "scale(1)"; }}
+          >
+            <video
+              ref={el => videoRefs.current[i] = el}
+              src={v.videoUrl}
+              muted
+              playsInline
+              onEnded={() => handleEnded(i)}
+              style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
+            />
+
+            {/* Bottom gradient + info */}
+            <div style={{ position:"absolute", bottom:0, left:0, right:0, background:"linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 55%, transparent 100%)", borderRadius:"0 0 20px 20px", padding:"1.2rem 1rem 1rem", pointerEvents:"none" }}>
+              <div style={{ display:"inline-block", background:"rgba(232,114,12,0.92)", color:"#fff", borderRadius:4, padding:"2px 8px", fontSize:"0.55rem", fontWeight:800, letterSpacing:"0.12em", marginBottom:"0.4rem" }}>{v.tag}</div>
+              <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", fontWeight:900, color:"#fff", lineHeight:1.2, marginBottom:"0.2rem", fontStyle:"italic" }}>{v.title}</div>
+              <div style={{ fontSize:"0.68rem", color:"rgba(255,255,255,0.65)", fontStyle:"italic" }}>{v.caption}</div>
+            </div>
+
+            {/* Play button overlay */}
+            {activeVideo !== i && (
+              <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", background:"rgba(0,0,0,0.2)", borderRadius:20 }}>
+                <div style={{ width:56, height:56, borderRadius:"50%", background:"rgba(232,114,12,0.85)", backdropFilter:"blur(8px)", border:"2px solid rgba(255,255,255,0.3)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 4px 20px rgba(232,114,12,0.5)" }}>
+                  <span style={{ fontSize:20, color:"#fff", marginLeft:4 }}>▶</span>
+                </div>
+              </div>
+            )}
+
+            {/* Playing indicator */}
+            {activeVideo === i && (
+              <div style={{ position:"absolute", top:12, right:12, display:"flex", gap:3, alignItems:"flex-end", height:20 }}>
+                {[1,2,3,4].map(b => (
+                  <div key={b} style={{ width:3, borderRadius:2, background:"#E8720C", animation:`barBounce${b} 0.8s ease-in-out infinite`, height: b%2===0 ? 16 : 10 }} />
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Bottom CTA */}
+      <div style={{ textAlign:"center", marginTop:"3rem" }}>
+        <p style={{ color:"rgba(255,255,255,0.4)", fontSize:"0.78rem", marginBottom:"1rem", letterSpacing:"0.08em" }}>Join 12,000+ conscious souls on their journey</p>
+        <div style={{ display:"inline-flex", alignItems:"center", gap:8, color:"rgba(255,255,255,0.5)", fontSize:"0.7rem" }}>
+          <span style={{ color:T.orange }}>✦</span><span>#WishStoneJourney</span><span style={{ color:T.orange }}>✦</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+

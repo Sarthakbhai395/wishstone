@@ -44,8 +44,8 @@ app.options("*", cors(corsOptions));
 app.use(cors(corsOptions));
 app.use(cors({
   origin: [
-    "https://your-frontend.vercel.app",
-    "https://your-admin.vercel.app"
+    "https://wishstone-one.vercel.app/",
+    "https://wishstone-admin.vercel.app/"
   ],
   credentials: true
 }));
