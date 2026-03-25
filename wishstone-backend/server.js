@@ -42,6 +42,13 @@ const corsOptions = {
 // Handle preflight OPTIONS requests for all routes
 app.options("*", cors(corsOptions));
 app.use(cors(corsOptions));
+app.use(cors({
+  origin: [
+    "https://your-frontend.vercel.app",
+    "https://your-admin.vercel.app"
+  ],
+  credentials: true
+}));
 
 // ─── COMPRESSION ─────────────────────────────────────────────
 app.use(compression());
