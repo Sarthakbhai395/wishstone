@@ -558,18 +558,17 @@ function QuoteSection() {
   }, []);
   const q = QUOTES[idx];
   return (
-    <section style={{ background:T.bgDark, padding:"90px clamp(1.5rem,5vw,3.5rem)", textAlign:"center", position:"relative", overflow:"hidden" }}>
+    <section style={{ background:T.bgDark, padding:"48px clamp(1.5rem,5vw,3.5rem)", textAlign:"center", position:"relative", overflow:"hidden" }}>
       <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at 50% 50%, rgba(232,114,12,0.06) 0%, transparent 70%)", pointerEvents:"none" }} />
       <div className="max-w" style={{ maxWidth:760, position:"relative" }}>
-        <div style={{ fontSize:"0.62rem", fontWeight:700, color:T.orange, letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:"1.5rem", display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
+        <div style={{ fontSize:"0.62rem", fontWeight:700, color:T.orange, letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:"1rem", display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
           <span>✦</span> Daily Manifestation Oracle <span>✦</span>
         </div>
-        <div style={{ fontSize:"3rem", color:"rgba(232,114,12,0.35)", lineHeight:1, marginBottom:"1.5rem", fontFamily:"Georgia,serif" }}>"</div>
-        <blockquote key={key} style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.2rem,2.8vw,1.7rem)", fontWeight:700, color:T.white, lineHeight:1.55, marginBottom:"1.5rem", fontStyle:"italic", animation:"quoteIn 0.5s ease both" }}>
-          {q.text}
+        <blockquote key={key} style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.1rem,2.5vw,1.5rem)", fontWeight:700, color:T.white, lineHeight:1.5, marginBottom:"0.6rem", fontStyle:"italic", animation:"quoteIn 0.5s ease both" }}>
+          "{q.text}"
         </blockquote>
         <cite style={{ fontSize:"0.72rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase", fontStyle:"normal" }}>— {q.author}</cite>
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"1rem", marginTop:"2.5rem" }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"1rem", marginTop:"1.4rem" }}>
           <button onClick={() => { setIdx(i => (i-1+QUOTES.length)%QUOTES.length); setKey(k=>k+1); }} style={{ width:28, height:28, borderRadius:"50%", border:`1px solid rgba(255,255,255,0.2)`, background:"none", color:"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:12, display:"flex", alignItems:"center", justifyContent:"center" }}>‹</button>
           <div style={{ width:180, height:2, background:"rgba(255,255,255,0.1)", borderRadius:1, position:"relative" }}>
             <div style={{ position:"absolute", left:0, top:0, height:"100%", background:T.orange, borderRadius:1, width:`${((idx+1)/QUOTES.length)*100}%`, transition:"width 0.4s ease" }} />
@@ -615,14 +614,15 @@ function FounderNoteSection() {
             border:`1px solid ${T.border}`,
             boxShadow:"0 12px 60px rgba(0,0,0,0.08)",
             background:T.bg,
+            alignItems:"stretch",
           }}
         >
           {/* LEFT: Founder photo */}
-          <div style={{ position:"relative", minHeight:480 }}>
+          <div style={{ position:"relative", minHeight:0 }}>
             <img
               src="/vikas sir gutargoo.png"
               alt="Vikash Malik - Co-founder, WishStone"
-              style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center top", display:"block" }}
+              style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center top", display:"block", position:"absolute", inset:0 }}
             />
             {/* Overlay gradient */}
             <div style={{ position:"absolute", inset:0, background:"linear-gradient(135deg, rgba(44,51,32,0.25), rgba(232,114,12,0.08))" }} />
