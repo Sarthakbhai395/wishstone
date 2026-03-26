@@ -402,6 +402,30 @@ function MarqueeSection() {
 
 // ─── COMMUNITY VIDEO SECTION — REDESIGNED ────────────────────
 function CommunityVideoSection() {
+  const videoRefs = useRef([]);
+  const [activeVideo, setActiveVideo] = useState(null);
+  const [playing, setPlaying] = useState(false);
+
+  const handleClick = (i) => {
+    const vid = videoRefs.current[i];
+    if (!vid) return;
+
+    if (activeVideo === i) {
+      // same video — toggle play/pause
+      if (vid.paused) { vid.play().catch(() => {}); setPlaying(true); }
+      else { vid.pause(); setPlaying(false); }
+    } else {
+      // different video — pause all others, play this one with sound
+      videoRefs.current.forEach((v, idx) => {
+        if (v && idx !== i) { v.pause(); v.muted = true; v.currentTime = 0; }
+      });
+      vid.muted = false;
+      vid.play().catch(() => {});
+      setActiveVideo(i);
+      setPlaying(true);
+    }
+  };
+
   return (
     <section style={{ background:T.bgDark, paddingTop:"80px", paddingBottom:"80px", overflow:"hidden", position:"relative" }}>
       <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at 50% 0%, rgba(232,114,12,0.08) 0%, transparent 60%)", pointerEvents:"none" }} />
@@ -419,25 +443,27 @@ function CommunityVideoSection() {
         <p style={{ color:"rgba(255,255,255,0.45)", fontSize:"0.84rem", marginTop:"0.8rem", fontStyle:"italic" }}>Real moments. Real intention. Real transformation.</p>
       </div>
 
-      {/* Video Strip — all autoplay simultaneously */}
+      {/* Video Strip */}
       <div style={{ overflowX:"auto", overflowY:"hidden", scrollSnapType:"x mandatory", WebkitOverflowScrolling:"touch", display:"flex", gap:"1.2rem", paddingLeft:"clamp(1rem,4vw,3rem)", paddingRight:"clamp(1rem,4vw,3rem)", paddingBottom:8, scrollbarWidth:"none" }}>
         {COMMUNITY_VIDEOS.map((v, i) => (
           <div
             key={v.id}
+            onClick={() => handleClick(i)}
             style={{
               flex:"0 0 220px",
               aspectRatio:"9/16",
               borderRadius:20,
               overflow:"hidden",
               position:"relative",
+              cursor:"pointer",
               scrollSnapAlign:"start",
-              boxShadow:"0 8px 32px rgba(0,0,0,0.4)",
+              boxShadow: activeVideo === i ? "0 16px 48px rgba(0,0,0,0.5)" : "0 8px 32px rgba(0,0,0,0.4)",
+              transform: activeVideo === i ? "scale(1.03)" : "scale(1)",
               transition:"transform 0.3s ease, box-shadow 0.3s ease",
             }}
-            onMouseEnter={e => { e.currentTarget.style.transform="scale(1.03)"; e.currentTarget.style.boxShadow="0 0 0 3px #E8720C, 0 16px 48px rgba(232,114,12,0.35)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform="scale(1)"; e.currentTarget.style.boxShadow="0 8px 32px rgba(0,0,0,0.4)"; }}
           >
             <video
+              ref={el => videoRefs.current[i] = el}
               src={v.videoUrl}
               autoPlay
               muted
@@ -451,6 +477,14 @@ function CommunityVideoSection() {
               <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", fontWeight:900, color:"#fff", lineHeight:1.2, marginBottom:"0.2rem", fontStyle:"italic" }}>{v.title}</div>
               <div style={{ fontSize:"0.68rem", color:"rgba(255,255,255,0.65)", fontStyle:"italic" }}>{v.caption}</div>
             </div>
+            {/* Play/Pause button — only on active video */}
+            {activeVideo === i && (
+              <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", pointerEvents:"none" }}>
+                <div style={{ width:56, height:56, borderRadius:"50%", background:"rgba(0,0,0,0.55)", backdropFilter:"blur(6px)", border:"2px solid rgba(255,255,255,0.25)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 4px 20px rgba(0,0,0,0.4)", opacity: playing ? 0 : 1, transition:"opacity 0.2s" }}>
+                  <span style={{ fontSize:22, color:"#fff", marginLeft: playing ? 0 : 4 }}>{playing ? "⏸" : "▶"}</span>
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -793,41 +827,76 @@ function HomePage({ onShop, onRitual, onNav }) {
 
 // ─── BEST SELLERS STRIP (reusable) ───────────────────────────
 function BestSellersStrip({ onShop }) {
+  const scrollRef = useRef(null);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollStart = useRef(0);
+
+  const scroll = (dir) => {
+    scrollRef.current.scrollBy({ left: dir * 240, behavior: "smooth" });
+  };
+
+  const onMouseDown = e => {
+    isDragging.current = true;
+    startX.current = e.pageX;
+    scrollStart.current = scrollRef.current.scrollLeft;
+    scrollRef.current.style.cursor = "grabbing";
+  };
+  const onMouseUp   = () => { isDragging.current = false; scrollRef.current.style.cursor = "grab"; };
+  const onMouseLeave= () => { isDragging.current = false; scrollRef.current.style.cursor = "grab"; };
+  const onMouseMove = e => {
+    if (!isDragging.current) return;
+    e.preventDefault();
+    scrollRef.current.scrollLeft = scrollStart.current - (e.pageX - startX.current);
+  };
+
   return (
-    <section style={{ background:"#fff", paddingTop:"70px", paddingBottom:"70px", overflow:"hidden" }}>
+    <section style={{ background:"#fff", paddingTop:"70px", paddingBottom:"70px" }}>
       <div className="max-w" style={{ paddingLeft:"clamp(1.5rem,5vw,3.5rem)", paddingRight:"clamp(1.5rem,5vw,3.5rem)", marginBottom:"2rem" }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
           <div>
             <div style={{ fontSize:"0.65rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase", marginBottom:8 }}>BEST SELLERS</div>
             <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3.5vw,2.2rem)", fontWeight:900, color:T.text, margin:0 }}>Most Loved Stones</h2>
           </div>
-          <button className="btn-outline" onClick={onShop} style={{ padding:"10px 24px", fontSize:"0.78rem", borderRadius:8 }}>View All →</button>
+          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+            <button onClick={() => scroll(-1)} style={{ width:38, height:38, borderRadius:"50%", border:`1.5px solid ${T.border}`, background:"#fff", cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.2s" }}
+              onMouseEnter={e => { e.currentTarget.style.background=T.orange; e.currentTarget.style.borderColor=T.orange; e.currentTarget.style.color="#fff"; }}
+              onMouseLeave={e => { e.currentTarget.style.background="#fff"; e.currentTarget.style.borderColor=T.border; e.currentTarget.style.color="#000"; }}>‹</button>
+            <button onClick={() => scroll(1)} style={{ width:38, height:38, borderRadius:"50%", border:`1.5px solid ${T.border}`, background:"#fff", cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.2s" }}
+              onMouseEnter={e => { e.currentTarget.style.background=T.orange; e.currentTarget.style.borderColor=T.orange; e.currentTarget.style.color="#fff"; }}
+              onMouseLeave={e => { e.currentTarget.style.background="#fff"; e.currentTarget.style.borderColor=T.border; e.currentTarget.style.color="#000"; }}>›</button>
+            <button className="btn-outline" onClick={onShop} style={{ padding:"10px 24px", fontSize:"0.78rem", borderRadius:8 }}>View All →</button>
+          </div>
         </div>
       </div>
-      <div style={{ overflow:"hidden", position:"relative" }}>
-
-        <div style={{ display:"flex", animation:"autoScroll 28s linear infinite", width:"max-content" }}>
-          {[...PRODUCTS, ...PRODUCTS].map((p, i) => (
-            <div key={i} onClick={onShop} style={{ width:220, flexShrink:0, marginRight:"1.2rem", cursor:"pointer" }}>
-              <div style={{ borderRadius:14, overflow:"hidden", border:`1px solid ${T.border}`, background:T.bg, transition:"transform 0.3s, box-shadow 0.3s" }}
-                onMouseEnter={e => { e.currentTarget.style.transform="translateY(-5px)"; e.currentTarget.style.boxShadow="0 16px 40px rgba(0,0,0,0.1)"; }}
-                onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="none"; }}>
-                <div style={{ position:"relative", aspectRatio:"1", overflow:"hidden" }}>
-                  <img src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-                  <div style={{ position:"absolute", top:8, left:8, background:T.orange, color:"#fff", borderRadius:4, padding:"2px 8px", fontSize:"0.6rem", fontWeight:800 }}>-{p.discount}%</div>
-                  {p.bestSeller && <div style={{ position:"absolute", bottom:6, left:6, background:T.bgDark, color:T.orange, borderRadius:4, padding:"2px 7px", fontSize:"0.58rem", fontWeight:700 }}>BEST SELLER</div>}
-                </div>
-                <div style={{ padding:"0.9rem" }}>
-                  <div style={{ fontSize:"0.8rem", fontWeight:700, color:T.text, marginBottom:4, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{p.name}</div>
-                  <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                    <span style={{ fontSize:"0.9rem", color:T.orange, fontWeight:700 }}>Rs.{p.price.toLocaleString()}</span>
-                    <span style={{ color:T.textMid, fontSize:"0.7rem", textDecoration:"line-through" }}>Rs.{p.originalPrice.toLocaleString()}</span>
-                  </div>
+      <div
+        ref={scrollRef}
+        onMouseDown={onMouseDown}
+        onMouseUp={onMouseUp}
+        onMouseLeave={onMouseLeave}
+        onMouseMove={onMouseMove}
+        style={{ overflowX:"auto", overflowY:"hidden", display:"flex", gap:"1.2rem", paddingLeft:"clamp(1rem,4vw,3rem)", paddingRight:"clamp(1rem,4vw,3rem)", paddingBottom:8, cursor:"grab", userSelect:"none", scrollbarWidth:"none", msOverflowStyle:"none", WebkitOverflowScrolling:"touch" }}
+      >
+        {PRODUCTS.map((p, i) => (
+          <div key={i} onClick={onShop} style={{ width:220, flexShrink:0, cursor:"pointer" }}>
+            <div style={{ borderRadius:14, overflow:"hidden", border:`1px solid ${T.border}`, background:T.bg, transition:"transform 0.3s, box-shadow 0.3s" }}
+              onMouseEnter={e => { e.currentTarget.style.transform="translateY(-5px)"; e.currentTarget.style.boxShadow="0 16px 40px rgba(0,0,0,0.1)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="none"; }}>
+              <div style={{ position:"relative", aspectRatio:"1", overflow:"hidden" }}>
+                <img src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                <div style={{ position:"absolute", top:8, left:8, background:T.orange, color:"#fff", borderRadius:4, padding:"2px 8px", fontSize:"0.6rem", fontWeight:800 }}>-{p.discount}%</div>
+                {p.bestSeller && <div style={{ position:"absolute", bottom:6, left:6, background:T.bgDark, color:T.orange, borderRadius:4, padding:"2px 7px", fontSize:"0.58rem", fontWeight:700 }}>BEST SELLER</div>}
+              </div>
+              <div style={{ padding:"0.9rem" }}>
+                <div style={{ fontSize:"0.8rem", fontWeight:700, color:T.text, marginBottom:4, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{p.name}</div>
+                <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                  <span style={{ fontSize:"0.9rem", color:T.orange, fontWeight:700 }}>Rs.{p.price.toLocaleString()}</span>
+                  <span style={{ color:T.textMid, fontSize:"0.7rem", textDecoration:"line-through" }}>Rs.{p.originalPrice.toLocaleString()}</span>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </section>
   );

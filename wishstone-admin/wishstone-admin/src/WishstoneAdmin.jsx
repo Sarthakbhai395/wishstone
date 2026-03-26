@@ -48,6 +48,22 @@ const css = `
   /* ── Category grid ── */
   .ws-cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;}
 
+  /* ── Stat grid ── */
+  .ws-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+
+  /* ── Two col ── */
+  .ws-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+
+  /* ── Filter tabs ── */
+  .ws-filter-tabs{display:flex;flex-wrap:wrap;gap:8px;}
+
+  /* ─────────────────────────────────────────
+     BREAKPOINT: 1200px — 3-col stat grid
+  ───────────────────────────────────────── */
+  @media(max-width:1200px){
+    .ws-stat-grid{grid-template-columns:repeat(2,1fr)!important;}
+  }
+
   /* ─────────────────────────────────────────
      BREAKPOINT: 1100px — collapse sidebar to icon-only
   ───────────────────────────────────────── */
@@ -55,14 +71,13 @@ const css = `
     .ws-sidebar{width:68px!important;}
     .ws-sidebar .ws-sidebar-text{display:none!important;}
     .ws-sidebar .ws-brand-text{display:none!important;}
-    .ws-main{margin-left:68px!important;}
+    .ws-main{margin-left:68px!important;max-width:calc(100vw - 68px)!important;}
   }
 
   /* ─────────────────────────────────────────
      BREAKPOINT: 768px — full mobile layout
   ───────────────────────────────────────── */
   @media(max-width:768px){
-    /* Sidebar hidden by default, shown as drawer when open */
     .ws-sidebar{
       display:flex!important;
       transform:translateX(-100%);
@@ -74,46 +89,26 @@ const css = `
     .ws-sidebar .ws-sidebar-text{display:inline!important;}
     .ws-sidebar .ws-brand-text{display:block!important;}
     .ws-close-btn{display:flex!important;align-items:center;justify-content:center;}
-
-    /* Show mobile top bar */
     .ws-mobile-bar{display:flex!important;}
-
-    /* Main content full width, padded for top bar */
-    .ws-main{margin-left:0!important;padding:1rem!important;padding-top:4.8rem!important;}
-
-    /* Stat grid: 2 columns */
+    .ws-main{margin-left:0!important;padding:1rem!important;padding-top:4.8rem!important;max-width:100vw!important;}
     .ws-stat-grid{grid-template-columns:1fr 1fr!important;}
-
-    /* Two-col sections collapse */
     .ws-two-col{grid-template-columns:1fr!important;}
-
-    /* Modal grids collapse */
     .ws-modal-grid{grid-template-columns:1fr!important;}
     .ws-customer-grid{grid-template-columns:1fr!important;}
     .ws-order-detail-grid{grid-template-columns:1fr!important;}
-
-    /* Page headers stack */
     .ws-page-header{flex-direction:column;align-items:flex-start!important;}
     .ws-page-header button{width:100%;}
-
-    /* Coupon & category grids */
     .ws-coupon-grid{grid-template-columns:1fr!important;}
     .ws-cat-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))!important;}
-
-    /* Customer card inner grids */
     .ws-cust-inner-grid{grid-template-columns:1fr!important;}
-
-    /* Filter tabs scroll */
     .ws-filter-tabs{overflow-x:auto;padding-bottom:4px;flex-wrap:nowrap!important;}
     .ws-filter-tabs::-webkit-scrollbar{height:3px;}
     .ws-filter-tabs::-webkit-scrollbar-thumb{background:#7c3aed;border-radius:2px;}
-
-    /* Stat value font size */
     .ws-stat-val{font-size:1.5rem!important;}
-
-    /* Action buttons in tables */
     .ws-action-btns{flex-direction:column!important;gap:4px!important;}
     .ws-action-btns button{width:100%;}
+    /* Modal full screen on mobile */
+    .ws-modal-inner{padding:1rem!important;}
   }
 
   /* ─────────────────────────────────────────
@@ -124,12 +119,10 @@ const css = `
     .ws-main{padding:0.75rem!important;padding-top:4.8rem!important;}
     .ws-cat-grid{grid-template-columns:1fr!important;}
     .ws-coupon-grid{grid-template-columns:1fr!important;}
-
-    /* Customer card stats pills stack */
     .ws-cust-stats{flex-direction:column!important;align-items:flex-start!important;}
-
-    /* Modal padding */
-    .ws-modal-inner{padding:1.2rem!important;}
+    .ws-modal-inner{padding:0.75rem!important;}
+    .ws-table-wrap table{min-width:500px;}
+    .ws-page-header button{font-size:0.78rem!important;}
   }
 `;
 
@@ -408,14 +401,14 @@ function Dashboard({ token }) {
       </div>
 
       {/* Stats grid */}
-      <div className="ws-stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
+      <div className="ws-stat-grid" style={{ marginBottom: "2rem" }}>
         <Stat icon="📦" label="Total Orders" value={data.totalOrders} color="#7c3aed" />
         <Stat icon="💰" label="Total Revenue" value={`₹${(data.totalRevenue || 0).toLocaleString()}`} color="#10b981" />
         <Stat icon="💎" label="Products" value={data.totalProducts} color="#3b82f6" />
         <Stat icon="👥" label="Customers" value={data.totalUsers} color="#ec4899" />
       </div>
 
-      <div className="ws-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+      <div className="ws-two-col">
         {/* Recent Orders */}
         <div style={{ background: "#13151a", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, padding: "1.5rem" }}>
           <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: "1rem", color: "#fff", marginBottom: "1.2rem", display: "flex", alignItems: "center", gap: 8 }}>
@@ -1543,7 +1536,7 @@ export default function AdminApp() {
                   <div style={{ fontSize: "0.65rem", color: "#7c3aed", letterSpacing: "0.1em" }}>ADMIN PANEL</div>
                 </div>
               </div>
-              <button onClick={() => setSidebarOpen(false)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 20, lineHeight: 1, display: "none" }} className="ws-close-btn">✕</button>
+              <button onClick={() => setSidebarOpen(false)} style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", fontSize: 20, lineHeight: 1 }} className="ws-close-btn">✕</button>
             </div>
           </div>
 
@@ -1585,7 +1578,7 @@ export default function AdminApp() {
           </div>
         </aside>
 
-        <main className="ws-main" style={{ flex: 1, marginLeft: 240, padding: "2rem 2.5rem", maxWidth: "calc(100vw - 240px)", transition: "margin-left 0.3s ease, padding 0.3s ease" }}>
+        <main className="ws-main" style={{ flex: 1, marginLeft: 240, padding: "2rem 2.5rem", transition: "margin-left 0.3s ease, padding 0.3s ease", minWidth: 0 }}>
           <PageComponent token={token} showToast={showToast} />
         </main>
       </div>
