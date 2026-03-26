@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 
 const T = {
@@ -161,6 +161,8 @@ const GLOBAL_CSS = `
     .prod-detail-grid{grid-template-columns:1fr !important;}
     .dashboard-grid{grid-template-columns:1fr !important;}
     .dashboard-stats{grid-template-columns:repeat(2,1fr) !important;}
+    .dashboard-layout{grid-template-columns:1fr !important;}
+    .dash-sidebar{position:relative !important; top:0 !important;}
   }
   @media(max-width:768px){
     .hero-grid{grid-template-columns:1fr !important; gap:0 !important;}
@@ -174,6 +176,10 @@ const GLOBAL_CSS = `
     .dashboard-stats{grid-template-columns:repeat(2,1fr) !important;}
     .founder-grid{grid-template-columns:1fr !important;}
     .video-card{width:180px !important;}
+    .dashboard-layout{grid-template-columns:1fr !important; gap:1.2rem !important;}
+    .dash-sidebar{margin-bottom:1rem !important;}
+    .dash-order-card{padding:1rem !important; gap:10px !important;}
+    .dash-order-card > div:first-child{display:none !important;}
   }
   @media(max-width:600px){
     .prod-grid{grid-template-columns:1fr !important;}
@@ -182,11 +188,13 @@ const GLOBAL_CSS = `
     .hero-badge{transform:scale(0.78) !important;}
     .dashboard-stats{grid-template-columns:repeat(2,1fr) !important;}
     .video-card{width:160px !important;}
+    .checkout-grid{grid-template-columns:1fr !important;}
   }
   @media(max-width:480px){
     .stats-row > div{flex:1 1 100% !important;}
     .dashboard-stats{grid-template-columns:1fr 1fr !important;}
     .video-card{width:150px !important;}
+    .dash-order-card{flex-direction:column !important; align-items:flex-start !important;}
   }
 `;
 
@@ -1567,124 +1575,382 @@ function LoginPage({ onLogin, onSwitch }) {
 // ─── USER DASHBOARD ───────────────────────────────────────────
 function UserDashboard({ user, orders, onLogout, onNav }) {
   const [activeTab, setActiveTab] = useState("orders");
-  const tabs = [{ key:"orders", icon:"📦", label:"My Orders" },{ key:"track", icon:"🚚", label:"Track Order" },{ key:"profile", icon:"👤", label:"Profile" },{ key:"wishlist", icon:"🤍", label:"Wishlist" }];
-  const statCards = [{ icon:"📦", label:"Total Orders", value: orders.length },{ icon:"💰", label:"Total Spent", value: "Rs." + orders.reduce((s,o) => s+(o.totalAmount||0), 0).toLocaleString() },{ icon:"🌟", label:"Member Since", value: user.joinedAt || new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) },{ icon:"🎯", label:"Manifestations", value: orders.length * 3 || 0 }];
+  const [apiOrders, setApiOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
+  const totalSpent = orders.reduce((s,o) => s+(o.totalAmount||0), 0);
+  const pending    = orders.filter(o => (o.status||"Confirmed") === "Pending").length;
+  const completed  = orders.filter(o => (o.status||"Confirmed") === "Delivered").length;
+
+  // Fetch orders from backend if token exists
+  useEffect(() => {
+    const token = localStorage.getItem("ws_token");
+    if (!token || token.startsWith("local_") || token.startsWith("google_")) return;
+    const API = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
+    setLoadingOrders(true);
+    fetch(`${API}/api/orders/my`, { headers:{ Authorization:`Bearer ${token}` } })
+      .then(r => r.json())
+      .then(d => { if (d.success && d.orders) setApiOrders(d.orders); })
+      .catch(() => {})
+      .finally(() => setLoadingOrders(false));
+  }, []);
+
+  const allOrders = apiOrders.length > 0 ? apiOrders : orders;
+
+  const P = "#7c3aed"; // purple accent
+  const PL = "#f5f0ff";
+  const bg = "#f0f2f8";
+  const card = "#ffffff";
+  const border = "rgba(0,0,0,0.07)";
+  const txt = "#1a1a1a";
+  const sub = "#6b7280";
+
+  const tabs = [
+    { key:"orders",  icon:"🛍", label:"My Orders" },
+    { key:"track",   icon:"📦", label:"Track Orders" },
+    { key:"profile", icon:"👤", label:"Profile" },
+    { key:"wishlist",icon:"🤍", label:"Wishlist" },
+    { key:"cart",    icon:"🛒", label:"Cart" },
+  ];
+
+  const statCards = [
+    { label:"Total Orders",  value: allOrders.length,                  icon:"🛍", color:"#3b82f6", light:"#eff6ff" },
+    { label:"Pending",       value: pending,                           icon:"⏳", color:"#f97316", light:"#fff7ed" },
+    { label:"Completed",     value: completed,                         icon:"✅", color:"#10b981", light:"#ecfdf5" },
+    { label:"Total Spent",   value: "₹"+totalSpent.toLocaleString(),   icon:"💰", color:P,         light:PL },
+  ];
 
   return (
-    <div style={{ paddingTop:90, background:T.bg, minHeight:"100vh" }}>
-      <div className="max-w" style={{ padding:"clamp(1.5rem,4vw,2.5rem)" }}>
-        <div style={{ background:`linear-gradient(135deg, ${T.bgDark} 0%, #3a4a28 100%)`, borderRadius:20, padding:"clamp(1.5rem,4vw,2.5rem)", marginBottom:"1.5rem", position:"relative", overflow:"hidden" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:"1.5rem", flexWrap:"wrap", position:"relative" }}>
-            <div style={{ width:72, height:72, borderRadius:"50%", background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:28, color:"#fff", fontWeight:900, flexShrink:0 }}>
+    <div style={{ paddingTop:72, background:bg, minHeight:"100vh", fontFamily:"'Inter',sans-serif" }}>
+      <style>{`
+        @keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes popIn{from{opacity:0;transform:scale(0.94)}to{opacity:1;transform:scale(1)}}
+        .dash-nav-btn:hover{background:${PL} !important;color:${P} !important;}
+        .dash-order-card:hover{box-shadow:0 8px 32px rgba(0,0,0,0.1) !important;transform:translateY(-2px);}
+        .dash-stat:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,0.1) !important;}
+      `}</style>
+
+      <div style={{ maxWidth:1450, margin:"0 auto", padding:"1.5rem clamp(1rem,2.5vw,2rem)", display:"grid", gridTemplateColumns:"280px 1fr", gap:"1.8rem", alignItems:"start" }} className="dashboard-layout">
+
+        {/* ── SIDEBAR ── */}
+        <aside style={{ position:"sticky", top:80 }} className="dash-sidebar">
+
+          {/* Brand */}
+          <div style={{ background:card, borderRadius:16, padding:"1.3rem 1.5rem", marginBottom:"0.8rem", border:`1px solid ${border}`, boxShadow:"0 2px 12px rgba(0,0,0,0.06)", display:"flex", alignItems:"center", gap:12 }}>
+            <div style={{ width:42, height:42, borderRadius:11, background:`linear-gradient(135deg,${P},#a855f7)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0 }}>💎</div>
+            <div style={{ flex:1, minWidth:0 }}>
+              <div style={{ fontWeight:800, fontSize:"1.05rem", color:txt, fontFamily:"'Playfair Display',serif" }}>WishStone</div>
+              <div style={{ fontSize:"0.7rem", color:sub }}>Your Dashboard</div>
+            </div>
+            <div style={{ width:38, height:38, borderRadius:"50%", background:`linear-gradient(135deg,${P},#a855f7)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff", flexShrink:0 }}>
               {(user.name||user.email||"U")[0].toUpperCase()}
             </div>
-            <div style={{ flex:1, minWidth:0 }}>
-              <h2 style={{ fontFamily:"'Playfair Display',serif", color:"#fff", fontSize:"clamp(1.1rem,3vw,1.5rem)", fontWeight:900, margin:"0 0 4px" }}>{user.name||"WishStone Member"}</h2>
-              <p style={{ color:"rgba(255,255,255,0.55)", fontSize:"0.82rem", margin:"0 0 8px" }}>{user.email}</p>
-            </div>
-            <div style={{ display:"flex", gap:"0.7rem", flexShrink:0 }}>
-              <button className="btn-orange" onClick={() => onNav("products")} style={{ padding:"9px 18px", fontSize:"0.75rem", borderRadius:8 }}>Shop Now</button>
-              <button onClick={onLogout} style={{ padding:"9px 18px", fontSize:"0.75rem", borderRadius:8, background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.2)", color:"rgba(255,255,255,0.8)", cursor:"pointer", fontFamily:"'Inter',sans-serif", fontWeight:600 }}>Sign Out</button>
-            </div>
           </div>
-        </div>
 
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"1rem", marginBottom:"1.5rem" }} className="dashboard-stats">
-          {statCards.map(s => (
-            <div key={s.label} style={{ background:"#fff", borderRadius:14, padding:"1.2rem", border:`1px solid ${T.border}`, textAlign:"center" }}>
-              <div style={{ fontSize:26, marginBottom:6 }}>{s.icon}</div>
-              <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.3rem", fontWeight:900, color:T.text, lineHeight:1 }}>{s.value}</div>
-              <div style={{ fontSize:"0.68rem", color:T.textMid, fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", marginTop:4 }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
+          {/* Nav links */}
+          <div style={{ background:card, borderRadius:16, padding:"0.7rem", border:`1px solid ${border}`, boxShadow:"0 2px 12px rgba(0,0,0,0.06)", marginBottom:"0.8rem" }}>
+            {tabs.map(t => (
+              <button key={t.key} className="dash-nav-btn"
+                onClick={() => { if(t.key==="wishlist") onNav("wishlist"); else if(t.key==="cart") onNav("cart"); else setActiveTab(t.key); }}
+                style={{ width:"100%", display:"flex", alignItems:"center", gap:13, padding:"13px 15px", borderRadius:11, border:"none", cursor:"pointer", fontFamily:"'Inter',sans-serif", fontSize:"0.9rem", fontWeight:600, marginBottom:3, transition:"all 0.18s",
+                  background: activeTab===t.key ? `linear-gradient(135deg,${P},#a855f7)` : "transparent",
+                  color: activeTab===t.key ? "#fff" : "#374151",
+                  boxShadow: activeTab===t.key ? `0 4px 16px rgba(124,58,237,0.3)` : "none" }}>
+                <span style={{ fontSize:19, width:24, textAlign:"center", flexShrink:0 }}>{t.icon}</span>
+                <span style={{ flex:1, textAlign:"left" }}>{t.label}</span>
+                {activeTab===t.key && <span style={{ width:7, height:7, borderRadius:"50%", background:"#fff", display:"inline-block", flexShrink:0 }} />}
+              </button>
+            ))}
+          </div>
 
-        <div style={{ display:"flex", gap:"0.5rem", marginBottom:"1.5rem", background:"#fff", borderRadius:12, padding:"0.4rem", border:`1px solid ${T.border}`, width:"fit-content" }}>
-          {tabs.map(t => (
-            <button key={t.key} onClick={() => { if(t.key==="wishlist") onNav("wishlist"); else setActiveTab(t.key); }}
-              style={{ padding:"9px 18px", borderRadius:9, border:"none", cursor:"pointer", fontSize:"0.78rem", fontWeight:600, fontFamily:"'Inter',sans-serif", display:"flex", alignItems:"center", gap:6, transition:"all 0.2s", background: activeTab===t.key ? T.orange : "transparent", color: activeTab===t.key ? "#fff" : T.textMid }}>
-              <span>{t.icon}</span> {t.label}
+          {/* Sign out */}
+          <div style={{ background:card, borderRadius:16, padding:"0.7rem", border:`1px solid ${border}`, boxShadow:"0 2px 12px rgba(0,0,0,0.06)", marginBottom:"0.8rem" }}>
+            <button onClick={onLogout} className="dash-nav-btn"
+              style={{ width:"100%", display:"flex", alignItems:"center", gap:13, padding:"13px 15px", borderRadius:11, border:"none", cursor:"pointer", fontFamily:"'Inter',sans-serif", fontSize:"0.9rem", fontWeight:600, background:"transparent", color:"#ef4444", transition:"all 0.18s" }}>
+              <span style={{ fontSize:19, width:24, textAlign:"center" }}>🚪</span>
+              <span>Sign Out</span>
             </button>
-          ))}
-        </div>
-
-        {activeTab==="orders" && (
-          <div>
-            <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.1rem", fontWeight:900, marginBottom:"1rem" }}>Order History</h3>
-            {(!orders||orders.length===0) ? (
-              <div style={{ background:"#fff", borderRadius:16, padding:"3.5rem 2rem", textAlign:"center", border:`1px solid ${T.border}` }}>
-                <div style={{ fontSize:52, marginBottom:14 }}>📦</div>
-                <button className="btn-orange" onClick={() => onNav("products")} style={{ padding:"12px 28px", fontSize:"0.82rem", borderRadius:8 }}>Shop Now</button>
-              </div>
-            ) : orders.map((o,i) => (
-              <div key={i} style={{ background:"#fff", borderRadius:14, padding:"1.4rem", marginBottom:"1rem", border:`1px solid ${T.border}` }}>
-                <div style={{ display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:10, marginBottom:"0.8rem" }}>
-                  <div style={{ fontWeight:700, color:T.text }}>Order #{o._id ? o._id.slice(-6).toUpperCase() : String(i+1).padStart(6,"0")}</div>
-                  <span style={{ background:"rgba(45,122,90,0.1)", color:"#2d7a5a", padding:"4px 14px", borderRadius:20, fontSize:"0.7rem", fontWeight:700 }}>{o.status||"Confirmed"}</span>
-                </div>
-                <div style={{ display:"flex", justifyContent:"space-between", borderTop:`1px solid ${T.border}`, paddingTop:"0.7rem" }}>
-                  <span style={{ fontSize:"0.78rem", color:T.textMid }}>Total Amount</span>
-                  <span style={{ fontWeight:800, color:T.orange }}>Rs.{o.totalAmount ? o.totalAmount.toLocaleString() : "—"}</span>
-                </div>
-              </div>
-            ))}
           </div>
-        )}
 
-        {activeTab==="track" && (
-          <div>
-            <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.1rem", fontWeight:900, marginBottom:"1rem" }}>Track Your Orders</h3>
-            {(!orders||orders.length===0) ? (
-              <div style={{ background:"#fff", borderRadius:16, padding:"3.5rem 2rem", textAlign:"center", border:`1px solid ${T.border}` }}>
-                <div style={{ fontSize:52, marginBottom:14 }}>🚚</div>
-                <p style={{ color:T.textMid, fontSize:"0.85rem", marginBottom:16 }}>No orders to track yet.</p>
-                <button className="btn-orange" onClick={() => onNav("products")} style={{ padding:"12px 28px", fontSize:"0.82rem", borderRadius:8 }}>Shop Now</button>
+          {/* Special offer card */}
+          <div style={{ background:`linear-gradient(135deg,${P},#a855f7)`, borderRadius:16, padding:"1.4rem 1.3rem", boxShadow:`0 4px 20px rgba(124,58,237,0.3)` }}>
+            <div style={{ fontSize:"0.95rem", fontWeight:800, color:"#fff", marginBottom:7 }}>Special Offer! 🎉</div>
+            <div style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.88)", marginBottom:"1.1rem", lineHeight:1.6 }}>Get ₹300 off on your next purchase.<br />Use code: <strong>WOW300</strong></div>
+            <button onClick={() => onNav("products")} style={{ width:"100%", padding:"10px", background:"#fff", color:P, border:"none", borderRadius:10, fontSize:"0.82rem", fontWeight:800, cursor:"pointer", fontFamily:"'Inter',sans-serif", letterSpacing:"0.02em" }}>Shop Now</button>
+          </div>
+        </aside>
+
+        {/* ── MAIN CONTENT ── */}
+        <main style={{ minWidth:0 }}>
+
+          {/* ── MY ORDERS ── */}
+          {activeTab==="orders" && (
+            <div style={{ animation:"slideUp 0.35s ease both" }}>
+              <div style={{ marginBottom:"1.5rem" }}>
+                <h1 style={{ fontSize:"1.75rem", fontWeight:900, color:txt, margin:0 }}>My Orders</h1>
+                <p style={{ color:sub, fontSize:"0.9rem", marginTop:5 }}>Track and manage your orders</p>
               </div>
-            ) : orders.map((o,i) => (
-              <div key={i} style={{ background:"#fff", borderRadius:16, padding:"1.5rem", marginBottom:"1rem", border:`1px solid ${T.border}`, boxShadow:"0 2px 12px rgba(0,0,0,0.04)" }}>
-                <div style={{ display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:8, marginBottom:"1.2rem" }}>
-                  <div>
-                    <div style={{ fontWeight:700, color:T.text, fontSize:"0.9rem" }}>Order #{o._id ? o._id.slice(-6).toUpperCase() : String(i+1).padStart(6,"0")}</div>
-                    <div style={{ fontSize:"0.72rem", color:T.textMid, marginTop:2 }}>{o.createdAt ? new Date(o.createdAt).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) : ""}</div>
-                  </div>
-                  <span style={{ background:"rgba(45,122,90,0.1)", color:"#2d7a5a", padding:"4px 14px", borderRadius:20, fontSize:"0.7rem", fontWeight:700, height:"fit-content" }}>✓ {o.status||"Confirmed"}</span>
-                </div>
-                {/* Progress bar */}
-                <div style={{ display:"flex", alignItems:"center", gap:0, marginBottom:"0.8rem" }}>
-                  {[["📦","Confirmed"],["⚙️","Processing"],["🚚","Shipped"],["🏠","Delivered"]].map(([icon,label],si) => (
-                    <div key={si} style={{ flex:1, textAlign:"center", position:"relative" }}>
-                      <div style={{ width:32, height:32, borderRadius:"50%", background: si===0 ? T.orange : "rgba(232,114,12,0.12)", border:`2px solid ${si===0 ? T.orange : T.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, margin:"0 auto 4px", transition:"all 0.3s" }}>{icon}</div>
-                      <div style={{ fontSize:"0.58rem", color: si===0 ? T.orange : T.textMid, fontWeight: si===0 ? 700 : 500 }}>{label}</div>
-                      {si < 3 && <div style={{ position:"absolute", top:15, left:"60%", right:"-40%", height:2, background: si===0 ? `linear-gradient(to right,${T.orange},rgba(232,114,12,0.15))` : T.border, zIndex:0 }} />}
+
+              {/* Stat cards */}
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"1.1rem", marginBottom:"1.5rem" }} className="dashboard-stats">
+                {statCards.map((s,i) => (
+                  <div key={s.label} className="dash-stat" style={{ background:card, borderRadius:16, padding:"1.3rem 1.1rem", border:`1px solid ${border}`, display:"flex", justifyContent:"space-between", alignItems:"center", boxShadow:"0 2px 12px rgba(0,0,0,0.06)", transition:"all 0.2s", animation:`popIn 0.3s ease ${i*0.07}s both` }}>
+                    <div>
+                      <div style={{ fontSize:"0.75rem", color:sub, fontWeight:500, marginBottom:5 }}>{s.label}</div>
+                      <div style={{ fontSize:"1.5rem", fontWeight:900, color:txt, lineHeight:1 }}>{s.value}</div>
                     </div>
-                  ))}
-                </div>
-                <div style={{ background:"rgba(232,114,12,0.06)", borderRadius:10, padding:"10px 14px", display:"flex", alignItems:"center", gap:8 }}>
-                  <span style={{ fontSize:16 }}>📅</span>
-                  <span style={{ fontSize:"0.78rem", color:T.textMid }}>Expected delivery: <strong style={{ color:T.text }}>4–5 business days from order date</strong></span>
-                </div>
+                    <div style={{ width:48, height:48, borderRadius:13, background:s.light, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>{s.icon}</div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
 
-        {activeTab==="profile" && (
-          <div style={{ background:"#fff", borderRadius:16, padding:"2rem", border:`1px solid ${T.border}` }}>
-            <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.1rem", fontWeight:900, marginBottom:"1.5rem" }}>Profile Information</h3>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1.2rem" }} className="checkout-grid">
-              {[["Full Name", user.name||"—"],["Email Address", user.email||"—"],["Member Since", user.joinedAt || new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})],["Account Type","Sacred Member"]].map(([l,v]) => (
-                <div key={l} style={{ padding:"1rem", background:T.bg, borderRadius:10, border:`1px solid ${T.border}` }}>
-                  <div style={{ fontSize:"0.65rem", fontWeight:700, color:T.textMid, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:5 }}>{l}</div>
-                  <div style={{ fontSize:"0.9rem", fontWeight:600, color:T.text }}>{v}</div>
+              {/* Order list */}
+              {loadingOrders ? (
+                <div style={{ background:card, borderRadius:18, padding:"3.5rem", textAlign:"center", border:`1px solid ${border}` }}>
+                  <div style={{ width:40, height:40, border:`3px solid ${PL}`, borderTop:`3px solid ${P}`, borderRadius:"50%", animation:"spin 0.8s linear infinite", margin:"0 auto 14px" }} />
+                  <p style={{ color:sub, fontSize:"0.92rem" }}>Loading orders...</p>
+                </div>
+              ) : allOrders.length === 0 ? (
+                <div style={{ background:card, borderRadius:18, padding:"4rem 2.5rem", textAlign:"center", border:`1px solid ${border}` }}>
+                  <div style={{ fontSize:64, marginBottom:18 }}>📦</div>
+                  <p style={{ color:sub, fontSize:"1rem", marginBottom:22 }}>No orders yet. Start your sacred journey.</p>
+                  <button onClick={() => onNav("products")} style={{ padding:"13px 30px", fontSize:"0.9rem", borderRadius:11, background:`linear-gradient(135deg,${P},#a855f7)`, color:"#fff", border:"none", cursor:"pointer", fontFamily:"'Inter',sans-serif", fontWeight:700 }}>Shop Now</button>
+                </div>
+              ) : allOrders.map((o,i) => {
+                // Get product images from order items
+                const orderImages = o.items ? o.items.slice(0,3).map(item => {
+                  const product = PRODUCTS.find(p => p.id === item.productId || p.name === item.name);
+                  return product ? product.image : item.image;
+                }).filter(Boolean) : [];
+                
+                return (
+                <div key={i} className="dash-order-card" style={{ background:card, borderRadius:16, padding:"1.4rem 1.6rem", marginBottom:"1rem", border:`1px solid ${border}`, animation:`slideUp 0.3s ease ${i*0.06}s both`, boxShadow:"0 2px 12px rgba(0,0,0,0.06)", transition:"all 0.2s", display:"flex", alignItems:"center", gap:16, flexWrap:"wrap" }}>
+                  {/* Product Images Preview */}
+                  <div style={{ display:"flex", gap:6, flexShrink:0 }}>
+                    {orderImages.length > 0 ? orderImages.map((img, idx) => (
+                      <div key={idx} style={{ width:56, height:56, borderRadius:12, overflow:"hidden", border:`2px solid ${border}`, background:"#f9fafb" }}>
+                        <img src={img} alt="Product" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                      </div>
+                    )) : (
+                      <div style={{ width:56, height:56, borderRadius:12, background:PL, display:"flex", alignItems:"center", justifyContent:"center", fontSize:26, flexShrink:0 }}>🛍</div>
+                    )}
+                  </div>
+                  
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontWeight:700, color:txt, fontSize:"0.98rem", marginBottom:2 }}>Order #{o._id ? o._id.slice(-6).toUpperCase() : String(i+1).padStart(6,"0")}</div>
+                    <div style={{ fontSize:"0.78rem", color:sub, marginTop:4, display:"flex", gap:14, flexWrap:"wrap" }}>
+                      <span>📅 {o.createdAt ? new Date(o.createdAt).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) : "—"}</span>
+                      <span>💰 ₹{o.totalAmount ? o.totalAmount.toLocaleString() : "—"}</span>
+                      {o.items && <span>📦 {o.items.length} item{o.items.length!==1?"s":""}</span>}
+                    </div>
+                  </div>
+                  <div style={{ display:"flex", alignItems:"center", gap:9, flexShrink:0, flexWrap:"wrap" }}>
+                    <span style={{ background: (o.status||"Confirmed")==="Delivered" ? "#ecfdf5" : (o.status||"Confirmed")==="Shipped" ? "#eff6ff" : "#fff7ed", color: (o.status||"Confirmed")==="Delivered" ? "#10b981" : (o.status||"Confirmed")==="Shipped" ? "#3b82f6" : "#f97316", padding:"6px 16px", borderRadius:20, fontSize:"0.72rem", fontWeight:700, border:`1px solid currentColor`, opacity:0.9 }}>{o.status||"Confirmed"}</span>
+                    <button onClick={() => setSelectedOrder(o)} style={{ padding:"8px 16px", background:`linear-gradient(135deg,${P},#a855f7)`, color:"#fff", border:"none", borderRadius:9, fontSize:"0.78rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>View</button>
+                    <button onClick={() => setActiveTab("track")} style={{ padding:"8px 16px", background:PL, color:P, border:`1px solid rgba(124,58,237,0.2)`, borderRadius:9, fontSize:"0.78rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>Track</button>
+                  </div>
+                </div>
+              )})}
+            </div>
+          )}
+
+          {/* ── TRACK ORDERS ── */}
+          {activeTab==="track" && (
+            <div style={{ animation:"slideUp 0.35s ease both" }}>
+              <div style={{ marginBottom:"1.5rem" }}>
+                <h1 style={{ fontSize:"1.75rem", fontWeight:900, color:txt, margin:0 }}>Track Orders</h1>
+                <p style={{ color:sub, fontSize:"0.9rem", marginTop:5 }}>Monitor your package in real-time</p>
+              </div>
+              {allOrders.length === 0 ? (
+                <div style={{ background:card, borderRadius:18, padding:"4rem 2.5rem", textAlign:"center", border:`1px solid ${border}` }}>
+                  <div style={{ fontSize:64, marginBottom:18 }}>🚚</div>
+                  <p style={{ color:sub, fontSize:"1rem", marginBottom:22 }}>No orders to track yet.</p>
+                  <button onClick={() => onNav("products")} style={{ padding:"13px 30px", fontSize:"0.9rem", borderRadius:11, background:`linear-gradient(135deg,${P},#a855f7)`, color:"#fff", border:"none", cursor:"pointer", fontFamily:"'Inter',sans-serif", fontWeight:700 }}>Shop Now</button>
+                </div>
+              ) : allOrders.map((o,i) => (
+                <div key={i} style={{ background:card, borderRadius:18, padding:"1.8rem", marginBottom:"1.3rem", border:`1px solid ${border}`, animation:`slideUp 0.3s ease ${i*0.07}s both`, boxShadow:"0 3px 18px rgba(0,0,0,0.07)" }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:9, marginBottom:"1.5rem" }}>
+                    <div>
+                      <div style={{ fontWeight:700, color:txt, fontSize:"1.05rem" }}>Order #{o._id ? o._id.slice(-6).toUpperCase() : String(i+1).padStart(6,"0")}</div>
+                      <div style={{ fontSize:"0.78rem", color:sub, marginTop:4 }}>Placed on {o.createdAt ? new Date(o.createdAt).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) : "—"}</div>
+                    </div>
+                    <span style={{ background:"#ecfdf5", color:"#10b981", padding:"6px 18px", borderRadius:20, fontSize:"0.75rem", fontWeight:700, border:"1px solid rgba(16,185,129,0.25)", height:"fit-content" }}>✓ {o.status||"Confirmed"}</span>
+                  </div>
+
+                  {/* Timeline */}
+                  <div style={{ display:"flex", alignItems:"flex-start", marginBottom:"1.5rem", position:"relative" }}>
+                    {[["✅","Order Placed",true],["📦","Processing",false],["🚚","Shipped",false],["🏠","Delivered",false]].map(([icon,label,active],si) => (
+                      <div key={si} style={{ flex:1, textAlign:"center", position:"relative", zIndex:1 }}>
+                        <div style={{ width:50, height:50, borderRadius:"50%", background: active ? `linear-gradient(135deg,${P},#a855f7)` : "#f3f4f6", border:`2px solid ${active ? P : "#e5e7eb"}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, margin:"0 auto 7px", boxShadow: active ? `0 4px 18px rgba(124,58,237,0.35)` : "none", transition:"all 0.3s" }}>{icon}</div>
+                        <div style={{ fontSize:"0.7rem", color: active ? P : sub, fontWeight: active ? 700 : 500 }}>{label}</div>
+                        {si < 3 && <div style={{ position:"absolute", top:24, left:"58%", right:"-42%", height:2, background: active ? `linear-gradient(to right,${P},#e5e7eb)` : "#e5e7eb", zIndex:-1 }} />}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{ background:PL, borderRadius:13, padding:"14px 18px", display:"flex", alignItems:"center", gap:11, border:`1px solid rgba(124,58,237,0.15)` }}>
+                    <span style={{ fontSize:20 }}>📅</span>
+                    <span style={{ fontSize:"0.85rem", color:sub }}>Expected delivery: <strong style={{ color:txt }}>4–5 business days from order date</strong></span>
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+
+          {/* ── PROFILE ── */}
+          {activeTab==="profile" && (
+            <div style={{ animation:"slideUp 0.35s ease both" }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1.5rem", flexWrap:"wrap", gap:10 }}>
+                <div>
+                  <h1 style={{ fontSize:"1.75rem", fontWeight:900, color:txt, margin:0 }}>My Profile</h1>
+                  <p style={{ color:sub, fontSize:"0.9rem", marginTop:5 }}>Manage your account information</p>
+                </div>
+              </div>
+              <div style={{ display:"grid", gridTemplateColumns:"220px 1fr", gap:"1.5rem", alignItems:"start" }} className="checkout-grid">
+                {/* Avatar card */}
+                <div style={{ background:card, borderRadius:18, padding:"2rem 1.3rem", border:`1px solid ${border}`, textAlign:"center", boxShadow:"0 2px 14px rgba(0,0,0,0.06)" }}>
+                  <div style={{ width:80, height:80, borderRadius:"50%", background:`linear-gradient(135deg,${P},#a855f7)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:32, color:"#fff", fontWeight:900, margin:"0 auto 14px", boxShadow:`0 4px 22px rgba(124,58,237,0.35)` }}>
+                    {(user.name||user.email||"U").slice(0,2).toUpperCase()}
+                  </div>
+                  <div style={{ fontWeight:800, color:txt, fontSize:"1.05rem", marginBottom:5 }}>{user.name||"Member"}</div>
+                  <div style={{ color:P, fontSize:"0.78rem", fontWeight:600, marginBottom:9 }}>Sacred Member</div>
+                  <div style={{ color:sub, fontSize:"0.75rem" }}>📅 Joined {user.joinedAt || new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</div>
+                </div>
+                {/* Info card */}
+                <div style={{ background:card, borderRadius:18, padding:"2rem", border:`1px solid ${border}`, boxShadow:"0 2px 14px rgba(0,0,0,0.06)" }}>
+                  <div style={{ fontWeight:700, color:txt, fontSize:"1.1rem", marginBottom:"1.3rem" }}>Personal Information</div>
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1.1rem" }}>
+                    {[["👤 Full Name", user.name||"—"],["✉️ Email Address", user.email||"—"],["📅 Member Since", user.joinedAt || new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})],["🏅 Account Type","Sacred Member"]].map(([l,v]) => (
+                      <div key={l} style={{ padding:"1rem 1.1rem", background:bg, borderRadius:11, border:`1px solid ${border}` }}>
+                        <div style={{ fontSize:"0.68rem", fontWeight:700, color:sub, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:6 }}>{l}</div>
+                        <div style={{ fontSize:"0.95rem", fontWeight:600, color:txt }}>{v}</div>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Account stats */}
+                  <div style={{ marginTop:"1.5rem", paddingTop:"1.3rem", borderTop:`1px solid ${border}` }}>
+                    <div style={{ fontWeight:700, color:txt, fontSize:"1rem", marginBottom:"1rem" }}>Account Statistics</div>
+                    <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"0.9rem" }} className="dashboard-stats">
+                      {statCards.map(s => (
+                        <div key={s.label} style={{ background:s.light, borderRadius:13, padding:"1rem 0.8rem", textAlign:"center", border:`1px solid ${border}` }}>
+                          <div style={{ fontSize:24, marginBottom:5 }}>{s.icon}</div>
+                          <div style={{ fontWeight:800, color:s.color, fontSize:"1.1rem" }}>{s.value}</div>
+                          <div style={{ fontSize:"0.64rem", color:sub, marginTop:3 }}>{s.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </main>
       </div>
+
+      {/* ── ORDER DETAILS MODAL ── */}
+      {selectedOrder && (
+        <div onClick={() => setSelectedOrder(null)} style={{ position:"fixed", inset:0, zIndex:9999, background:"rgba(0,0,0,0.6)", backdropFilter:"blur(6px)", display:"flex", alignItems:"center", justifyContent:"center", padding:"1rem", overflowY:"auto" }}>
+          <div onClick={e => e.stopPropagation()} style={{ background:card, borderRadius:20, maxWidth:700, width:"100%", maxHeight:"90vh", overflowY:"auto", boxShadow:"0 24px 80px rgba(0,0,0,0.25)", animation:"modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both" }}>
+            
+            {/* Header */}
+            <div style={{ position:"sticky", top:0, background:card, borderBottom:`1px solid ${border}`, padding:"1.5rem 2rem", display:"flex", justifyContent:"space-between", alignItems:"center", zIndex:10 }}>
+              <div>
+                <h2 style={{ fontSize:"1.4rem", fontWeight:900, color:txt, margin:0 }}>Order Details</h2>
+                <p style={{ fontSize:"0.8rem", color:sub, marginTop:3 }}>Order #{selectedOrder._id ? selectedOrder._id.slice(-6).toUpperCase() : "N/A"}</p>
+              </div>
+              <button onClick={() => setSelectedOrder(null)} style={{ background:"none", border:"none", cursor:"pointer", fontSize:26, color:sub, lineHeight:1, padding:4 }}>×</button>
+            </div>
+
+            <div style={{ padding:"2rem" }}>
+              {/* Order Status */}
+              <div style={{ background:PL, borderRadius:14, padding:"1.2rem", marginBottom:"1.5rem", border:`1px solid rgba(124,58,237,0.15)` }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:10 }}>
+                  <div>
+                    <div style={{ fontSize:"0.7rem", color:sub, fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:4 }}>Order Status</div>
+                    <div style={{ fontSize:"1.1rem", fontWeight:800, color:P }}>{selectedOrder.status||"Confirmed"}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize:"0.7rem", color:sub, fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:4 }}>Order Date</div>
+                    <div style={{ fontSize:"0.95rem", fontWeight:700, color:txt }}>{selectedOrder.createdAt ? new Date(selectedOrder.createdAt).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) : "—"}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Products List */}
+              <div style={{ marginBottom:"1.5rem" }}>
+                <h3 style={{ fontSize:"1.05rem", fontWeight:800, color:txt, marginBottom:"1rem" }}>Order Items</h3>
+                {selectedOrder.items && selectedOrder.items.length > 0 ? selectedOrder.items.map((item, idx) => {
+                  const product = PRODUCTS.find(p => p.id === item.productId || p.name === item.name);
+                  return (
+                    <div key={idx} style={{ background:bg, borderRadius:12, padding:"1rem", marginBottom:"0.8rem", display:"flex", gap:14, alignItems:"center", border:`1px solid ${border}` }}>
+                      <div style={{ width:70, height:70, borderRadius:10, overflow:"hidden", flexShrink:0, background:"#fff" }}>
+                        <img src={product?.image || item.image || "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80"} alt={item.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                      </div>
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontWeight:700, color:txt, fontSize:"0.95rem", marginBottom:3 }}>{item.name || product?.name || "Product"}</div>
+                        <div style={{ fontSize:"0.75rem", color:sub }}>Quantity: {item.quantity || item.qty || 1}</div>
+                      </div>
+                      <div style={{ textAlign:"right", flexShrink:0 }}>
+                        <div style={{ fontSize:"1.05rem", fontWeight:800, color:P }}>₹{((item.price || product?.price || 0) * (item.quantity || item.qty || 1)).toLocaleString()}</div>
+                        <div style={{ fontSize:"0.7rem", color:sub, marginTop:2 }}>₹{(item.price || product?.price || 0).toLocaleString()} each</div>
+                      </div>
+                    </div>
+                  );
+                }) : (
+                  <div style={{ background:bg, borderRadius:12, padding:"2rem", textAlign:"center", border:`1px solid ${border}` }}>
+                    <p style={{ color:sub, fontSize:"0.85rem" }}>No items found in this order</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Bill Summary */}
+              <div style={{ background:`linear-gradient(135deg,${P},#a855f7)`, borderRadius:14, padding:"1.5rem", color:"#fff" }}>
+                <h3 style={{ fontSize:"1.05rem", fontWeight:800, marginBottom:"1rem", color:"#fff" }}>Bill Summary</h3>
+                <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"0.7rem", fontSize:"0.88rem" }}>
+                  <span style={{ opacity:0.9 }}>Subtotal</span>
+                  <span style={{ fontWeight:700 }}>₹{(selectedOrder.totalAmount || 0).toLocaleString()}</span>
+                </div>
+                <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"0.7rem", fontSize:"0.88rem" }}>
+                  <span style={{ opacity:0.9 }}>Shipping</span>
+                  <span style={{ fontWeight:700 }}>Free</span>
+                </div>
+                <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"0.7rem", fontSize:"0.88rem" }}>
+                  <span style={{ opacity:0.9 }}>Tax (GST)</span>
+                  <span style={{ fontWeight:700 }}>Included</span>
+                </div>
+                <div style={{ borderTop:"1px solid rgba(255,255,255,0.3)", marginTop:"0.8rem", paddingTop:"0.8rem", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                  <span style={{ fontSize:"1.1rem", fontWeight:800 }}>Total Amount</span>
+                  <span style={{ fontSize:"1.5rem", fontWeight:900 }}>₹{(selectedOrder.totalAmount || 0).toLocaleString()}</span>
+                </div>
+              </div>
+
+              {/* Shipping Address */}
+              {selectedOrder.shippingAddress && (
+                <div style={{ marginTop:"1.5rem", background:bg, borderRadius:14, padding:"1.3rem", border:`1px solid ${border}` }}>
+                  <h3 style={{ fontSize:"1.05rem", fontWeight:800, color:txt, marginBottom:"0.9rem" }}>Shipping Address</h3>
+                  <div style={{ fontSize:"0.88rem", color:txt, lineHeight:1.7 }}>
+                    <div style={{ fontWeight:700, marginBottom:4 }}>{selectedOrder.shippingAddress.name || user.name || "Customer"}</div>
+                    <div>{selectedOrder.shippingAddress.address || "—"}</div>
+                    <div>{selectedOrder.shippingAddress.city || "—"}, {selectedOrder.shippingAddress.state || "—"} {selectedOrder.shippingAddress.pincode || ""}</div>
+                    <div style={{ marginTop:6, color:sub }}>📞 {selectedOrder.shippingAddress.phone || "—"}</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div style={{ marginTop:"1.5rem", display:"flex", gap:"0.8rem", flexWrap:"wrap" }}>
+                <button onClick={() => { setSelectedOrder(null); setActiveTab("track"); }} style={{ flex:1, padding:"12px", background:PL, color:P, border:`1px solid rgba(124,58,237,0.2)`, borderRadius:10, fontSize:"0.85rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>Track Order</button>
+                <button onClick={() => setSelectedOrder(null)} style={{ flex:1, padding:"12px", background:`linear-gradient(135deg,${P},#a855f7)`, color:"#fff", border:"none", borderRadius:10, fontSize:"0.85rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
 
 // ─── ORDER CONFIRM MODAL ──────────────────────────────────────
 function OrderConfirmModal({ order, onClose }) {
