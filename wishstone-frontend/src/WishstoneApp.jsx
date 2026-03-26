@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 
 const T = {
@@ -9,15 +9,15 @@ const T = {
 };
 
 const PRODUCTS = [
-  { id:1, name:"WishStone — Rose Quartz", category:"manifestation", price:1299, originalPrice:1799, discount:28,
+  { id:1, name:"WishStone � Rose Quartz", category:"manifestation", price:1299, originalPrice:1799, discount:28,
     image:"https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80",
     images:["https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80","https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=600&q=80","https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?w=600&q=80","https://images.unsplash.com/photo-1471943311424-646960669fbc?w=600&q=80"],
     shortDesc:"Moon-charged rose quartz to amplify love, compassion, and self-worth energies in your sacred space.", suitableFor:"Beginners, healers, those seeking emotional balance", benefits:["Enhances self-love","Promotes emotional healing","Attracts positive relationships","Clears heart chakra"], bestSeller:true },
-  { id:2, name:"WishStone — Amethyst", category:"manifestation", price:2199, originalPrice:2999, discount:27,
+  { id:2, name:"WishStone � Amethyst", category:"manifestation", price:2199, originalPrice:2999, discount:27,
     image:"https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=600&q=80",
     images:["https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=600&q=80","https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80","https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=600&q=80","https://images.unsplash.com/photo-1545158535-c3f7168c28b6?w=600&q=80"],
     shortDesc:"Premium amethyst from Brazilian mines for deep meditation and amplifying intuition.", suitableFor:"Meditators, spiritual seekers, healers", benefits:["Deepens meditation","Protects energy field","Enhances intuition","Promotes restful sleep"], bestSeller:true },
-  { id:3, name:"WishStone — Obsidian", category:"manifestation", price:899, originalPrice:1199, discount:25,
+  { id:3, name:"WishStone � Obsidian", category:"manifestation", price:899, originalPrice:1199, discount:25,
     image:"https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=600&q=80",
     images:["https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=600&q=80","https://images.unsplash.com/photo-1531306728370-e2ebd9d7bb99?w=600&q=80","https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80","https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=600&q=80"],
     shortDesc:"Volcanic obsidian known for powerful protective properties against negative energies.", suitableFor:"Empaths, sensitives, protection seekers", benefits:["Shields from negativity","Grounds energy","Reveals hidden truths","Heals emotional wounds"], bestSeller:true },
@@ -49,32 +49,32 @@ const QUOTES = [
   { text:"You are the creator of your own reality.", author:"Abraham Hicks" },
   { text:"Ask for what you want and be prepared to get it.", author:"Maya Angelou" },
   { text:"The universe is not outside of you. Look inside yourself.", author:"Rumi" },
-  { text:"जो तुम खोज रहे हो, वह भी तुम्हें खोज रहा है।", author:"Rumi" },
+  { text:"?? ??? ??? ??? ??, ?? ?? ??????? ??? ??? ???", author:"Rumi" },
 ];
 
 const MARQUEE_ITEMS = [
-  "शुभ संकल्प","Manifest with Intention","विश्वास करो, पाओ","You Are The Creator",
-  "ब्रह्माण्ड पर भरोसा करो","Abundance Is Your Birthright","WishStone","अपनी नियति बनाओ",
-  "शुभ संकल्प","Manifest with Intention","विश्वास करो, पाओ","You Are The Creator",
-  "ब्रह्माण्ड पर भरोसा करो","Abundance Is Your Birthright","WishStone","अपनी नियति बनाओ",
+  "??? ??????","Manifest with Intention","??????? ???, ???","You Are The Creator",
+  "?????????? ?? ????? ???","Abundance Is Your Birthright","WishStone","???? ????? ????",
+  "??? ??????","Manifest with Intention","??????? ???, ???","You Are The Creator",
+  "?????????? ?? ????? ???","Abundance Is Your Birthright","WishStone","???? ????? ????",
 ];
 
 const POWERS = [
-  { num:"01", iconBg:"#fff0e8", icon:"🎯", title:"Intention Anchoring",
-    desc:"Stone ka physical weight ek somatic anchor create karta hai — ek tangible connection apni conscious wish aur physical duniya ke beech.",
+  { num:"01", iconBg:"#fff0e8", icon:"??", title:"Intention Anchoring",
+    desc:"Stone ka physical weight ek somatic anchor create karta hai � ek tangible connection apni conscious wish aur physical duniya ke beech.",
     tag:"NEUROSCIENCE-BACKED",
     image:"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80" },
-  { num:"02", iconBg:"#f0e8f8", icon:"🔮", title:"Frequency Activation",
-    desc:"Specific crystal formations jo apni personal energy field ko tune karti hain — clarity, abundance, aur love attract karo.",
+  { num:"02", iconBg:"#f0e8f8", icon:"??", title:"Frequency Activation",
+    desc:"Specific crystal formations jo apni personal energy field ko tune karti hain � clarity, abundance, aur love attract karo.",
     tag:"CRYSTAL SCIENCE",
     image:"https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=600&q=80" },
-  { num:"03", iconBg:"#e8f0e8", icon:"🌿", title:"Earth Grounding",
-    desc:"Natural stone compounds carry prithvi ki stabilizing frequency — calm, centered, aur aligned raho apni highest desires ke saath.",
+  { num:"03", iconBg:"#e8f0e8", icon:"??", title:"Earth Grounding",
+    desc:"Natural stone compounds carry prithvi ki stabilizing frequency � calm, centered, aur aligned raho apni highest desires ke saath.",
     tag:"EARTH ENERGY",
     image:"https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80" },
 ];
 
-// ── Community Videos with Pixabay URLs ──
+// -- Community Videos with Pixabay URLs --
 const COMMUNITY_VIDEOS = [
   { id:1, videoUrl:"https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",   title:"Balance",    caption:"Finding stillness in motion",   tag:"MINDFULNESS" },
   { id:2, videoUrl:"https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",  title:"Gratitude",  caption:"Everyday abundance",            tag:"GRATITUDE" },
@@ -190,7 +190,7 @@ const GLOBAL_CSS = `
   }
 `;
 
-// ─── HEADER ───────────────────────────────────────────────────
+// --- HEADER ---------------------------------------------------
 function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -214,7 +214,7 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
     }}>
       <div className="max-w" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", height:64, padding:"0 clamp(1rem,4vw,2.5rem)" }}>
         <button onClick={() => navTo("home")} style={{ background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:9, flexShrink:0 }}>
-          <div style={{ width:32, height:32, borderRadius:8, background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>💎</div>
+          <div style={{ width:32, height:32, borderRadius:8, background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>??</div>
           <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.15rem", fontWeight:900, color:T.text }}>WishStone</span>
         </button>
 
@@ -223,18 +223,18 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
             <button key={k} className={`nav-link${currentPage===k?" active":""}`} onClick={() => navTo(k)}>{l}</button>
           ))}
           <button onClick={() => navTo("cart")} style={{ background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:5, fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.1em", textTransform:"uppercase", color:T.text, position:"relative" }}>
-            🛒 Cart
+            ?? Cart
             {cartCount > 0 && <span style={{ background:T.orange, color:"#fff", borderRadius:"50%", width:16, height:16, fontSize:"0.58rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700, position:"absolute", top:-6, right:-8 }}>{cartCount}</span>}
           </button>
         </nav>
 
         <div style={{ display:"flex", alignItems:"center", gap:"0.7rem" }}>
           <button onClick={() => navTo("wishlist")} style={{ background:"none", border:"none", cursor:"pointer", position:"relative", fontSize:18, padding:"4px 5px" }}>
-            🤍
+            ??
             {wishCount > 0 && <span style={{ position:"absolute", top:0, right:0, background:T.orange, color:"#fff", borderRadius:"50%", width:15, height:15, fontSize:"0.55rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700 }}>{wishCount}</span>}
           </button>
           <button onClick={() => navTo("cart")} className="show-mobile-flex" style={{ display:"none", background:"none", border:"none", cursor:"pointer", position:"relative", fontSize:18, padding:"4px 5px" }}>
-            🛒
+            ??
             {cartCount > 0 && <span style={{ position:"absolute", top:0, right:0, background:T.orange, color:"#fff", borderRadius:"50%", width:15, height:15, fontSize:"0.55rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700 }}>{cartCount}</span>}
           </button>
           {user ? (
@@ -282,7 +282,7 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
   );
 }
 
-// ─── HERO — TEXT CENTERED ─────────────────────────────────────
+// --- HERO � TEXT CENTERED -------------------------------------
 function Hero({ onShop, onRitual }) {
   const [rot, setRot] = useState({ x: 6, y: -18 });
   const [dragging, setDragging] = useState(false);
@@ -312,24 +312,24 @@ function Hero({ onShop, onRitual }) {
       <div style={{ position:"absolute", bottom:"28%", right:"32%", width:6, height:6, borderRadius:"50%", background:T.orange, opacity:0.4 }} />
 
       <div className="max-w hero-grid" style={{ width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2.5rem", alignItems:"center" }}>
-        {/* LEFT: Text — fully centered */}
+        {/* LEFT: Text � fully centered */}
         <div style={{ animation:"fadeUp 0.8s ease both", display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center" }}>
           <div style={{ display:"inline-flex", alignItems:"center", gap:7, background:"rgba(232,114,12,0.08)", border:`1px solid rgba(232,114,12,0.22)`, borderRadius:20, paddingTop:5, paddingBottom:5, paddingLeft:14, paddingRight:14, marginBottom:"1.6rem" }}>
-            <span style={{ color:T.orange, fontSize:10 }}>✦</span>
+            <span style={{ color:T.orange, fontSize:10 }}>?</span>
             <span style={{ fontSize:"0.65rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase" }}>India's Sacred Manifestation Stone</span>
           </div>
 
-          <h1 style={{ fontFamily:"'Noto Serif Devanagari','Playfair Display',serif", fontSize:"clamp(2.2rem,5.5vw,4.2rem)", fontWeight:900, lineHeight:1.1, marginBottom:"0.3rem", color:T.text }}>अपनी इच्छाएँ,</h1>
-          <h1 style={{ fontFamily:"'Noto Serif Devanagari','Playfair Display',serif", fontSize:"clamp(2.2rem,5.5vw,4.2rem)", fontWeight:900, lineHeight:1.1, marginBottom:"1rem", color:T.orange, fontStyle:"italic" }}>अपनी नियति।</h1>
+          <h1 style={{ fontFamily:"'Noto Serif Devanagari','Playfair Display',serif", fontSize:"clamp(2.2rem,5.5vw,4.2rem)", fontWeight:900, lineHeight:1.1, marginBottom:"0.3rem", color:T.text }}>???? ???????,</h1>
+          <h1 style={{ fontFamily:"'Noto Serif Devanagari','Playfair Display',serif", fontSize:"clamp(2.2rem,5.5vw,4.2rem)", fontWeight:900, lineHeight:1.1, marginBottom:"1rem", color:T.orange, fontStyle:"italic" }}>???? ??????</h1>
 
           <p style={{ fontSize:"clamp(0.7rem,1.2vw,0.88rem)", fontWeight:600, letterSpacing:"0.22em", textTransform:"uppercase", color:T.text, marginBottom:"1.2rem", borderBottom:`2px solid ${T.text}`, paddingBottom:"0.8rem", display:"inline-block" }}>Manifest with WishStone</p>
 
           <blockquote style={{ fontSize:"clamp(0.8rem,1.4vw,0.88rem)", color:T.textMid, lineHeight:1.7, marginBottom:"2rem", borderLeft:`3px solid ${T.orange}`, paddingLeft:"1rem", fontStyle:"italic", maxWidth:420, textAlign:"left" }}>
-            "जो तुम खोज रहे हो, वह भी तुम्हें खोज रहा है — WishStone उस रास्ते को छोटा करता है।"
+            "?? ??? ??? ??? ??, ?? ?? ??????? ??? ??? ?? � WishStone ?? ?????? ?? ???? ???? ???"
           </blockquote>
 
           <div style={{ display:"flex", gap:"0.8rem", flexWrap:"wrap", justifyContent:"center" }}>
-            <button className="btn-orange" onClick={onShop} style={{ paddingTop:13, paddingBottom:13, paddingLeft:26, paddingRight:26, fontSize:"0.82rem", borderRadius:8 }}>अभी शुरू करें</button>
+            <button className="btn-orange" onClick={onShop} style={{ paddingTop:13, paddingBottom:13, paddingLeft:26, paddingRight:26, fontSize:"0.82rem", borderRadius:8 }}>??? ???? ????</button>
             <button className="btn-outline" onClick={onRitual} style={{ paddingTop:13, paddingBottom:13, paddingLeft:26, paddingRight:26, fontSize:"0.82rem", borderRadius:8 }}>The Ritual</button>
           </div>
         </div>
@@ -337,7 +337,7 @@ function Hero({ onShop, onRitual }) {
         {/* RIGHT: 3D Interactive Stone */}
         <div style={{ position:"relative", display:"flex", alignItems:"center", justifyContent:"center", minHeight:"clamp(320px,45vw,520px)", perspective:"900px" }}
           onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}>
-          <div style={{ position:"absolute", bottom:8, left:"50%", transform:"translateX(-50%)", fontSize:"0.62rem", color:T.textMid, letterSpacing:"0.1em", textTransform:"uppercase", fontWeight:600, opacity:0.6, whiteSpace:"nowrap", zIndex:10 }}>↔ Drag to rotate</div>
+          <div style={{ position:"absolute", bottom:8, left:"50%", transform:"translateX(-50%)", fontSize:"0.62rem", color:T.textMid, letterSpacing:"0.1em", textTransform:"uppercase", fontWeight:600, opacity:0.6, whiteSpace:"nowrap", zIndex:10 }}>? Drag to rotate</div>
           <div onMouseDown={onMouseDown} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
             style={{ position:"relative", zIndex:2, transformStyle:"preserve-3d", transform: autoAnim ? undefined : `rotateX(${rot.x}deg) rotateY(${rot.y}deg)`, animation: autoAnim ? "stone3d 8s ease-in-out infinite" : "none", cursor: dragging ? "grabbing" : "grab", transition: dragging ? "none" : "transform 0.4s ease", userSelect:"none" }}>
             <div style={{ width:"clamp(190px,24vw,300px)", height:"clamp(230px,30vw,360px)", borderRadius:"50% 50% 48% 52% / 55% 55% 45% 45%", background:"radial-gradient(ellipse at 32% 28%, #f5b070 0%, #d06818 40%, #c85a10 65%, #7a3008 100%)", boxShadow:"0 40px 100px rgba(200,90,16,0.5), 0 0 0 1px rgba(200,90,16,0.1), inset 0 -25px 50px rgba(0,0,0,0.25), inset 0 12px 35px rgba(255,210,130,0.35)", position:"relative", overflow:"hidden" }}>
@@ -348,15 +348,15 @@ function Hero({ onShop, onRitual }) {
             <div style={{ position:"absolute", bottom:-18, left:"50%", transform:"translateX(-50%)", width:"70%", height:20, borderRadius:"50%", background:"rgba(200,90,16,0.22)", filter:"blur(10px)" }} />
           </div>
           <div className="hero-badge" style={{ position:"absolute", top:"14%", left:"0%", background:T.white, borderRadius:14, paddingTop:10, paddingBottom:10, paddingLeft:14, paddingRight:14, boxShadow:"0 8px 32px rgba(0,0,0,0.12)", display:"flex", alignItems:"center", gap:10, minWidth:148, zIndex:3, animation:"badgeFloat1 4s ease-in-out infinite" }}>
-            <div style={{ width:36, height:36, borderRadius:9, background:"linear-gradient(135deg,#ff6b6b,#ee5a24)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>🎯</div>
+            <div style={{ width:36, height:36, borderRadius:9, background:"linear-gradient(135deg,#ff6b6b,#ee5a24)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>??</div>
             <div><div style={{ fontSize:"0.78rem", fontWeight:700, color:T.text, whiteSpace:"nowrap" }}>Set Intentions</div><div style={{ fontSize:"0.63rem", color:T.textMid }}>Daily Ritual</div></div>
           </div>
           <div className="hero-badge" style={{ position:"absolute", top:"40%", right:"-4%", background:T.white, borderRadius:14, paddingTop:10, paddingBottom:10, paddingLeft:14, paddingRight:14, boxShadow:"0 8px 32px rgba(0,0,0,0.12)", display:"flex", alignItems:"center", gap:10, minWidth:158, zIndex:3, animation:"badgeFloat2 4.5s ease-in-out infinite" }}>
-            <div style={{ width:36, height:36, borderRadius:9, background:"linear-gradient(135deg,#f9ca24,#f0932b)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>✨</div>
+            <div style={{ width:36, height:36, borderRadius:9, background:"linear-gradient(135deg,#f9ca24,#f0932b)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>?</div>
             <div><div style={{ fontSize:"0.78rem", fontWeight:700, color:T.text, whiteSpace:"nowrap" }}>Energy Aligned</div><div style={{ fontSize:"0.63rem", color:T.textMid }}>Natural Stone</div></div>
           </div>
           <div className="hero-badge" style={{ position:"absolute", bottom:"12%", left:"4%", background:T.white, borderRadius:14, paddingTop:10, paddingBottom:10, paddingLeft:14, paddingRight:14, boxShadow:"0 8px 32px rgba(0,0,0,0.12)", display:"flex", alignItems:"center", gap:10, minWidth:148, zIndex:3, animation:"badgeFloat3 5s ease-in-out infinite" }}>
-            <div style={{ width:36, height:36, borderRadius:9, background:"linear-gradient(135deg,#6ab04c,#2ecc71)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>🌿</div>
+            <div style={{ width:36, height:36, borderRadius:9, background:"linear-gradient(135deg,#6ab04c,#2ecc71)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>??</div>
             <div><div style={{ fontSize:"0.78rem", fontWeight:700, color:T.text, whiteSpace:"nowrap" }}>Inner Peace</div><div style={{ fontSize:"0.63rem", color:T.textMid }}>Grounding</div></div>
           </div>
         </div>
@@ -365,13 +365,13 @@ function Hero({ onShop, onRitual }) {
   );
 }
 
-// ─── STATS BAR ────────────────────────────────────────────────
+// --- STATS BAR ------------------------------------------------
 function StatsBar() {
   return (
     <div style={{ background:T.bg, borderTop:`1px solid ${T.border}`, borderBottom:`1px solid ${T.border}`, padding:"28px clamp(1.5rem,5vw,3.5rem)" }}>
       <div className="max-w">
         <div style={{ display:"flex", justifyContent:"center", alignItems:"center", gap:"clamp(2rem,5vw,5rem)", flexWrap:"wrap" }}>
-          {[["12K+","DREAMERS"],["4.9★","RATING"],["100%","NATURAL"],["21","DAY SHIFT"]].map(([n,l]) => (
+          {[["12K+","DREAMERS"],["4.9?","RATING"],["100%","NATURAL"],["21","DAY SHIFT"]].map(([n,l]) => (
             <div key={l} style={{ textAlign:"center" }}>
               <div style={{ fontFamily:"'Inter',sans-serif", fontSize:"clamp(1.3rem,2.5vw,1.8rem)", fontWeight:800, color:T.text, lineHeight:1 }}>{n}</div>
               <div style={{ fontSize:"0.62rem", fontWeight:700, color:T.textMid, letterSpacing:"0.14em", marginTop:4, fontFamily:"'Inter',sans-serif" }}>{l}</div>
@@ -383,7 +383,7 @@ function StatsBar() {
   );
 }
 
-// ─── MARQUEE ──────────────────────────────────────────────────
+// --- MARQUEE --------------------------------------------------
 function MarqueeSection() {
   const doubled = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
   return (
@@ -392,7 +392,7 @@ function MarqueeSection() {
         {doubled.map((t, i) => (
           <span key={i} style={{ color: t==="WishStone" ? T.orange : "rgba(255,255,255,0.65)", fontSize:"0.75rem", fontWeight:600, letterSpacing:"0.12em", fontStyle:"italic", padding:"0 1.8rem", whiteSpace:"nowrap", fontFamily:"'Playfair Display',serif" }}>
             {t}
-            {i < doubled.length - 1 && <span style={{ color:T.orange, margin:"0 0.5rem" }}>•</span>}
+            {i < doubled.length - 1 && <span style={{ color:T.orange, margin:"0 0.5rem" }}>�</span>}
           </span>
         ))}
       </div>
@@ -400,7 +400,7 @@ function MarqueeSection() {
   );
 }
 
-// ─── COMMUNITY VIDEO SECTION — REDESIGNED ────────────────────
+// --- COMMUNITY VIDEO SECTION � REDESIGNED --------------------
 function CommunityVideoSection() {
   const videoRefs = useRef([]);
   const [activeVideo, setActiveVideo] = useState(null);
@@ -411,11 +411,11 @@ function CommunityVideoSection() {
     if (!vid) return;
 
     if (activeVideo === i) {
-      // same video — toggle play/pause
+      // same video � toggle play/pause
       if (vid.paused) { vid.play().catch(() => {}); setPlaying(true); }
       else { vid.pause(); setPlaying(false); }
     } else {
-      // different video — pause all others, play this one with sound
+      // different video � pause all others, play this one with sound
       videoRefs.current.forEach((v, idx) => {
         if (v && idx !== i) { v.pause(); v.muted = true; v.currentTime = 0; }
       });
@@ -477,11 +477,11 @@ function CommunityVideoSection() {
               <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", fontWeight:900, color:"#fff", lineHeight:1.2, marginBottom:"0.2rem", fontStyle:"italic" }}>{v.title}</div>
               <div style={{ fontSize:"0.68rem", color:"rgba(255,255,255,0.65)", fontStyle:"italic" }}>{v.caption}</div>
             </div>
-            {/* Play/Pause button — only on active video */}
+            {/* Play/Pause button � only on active video */}
             {activeVideo === i && (
               <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", pointerEvents:"none" }}>
                 <div style={{ width:56, height:56, borderRadius:"50%", background:"rgba(0,0,0,0.55)", backdropFilter:"blur(6px)", border:"2px solid rgba(255,255,255,0.25)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 4px 20px rgba(0,0,0,0.4)", opacity: playing ? 0 : 1, transition:"opacity 0.2s" }}>
-                  <span style={{ fontSize:22, color:"#fff", marginLeft: playing ? 0 : 4 }}>{playing ? "⏸" : "▶"}</span>
+                  <span style={{ fontSize:22, color:"#fff", marginLeft: playing ? 0 : 4 }}>{playing ? "?" : "?"}</span>
                 </div>
               </div>
             )}
@@ -493,14 +493,14 @@ function CommunityVideoSection() {
       <div style={{ textAlign:"center", marginTop:"3rem" }}>
         <p style={{ color:"rgba(255,255,255,0.4)", fontSize:"0.78rem", marginBottom:"1rem", letterSpacing:"0.08em" }}>Join 12,000+ conscious souls on their journey</p>
         <div style={{ display:"inline-flex", alignItems:"center", gap:8, color:"rgba(255,255,255,0.5)", fontSize:"0.7rem" }}>
-          <span style={{ color:T.orange }}>✦</span><span>#WishStoneJourney</span><span style={{ color:T.orange }}>✦</span>
+          <span style={{ color:T.orange }}>?</span><span>#WishStoneJourney</span><span style={{ color:T.orange }}>?</span>
         </div>
       </div>
     </section>
   );
 }
 
-// ─── POWERS SECTION ──────────────────────────────────────────
+// --- POWERS SECTION ------------------------------------------
 function PowersSection({ onNav }) {
   return (
     <section style={{ background:T.bg, padding:"90px clamp(1.5rem,5vw,3.5rem)" }}>
@@ -508,7 +508,7 @@ function PowersSection({ onNav }) {
         <div style={{ textAlign:"center", marginBottom:"3.5rem" }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:14 }}>
             <div style={{ height:1, width:40, background:T.orange }} />
-            <span style={{ fontSize:"0.65rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase" }}>WishStone की शक्ति</span>
+            <span style={{ fontSize:"0.65rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase" }}>WishStone ?? ?????</span>
             <div style={{ height:1, width:40, background:T.orange }} />
           </div>
           <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.8rem,4vw,2.8rem)", fontWeight:900, color:T.text, lineHeight:1.2 }}>
@@ -536,7 +536,7 @@ function PowersSection({ onNav }) {
                   <button onClick={() => onNav("benefits")} style={{ background:"none", border:"none", cursor:"pointer", color:T.orange, fontSize:"0.75rem", fontWeight:700, display:"flex", alignItems:"center", gap:4, fontFamily:"'Inter',sans-serif", transition:"gap 0.2s" }}
                     onMouseEnter={e => e.currentTarget.style.gap="8px"}
                     onMouseLeave={e => e.currentTarget.style.gap="4px"}>
-                    Learn More →
+                    Learn More ?
                   </button>
                 </div>
               </div>
@@ -548,7 +548,7 @@ function PowersSection({ onNav }) {
   );
 }
 
-// ─── QUOTE SECTION ────────────────────────────────────────────
+// --- QUOTE SECTION --------------------------------------------
 function QuoteSection() {
   const [idx, setIdx] = useState(0);
   const [key, setKey] = useState(0);
@@ -562,15 +562,15 @@ function QuoteSection() {
       <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at 50% 50%, rgba(232,114,12,0.06) 0%, transparent 70%)", pointerEvents:"none" }} />
       <div className="max-w" style={{ maxWidth:760, position:"relative" }}>
         <div style={{ fontSize:"0.62rem", fontWeight:700, color:T.orange, letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:"1.5rem", display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
-          <span>✦</span> Daily Manifestation Oracle <span>✦</span>
+          <span>?</span> Daily Manifestation Oracle <span>?</span>
         </div>
         <div style={{ fontSize:"3rem", color:"rgba(232,114,12,0.35)", lineHeight:1, marginBottom:"1.5rem", fontFamily:"Georgia,serif" }}>"</div>
         <blockquote key={key} style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.2rem,2.8vw,1.7rem)", fontWeight:700, color:T.white, lineHeight:1.55, marginBottom:"1.5rem", fontStyle:"italic", animation:"quoteIn 0.5s ease both" }}>
           {q.text}
         </blockquote>
-        <cite style={{ fontSize:"0.72rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase", fontStyle:"normal" }}>— {q.author}</cite>
+        <cite style={{ fontSize:"0.72rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase", fontStyle:"normal" }}>� {q.author}</cite>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"1rem", marginTop:"2.5rem" }}>
-          <button onClick={() => { setIdx(i => (i-1+QUOTES.length)%QUOTES.length); setKey(k=>k+1); }} style={{ width:28, height:28, borderRadius:"50%", border:`1px solid rgba(255,255,255,0.2)`, background:"none", color:"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:12, display:"flex", alignItems:"center", justifyContent:"center" }}>‹</button>
+          <button onClick={() => { setIdx(i => (i-1+QUOTES.length)%QUOTES.length); setKey(k=>k+1); }} style={{ width:28, height:28, borderRadius:"50%", border:`1px solid rgba(255,255,255,0.2)`, background:"none", color:"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:12, display:"flex", alignItems:"center", justifyContent:"center" }}>�</button>
           <div style={{ width:180, height:2, background:"rgba(255,255,255,0.1)", borderRadius:1, position:"relative" }}>
             <div style={{ position:"absolute", left:0, top:0, height:"100%", background:T.orange, borderRadius:1, width:`${((idx+1)/QUOTES.length)*100}%`, transition:"width 0.4s ease" }} />
           </div>
@@ -579,14 +579,14 @@ function QuoteSection() {
               <button key={i} onClick={() => { setIdx(i); setKey(k=>k+1); }} style={{ width: i===idx ? 18 : 7, height:7, borderRadius:4, background: i===idx ? T.orange : "rgba(255,255,255,0.2)", border:"none", cursor:"pointer", transition:"all 0.3s", padding:0 }} />
             ))}
           </div>
-          <button onClick={() => { setIdx(i => (i+1)%QUOTES.length); setKey(k=>k+1); }} style={{ width:28, height:28, borderRadius:"50%", border:`1px solid rgba(255,255,255,0.2)`, background:"none", color:"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:12, display:"flex", alignItems:"center", justifyContent:"center" }}>›</button>
+          <button onClick={() => { setIdx(i => (i+1)%QUOTES.length); setKey(k=>k+1); }} style={{ width:28, height:28, borderRadius:"50%", border:`1px solid rgba(255,255,255,0.2)`, background:"none", color:"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:12, display:"flex", alignItems:"center", justifyContent:"center" }}>�</button>
         </div>
       </div>
     </section>
   );
 }
 
-// ─── FOUNDER NOTE SECTION — replaces OurStories ──────────────
+// --- FOUNDER NOTE SECTION � replaces OurStories --------------
 function FounderNoteSection() {
   return (
     <section style={{ background:"#fff", padding:"80px clamp(1.5rem,5vw,3.5rem)" }}>
@@ -653,7 +653,7 @@ function FounderNoteSection() {
               borderRadius:20, padding:"5px 14px",
               marginBottom:"1.5rem", width:"fit-content",
             }}>
-              <span style={{ color:T.orange, fontSize:10 }}>✦</span>
+              <span style={{ color:T.orange, fontSize:10 }}>?</span>
               <span style={{ fontSize:"0.62rem", fontWeight:700, color:T.orange, letterSpacing:"0.15em", textTransform:"uppercase" }}>A Note from Our Founders</span>
             </div>
 
@@ -674,16 +674,16 @@ function FounderNoteSection() {
 
             {/* Body paragraphs */}
             <p style={{ fontSize:"0.86rem", color:T.textMid, lineHeight:1.8, marginBottom:"1rem" }}>
-              We've seen people give up on goals they never stopped wanting. We didn't start WishStone with a business plan. We started it with a simple question — <strong style={{ color:T.text }}>why do people who genuinely want to change, still stay where they are?</strong>
+              We've seen people give up on goals they never stopped wanting. We didn't start WishStone with a business plan. We started it with a simple question � <strong style={{ color:T.text }}>why do people who genuinely want to change, still stay where they are?</strong>
             </p>
             <p style={{ fontSize:"0.86rem", color:T.textMid, lineHeight:1.8, marginBottom:"1rem" }}>
               It's not laziness. It's not lack of desire. Life just gets loud. And in that noise, intention fades.
             </p>
             <p style={{ fontSize:"0.86rem", color:T.textMid, lineHeight:1.8, marginBottom:"1.5rem" }}>
-              We travelled, we observed, and one thing kept showing up everywhere — people who stayed on track almost always had something <em>physical</em> to hold on to. A stone. A thread. A small object that brought them back to what mattered.
+              We travelled, we observed, and one thing kept showing up everywhere � people who stayed on track almost always had something <em>physical</em> to hold on to. A stone. A thread. A small object that brought them back to what mattered.
             </p>
             <p style={{ fontSize:"0.86rem", color:T.text, lineHeight:1.8, fontWeight:600, marginBottom:"2rem" }}>
-              That's WishStone. Not a lucky charm. Just a daily reminder that what you want — still matters.
+              That's WishStone. Not a lucky charm. Just a daily reminder that what you want � still matters.
             </p>
 
             {/* Signature */}
@@ -713,7 +713,7 @@ function FounderNoteSection() {
   );
 }
 
-// ─── FOOTER ───────────────────────────────────────────────────
+// --- FOOTER ---------------------------------------------------
 function Footer() {
   return (
     <footer style={{ background:T.bgDark, padding:"60px clamp(1.5rem,5vw,3.5rem) 30px", borderTop:`3px solid ${T.orange}` }}>
@@ -721,10 +721,10 @@ function Footer() {
         <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", gap:"3rem", marginBottom:"3rem" }} className="footer-grid">
           <div>
             <div style={{ display:"flex", alignItems:"center", gap:9, marginBottom:"1rem" }}>
-              <div style={{ width:30, height:30, borderRadius:7, background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:14 }}>💎</div>
+              <div style={{ width:30, height:30, borderRadius:7, background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:14 }}>??</div>
               <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", fontWeight:900, color:T.white }}>WishStone</span>
             </div>
-            <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.5)", lineHeight:1.7, maxWidth:240 }}>India's sacred manifestation stone — hand-crafted with ancient yantra to help you manifest your deepest desires.</p>
+            <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.5)", lineHeight:1.7, maxWidth:240 }}>India's sacred manifestation stone � hand-crafted with ancient yantra to help you manifest your deepest desires.</p>
           </div>
           {[
             { title:"Shop", links:["WishStone Original","Ritual Kits","Bundles","Best Sellers","New Arrivals"] },
@@ -743,15 +743,15 @@ function Footer() {
           ))}
         </div>
         <div style={{ borderTop:"1px solid rgba(255,255,255,0.08)", paddingTop:"1.5rem", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:10 }}>
-          <p style={{ fontSize:"0.72rem", color:"rgba(255,255,255,0.3)" }}>© 2024 WishStone. All rights reserved.</p>
-          <p style={{ fontSize:"0.72rem", color:"rgba(255,255,255,0.3)" }}>Made with 💎 for conscious souls across India</p>
+          <p style={{ fontSize:"0.72rem", color:"rgba(255,255,255,0.3)" }}>� 2024 WishStone. All rights reserved.</p>
+          <p style={{ fontSize:"0.72rem", color:"rgba(255,255,255,0.3)" }}>Made with ?? for conscious souls across India</p>
         </div>
       </div>
     </footer>
   );
 }
 
-// ─── HOME PAGE ────────────────────────────────────────────────
+// --- HOME PAGE ------------------------------------------------
 function HomePage({ onShop, onRitual, onNav }) {
   const [openFaq, setOpenFaq] = useState(null);
   return (
@@ -768,7 +768,7 @@ function HomePage({ onShop, onRitual, onNav }) {
               <div style={{ fontSize:"0.65rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase", marginBottom:8 }}>BEST SELLERS</div>
               <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3.5vw,2.2rem)", fontWeight:900, color:T.text, margin:0 }}>Most Loved Stones</h2>
             </div>
-            <button className="btn-outline" onClick={onShop} style={{ padding:"10px 24px", fontSize:"0.78rem", borderRadius:8 }}>View All →</button>
+            <button className="btn-outline" onClick={onShop} style={{ padding:"10px 24px", fontSize:"0.78rem", borderRadius:8 }}>View All ?</button>
           </div>
         </div>
         <div style={{ overflow:"hidden", position:"relative" }}>
@@ -800,7 +800,7 @@ function HomePage({ onShop, onRitual, onNav }) {
       <PowersSection onNav={onNav} />
       <QuoteSection />
 
-      {/* Founder Note — replaces user stories */}
+      {/* Founder Note � replaces user stories */}
       <FounderNoteSection />
 
       {/* FAQ */}
@@ -825,7 +825,7 @@ function HomePage({ onShop, onRitual, onNav }) {
   );
 }
 
-// ─── BEST SELLERS STRIP (reusable) ───────────────────────────
+// --- BEST SELLERS STRIP (reusable) ---------------------------
 function BestSellersStrip({ onShop }) {
   const scrollRef = useRef(null);
   const isDragging = useRef(false);
@@ -861,11 +861,11 @@ function BestSellersStrip({ onShop }) {
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
             <button onClick={() => scroll(-1)} style={{ width:38, height:38, borderRadius:"50%", border:`1.5px solid ${T.border}`, background:"#fff", cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.2s" }}
               onMouseEnter={e => { e.currentTarget.style.background=T.orange; e.currentTarget.style.borderColor=T.orange; e.currentTarget.style.color="#fff"; }}
-              onMouseLeave={e => { e.currentTarget.style.background="#fff"; e.currentTarget.style.borderColor=T.border; e.currentTarget.style.color="#000"; }}>‹</button>
+              onMouseLeave={e => { e.currentTarget.style.background="#fff"; e.currentTarget.style.borderColor=T.border; e.currentTarget.style.color="#000"; }}>�</button>
             <button onClick={() => scroll(1)} style={{ width:38, height:38, borderRadius:"50%", border:`1.5px solid ${T.border}`, background:"#fff", cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.2s" }}
               onMouseEnter={e => { e.currentTarget.style.background=T.orange; e.currentTarget.style.borderColor=T.orange; e.currentTarget.style.color="#fff"; }}
-              onMouseLeave={e => { e.currentTarget.style.background="#fff"; e.currentTarget.style.borderColor=T.border; e.currentTarget.style.color="#000"; }}>›</button>
-            <button className="btn-outline" onClick={onShop} style={{ padding:"10px 24px", fontSize:"0.78rem", borderRadius:8 }}>View All →</button>
+              onMouseLeave={e => { e.currentTarget.style.background="#fff"; e.currentTarget.style.borderColor=T.border; e.currentTarget.style.color="#000"; }}>�</button>
+            <button className="btn-outline" onClick={onShop} style={{ padding:"10px 24px", fontSize:"0.78rem", borderRadius:8 }}>View All ?</button>
           </div>
         </div>
       </div>
@@ -901,7 +901,7 @@ function BestSellersStrip({ onShop }) {
     </section>
   );
 }
-// ─── PRODUCTS PAGE ────────────────────────────────────────────
+// --- PRODUCTS PAGE --------------------------------------------
 function ProductsPage({ onAdd, onWish, wished, onClick, cart }) {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
@@ -933,7 +933,7 @@ function ProductsPage({ onAdd, onWish, wished, onClick, cart }) {
                   <div style={{ position:"absolute", top:10, left:10, background:T.orange, color:"#fff", borderRadius:4, padding:"3px 10px", fontSize:"0.65rem", fontWeight:800 }}>-{p.discount}%</div>
                   <button onClick={e => { e.stopPropagation(); onWish(p.id); }} style={{ position:"absolute", top:8, right:8, background:"rgba(255,255,255,0.9)", border:"none", borderRadius:"50%", width:32, height:32, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:14, transition:"transform 0.2s" }}
                     onMouseEnter={e => e.currentTarget.style.transform="scale(1.15)"} onMouseLeave={e => e.currentTarget.style.transform="scale(1)"}
-                  >{wished.includes(p.id) ? "❤️" : "🤍"}</button>
+                  >{wished.includes(p.id) ? "??" : "??"}</button>
                   {p.bestSeller && <div style={{ position:"absolute", bottom:8, left:8, background:T.bgDark, color:T.orange, borderRadius:4, padding:"2px 8px", fontSize:"0.6rem", fontWeight:700, letterSpacing:"0.08em" }}>BEST SELLER</div>}
                 </div>
                 <div style={{ padding:"1.2rem" }}>
@@ -945,7 +945,7 @@ function ProductsPage({ onAdd, onWish, wished, onClick, cart }) {
                   </div>
                   {qty > 0 ? (
                     <div onClick={e => e.stopPropagation()} style={{ display:"flex", alignItems:"center", gap:0, border:`1.5px solid ${T.orange}`, borderRadius:8, overflow:"hidden", width:"100%" }}>
-                      <button onClick={() => onAdd({ ...p, qty:-1 })} style={{ flex:1, height:38, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.orange, fontWeight:700 }}>−</button>
+                      <button onClick={() => onAdd({ ...p, qty:-1 })} style={{ flex:1, height:38, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.orange, fontWeight:700 }}>-</button>
                       <span style={{ flex:1, textAlign:"center", fontWeight:800, color:T.orange, fontSize:"0.95rem" }}>{qty}</span>
                       <button onClick={() => onAdd(p)} style={{ flex:1, height:38, background:T.orange, border:"none", cursor:"pointer", fontSize:18, color:"#fff", fontWeight:700 }}>+</button>
                     </div>
@@ -957,12 +957,12 @@ function ProductsPage({ onAdd, onWish, wished, onClick, cart }) {
             );
           })}
         </div>
-        {filtered.length===0 && <div style={{ textAlign:"center", padding:"4rem", color:T.textMid }}><div style={{ fontSize:48, marginBottom:12 }}>🔍</div><p>No products found.</p></div>}
+        {filtered.length===0 && <div style={{ textAlign:"center", padding:"4rem", color:T.textMid }}><div style={{ fontSize:48, marginBottom:12 }}>??</div><p>No products found.</p></div>}
       </div>
     </div>
   );
 }
-// ─── PRODUCT DETAIL ───────────────────────────────────────────
+// --- PRODUCT DETAIL -------------------------------------------
 function ProductPage({ product: p, onAdd, onWish, wished, cart, onShop }) {
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState("desc");
@@ -1010,19 +1010,19 @@ function ProductPage({ product: p, onAdd, onWish, wished, cart, onShop }) {
             </div>
             <div style={{ display:"flex", gap:"1rem", alignItems:"center", marginBottom:"1rem" }}>
               <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.border}`, borderRadius:8, overflow:"hidden" }}>
-                <button onClick={() => setQty(q => Math.max(1,q-1))} style={{ width:36, height:40, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.text }}>−</button>
+                <button onClick={() => setQty(q => Math.max(1,q-1))} style={{ width:36, height:40, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.text }}>-</button>
                 <span style={{ width:40, textAlign:"center", fontWeight:700, color:T.text }}>{qty}</span>
                 <button onClick={() => setQty(q => q+1)} style={{ width:36, height:40, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.text }}>+</button>
               </div>
               <button className="btn-orange" onClick={() => { for(let i=0;i<qty;i++) onAdd(p); }} style={{ flex:1, padding:"12px", fontSize:"0.8rem", borderRadius:8 }}>
                 Add to Cart {cartQty > 0 && <span style={{ background:"rgba(255,255,255,0.25)", borderRadius:10, padding:"1px 7px", marginLeft:6, fontSize:"0.72rem" }}>{cartQty} in cart</span>}
               </button>
-              <button onClick={() => onWish(p.id)} style={{ width:44, height:44, borderRadius:8, border:`1.5px solid ${T.border}`, background:"#fff", cursor:"pointer", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center" }}>{wished.includes(p.id) ? "❤️" : "🤍"}</button>
+              <button onClick={() => onWish(p.id)} style={{ width:44, height:44, borderRadius:8, border:`1.5px solid ${T.border}`, background:"#fff", cursor:"pointer", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center" }}>{wished.includes(p.id) ? "??" : "??"}</button>
             </div>
             <div style={{ display:"flex", gap:"1.2rem", flexWrap:"wrap" }}>
               {["Free shipping above Rs.999","7-day returns","100% natural"].map(f => (
                 <div key={f} style={{ display:"flex", alignItems:"center", gap:5, fontSize:"0.7rem", color:T.textMid }}>
-                  <span style={{ color:T.orange }}>✓</span> {f}
+                  <span style={{ color:T.orange }}>?</span> {f}
                 </div>
               ))}
             </div>
@@ -1038,7 +1038,7 @@ function ProductPage({ product: p, onAdd, onWish, wished, cart, onShop }) {
         <div style={{ fontSize:"0.82rem", color:T.orange, fontWeight:800, lineHeight:1.3 }}>Rs.{p.price.toLocaleString()}</div>
       </div>
       <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.border}`, borderRadius:7, overflow:"hidden", flexShrink:0, height:34 }}>
-        <button onClick={() => setQty(q => Math.max(1,q-1))} style={{ width:28, height:34, background:"none", border:"none", cursor:"pointer", fontSize:14, color:T.text, lineHeight:1 }}>−</button>
+        <button onClick={() => setQty(q => Math.max(1,q-1))} style={{ width:28, height:34, background:"none", border:"none", cursor:"pointer", fontSize:14, color:T.text, lineHeight:1 }}>-</button>
         <span style={{ width:28, textAlign:"center", fontWeight:700, color:T.text, fontSize:"0.82rem" }}>{qty}</span>
         <button onClick={() => setQty(q => q+1)} style={{ width:28, height:34, background:"none", border:"none", cursor:"pointer", fontSize:14, color:T.text, lineHeight:1 }}>+</button>
       </div>
@@ -1049,12 +1049,12 @@ function ProductPage({ product: p, onAdd, onWish, wished, cart, onShop }) {
     </>
   );
 }
-// ─── RITUALS PAGE ─────────────────────────────────────────────
+// --- RITUALS PAGE ---------------------------------------------
 function RitualsPage() {
   const rituals = [
-    { icon:"🌙", title:"New Moon Ritual", time:"30 min", desc:"Set powerful intentions with your WishStone under the new moon. Write your desires, charge your stone, and visualize your manifestation.", steps:["Apne space ko sage se cleanse karein","WishStone ko dono haathon mein pakdein","3 intentions paper pe likhein","Stone ko paper pe raat bhar rakhein","10 minute meditation karein"] },
-    { icon:"☀️", title:"Morning Activation", time:"10 min", desc:"Har subah WishStone activation ritual se apni energy align karein aur din ko positive tone dein.", steps:["WishStone ko dono haathon mein pakdein","5 gehri sansein lein","Apni intention zor se bolein","Stone ko apne dil pe rakhein","Isse poore din saath rakhein"] },
-    { icon:"🌿", title:"Cleansing Ceremony", time:"20 min", desc:"Regular cleansing se accumulated energies remove hoti hain aur WishStone apni natural vibrational state mein wapas aata hai.", steps:["Stone ko thande paani se dhoyein","Sage smoke se pass karein","1 ghante ke liye sunlight mein rakhein","Nayi intention set karein","Sacred space mein store karein"] },
+    { icon:"??", title:"New Moon Ritual", time:"30 min", desc:"Set powerful intentions with your WishStone under the new moon. Write your desires, charge your stone, and visualize your manifestation.", steps:["Apne space ko sage se cleanse karein","WishStone ko dono haathon mein pakdein","3 intentions paper pe likhein","Stone ko paper pe raat bhar rakhein","10 minute meditation karein"] },
+    { icon:"??", title:"Morning Activation", time:"10 min", desc:"Har subah WishStone activation ritual se apni energy align karein aur din ko positive tone dein.", steps:["WishStone ko dono haathon mein pakdein","5 gehri sansein lein","Apni intention zor se bolein","Stone ko apne dil pe rakhein","Isse poore din saath rakhein"] },
+    { icon:"??", title:"Cleansing Ceremony", time:"20 min", desc:"Regular cleansing se accumulated energies remove hoti hain aur WishStone apni natural vibrational state mein wapas aata hai.", steps:["Stone ko thande paani se dhoyein","Sage smoke se pass karein","1 ghante ke liye sunlight mein rakhein","Nayi intention set karein","Sacred space mein store karein"] },
   ];
   return (
     <div style={{ paddingTop:90, background:T.bg, minHeight:"100vh" }}>
@@ -1085,15 +1085,15 @@ function RitualsPage() {
   );
 }
 
-// ─── BENEFITS PAGE ────────────────────────────────────────────
+// --- BENEFITS PAGE --------------------------------------------
 function BenefitsPage() {
   const benefits = [
-    { icon:"🧘", title:"Mental Clarity", desc:"WishStone ki sacred yantra aur crystal energy mental chatter ko quiet karti hai, focus improve karti hai, aur decision-making mein clarity laati hai." },
-    { icon:"💚", title:"Emotional Healing", desc:"Rose quartz aur moonstone gently emotional blockages release karte hain, self-love promote karte hain, aur past wounds se healing support karte hain." },
-    { icon:"⚡", title:"Energy Amplification", desc:"WishStone ki frequency motivation, creativity, aur life force energy boost karti hai." },
-    { icon:"🛡️", title:"Protection", desc:"Obsidian aur black tourmaline powerful energetic shields create karte hain." },
-    { icon:"😴", title:"Better Sleep", desc:"Amethyst aur selenite nervous system ko calm karte hain, anxiety reduce karte hain." },
-    { icon:"🌟", title:"Spiritual Growth", desc:"WishStone ki sacred yantra third eye open karti hai, intuition enhance karti hai." },
+    { icon:"??", title:"Mental Clarity", desc:"WishStone ki sacred yantra aur crystal energy mental chatter ko quiet karti hai, focus improve karti hai, aur decision-making mein clarity laati hai." },
+    { icon:"??", title:"Emotional Healing", desc:"Rose quartz aur moonstone gently emotional blockages release karte hain, self-love promote karte hain, aur past wounds se healing support karte hain." },
+    { icon:"?", title:"Energy Amplification", desc:"WishStone ki frequency motivation, creativity, aur life force energy boost karti hai." },
+    { icon:"???", title:"Protection", desc:"Obsidian aur black tourmaline powerful energetic shields create karte hain." },
+    { icon:"??", title:"Better Sleep", desc:"Amethyst aur selenite nervous system ko calm karte hain, anxiety reduce karte hain." },
+    { icon:"??", title:"Spiritual Growth", desc:"WishStone ki sacred yantra third eye open karti hai, intuition enhance karti hai." },
   ];
   return (
     <div style={{ paddingTop:90, background:T.bg, minHeight:"100vh" }}>
@@ -1114,13 +1114,13 @@ function BenefitsPage() {
   );
 }
 
-// ─── STORIES PAGE ─────────────────────────────────────────────
+// --- STORIES PAGE ---------------------------------------------
 function StoriesPage() {
   const stories = [
-    { name:"Priya S.", city:"Mumbai", rating:5, text:"Pehle mujhe yakeen nahi tha, lekin Rose Quartz use karne ke 3 hafte baad, main genuinely zyada peaceful feel karti hoon.", product:"WishStone — Rose Quartz", avatar:"P" },
-    { name:"Rahul M.", city:"Delhi", rating:5, text:"Amethyst WishStone ne meri meditation practice completely change kar di.", product:"WishStone — Amethyst", avatar:"R" },
+    { name:"Priya S.", city:"Mumbai", rating:5, text:"Pehle mujhe yakeen nahi tha, lekin Rose Quartz use karne ke 3 hafte baad, main genuinely zyada peaceful feel karti hoon.", product:"WishStone � Rose Quartz", avatar:"P" },
+    { name:"Rahul M.", city:"Delhi", rating:5, text:"Amethyst WishStone ne meri meditation practice completely change kar di.", product:"WishStone � Amethyst", avatar:"R" },
     { name:"Ananya K.", city:"Bangalore", rating:5, text:"2 mahine pehle morning ritual shuru kiya WishStone ke saath. Meri productivity double ho gayi.", product:"Moonstone Ritual Kit", avatar:"A" },
-    { name:"Vikram T.", city:"Pune", rating:5, text:"Obsidian WishStone mere desk pe hai aur meri workspace ki energy shift ho gayi hai.", product:"WishStone — Obsidian", avatar:"V" },
+    { name:"Vikram T.", city:"Pune", rating:5, text:"Obsidian WishStone mere desk pe hai aur meri workspace ki energy shift ho gayi hai.", product:"WishStone � Obsidian", avatar:"V" },
     { name:"Meera J.", city:"Chennai", rating:5, text:"Lavender Bundle bilkul divine hai. Ghar ki khushboo incredible hai.", product:"Healing Lavender Bundle", avatar:"M" },
     { name:"Arjun P.", city:"Hyderabad", rating:5, text:"Apni maa ko Sandalwood Incense gift kiya. Quality exceptional hai.", product:"Sacred Sandalwood Incense", avatar:"A" },
   ];
@@ -1133,14 +1133,14 @@ function StoriesPage() {
           {stories.map((s,i) => (
             <div key={i} style={{ background:"#fff", borderRadius:16, padding:"1.5rem", border:`1px solid ${T.border}` }}>
               <div style={{ display:"flex", gap:3, marginBottom:"1rem" }}>
-                {Array(s.rating).fill(0).map((_,j) => <span key={j} style={{ color:T.orange, fontSize:13 }}>★</span>)}
+                {Array(s.rating).fill(0).map((_,j) => <span key={j} style={{ color:T.orange, fontSize:13 }}>?</span>)}
               </div>
               <p style={{ fontSize:"0.84rem", color:T.textMid, lineHeight:1.7, marginBottom:"1.2rem", fontStyle:"italic" }}>"{s.text}"</p>
               <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                 <div style={{ width:36, height:36, borderRadius:"50%", background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700, fontSize:"0.85rem" }}>{s.avatar}</div>
                 <div>
                   <div style={{ fontWeight:700, color:T.text, fontSize:"0.82rem" }}>{s.name}</div>
-                  <div style={{ fontSize:"0.68rem", color:T.textMid }}>{s.city} · {s.product}</div>
+                  <div style={{ fontSize:"0.68rem", color:T.textMid }}>{s.city} � {s.product}</div>
                 </div>
               </div>
             </div>
@@ -1151,14 +1151,14 @@ function StoriesPage() {
   );
 }
 
-// ─── CART PAGE ────────────────────────────────────────────────
+// --- CART PAGE ------------------------------------------------
 function CartPage({ cart, onQty, onRemove, onCheckout }) {
   const sub = cart.reduce((s,i) => s + i.price*i.qty, 0);
   const ship = sub >= 999 ? 0 : 99;
   const total = sub + ship;
   if (cart.length===0) return (
     <div style={{ paddingTop:130, paddingBottom:40, paddingLeft:"2rem", paddingRight:"2rem", background:T.bg, minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, textAlign:"center" }}>
-      <div style={{ fontSize:56 }}>🛒</div>
+      <div style={{ fontSize:56 }}>??</div>
       <h2 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.8rem", fontWeight:900 }}>Your Cart is Empty</h2>
     </div>
   );
@@ -1208,7 +1208,7 @@ function CartPage({ cart, onQty, onRemove, onCheckout }) {
   );
 }
 
-// ─── CHECKOUT PAGE ────────────────────────────────────────────
+// --- CHECKOUT PAGE --------------------------------------------
 function CheckoutPage({ cart, onPlaceOrder }) {
   const [form, setForm] = useState({ name:"", email:"", phone:"", address:"", city:"", state:"", pincode:"" });
   const [coupon, setCoupon] = useState("");
@@ -1227,7 +1227,7 @@ function CheckoutPage({ cart, onPlaceOrder }) {
   const applyCoupon = async () => {
     if (!coupon.trim()) return;
     try {
-      const API_BASE = process.env.REACT_APP_API_URL || window.WISHSTONE_API || "https://wishstone-api.onrender.com";
+      const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
       const res = await fetch(`${API_BASE}/api/coupons/validate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1291,15 +1291,15 @@ function CheckoutPage({ cart, onPlaceOrder }) {
               </div>
               {couponMsg && <p style={{ fontSize:"0.76rem", marginTop:6, color: discount>0 ? "#2d7a5a" : "#c0392b" }}>{couponMsg}</p>}
             </div>
-            {/* ─── GIFT WRAPPING ─── */}
+            {/* --- GIFT WRAPPING --- */}
             <div style={{ background:"#fff", borderRadius:16, padding:"1.5rem", border:`1px solid ${T.border}`, marginBottom:"1.2rem" }}>
               <label style={{ display:"flex", alignItems:"center", gap:"0.75rem", cursor:"pointer", userSelect:"none" }}>
                 <div onClick={() => setIsGift(g => !g)} style={{ width:22, height:22, borderRadius:6, border:`2px solid ${isGift ? T.orange : T.border}`, background: isGift ? T.orange : "#fff", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, transition:"all 0.2s" }}>
-                  {isGift && <span style={{ color:"#fff", fontSize:13, lineHeight:1, fontWeight:900 }}>✓</span>}
+                  {isGift && <span style={{ color:"#fff", fontSize:13, lineHeight:1, fontWeight:900 }}>?</span>}
                 </div>
                 <div>
-                  <span style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1rem", fontWeight:700 }}>🎁 Gift Wrapping</span>
-                  <span style={{ display:"block", fontSize:"0.72rem", color:T.textMid, marginTop:2 }}>Add premium gift wrapping — ₹50 per item</span>
+                  <span style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1rem", fontWeight:700 }}>?? Gift Wrapping</span>
+                  <span style={{ display:"block", fontSize:"0.72rem", color:T.textMid, marginTop:2 }}>Add premium gift wrapping � ?50 per item</span>
                 </div>
               </label>
               {isGift && (
@@ -1308,7 +1308,7 @@ function CheckoutPage({ cart, onPlaceOrder }) {
                   <textarea value={giftNote} onChange={e => setGiftNote(e.target.value)} placeholder="Write a personal message for the recipient..." rows={3}
                     style={{ width:"100%", padding:"11px 13px", border:`1.5px solid ${T.border}`, borderRadius:8, fontSize:"0.84rem", background:"#fff", color:T.text, outline:"none", resize:"vertical", boxSizing:"border-box", fontFamily:"'Inter',sans-serif" }}
                     onFocus={e => e.target.style.borderColor=T.orange} onBlur={e => e.target.style.borderColor=T.border} />
-                  <p style={{ fontSize:"0.72rem", color:T.orange, marginTop:6, fontWeight:600 }}>Gift wrapping charge: ₹{giftCharge} ({totalQty} item{totalQty>1?"s":""} × ₹50)</p>
+                  <p style={{ fontSize:"0.72rem", color:T.orange, marginTop:6, fontWeight:600 }}>Gift wrapping charge: ?{giftCharge} ({totalQty} item{totalQty>1?"s":""} � ?50)</p>
                 </div>
               )}
             </div>
@@ -1334,12 +1334,12 @@ function CheckoutPage({ cart, onPlaceOrder }) {
             {discount > 0 && (
               <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
                 <span style={{ fontSize:"0.8rem", color:"#2d7a5a" }}>Coupon Discount</span>
-                <span style={{ fontSize:"0.8rem", fontWeight:600, color:"#2d7a5a" }}>−Rs.{discount}</span>
+                <span style={{ fontSize:"0.8rem", fontWeight:600, color:"#2d7a5a" }}>-Rs.{discount}</span>
               </div>
             )}
             {isGift && (
               <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
-                <span style={{ fontSize:"0.8rem", color:T.orange }}>🎁 Gift Wrapping</span>
+                <span style={{ fontSize:"0.8rem", color:T.orange }}>?? Gift Wrapping</span>
                 <span style={{ fontSize:"0.8rem", fontWeight:600, color:T.orange }}>+Rs.{giftCharge}</span>
               </div>
             )}
@@ -1354,12 +1354,12 @@ function CheckoutPage({ cart, onPlaceOrder }) {
   );
 }
 
-// ─── WISHLIST PAGE ────────────────────────────────────────────
+// --- WISHLIST PAGE --------------------------------------------
 function WishlistPage({ ids, onAdd, onWish, onClick }) {
   const items = PRODUCTS.filter(p => ids.includes(p.id));
   if (!items.length) return (
     <div style={{ paddingTop:130, paddingBottom:40, paddingLeft:"2rem", paddingRight:"2rem", background:T.bg, minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, textAlign:"center" }}>
-      <div style={{ fontSize:56 }}>🤍</div>
+      <div style={{ fontSize:56 }}>??</div>
       <h2 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.8rem", fontWeight:900 }}>Your Wishlist is Empty</h2>
     </div>
   );
@@ -1374,7 +1374,7 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
               <div style={{ position:"relative", aspectRatio:"4/3", overflow:"hidden" }}>
                 <img src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                 <div style={{ position:"absolute", top:10, left:10, background:T.orange, color:"#fff", borderRadius:4, padding:"3px 10px", fontSize:"0.65rem", fontWeight:800 }}>-{p.discount}%</div>
-                <button onClick={e => { e.stopPropagation(); onWish(p.id); }} style={{ position:"absolute", top:8, right:8, background:"rgba(255,255,255,0.9)", border:"none", borderRadius:"50%", width:32, height:32, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:14 }}>❤️</button>
+                <button onClick={e => { e.stopPropagation(); onWish(p.id); }} style={{ position:"absolute", top:8, right:8, background:"rgba(255,255,255,0.9)", border:"none", borderRadius:"50%", width:32, height:32, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:14 }}>??</button>
               </div>
               <div style={{ padding:"1.2rem" }}>
                 <h4 style={{ fontSize:"0.92rem", fontWeight:700, color:T.text, marginBottom:"0.4rem" }}>{p.name}</h4>
@@ -1392,7 +1392,7 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
   );
 }
 
-// ─── AUTH PAGES ───────────────────────────────────────────────
+// --- AUTH PAGES -----------------------------------------------
 function SignupPage({ onSignup, onSwitch }) {
   const [form, setForm] = useState({ name:"", email:"", password:"", confirm:"" });
   const [showPw, setShowPw] = useState(false);
@@ -1407,7 +1407,7 @@ function SignupPage({ onSignup, onSwitch }) {
     if (form.password.length<6) return setError("Password must be at least 6 characters.");
     setLoading(true);
     try {
-      const API_BASE = window.WISHSTONE_API || "https://wishstone-api.onrender.com";
+      const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
       const res = await fetch(`${API_BASE}/api/auth/register`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ name:form.name, email:form.email, password:form.password }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message||"Registration failed");
@@ -1424,14 +1424,14 @@ function SignupPage({ onSignup, onSwitch }) {
       <div style={{ background:"#fff", borderRadius:16, padding:"2.5rem", width:"100%", maxWidth:420, boxShadow:"0 8px 40px rgba(0,0,0,0.1)", border:`1px solid ${T.border}`, animation:"cardIn 0.5s ease both" }}>
         {success ? (
           <div style={{ textAlign:"center", padding:"1rem 0" }}>
-            <div style={{ fontSize:52, marginBottom:16 }}>🎉</div>
+            <div style={{ fontSize:52, marginBottom:16 }}>??</div>
             <h2 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.4rem", fontWeight:900, marginBottom:8 }}>Account Created!</h2>
             <p style={{ color:T.textMid, fontSize:"0.85rem" }}>Redirecting you to sign in...</p>
           </div>
         ) : (
           <>
             <div style={{ textAlign:"center", marginBottom:"2rem" }}>
-              <div style={{ fontSize:38, marginBottom:8 }}>💎</div>
+              <div style={{ fontSize:38, marginBottom:8 }}>??</div>
               <h2 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.5rem", fontWeight:900, margin:0 }}>Create Account</h2>
             </div>
             <form onSubmit={handle}>
@@ -1490,7 +1490,7 @@ function LoginPage({ onLogin, onSwitch }) {
     if (!form.email||!form.password) return setError("Email and password are required.");
     setLoading(true);
     try {
-      const API_BASE = window.WISHSTONE_API || "https://wishstone-api.onrender.com";
+      const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
       const res = await fetch(`${API_BASE}/api/auth/login`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ email:form.email, password:form.password }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message||"Login failed");
@@ -1508,7 +1508,7 @@ function LoginPage({ onLogin, onSwitch }) {
     <div style={{ minHeight:"100vh", background:T.bg, display:"flex", alignItems:"center", justifyContent:"center", paddingTop:100, paddingBottom:"2rem", paddingLeft:"2rem", paddingRight:"2rem" }}>
       <div style={{ background:"#fff", borderRadius:16, padding:"2.5rem", width:"100%", maxWidth:400, boxShadow:"0 8px 40px rgba(0,0,0,0.1)", border:`1px solid ${T.border}`, animation:"cardIn 0.5s ease both" }}>
         <div style={{ textAlign:"center", marginBottom:"2rem" }}>
-          <div style={{ fontSize:38, marginBottom:8 }}>🔮</div>
+          <div style={{ fontSize:38, marginBottom:8 }}>??</div>
           <h2 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.5rem", fontWeight:900, margin:0 }}>Welcome Back</h2>
         </div>
         <form onSubmit={handle}>
@@ -1524,7 +1524,7 @@ function LoginPage({ onLogin, onSwitch }) {
               <input type={showPw?"text":"password"} placeholder="Enter your password" value={form.password} onChange={e => setForm({...form,password:e.target.value})}
                 style={{ width:"100%", padding:"11px 42px 11px 13px", border:`1.5px solid ${T.border}`, borderRadius:8, fontSize:"0.88rem", background:"#fff", color:T.text, outline:"none", boxSizing:"border-box" }}
                 onFocus={e => e.target.style.borderColor=T.orange} onBlur={e => e.target.style.borderColor=T.border} />
-              <button type="button" onClick={() => setShowPw(!showPw)} style={{ position:"absolute", right:11, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", fontSize:15, color:T.textMid }}>{showPw?"🙈":"👁"}</button>
+              <button type="button" onClick={() => setShowPw(!showPw)} style={{ position:"absolute", right:11, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", fontSize:15, color:T.textMid }}>{showPw?"??":"??"}</button>
             </div>
           </div>
           {error && <p style={{ color:"#c0392b", fontSize:"0.78rem", marginBottom:"1rem" }}>{error}</p>}
@@ -1554,7 +1554,7 @@ function LoginPage({ onLogin, onSwitch }) {
           />
         </div>
         <div style={{ marginTop:"1rem", padding:"10px 12px", background:"rgba(232,114,12,0.06)", border:`1px solid rgba(232,114,12,0.15)`, borderRadius:8 }}>
-          <p style={{ fontSize:"0.72rem", color:T.textMid, textAlign:"center" }}>💡 Demo mode: Enter any email & password to explore</p>
+          <p style={{ fontSize:"0.72rem", color:T.textMid, textAlign:"center" }}>?? Demo mode: Enter any email & password to explore</p>
         </div>
         <p style={{ textAlign:"center", marginTop:"1rem", fontSize:"0.82rem", color:T.textMid }}>
           New to WishStone? <button onClick={onSwitch} style={{ background:"none", border:"none", cursor:"pointer", color:T.orange, fontWeight:700, fontSize:"0.82rem" }}>Create Account</button>
@@ -1564,11 +1564,11 @@ function LoginPage({ onLogin, onSwitch }) {
   );
 }
 
-// ─── USER DASHBOARD ───────────────────────────────────────────
+// --- USER DASHBOARD -------------------------------------------
 function UserDashboard({ user, orders, onLogout, onNav }) {
   const [activeTab, setActiveTab] = useState("orders");
-  const tabs = [{ key:"orders", icon:"📦", label:"My Orders" },{ key:"profile", icon:"👤", label:"Profile" },{ key:"wishlist", icon:"🤍", label:"Wishlist" }];
-  const statCards = [{ icon:"📦", label:"Total Orders", value: orders.length },{ icon:"💰", label:"Total Spent", value: "Rs." + orders.reduce((s,o) => s+(o.totalAmount||0), 0).toLocaleString() },{ icon:"🌟", label:"Member Since", value: "2024" },{ icon:"🎯", label:"Manifestations", value: orders.length * 3 || 0 }];
+  const tabs = [{ key:"orders", icon:"??", label:"My Orders" },{ key:"profile", icon:"??", label:"Profile" },{ key:"wishlist", icon:"??", label:"Wishlist" }];
+  const statCards = [{ icon:"??", label:"Total Orders", value: orders.length },{ icon:"??", label:"Total Spent", value: "Rs." + orders.reduce((s,o) => s+(o.totalAmount||0), 0).toLocaleString() },{ icon:"??", label:"Member Since", value: "2024" },{ icon:"??", label:"Manifestations", value: orders.length * 3 || 0 }];
 
   return (
     <div style={{ paddingTop:90, background:T.bg, minHeight:"100vh" }}>
@@ -1613,7 +1613,7 @@ function UserDashboard({ user, orders, onLogout, onNav }) {
             <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.1rem", fontWeight:900, marginBottom:"1rem" }}>Order History</h3>
             {(!orders||orders.length===0) ? (
               <div style={{ background:"#fff", borderRadius:16, padding:"3.5rem 2rem", textAlign:"center", border:`1px solid ${T.border}` }}>
-                <div style={{ fontSize:52, marginBottom:14 }}>📦</div>
+                <div style={{ fontSize:52, marginBottom:14 }}>??</div>
                 <button className="btn-orange" onClick={() => onNav("products")} style={{ padding:"12px 28px", fontSize:"0.82rem", borderRadius:8 }}>Shop Now</button>
               </div>
             ) : orders.map((o,i) => (
@@ -1624,7 +1624,7 @@ function UserDashboard({ user, orders, onLogout, onNav }) {
                 </div>
                 <div style={{ display:"flex", justifyContent:"space-between", borderTop:`1px solid ${T.border}`, paddingTop:"0.7rem" }}>
                   <span style={{ fontSize:"0.78rem", color:T.textMid }}>Total Amount</span>
-                  <span style={{ fontWeight:800, color:T.orange }}>Rs.{o.totalAmount ? o.totalAmount.toLocaleString() : "—"}</span>
+                  <span style={{ fontWeight:800, color:T.orange }}>Rs.{o.totalAmount ? o.totalAmount.toLocaleString() : "�"}</span>
                 </div>
               </div>
             ))}
@@ -1635,7 +1635,7 @@ function UserDashboard({ user, orders, onLogout, onNav }) {
           <div style={{ background:"#fff", borderRadius:16, padding:"2rem", border:`1px solid ${T.border}` }}>
             <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.1rem", fontWeight:900, marginBottom:"1.5rem" }}>Profile Information</h3>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1.2rem" }} className="checkout-grid">
-              {[["Full Name", user.name||"—"],["Email Address", user.email||"—"],["Member Since","2024"],["Account Type","Sacred Member"]].map(([l,v]) => (
+              {[["Full Name", user.name||"�"],["Email Address", user.email||"�"],["Member Since","2024"],["Account Type","Sacred Member"]].map(([l,v]) => (
                 <div key={l} style={{ padding:"1rem", background:T.bg, borderRadius:10, border:`1px solid ${T.border}` }}>
                   <div style={{ fontSize:"0.65rem", fontWeight:700, color:T.textMid, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:5 }}>{l}</div>
                   <div style={{ fontSize:"0.9rem", fontWeight:600, color:T.text }}>{v}</div>
@@ -1649,7 +1649,7 @@ function UserDashboard({ user, orders, onLogout, onNav }) {
   );
 }
 
-// ─── PROMO MODAL ──────────────────────────────────────────────
+// --- PROMO MODAL ----------------------------------------------
 function PromoModal({ show, onClose, onShop }) {
   const [coupons, setCoupons] = useState([]);
   const [copied, setCopied] = useState(null);
@@ -1659,7 +1659,7 @@ function PromoModal({ show, onClose, onShop }) {
   useEffect(() => {
     if (!show) return;
     setLoading(true);
-    const API_BASE = process.env.REACT_APP_API_URL || window.WISHSTONE_API || "https://wishstone-api.onrender.com";
+    const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
     fetch(`${API_BASE}/api/coupons`)
       .then(r => r.json())
       .then(d => { if (d.success && d.coupons) setCoupons(d.coupons); })
@@ -1679,11 +1679,11 @@ function PromoModal({ show, onClose, onShop }) {
     <div onClick={onClose} style={{ position:"fixed", inset:0, zIndex:9999, background:"rgba(0,0,0,0.6)", backdropFilter:"blur(6px)", display:"flex", alignItems:"center", justifyContent:"center", padding:"1rem" }}>
       <div onClick={e => e.stopPropagation()} style={{ background:"#fff", borderRadius:24, maxWidth:440, width:"100%", overflow:"hidden", boxShadow:"0 32px 80px rgba(0,0,0,0.3)", position:"relative", animation:"modalIn 0.45s cubic-bezier(0.34,1.56,0.64,1) both" }}>
         {/* Header */}
-        <button onClick={onClose} style={{ position:"absolute", top:14, right:16, background:"rgba(255,255,255,0.15)", border:"none", borderRadius:"50%", width:30, height:30, cursor:"pointer", fontSize:16, color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2, lineHeight:1 }}>✕</button>
+        <button onClick={onClose} style={{ position:"absolute", top:14, right:16, background:"rgba(255,255,255,0.15)", border:"none", borderRadius:"50%", width:30, height:30, cursor:"pointer", fontSize:16, color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2, lineHeight:1 }}>?</button>
         <div style={{ background:`linear-gradient(135deg,${T.bgDark} 0%,#3a4a28 60%,#4a3a10 100%)`, padding:"2rem 2rem 1.8rem", textAlign:"center", position:"relative", overflow:"hidden" }}>
           <div style={{ position:"absolute", top:-30, right:-30, width:120, height:120, borderRadius:"50%", background:"rgba(232,114,12,0.12)" }} />
           <div style={{ position:"absolute", bottom:-20, left:-20, width:80, height:80, borderRadius:"50%", background:"rgba(232,114,12,0.08)" }} />
-          <div style={{ fontSize:44, marginBottom:"0.6rem", position:"relative" }}>🎁</div>
+          <div style={{ fontSize:44, marginBottom:"0.6rem", position:"relative" }}>??</div>
           <h2 style={{ fontFamily:"'Playfair Display',serif", color:"#fff", fontSize:"1.45rem", fontWeight:900, margin:"0 0 0.4rem", position:"relative" }}>Exclusive Offers</h2>
           <p style={{ color:"rgba(255,255,255,0.6)", fontSize:"0.8rem", margin:0, position:"relative" }}>Tap a coupon to copy the code instantly</p>
         </div>
@@ -1702,10 +1702,10 @@ function PromoModal({ show, onClose, onShop }) {
               onMouseLeave={e => { if(copied!==i) e.currentTarget.style.borderStyle="dashed"; e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,0.04)"; }}>
               <div style={{ flex:1, minWidth:0 }}>
                 <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.3rem", fontWeight:900, color:T.orange, letterSpacing:"0.06em", animation: copied===i ? "copyPop 0.3s ease" : "none" }}>{c.code}</div>
-                <div style={{ fontSize:"0.72rem", color:T.textMid, marginTop:2, lineHeight:1.4 }}>{c.description || (c.discountType==="flat" ? `₹${c.discountValue} off` : `${c.discountValue}% off`)}{c.minOrderValue > 0 ? ` · Min ₹${c.minOrderValue}` : ""}</div>
+                <div style={{ fontSize:"0.72rem", color:T.textMid, marginTop:2, lineHeight:1.4 }}>{c.description || (c.discountType==="flat" ? `?${c.discountValue} off` : `${c.discountValue}% off`)}{c.minOrderValue > 0 ? ` � Min ?${c.minOrderValue}` : ""}</div>
               </div>
               <div style={{ flexShrink:0, background: copied===i ? T.orange : "rgba(232,114,12,0.08)", borderRadius:8, padding:"6px 12px", fontSize:"0.68rem", fontWeight:700, color: copied===i ? "#fff" : T.orange, transition:"all 0.2s", whiteSpace:"nowrap" }}>
-                {copied===i ? "✓ Copied!" : "TAP TO COPY"}
+                {copied===i ? "? Copied!" : "TAP TO COPY"}
               </div>
             </div>
           ))}
@@ -1720,7 +1720,7 @@ function PromoModal({ show, onClose, onShop }) {
     </div>
   );
 }
-// ─── MAIN APP ─────────────────────────────────────────────────
+// --- MAIN APP -------------------------------------------------
 export default function WishstoneApp() {
   const [page, setPage] = useState("home");
   const [cart, setCart] = useState([]);
@@ -1772,7 +1772,7 @@ export default function WishstoneApp() {
       {page==="auth" && authMode==="login"  && <LoginPage  onLogin={handleLogin} onSwitch={()=>setAuthMode("signup")} />}
       {page==="dashboard" && user && <UserDashboard user={user} orders={orders} onLogout={handleLogout} onNav={nav} />}
       {page!=="auth" && <Footer />}
-      {/* ── Promo Modal ── */}
+      {/* -- Promo Modal -- */}
       <PromoModal show={showModal} onClose={() => setShowModal(false)} onShop={() => { setShowModal(false); nav("products"); }} />
     </div>
     </GoogleOAuthProvider>
