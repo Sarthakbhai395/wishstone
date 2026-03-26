@@ -107,7 +107,6 @@ const css = `
     .ws-stat-val{font-size:1.5rem!important;}
     .ws-action-btns{flex-direction:column!important;gap:4px!important;}
     .ws-action-btns button{width:100%;}
-    /* Modal full screen on mobile */
     .ws-modal-inner{padding:1rem!important;}
   }
 
@@ -1536,12 +1535,16 @@ export default function AdminApp() {
         </div>
 
         <aside className={`ws-sidebar${sidebarOpen ? " ws-open" : ""}`} style={{
-          width: 240, minHeight: "100vh",
+          width: 240,
+          minHeight: "100vh",
           background: "linear-gradient(180deg, #0d0f13 0%, #10121a 100%)",
           borderRight: "1px solid rgba(255,255,255,0.06)",
-          display: "flex", flexDirection: "column",
-          position: "fixed", left: 0, top: 0, bottom: 0,
-          zIndex: 100, transition: "width 0.3s ease",
+          display: "flex",
+          flexDirection: "column",
+          position: "fixed",
+          left: 0, top: 0, bottom: 0,
+          zIndex: 500,
+          transition: "transform 0.3s ease, width 0.3s ease",
         }}>
           {/* Brand */}
           <div style={{ padding: "1.5rem 1.5rem 1rem", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
@@ -1595,7 +1598,7 @@ export default function AdminApp() {
           </div>
         </aside>
 
-        <main className="ws-main" style={{ flex: 1, marginLeft: 240, padding: "2rem 2.5rem", transition: "margin-left 0.3s ease, padding 0.3s ease", minWidth: 0 }}>
+        <main className="ws-main" style={{ flex: 1, marginLeft: 240, padding: "2rem 2.5rem", transition: "margin-left 0.3s ease, padding 0.3s ease, max-width 0.3s ease", minWidth: 0, maxWidth: "calc(100vw - 240px)" }}>
           <PageComponent token={token} showToast={showToast} />
         </main>
       </div>
