@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
-const API = process.env.REACT_APP_API_URL ||  "https://your-backend.onrender.com";
+const API = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com/api";
 
 // ─── THEME / GLOBALS ──────────────────────────────────────────
 const css = `
@@ -381,15 +381,32 @@ function Sidebar({ active, onNav, admin, onLogout }) {
 function Dashboard({ token }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
+    const timeout = setTimeout(() => { setLoading(false); setError(true); }, 10000);
     api.get("/admin/analytics", token)
-      .then(r => { setData(r.data.analytics); setLoading(false); })
-      .catch(() => setLoading(false));
+      .then(r => { clearTimeout(timeout); setData(r.data.analytics); setLoading(false); })
+      .catch(() => { clearTimeout(timeout); setLoading(false); setError(true); });
   }, []);
 
-  if (loading) return <div style={{ padding: "4rem", textAlign: "center", color: "#64748b" }}>Loading analytics...</div>;
-  if (!data) return <div style={{ padding: "4rem", textAlign: "center", color: "#f87171" }}>Could not load analytics. Make sure backend is running.</div>;
+  if (loading) return (
+    <div style={{ padding: "4rem", textAlign: "center" }}>
+      <div style={{ width: 40, height: 40, border: "3px solid rgba(124,58,237,0.2)", borderTop: "3px solid #7c3aed", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 1rem" }} />
+      <div style={{ color: "#64748b", fontSize: "0.9rem" }}>Loading analytics...</div>
+    </div>
+  );
+  if (error || !data) return (
+    <div style={{ padding: "4rem", textAlign: "center" }}>
+      <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
+      <div style={{ color: "#f87171", fontSize: "1rem", marginBottom: 8 }}>Could not load analytics</div>
+      <div style={{ color: "#64748b", fontSize: "0.82rem", marginBottom: 20 }}>Backend may be sleeping (Render free tier). Try again in a moment.</div>
+      <button onClick={() => { setLoading(true); setError(false); api.get("/admin/analytics", token).then(r => { setData(r.data.analytics); setLoading(false); }).catch(() => { setLoading(false); setError(true); }); }}
+        style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.4)", color: "#a78bfa", borderRadius: 8, padding: "10px 24px", cursor: "pointer", fontSize: "0.85rem" }}>
+        🔄 Retry
+      </button>
+    </div>
+  );
 
   const statusColor = { pending: "yellow", confirmed: "blue", processing: "purple", shipped: "blue", delivered: "green", cancelled: "red" };
 
