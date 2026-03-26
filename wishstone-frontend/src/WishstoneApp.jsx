@@ -1567,8 +1567,8 @@ function LoginPage({ onLogin, onSwitch }) {
 // ─── USER DASHBOARD ───────────────────────────────────────────
 function UserDashboard({ user, orders, onLogout, onNav }) {
   const [activeTab, setActiveTab] = useState("orders");
-  const tabs = [{ key:"orders", icon:"📦", label:"My Orders" },{ key:"profile", icon:"👤", label:"Profile" },{ key:"wishlist", icon:"🤍", label:"Wishlist" }];
-  const statCards = [{ icon:"📦", label:"Total Orders", value: orders.length },{ icon:"💰", label:"Total Spent", value: "Rs." + orders.reduce((s,o) => s+(o.totalAmount||0), 0).toLocaleString() },{ icon:"🌟", label:"Member Since", value: "2024" },{ icon:"🎯", label:"Manifestations", value: orders.length * 3 || 0 }];
+  const tabs = [{ key:"orders", icon:"📦", label:"My Orders" },{ key:"track", icon:"🚚", label:"Track Order" },{ key:"profile", icon:"👤", label:"Profile" },{ key:"wishlist", icon:"🤍", label:"Wishlist" }];
+  const statCards = [{ icon:"📦", label:"Total Orders", value: orders.length },{ icon:"💰", label:"Total Spent", value: "Rs." + orders.reduce((s,o) => s+(o.totalAmount||0), 0).toLocaleString() },{ icon:"🌟", label:"Member Since", value: user.joinedAt || new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) },{ icon:"🎯", label:"Manifestations", value: orders.length * 3 || 0 }];
 
   return (
     <div style={{ paddingTop:90, background:T.bg, minHeight:"100vh" }}>
@@ -1631,11 +1631,48 @@ function UserDashboard({ user, orders, onLogout, onNav }) {
           </div>
         )}
 
+        {activeTab==="track" && (
+          <div>
+            <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.1rem", fontWeight:900, marginBottom:"1rem" }}>Track Your Orders</h3>
+            {(!orders||orders.length===0) ? (
+              <div style={{ background:"#fff", borderRadius:16, padding:"3.5rem 2rem", textAlign:"center", border:`1px solid ${T.border}` }}>
+                <div style={{ fontSize:52, marginBottom:14 }}>🚚</div>
+                <p style={{ color:T.textMid, fontSize:"0.85rem", marginBottom:16 }}>No orders to track yet.</p>
+                <button className="btn-orange" onClick={() => onNav("products")} style={{ padding:"12px 28px", fontSize:"0.82rem", borderRadius:8 }}>Shop Now</button>
+              </div>
+            ) : orders.map((o,i) => (
+              <div key={i} style={{ background:"#fff", borderRadius:16, padding:"1.5rem", marginBottom:"1rem", border:`1px solid ${T.border}`, boxShadow:"0 2px 12px rgba(0,0,0,0.04)" }}>
+                <div style={{ display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:8, marginBottom:"1.2rem" }}>
+                  <div>
+                    <div style={{ fontWeight:700, color:T.text, fontSize:"0.9rem" }}>Order #{o._id ? o._id.slice(-6).toUpperCase() : String(i+1).padStart(6,"0")}</div>
+                    <div style={{ fontSize:"0.72rem", color:T.textMid, marginTop:2 }}>{o.createdAt ? new Date(o.createdAt).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) : ""}</div>
+                  </div>
+                  <span style={{ background:"rgba(45,122,90,0.1)", color:"#2d7a5a", padding:"4px 14px", borderRadius:20, fontSize:"0.7rem", fontWeight:700, height:"fit-content" }}>✓ {o.status||"Confirmed"}</span>
+                </div>
+                {/* Progress bar */}
+                <div style={{ display:"flex", alignItems:"center", gap:0, marginBottom:"0.8rem" }}>
+                  {[["📦","Confirmed"],["⚙️","Processing"],["🚚","Shipped"],["🏠","Delivered"]].map(([icon,label],si) => (
+                    <div key={si} style={{ flex:1, textAlign:"center", position:"relative" }}>
+                      <div style={{ width:32, height:32, borderRadius:"50%", background: si===0 ? T.orange : "rgba(232,114,12,0.12)", border:`2px solid ${si===0 ? T.orange : T.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, margin:"0 auto 4px", transition:"all 0.3s" }}>{icon}</div>
+                      <div style={{ fontSize:"0.58rem", color: si===0 ? T.orange : T.textMid, fontWeight: si===0 ? 700 : 500 }}>{label}</div>
+                      {si < 3 && <div style={{ position:"absolute", top:15, left:"60%", right:"-40%", height:2, background: si===0 ? `linear-gradient(to right,${T.orange},rgba(232,114,12,0.15))` : T.border, zIndex:0 }} />}
+                    </div>
+                  ))}
+                </div>
+                <div style={{ background:"rgba(232,114,12,0.06)", borderRadius:10, padding:"10px 14px", display:"flex", alignItems:"center", gap:8 }}>
+                  <span style={{ fontSize:16 }}>📅</span>
+                  <span style={{ fontSize:"0.78rem", color:T.textMid }}>Expected delivery: <strong style={{ color:T.text }}>4–5 business days from order date</strong></span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {activeTab==="profile" && (
           <div style={{ background:"#fff", borderRadius:16, padding:"2rem", border:`1px solid ${T.border}` }}>
             <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.1rem", fontWeight:900, marginBottom:"1.5rem" }}>Profile Information</h3>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1.2rem" }} className="checkout-grid">
-              {[["Full Name", user.name||"—"],["Email Address", user.email||"—"],["Member Since","2024"],["Account Type","Sacred Member"]].map(([l,v]) => (
+              {[["Full Name", user.name||"—"],["Email Address", user.email||"—"],["Member Since", user.joinedAt || new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})],["Account Type","Sacred Member"]].map(([l,v]) => (
                 <div key={l} style={{ padding:"1rem", background:T.bg, borderRadius:10, border:`1px solid ${T.border}` }}>
                   <div style={{ fontSize:"0.65rem", fontWeight:700, color:T.textMid, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:5 }}>{l}</div>
                   <div style={{ fontSize:"0.9rem", fontWeight:600, color:T.text }}>{v}</div>
@@ -1644,6 +1681,68 @@ function UserDashboard({ user, orders, onLogout, onNav }) {
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ─── ORDER CONFIRM MODAL ──────────────────────────────────────
+function OrderConfirmModal({ order, onClose }) {
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    const timers = [
+      setTimeout(() => setStep(1), 400),
+      setTimeout(() => setStep(2), 1200),
+      setTimeout(() => setStep(3), 2200),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  return (
+    <div style={{ position:"fixed", inset:0, zIndex:9999, background:"rgba(0,0,0,0.7)", backdropFilter:"blur(8px)", display:"flex", alignItems:"center", justifyContent:"center", padding:"1rem" }}>
+      <div style={{ background:"#fff", borderRadius:24, maxWidth:420, width:"100%", padding:"2.5rem 2rem", textAlign:"center", boxShadow:"0 32px 80px rgba(0,0,0,0.3)", animation:"modalIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both" }}>
+        {/* Animated checkmark */}
+        <div style={{ width:80, height:80, borderRadius:"50%", background:"linear-gradient(135deg,#2d7a5a,#10b981)", margin:"0 auto 1.5rem", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 8px 32px rgba(16,185,129,0.35)", animation: step>=1 ? "fadeInScale 0.5s ease both" : "none", opacity: step>=1 ? 1 : 0 }}>
+          <span style={{ fontSize:36, color:"#fff" }}>✓</span>
+        </div>
+
+        <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.5rem", fontWeight:900, color:"#1a1a1a", marginBottom:"0.5rem", opacity: step>=2 ? 1 : 0, transform: step>=2 ? "translateY(0)" : "translateY(10px)", transition:"all 0.4s ease" }}>
+          Order Confirmed! 🎉
+        </h2>
+        <p style={{ color:"#64748b", fontSize:"0.85rem", marginBottom:"1.5rem", opacity: step>=2 ? 1 : 0, transition:"all 0.4s ease 0.1s" }}>
+          Your sacred order has been placed successfully
+        </p>
+
+        {/* Order details */}
+        <div style={{ background:"#f8fafc", borderRadius:14, padding:"1.2rem", marginBottom:"1.5rem", opacity: step>=3 ? 1 : 0, transform: step>=3 ? "translateY(0)" : "translateY(12px)", transition:"all 0.4s ease 0.2s" }}>
+          <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
+            <span style={{ fontSize:"0.78rem", color:"#64748b" }}>Order ID</span>
+            <span style={{ fontSize:"0.78rem", fontWeight:700, color:"#1a1a1a" }}>#{order._id.slice(-6).toUpperCase()}</span>
+          </div>
+          <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
+            <span style={{ fontSize:"0.78rem", color:"#64748b" }}>Amount Paid</span>
+            <span style={{ fontSize:"0.78rem", fontWeight:700, color:T.orange }}>Rs.{(order.totalAmount||0).toLocaleString()}</span>
+          </div>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <span style={{ fontSize:"0.78rem", color:"#64748b" }}>Delivery</span>
+            <span style={{ background:"rgba(16,185,129,0.1)", color:"#2d7a5a", padding:"3px 10px", borderRadius:20, fontSize:"0.7rem", fontWeight:700 }}>4–5 Business Days</span>
+          </div>
+        </div>
+
+        {/* Delivery steps */}
+        <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"1.8rem", opacity: step>=3 ? 1 : 0, transition:"all 0.4s ease 0.3s" }}>
+          {[["📦","Packed"],["🚚","Shipped"],["🏠","Delivered"]].map(([icon, label], i) => (
+            <div key={i} style={{ flex:1, textAlign:"center" }}>
+              <div style={{ fontSize:22, marginBottom:4 }}>{icon}</div>
+              <div style={{ fontSize:"0.62rem", color:"#64748b", fontWeight:600 }}>{label}</div>
+              {i < 2 && <div style={{ position:"absolute" }} />}
+            </div>
+          ))}
+        </div>
+
+        <button onClick={onClose} style={{ width:"100%", padding:"13px", background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, color:"#fff", border:"none", borderRadius:12, fontSize:"0.85rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", opacity: step>=3 ? 1 : 0, transition:"opacity 0.4s ease 0.4s" }}>
+          Track My Order →
+        </button>
       </div>
     </div>
   );
@@ -1738,13 +1837,16 @@ export default function WishstoneApp() {
   const [wished, setWished] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [user, setUser] = useState(null);
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState(() => { try { return JSON.parse(localStorage.getItem("ws_orders")||"[]"); } catch { return []; } });
   const [authMode, setAuthMode] = useState("login");
+  const [orderConfirm, setOrderConfirm] = useState(null);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("ws_user");
     if (savedUser) { try { setUser(JSON.parse(savedUser)); } catch(e) { localStorage.removeItem("ws_user"); } }
   }, []);
+
+  useEffect(() => { localStorage.setItem("ws_orders", JSON.stringify(orders)); }, [orders]);
 
   const [showModal, setShowModal] = useState(false);
   useEffect(() => { const t = setTimeout(() => setShowModal(true), 5000); return () => clearTimeout(t); }, []);
@@ -1759,7 +1861,12 @@ export default function WishstoneApp() {
   const toggleWish = id => setWished(w => w.includes(id)?w.filter(x=>x!==id):[...w,id]);
   const updateQty = (id,delta) => setCart(c => c.map(i=>i.id===id?{...i,qty:Math.max(0,i.qty+delta)}:i).filter(i=>i.qty>0));
   const removeFromCart = id => setCart(c => c.filter(i=>i.id!==id));
-  const handlePlaceOrder = data => { setOrders(o=>[{...data,_id:Date.now().toString(),status:"Confirmed",createdAt:new Date().toISOString()},...o]); setCart([]); nav("home"); };
+  const handlePlaceOrder = data => {
+    const newOrder = {...data, _id:Date.now().toString(), status:"Confirmed", createdAt:new Date().toISOString()};
+    setOrders(o => { const updated = [newOrder, ...o]; localStorage.setItem("ws_orders", JSON.stringify(updated)); return updated; });
+    setCart([]);
+    setOrderConfirm(newOrder);
+  };
   const handleLogin = (u) => { const ud = { ...u, joinedAt: u.joinedAt || new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) }; setUser(ud); localStorage.setItem("ws_user", JSON.stringify(ud)); if (!localStorage.getItem("ws_token")) localStorage.setItem("ws_token", "local_" + Date.now()); nav("home"); };
   const handleLogout = () => { setUser(null); localStorage.removeItem("ws_token"); localStorage.removeItem("ws_user"); nav("home"); };
   const nav = p => { setPage(p); window.scrollTo(0,0); };
@@ -1785,6 +1892,8 @@ export default function WishstoneApp() {
       {page!=="auth" && <Footer />}
       {/* ── Promo Modal ── */}
       <PromoModal show={showModal} onClose={() => setShowModal(false)} onShop={() => { setShowModal(false); nav("products"); }} />
+      {/* ── Order Confirm Modal ── */}
+      {orderConfirm && <OrderConfirmModal order={orderConfirm} onClose={() => { setOrderConfirm(null); nav("dashboard"); }} />}
     </div>
     </GoogleOAuthProvider>
   );
