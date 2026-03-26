@@ -1651,71 +1651,82 @@ function UserDashboard({ user, orders, onLogout, onNav }) {
 
 // ─── PROMO MODAL ──────────────────────────────────────────────
 function PromoModal({ show, onClose, onShop }) {
-  const [coupons, setCoupons] = useState([]);
-  const [copied, setCopied] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [activeIdx, setActiveIdx] = useState(0);
+  const [email, setEmail] = useState("");
+  const [claimed, setClaimed] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const COUPON = "WOW300";
 
-  useEffect(() => {
-    if (!show) return;
-    setLoading(true);
-    const API_BASE = process.env.REACT_APP_API_URL || window.WISHSTONE_API || "https://wishstone-api.onrender.com";
-    fetch(`${API_BASE}/api/coupons`)
-      .then(r => r.json())
-      .then(d => { if (d.success && d.coupons) setCoupons(d.coupons); })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [show]);
+  const handleClaim = () => {
+    if (!email.trim()) return;
+    setClaimed(true);
+  };
 
-  const copy = (code, idx) => {
-    navigator.clipboard.writeText(code).catch(() => {});
-    setCopied(idx);
-    setTimeout(() => setCopied(null), 2000);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(COUPON).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   if (!show) return null;
 
   return (
-    <div onClick={onClose} style={{ position:"fixed", inset:0, zIndex:9999, background:"rgba(0,0,0,0.6)", backdropFilter:"blur(6px)", display:"flex", alignItems:"center", justifyContent:"center", padding:"1rem" }}>
-      <div onClick={e => e.stopPropagation()} style={{ background:"#fff", borderRadius:24, maxWidth:440, width:"100%", overflow:"hidden", boxShadow:"0 32px 80px rgba(0,0,0,0.3)", position:"relative", animation:"modalIn 0.45s cubic-bezier(0.34,1.56,0.64,1) both" }}>
-        {/* Header */}
-        <button onClick={onClose} style={{ position:"absolute", top:14, right:16, background:"rgba(255,255,255,0.15)", border:"none", borderRadius:"50%", width:30, height:30, cursor:"pointer", fontSize:16, color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", zIndex:2, lineHeight:1 }}>✕</button>
-        <div style={{ background:`linear-gradient(135deg,${T.bgDark} 0%,#3a4a28 60%,#4a3a10 100%)`, padding:"2rem 2rem 1.8rem", textAlign:"center", position:"relative", overflow:"hidden" }}>
-          <div style={{ position:"absolute", top:-30, right:-30, width:120, height:120, borderRadius:"50%", background:"rgba(232,114,12,0.12)" }} />
-          <div style={{ position:"absolute", bottom:-20, left:-20, width:80, height:80, borderRadius:"50%", background:"rgba(232,114,12,0.08)" }} />
-          <div style={{ fontSize:44, marginBottom:"0.6rem", position:"relative" }}>🎁</div>
-          <h2 style={{ fontFamily:"'Playfair Display',serif", color:"#fff", fontSize:"1.45rem", fontWeight:900, margin:"0 0 0.4rem", position:"relative" }}>Exclusive Offers</h2>
-          <p style={{ color:"rgba(255,255,255,0.6)", fontSize:"0.8rem", margin:0, position:"relative" }}>Tap a coupon to copy the code instantly</p>
+    <div onClick={onClose} style={{ position:"fixed", inset:0, zIndex:9999, background:"rgba(0,0,0,0.45)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", padding:"1rem" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background:"#fff", borderRadius:16, maxWidth:420, width:"100%", padding:"2.5rem 2rem 2rem", boxShadow:"0 24px 64px rgba(0,0,0,0.18)", position:"relative", animation:"modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both", textAlign:"center" }}>
+
+        {/* Close */}
+        <button onClick={onClose} style={{ position:"absolute", top:14, right:16, background:"none", border:"none", cursor:"pointer", fontSize:20, color:"#999", lineHeight:1 }}>✕</button>
+
+        {/* Logo */}
+        <div style={{ marginBottom:"1.4rem" }}>
+          <div style={{ display:"inline-flex", alignItems:"center", gap:8, marginBottom:4 }}>
+            <div style={{ width:36, height:36, background:`linear-gradient(135deg,${T.bgDark},${T.orange})`, borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18 }}>💎</div>
+          </div>
+          <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"2rem", fontWeight:900, color:T.text, letterSpacing:"0.08em", lineHeight:1 }}>WISHSTONE</div>
+          <div style={{ fontSize:"0.65rem", letterSpacing:"0.22em", color:T.textMid, marginTop:2 }}>SACRED STORE</div>
         </div>
 
-        {/* Coupon Cards */}
-        <div style={{ padding:"1.4rem 1.6rem", maxHeight:320, overflowY:"auto" }}>
-          {loading ? (
-            <div style={{ textAlign:"center", padding:"2rem 0", color:T.textMid, fontSize:"0.82rem" }}>Loading offers...</div>
-          ) : coupons.length === 0 ? (
-            <div style={{ textAlign:"center", padding:"2rem 0", color:T.textMid, fontSize:"0.82rem" }}>No offers available right now.</div>
-          ) : coupons.map((c, i) => (
-            <div key={i} onClick={() => copy(c.code, i)}
-              style={{ background: copied===i ? `rgba(232,114,12,0.08)` : "#fff", border:`1.5px ${copied===i ? "solid" : "dashed"} ${copied===i ? T.orange : "rgba(232,114,12,0.35)"}`, borderRadius:14, padding:"1rem 1.2rem", marginBottom: i < coupons.length-1 ? "0.8rem" : 0, cursor:"pointer", display:"flex", alignItems:"center", gap:"1rem", transition:"all 0.25s", animation:`couponSlide 0.4s ease ${i*0.1}s both`,
-                boxShadow: copied===i ? `0 4px 20px rgba(232,114,12,0.18)` : "0 2px 8px rgba(0,0,0,0.04)" }}
-              onMouseEnter={e => { if(copied!==i) e.currentTarget.style.borderStyle="solid"; e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 8px 24px rgba(232,114,12,0.15)"; }}
-              onMouseLeave={e => { if(copied!==i) e.currentTarget.style.borderStyle="dashed"; e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,0.04)"; }}>
-              <div style={{ flex:1, minWidth:0 }}>
-                <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.3rem", fontWeight:900, color:T.orange, letterSpacing:"0.06em", animation: copied===i ? "copyPop 0.3s ease" : "none" }}>{c.code}</div>
-                <div style={{ fontSize:"0.72rem", color:T.textMid, marginTop:2, lineHeight:1.4 }}>{c.description || (c.discountType==="flat" ? `₹${c.discountValue} off` : `${c.discountValue}% off`)}{c.minOrderValue > 0 ? ` · Min ₹${c.minOrderValue}` : ""}</div>
-              </div>
-              <div style={{ flexShrink:0, background: copied===i ? T.orange : "rgba(232,114,12,0.08)", borderRadius:8, padding:"6px 12px", fontSize:"0.68rem", fontWeight:700, color: copied===i ? "#fff" : T.orange, transition:"all 0.2s", whiteSpace:"nowrap" }}>
-                {copied===i ? "✓ Copied!" : "TAP TO COPY"}
-              </div>
+        {!claimed ? (
+          <>
+            <p style={{ fontSize:"1rem", color:T.text, lineHeight:1.6, marginBottom:"1.6rem", fontFamily:"'Playfair Display',serif" }}>
+              Start your sacred journey with us and<br />get <strong style={{ color:T.orange }}>₹300 off</strong> your first order.
+            </p>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="Email address"
+              style={{ width:"100%", padding:"13px 16px", border:"1.5px solid #e5e5e5", borderRadius:10, fontSize:"0.9rem", color:T.text, outline:"none", boxSizing:"border-box", marginBottom:"0.9rem", fontFamily:"'Inter',sans-serif" }}
+              onFocus={e => e.target.style.borderColor=T.orange}
+              onBlur={e => e.target.style.borderColor="#e5e5e5"}
+              onKeyDown={e => e.key==="Enter" && handleClaim()}
+            />
+            <button onClick={handleClaim} style={{ width:"100%", padding:"14px", background:T.text, color:"#fff", border:"none", borderRadius:10, fontSize:"0.9rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", letterSpacing:"0.04em", transition:"background 0.2s" }}
+              onMouseEnter={e => e.currentTarget.style.background=T.orange}
+              onMouseLeave={e => e.currentTarget.style.background=T.text}>
+              Claim Discount
+            </button>
+            <button onClick={onClose} style={{ marginTop:"0.8rem", background:"none", border:"none", cursor:"pointer", fontSize:"0.75rem", color:"#aaa", fontFamily:"'Inter',sans-serif" }}>
+              No thanks, I'll pay full price
+            </button>
+          </>
+        ) : (
+          <>
+            <div style={{ fontSize:40, marginBottom:"0.6rem" }}>🎉</div>
+            <p style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", color:T.text, marginBottom:"0.4rem", fontWeight:700 }}>Your coupon is ready!</p>
+            <p style={{ fontSize:"0.8rem", color:T.textMid, marginBottom:"1.4rem" }}>Copy the code below and use it at checkout</p>
+            <div onClick={handleCopy} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:"#fdf6ee", border:`2px dashed ${T.orange}`, borderRadius:12, padding:"14px 18px", cursor:"pointer", marginBottom:"1.2rem", transition:"all 0.2s" }}
+              onMouseEnter={e => e.currentTarget.style.background="#fdecd6"}
+              onMouseLeave={e => e.currentTarget.style.background="#fdf6ee"}>
+              <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.6rem", fontWeight:900, color:T.orange, letterSpacing:"0.1em" }}>{COUPON}</span>
+              <span style={{ background: copied ? "#2d7a5a" : T.orange, color:"#fff", borderRadius:7, padding:"6px 14px", fontSize:"0.72rem", fontWeight:700, transition:"background 0.2s" }}>
+                {copied ? "✓ Copied!" : "COPY"}
+              </span>
             </div>
-          ))}
-        </div>
-
-        {/* Footer */}
-        <div style={{ padding:"0 1.6rem 1.6rem" }}>
-          <button className="btn-orange" onClick={onShop} style={{ width:"100%", padding:"13px", fontSize:"0.85rem", borderRadius:12, marginTop:"0.4rem" }}>Shop Now & Save</button>
-          <button onClick={onClose} style={{ width:"100%", marginTop:"0.6rem", background:"none", border:"none", cursor:"pointer", fontSize:"0.74rem", color:T.textMid, fontFamily:"'Inter',sans-serif" }}>No thanks, I'll pay full price</button>
-        </div>
+            <button className="btn-orange" onClick={() => { onClose(); onShop(); }} style={{ width:"100%", padding:"13px", fontSize:"0.85rem", borderRadius:10 }}>
+              Shop Now & Save
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
