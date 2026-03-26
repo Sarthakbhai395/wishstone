@@ -163,6 +163,7 @@ const GLOBAL_CSS = `
     .dashboard-stats{grid-template-columns:repeat(2,1fr) !important;}
     .dashboard-layout{grid-template-columns:1fr !important;}
     .dash-sidebar{position:relative !important; top:0 !important;}
+    .profile-grid{grid-template-columns:1fr !important;}
   }
   @media(max-width:768px){
     .hero-grid{grid-template-columns:1fr !important; gap:0 !important;}
@@ -180,6 +181,8 @@ const GLOBAL_CSS = `
     .dash-sidebar{margin-bottom:1rem !important;}
     .dash-order-card{padding:1rem !important; gap:10px !important;}
     .dash-order-card > div:first-child{display:none !important;}
+    .profile-grid{grid-template-columns:1fr !important;}
+    .profile-info-grid{grid-template-columns:1fr !important;}
   }
   @media(max-width:600px){
     .prod-grid{grid-template-columns:1fr !important;}
@@ -189,12 +192,16 @@ const GLOBAL_CSS = `
     .dashboard-stats{grid-template-columns:repeat(2,1fr) !important;}
     .video-card{width:160px !important;}
     .checkout-grid{grid-template-columns:1fr !important;}
+    .profile-grid{grid-template-columns:1fr !important;}
+    .profile-info-grid{grid-template-columns:1fr !important;}
   }
   @media(max-width:480px){
     .stats-row > div{flex:1 1 100% !important;}
     .dashboard-stats{grid-template-columns:1fr 1fr !important;}
     .video-card{width:150px !important;}
     .dash-order-card{flex-direction:column !important; align-items:flex-start !important;}
+    .profile-grid{grid-template-columns:1fr !important;}
+    .profile-info-grid{grid-template-columns:1fr !important;}
   }
 `;
 
@@ -1573,11 +1580,14 @@ function LoginPage({ onLogin, onSwitch }) {
 }
 
 // ─── USER DASHBOARD ───────────────────────────────────────────
-function UserDashboard({ user, orders, onLogout, onNav }) {
+function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
   const [activeTab, setActiveTab] = useState("orders");
   const [apiOrders, setApiOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [editForm, setEditForm] = useState({ name: user.name||"", email: user.email||"", phone: user.phone||"" });
+  const [editSaved, setEditSaved] = useState(false);
 
   const totalSpent = orders.reduce((s,o) => s+(o.totalAmount||0), 0);
   const pending    = orders.filter(o => (o.status||"Confirmed") === "Pending").length;
@@ -1803,11 +1813,18 @@ function UserDashboard({ user, orders, onLogout, onNav }) {
             <div style={{ animation:"slideUp 0.35s ease both" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1.5rem", flexWrap:"wrap", gap:10 }}>
                 <div>
-                  <h1 style={{ fontSize:"1.75rem", fontWeight:900, color:txt, margin:0 }}>My Profile</h1>
-                  <p style={{ color:sub, fontSize:"0.9rem", marginTop:5 }}>Manage your account information</p>
+                  <h1 style={{ fontSize:"clamp(1.3rem,4vw,1.75rem)", fontWeight:900, color:txt, margin:0 }}>My Profile</h1>
+                  <p style={{ color:sub, fontSize:"clamp(0.78rem,2vw,0.9rem)", marginTop:5 }}>Manage your account information</p>
                 </div>
+                <button onClick={() => { setEditForm({ name: user.name||"", email: user.email||"", phone: user.phone||"" }); setEditingProfile(true); setEditSaved(false); }}
+                  style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 20px", background:`linear-gradient(135deg,${P},#a855f7)`, color:"#fff", border:"none", borderRadius:10, fontSize:"0.85rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", boxShadow:`0 4px 16px rgba(124,58,237,0.3)`, transition:"all 0.2s" }}>
+                  ✏️ Edit Profile
+                </button>
               </div>
-              <div style={{ display:"grid", gridTemplateColumns:"220px 1fr", gap:"1.5rem", alignItems:"start" }} className="checkout-grid">
+
+              {/* Avatar + Info — stacks on mobile */}
+              <div className="profile-grid" style={{ display:"grid", gridTemplateColumns:"220px 1fr", gap:"1.5rem", alignItems:"start" }}>
+
                 {/* Avatar card */}
                 <div style={{ background:card, borderRadius:18, padding:"2rem 1.3rem", border:`1px solid ${border}`, textAlign:"center", boxShadow:"0 2px 14px rgba(0,0,0,0.06)" }}>
                   <div style={{ width:80, height:80, borderRadius:"50%", background:`linear-gradient(135deg,${P},#a855f7)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:32, color:"#fff", fontWeight:900, margin:"0 auto 14px", boxShadow:`0 4px 22px rgba(124,58,237,0.35)` }}>
@@ -1817,26 +1834,27 @@ function UserDashboard({ user, orders, onLogout, onNav }) {
                   <div style={{ color:P, fontSize:"0.78rem", fontWeight:600, marginBottom:9 }}>Sacred Member</div>
                   <div style={{ color:sub, fontSize:"0.75rem" }}>📅 Joined {user.joinedAt || new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</div>
                 </div>
+
                 {/* Info card */}
-                <div style={{ background:card, borderRadius:18, padding:"2rem", border:`1px solid ${border}`, boxShadow:"0 2px 14px rgba(0,0,0,0.06)" }}>
+                <div style={{ background:card, borderRadius:18, padding:"clamp(1.2rem,3vw,2rem)", border:`1px solid ${border}`, boxShadow:"0 2px 14px rgba(0,0,0,0.06)" }}>
                   <div style={{ fontWeight:700, color:txt, fontSize:"1.1rem", marginBottom:"1.3rem" }}>Personal Information</div>
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1.1rem" }}>
-                    {[["👤 Full Name", user.name||"—"],["✉️ Email Address", user.email||"—"],["📅 Member Since", user.joinedAt || new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})],["🏅 Account Type","Sacred Member"]].map(([l,v]) => (
-                      <div key={l} style={{ padding:"1rem 1.1rem", background:bg, borderRadius:11, border:`1px solid ${border}` }}>
-                        <div style={{ fontSize:"0.68rem", fontWeight:700, color:sub, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:6 }}>{l}</div>
-                        <div style={{ fontSize:"0.95rem", fontWeight:600, color:txt }}>{v}</div>
+                  <div className="profile-info-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1rem" }}>
+                    {[["👤 Full Name", user.name||"—"],["✉️ Email Address", user.email||"—"],["📞 Phone", user.phone||"—"],["📅 Member Since", user.joinedAt || new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})],["🏅 Account Type","Sacred Member"]].map(([l,v]) => (
+                      <div key={l} style={{ padding:"0.9rem 1rem", background:bg, borderRadius:11, border:`1px solid ${border}`, minWidth:0 }}>
+                        <div style={{ fontSize:"0.65rem", fontWeight:700, color:sub, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:5 }}>{l}</div>
+                        <div style={{ fontSize:"0.9rem", fontWeight:600, color:txt, wordBreak:"break-word" }}>{v}</div>
                       </div>
                     ))}
                   </div>
                   {/* Account stats */}
                   <div style={{ marginTop:"1.5rem", paddingTop:"1.3rem", borderTop:`1px solid ${border}` }}>
                     <div style={{ fontWeight:700, color:txt, fontSize:"1rem", marginBottom:"1rem" }}>Account Statistics</div>
-                    <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"0.9rem" }} className="dashboard-stats">
+                    <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"0.8rem" }} className="dashboard-stats">
                       {statCards.map(s => (
-                        <div key={s.label} style={{ background:s.light, borderRadius:13, padding:"1rem 0.8rem", textAlign:"center", border:`1px solid ${border}` }}>
-                          <div style={{ fontSize:24, marginBottom:5 }}>{s.icon}</div>
-                          <div style={{ fontWeight:800, color:s.color, fontSize:"1.1rem" }}>{s.value}</div>
-                          <div style={{ fontSize:"0.64rem", color:sub, marginTop:3 }}>{s.label}</div>
+                        <div key={s.label} style={{ background:s.light, borderRadius:13, padding:"0.9rem 0.6rem", textAlign:"center", border:`1px solid ${border}` }}>
+                          <div style={{ fontSize:22, marginBottom:4 }}>{s.icon}</div>
+                          <div style={{ fontWeight:800, color:s.color, fontSize:"1rem" }}>{s.value}</div>
+                          <div style={{ fontSize:"0.6rem", color:sub, marginTop:3 }}>{s.label}</div>
                         </div>
                       ))}
                     </div>
@@ -1847,6 +1865,95 @@ function UserDashboard({ user, orders, onLogout, onNav }) {
           )}
         </main>
       </div>
+
+      {/* ── EDIT PROFILE MODAL ── */}
+      {editingProfile && (
+        <div onClick={() => setEditingProfile(false)} style={{ position:"fixed", inset:0, zIndex:9999, background:"rgba(0,0,0,0.55)", backdropFilter:"blur(6px)", display:"flex", alignItems:"center", justifyContent:"center", padding:"1rem" }}>
+          <div onClick={e => e.stopPropagation()} style={{ background:card, borderRadius:20, maxWidth:480, width:"100%", boxShadow:"0 24px 80px rgba(0,0,0,0.22)", animation:"modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both", overflow:"hidden" }}>
+
+            {/* Header */}
+            <div style={{ background:`linear-gradient(135deg,${P},#a855f7)`, padding:"1.5rem 2rem", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <div>
+                <h2 style={{ fontSize:"1.25rem", fontWeight:900, color:"#fff", margin:0 }}>Edit Profile</h2>
+                <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.8)", marginTop:3 }}>Changes will be saved permanently</p>
+              </div>
+              <button onClick={() => setEditingProfile(false)} style={{ background:"rgba(255,255,255,0.2)", border:"none", cursor:"pointer", fontSize:20, color:"#fff", lineHeight:1, padding:"6px 10px", borderRadius:8 }}>×</button>
+            </div>
+
+            <div style={{ padding:"2rem" }}>
+              {editSaved ? (
+                <div style={{ textAlign:"center", padding:"1.5rem 0" }}>
+                  <div style={{ fontSize:52, marginBottom:12 }}>✅</div>
+                  <h3 style={{ fontWeight:800, color:txt, fontSize:"1.1rem", marginBottom:6 }}>Profile Updated!</h3>
+                  <p style={{ color:sub, fontSize:"0.82rem" }}>Your changes have been saved successfully.</p>
+                </div>
+              ) : (
+                <>
+                  {/* Name */}
+                  <div style={{ marginBottom:"1.1rem" }}>
+                    <label style={{ display:"block", fontSize:"0.68rem", fontWeight:700, color:sub, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:6 }}>👤 Full Name</label>
+                    <input
+                      type="text"
+                      value={editForm.name}
+                      onChange={e => setEditForm({...editForm, name: e.target.value})}
+                      placeholder="Enter your full name"
+                      style={{ width:"100%", padding:"11px 14px", border:`1.5px solid ${border}`, borderRadius:10, fontSize:"0.92rem", color:txt, outline:"none", boxSizing:"border-box", fontFamily:"'Inter',sans-serif", background:bg }}
+                      onFocus={e => e.target.style.borderColor=P}
+                      onBlur={e => e.target.style.borderColor=border}
+                    />
+                  </div>
+
+                  {/* Email */}
+                  <div style={{ marginBottom:"1.1rem" }}>
+                    <label style={{ display:"block", fontSize:"0.68rem", fontWeight:700, color:sub, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:6 }}>✉️ Email Address</label>
+                    <input
+                      type="email"
+                      value={editForm.email}
+                      onChange={e => setEditForm({...editForm, email: e.target.value})}
+                      placeholder="Enter your email"
+                      style={{ width:"100%", padding:"11px 14px", border:`1.5px solid ${border}`, borderRadius:10, fontSize:"0.92rem", color:txt, outline:"none", boxSizing:"border-box", fontFamily:"'Inter',sans-serif", background:bg }}
+                      onFocus={e => e.target.style.borderColor=P}
+                      onBlur={e => e.target.style.borderColor=border}
+                    />
+                  </div>
+
+                  {/* Phone */}
+                  <div style={{ marginBottom:"1.6rem" }}>
+                    <label style={{ display:"block", fontSize:"0.68rem", fontWeight:700, color:sub, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:6 }}>📞 Phone Number</label>
+                    <input
+                      type="tel"
+                      value={editForm.phone}
+                      onChange={e => setEditForm({...editForm, phone: e.target.value})}
+                      placeholder="Enter your phone number"
+                      style={{ width:"100%", padding:"11px 14px", border:`1.5px solid ${border}`, borderRadius:10, fontSize:"0.92rem", color:txt, outline:"none", boxSizing:"border-box", fontFamily:"'Inter',sans-serif", background:bg }}
+                      onFocus={e => e.target.style.borderColor=P}
+                      onBlur={e => e.target.style.borderColor=border}
+                    />
+                  </div>
+
+                  {/* Buttons */}
+                  <div style={{ display:"flex", gap:"0.8rem" }}>
+                    <button onClick={() => setEditingProfile(false)}
+                      style={{ flex:1, padding:"12px", background:bg, color:sub, border:`1px solid ${border}`, borderRadius:10, fontSize:"0.88rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>
+                      Cancel
+                    </button>
+                    <button onClick={() => {
+                        if (!editForm.name.trim() && !editForm.email.trim()) return;
+                        const updated = { ...user, name: editForm.name.trim()||user.name, email: editForm.email.trim()||user.email, phone: editForm.phone.trim() };
+                        onUpdateUser(updated);
+                        setEditSaved(true);
+                        setTimeout(() => setEditingProfile(false), 1400);
+                      }}
+                      style={{ flex:2, padding:"12px", background:`linear-gradient(135deg,${P},#a855f7)`, color:"#fff", border:"none", borderRadius:10, fontSize:"0.88rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", boxShadow:`0 4px 16px rgba(124,58,237,0.3)` }}>
+                      Save Changes
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── ORDER DETAILS MODAL ── */}
       {selectedOrder && (
@@ -2154,7 +2261,7 @@ export default function WishstoneApp() {
       {page==="wishlist"  && <WishlistPage ids={wished} onAdd={addToCart} onWish={toggleWish} onClick={p=>{setSelectedProduct(p);nav("product");}} />}
       {page==="auth" && authMode==="signup" && <SignupPage onSignup={handleLogin} onSwitch={()=>setAuthMode("login")} />}
       {page==="auth" && authMode==="login"  && <LoginPage  onLogin={handleLogin} onSwitch={()=>setAuthMode("signup")} />}
-      {page==="dashboard" && user && <UserDashboard user={user} orders={orders} onLogout={handleLogout} onNav={nav} />}
+      {page==="dashboard" && user && <UserDashboard user={user} orders={orders} onLogout={handleLogout} onNav={nav} onUpdateUser={u => { setUser(u); localStorage.setItem("ws_user", JSON.stringify(u)); }} />}
       {page!=="auth" && <Footer />}
       {/* ── Promo Modal ── */}
       <PromoModal show={showModal} onClose={() => setShowModal(false)} onShop={() => { setShowModal(false); nav("products"); }} />
