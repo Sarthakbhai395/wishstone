@@ -239,20 +239,38 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
           {links.map(([k,l]) => (
             <button key={k} className={`nav-link${currentPage===k?" active":""}`} onClick={() => navTo(k)}>{l}</button>
           ))}
-          <button onClick={() => navTo("cart")} style={{ background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:5, fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.1em", textTransform:"uppercase", color:T.text, position:"relative" }}>
-            🛒 Cart
-            {cartCount > 0 && <span style={{ background:T.orange, color:"#fff", borderRadius:"50%", width:16, height:16, fontSize:"0.58rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700, position:"absolute", top:-6, right:-8 }}>{cartCount}</span>}
+          <button onClick={() => navTo("cart")} style={{ background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:6, fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.1em", textTransform:"uppercase", color:T.text, position:"relative", padding:"6px 4px", borderRadius:8, transition:"background 0.2s" }}
+            onMouseEnter={e => e.currentTarget.style.background="rgba(0,0,0,0.05)"}
+            onMouseLeave={e => e.currentTarget.style.background="none"}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            Cart
+            {cartCount > 0 && <span style={{ background:T.orange, color:"#fff", borderRadius:"50%", width:16, height:16, fontSize:"0.58rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700, position:"absolute", top:-4, right:-6 }}>{cartCount}</span>}
           </button>
         </nav>
 
         <div style={{ display:"flex", alignItems:"center", gap:"0.7rem" }}>
-          <button onClick={() => navTo("wishlist")} style={{ background:"none", border:"none", cursor:"pointer", position:"relative", fontSize:18, padding:"4px 5px" }}>
-            🤍
-            {wishCount > 0 && <span style={{ position:"absolute", top:0, right:0, background:T.orange, color:"#fff", borderRadius:"50%", width:15, height:15, fontSize:"0.55rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700 }}>{wishCount}</span>}
+          {/* Wishlist icon — black default, red when items exist */}
+          <button onClick={() => navTo("wishlist")} style={{ background:"none", border:"none", cursor:"pointer", position:"relative", padding:"6px", display:"flex", alignItems:"center", justifyContent:"center", borderRadius:8, transition:"background 0.2s" }}
+            onMouseEnter={e => e.currentTarget.style.background="rgba(0,0,0,0.06)"}
+            onMouseLeave={e => e.currentTarget.style.background="none"}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill={wishCount > 0 ? "#e53e3e" : "none"} stroke={wishCount > 0 ? "#e53e3e" : "#1a1a1a"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition:"all 0.25s ease", display:"block" }}>
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            {wishCount > 0 && <span style={{ position:"absolute", top:0, right:0, background:"#e53e3e", color:"#fff", borderRadius:"50%", width:15, height:15, fontSize:"0.52rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700 }}>{wishCount}</span>}
           </button>
-          <button onClick={() => navTo("cart")} className="show-mobile-flex" style={{ display:"none", background:"none", border:"none", cursor:"pointer", position:"relative", fontSize:18, padding:"4px 5px" }}>
-            🛒
-            {cartCount > 0 && <span style={{ position:"absolute", top:0, right:0, background:T.orange, color:"#fff", borderRadius:"50%", width:15, height:15, fontSize:"0.55rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700 }}>{cartCount}</span>}
+
+          {/* Cart icon mobile — black */}
+          <button onClick={() => navTo("cart")} className="show-mobile-flex" style={{ display:"none", background:"none", border:"none", cursor:"pointer", position:"relative", padding:"6px", alignItems:"center", justifyContent:"center", borderRadius:8, transition:"background 0.2s" }}
+            onMouseEnter={e => e.currentTarget.style.background="rgba(0,0,0,0.06)"}
+            onMouseLeave={e => e.currentTarget.style.background="none"}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display:"block" }}>
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            {cartCount > 0 && <span style={{ position:"absolute", top:0, right:0, background:T.orange, color:"#fff", borderRadius:"50%", width:15, height:15, fontSize:"0.52rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700 }}>{cartCount}</span>}
           </button>
           {user ? (
             <>
