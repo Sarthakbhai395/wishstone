@@ -2220,6 +2220,7 @@ function ProductPageWrapper({ onAdd, onWish, wished, cart, onShop }) {
 }
 
 // ─── SCROLL TO TOP ON ROUTE CHANGE ────────────────────────────
+// v2.1 - routing fix
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
