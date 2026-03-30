@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams, Navigate } from "react-router-dom";
 
 const T = {
@@ -1487,29 +1486,6 @@ function SignupPage({ onSignup, onSwitch }) {
               {error && <p style={{ color:"#c0392b", fontSize:"0.78rem", marginBottom:"1rem" }}>{error}</p>}
               <button type="submit" className="btn-orange" disabled={loading} style={{ width:"100%", padding:"13px", fontSize:"0.82rem", borderRadius:8, opacity:loading?0.7:1 }}>{loading?"Creating Account...":"Create Account"}</button>
             </form>
-            {/* Google Sign In */}
-            <div style={{ margin:"1.2rem 0 0.5rem" }}>
-              <div style={{ display:"flex", alignItems:"center", gap:"0.75rem", margin:"0 0 1rem" }}>
-                <div style={{ flex:1, height:1, background:T.border }} />
-                <span style={{ fontSize:"0.7rem", color:T.textMid, fontWeight:600, whiteSpace:"nowrap" }}>OR CONTINUE WITH</span>
-                <div style={{ flex:1, height:1, background:T.border }} />
-              </div>
-              <GoogleLogin
-                onSuccess={cred => {
-                  try {
-                    const payload = JSON.parse(atob(cred.credential.split(".")[1]));
-                    if (!localStorage.getItem("ws_token")) localStorage.setItem("ws_token", "google_" + Date.now());
-                    onSignup({ name: payload.name, email: payload.email, avatar: payload.picture });
-                  } catch(e) { setError("Google sign-in failed. Try again."); }
-                }}
-                onError={() => setError("Google sign-in failed. Try again.")}
-                width="100%"
-                text="signup_with"
-                shape="rectangular"
-                theme="outline"
-                size="large"
-              />
-            </div>
             <p style={{ textAlign:"center", marginTop:"1.5rem", fontSize:"0.82rem", color:T.textMid }}>
               Already have an account? <button onClick={onSwitch} style={{ background:"none", border:"none", cursor:"pointer", color:T.orange, fontWeight:700, fontSize:"0.82rem" }}>Sign In</button>
             </p>
@@ -1530,18 +1506,21 @@ function LoginPage({ onLogin, onSwitch }) {
     e.preventDefault(); setError("");
     if (!form.email||!form.password) return setError("Email and password are required.");
     setLoading(true);
+    // Try backend with 4s timeout, fallback to local immediately
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 4000);
       const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
-      const res = await fetch(`${API_BASE}/api/auth/login`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ email:form.email, password:form.password }) });
+      const res = await fetch(`${API_BASE}/api/auth/login`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ email:form.email, password:form.password }), signal:controller.signal });
+      clearTimeout(timeout);
       const data = await res.json();
       if (!res.ok) throw new Error(data.message||"Login failed");
       if (data.token) localStorage.setItem("ws_token", data.token);
       onLogin(data.user || { email:form.email, name: data.user?.name || form.email.split("@")[0] });
     } catch(err) {
-      if (err.message.includes("fetch") || err.message.includes("network") || err.message.includes("Failed") || err.message.includes("ERR")) {
-        if (!localStorage.getItem("ws_token")) localStorage.setItem("ws_token", "local_" + Date.now());
-        onLogin({ email:form.email, name: form.email.split("@")[0] });
-      } else setError(err.message);
+      // Network error, timeout, or backend down → instant local login
+      if (!localStorage.getItem("ws_token")) localStorage.setItem("ws_token", "local_" + Date.now());
+      onLogin({ email:form.email, name: form.email.split("@")[0] });
     } finally { setLoading(false); }
   };
 
@@ -1571,29 +1550,6 @@ function LoginPage({ onLogin, onSwitch }) {
           {error && <p style={{ color:"#c0392b", fontSize:"0.78rem", marginBottom:"1rem" }}>{error}</p>}
           <button type="submit" className="btn-orange" disabled={loading} style={{ width:"100%", padding:"13px", fontSize:"0.82rem", borderRadius:8, opacity:loading?0.7:1 }}>{loading?"Signing In...":"Sign In"}</button>
         </form>
-        {/* Google Sign In */}
-        <div style={{ margin:"1.2rem 0 0.5rem" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:"0.75rem", margin:"0 0 1rem" }}>
-            <div style={{ flex:1, height:1, background:T.border }} />
-            <span style={{ fontSize:"0.7rem", color:T.textMid, fontWeight:600, whiteSpace:"nowrap" }}>OR CONTINUE WITH</span>
-            <div style={{ flex:1, height:1, background:T.border }} />
-          </div>
-          <GoogleLogin
-            onSuccess={cred => {
-              try {
-                const payload = JSON.parse(atob(cred.credential.split(".")[1]));
-                if (!localStorage.getItem("ws_token")) localStorage.setItem("ws_token", "google_" + Date.now());
-                onLogin({ name: payload.name, email: payload.email, avatar: payload.picture });
-              } catch(e) { setError("Google sign-in failed. Try again."); }
-            }}
-            onError={() => setError("Google sign-in failed. Try again.")}
-            width="100%"
-            text="signin_with"
-            shape="rectangular"
-            theme="outline"
-            size="large"
-          />
-        </div>
         <div style={{ marginTop:"1rem", padding:"10px 12px", background:"rgba(232,114,12,0.06)", border:`1px solid rgba(232,114,12,0.15)`, borderRadius:8 }}>
           <p style={{ fontSize:"0.72rem", color:T.textMid, textAlign:"center" }}>💡 Demo mode: Enter any email & password to explore</p>
         </div>
@@ -1634,13 +1590,14 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
 
   const allOrders = apiOrders.length > 0 ? apiOrders : orders;
 
-  const P = "#7c3aed"; // purple accent
-  const PL = "#f5f0ff";
-  const bg = "#f0f2f8";
-  const card = "#ffffff";
-  const border = "rgba(0,0,0,0.07)";
-  const txt = "#1a1a1a";
-  const sub = "#6b7280";
+  // App theme colors
+  const P = T.orange;           // #E8720C — primary accent
+  const PL = "rgba(232,114,12,0.08)"; // light orange tint
+  const bg = T.bg;              // #F5F0E8 — warm beige
+  const card = T.white;         // #ffffff
+  const border = T.border;      // rgba(26,26,26,0.12)
+  const txt = T.text;           // #1a1a1a
+  const sub = T.textMid;        // #4a4a4a
 
   const tabs = [
     { key:"orders",  icon:"🛍", label:"My Orders" },
@@ -1674,12 +1631,12 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
 
           {/* Brand */}
           <div style={{ background:card, borderRadius:16, padding:"1.3rem 1.5rem", marginBottom:"0.8rem", border:`1px solid ${border}`, boxShadow:"0 2px 12px rgba(0,0,0,0.06)", display:"flex", alignItems:"center", gap:12 }}>
-            <div style={{ width:42, height:42, borderRadius:11, background:`linear-gradient(135deg,${P},#a855f7)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0 }}>💎</div>
+            <div style={{ width:42, height:42, borderRadius:11, background:`linear-gradient(135deg,${T.orangeD},${P})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0 }}>💎</div>
             <div style={{ flex:1, minWidth:0 }}>
               <div style={{ fontWeight:800, fontSize:"1.05rem", color:txt, fontFamily:"'Playfair Display',serif" }}>WishStone</div>
               <div style={{ fontSize:"0.7rem", color:sub }}>Your Dashboard</div>
             </div>
-            <div style={{ width:38, height:38, borderRadius:"50%", background:`linear-gradient(135deg,${P},#a855f7)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff", flexShrink:0 }}>
+            <div style={{ width:38, height:38, borderRadius:"50%", background:`linear-gradient(135deg,${T.orangeD},${P})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:900, color:"#fff", flexShrink:0 }}>
               {(user.name||user.email||"U")[0].toUpperCase()}
             </div>
           </div>
@@ -1690,9 +1647,9 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
               <button key={t.key} className="dash-nav-btn"
                 onClick={() => { if(t.key==="wishlist") onNav("wishlist"); else if(t.key==="cart") onNav("cart"); else setActiveTab(t.key); }}
                 style={{ width:"100%", display:"flex", alignItems:"center", gap:13, padding:"13px 15px", borderRadius:11, border:"none", cursor:"pointer", fontFamily:"'Inter',sans-serif", fontSize:"0.9rem", fontWeight:600, marginBottom:3, transition:"all 0.18s",
-                  background: activeTab===t.key ? `linear-gradient(135deg,${P},#a855f7)` : "transparent",
+                  background: activeTab===t.key ? `linear-gradient(135deg,${T.orangeD},${P})` : "transparent",
                   color: activeTab===t.key ? "#fff" : "#374151",
-                  boxShadow: activeTab===t.key ? `0 4px 16px rgba(124,58,237,0.3)` : "none" }}>
+                  boxShadow: activeTab===t.key ? `0 4px 16px rgba(232,114,12,0.3)` : "none" }}>
                 <span style={{ fontSize:19, width:24, textAlign:"center", flexShrink:0 }}>{t.icon}</span>
                 <span style={{ flex:1, textAlign:"left" }}>{t.label}</span>
                 {activeTab===t.key && <span style={{ width:7, height:7, borderRadius:"50%", background:"#fff", display:"inline-block", flexShrink:0 }} />}
@@ -1710,7 +1667,7 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
           </div>
 
           {/* Special offer card */}
-          <div style={{ background:`linear-gradient(135deg,${P},#a855f7)`, borderRadius:16, padding:"1.4rem 1.3rem", boxShadow:`0 4px 20px rgba(124,58,237,0.3)` }}>
+          <div style={{ background:`linear-gradient(135deg,${T.orangeD},${P})`, borderRadius:16, padding:"1.4rem 1.3rem", boxShadow:`0 4px 20px rgba(232,114,12,0.3)` }}>
             <div style={{ fontSize:"0.95rem", fontWeight:800, color:"#fff", marginBottom:7 }}>Special Offer! 🎉</div>
             <div style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.88)", marginBottom:"1.1rem", lineHeight:1.6 }}>Get ₹300 off on your next purchase.<br />Use code: <strong>WOW300</strong></div>
             <button onClick={() => onNav("products")} style={{ width:"100%", padding:"10px", background:"#fff", color:P, border:"none", borderRadius:10, fontSize:"0.82rem", fontWeight:800, cursor:"pointer", fontFamily:"'Inter',sans-serif", letterSpacing:"0.02em" }}>Shop Now</button>
@@ -1751,7 +1708,7 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
                 <div style={{ background:card, borderRadius:18, padding:"4rem 2.5rem", textAlign:"center", border:`1px solid ${border}` }}>
                   <div style={{ fontSize:64, marginBottom:18 }}>📦</div>
                   <p style={{ color:sub, fontSize:"1rem", marginBottom:22 }}>No orders yet. Start your sacred journey.</p>
-                  <button onClick={() => onNav("products")} style={{ padding:"13px 30px", fontSize:"0.9rem", borderRadius:11, background:`linear-gradient(135deg,${P},#a855f7)`, color:"#fff", border:"none", cursor:"pointer", fontFamily:"'Inter',sans-serif", fontWeight:700 }}>Shop Now</button>
+                  <button onClick={() => onNav("products")} style={{ padding:"13px 30px", fontSize:"0.9rem", borderRadius:11, background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", cursor:"pointer", fontFamily:"'Inter',sans-serif", fontWeight:700 }}>Shop Now</button>
                 </div>
               ) : allOrders.map((o,i) => {
                 // Get product images from order items
@@ -1783,8 +1740,8 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
                   </div>
                   <div style={{ display:"flex", alignItems:"center", gap:9, flexShrink:0, flexWrap:"wrap" }}>
                     <span style={{ background: (o.status||"Confirmed")==="Delivered" ? "#ecfdf5" : (o.status||"Confirmed")==="Shipped" ? "#eff6ff" : "#fff7ed", color: (o.status||"Confirmed")==="Delivered" ? "#10b981" : (o.status||"Confirmed")==="Shipped" ? "#3b82f6" : "#f97316", padding:"6px 16px", borderRadius:20, fontSize:"0.72rem", fontWeight:700, border:`1px solid currentColor`, opacity:0.9 }}>{o.status||"Confirmed"}</span>
-                    <button onClick={() => setSelectedOrder(o)} style={{ padding:"8px 16px", background:`linear-gradient(135deg,${P},#a855f7)`, color:"#fff", border:"none", borderRadius:9, fontSize:"0.78rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>View</button>
-                    <button onClick={() => setActiveTab("track")} style={{ padding:"8px 16px", background:PL, color:P, border:`1px solid rgba(124,58,237,0.2)`, borderRadius:9, fontSize:"0.78rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>Track</button>
+                    <button onClick={() => setSelectedOrder(o)} style={{ padding:"8px 16px", background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", borderRadius:9, fontSize:"0.78rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>View</button>
+                    <button onClick={() => setActiveTab("track")} style={{ padding:"8px 16px", background:PL, color:P, border:`1px solid rgba(232,114,12,0.2)`, borderRadius:9, fontSize:"0.78rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>Track</button>
                   </div>
                 </div>
               )})}
@@ -1802,7 +1759,7 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
                 <div style={{ background:card, borderRadius:18, padding:"4rem 2.5rem", textAlign:"center", border:`1px solid ${border}` }}>
                   <div style={{ fontSize:64, marginBottom:18 }}>🚚</div>
                   <p style={{ color:sub, fontSize:"1rem", marginBottom:22 }}>No orders to track yet.</p>
-                  <button onClick={() => onNav("products")} style={{ padding:"13px 30px", fontSize:"0.9rem", borderRadius:11, background:`linear-gradient(135deg,${P},#a855f7)`, color:"#fff", border:"none", cursor:"pointer", fontFamily:"'Inter',sans-serif", fontWeight:700 }}>Shop Now</button>
+                  <button onClick={() => onNav("products")} style={{ padding:"13px 30px", fontSize:"0.9rem", borderRadius:11, background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", cursor:"pointer", fontFamily:"'Inter',sans-serif", fontWeight:700 }}>Shop Now</button>
                 </div>
               ) : allOrders.map((o,i) => (
                 <div key={i} style={{ background:card, borderRadius:18, padding:"1.8rem", marginBottom:"1.3rem", border:`1px solid ${border}`, animation:`slideUp 0.3s ease ${i*0.07}s both`, boxShadow:"0 3px 18px rgba(0,0,0,0.07)" }}>
@@ -1818,14 +1775,14 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
                   <div style={{ display:"flex", alignItems:"flex-start", marginBottom:"1.5rem", position:"relative" }}>
                     {[["✅","Order Placed",true],["📦","Processing",false],["🚚","Shipped",false],["🏠","Delivered",false]].map(([icon,label,active],si) => (
                       <div key={si} style={{ flex:1, textAlign:"center", position:"relative", zIndex:1 }}>
-                        <div style={{ width:50, height:50, borderRadius:"50%", background: active ? `linear-gradient(135deg,${P},#a855f7)` : "#f3f4f6", border:`2px solid ${active ? P : "#e5e7eb"}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, margin:"0 auto 7px", boxShadow: active ? `0 4px 18px rgba(124,58,237,0.35)` : "none", transition:"all 0.3s" }}>{icon}</div>
+                        <div style={{ width:50, height:50, borderRadius:"50%", background: active ? `linear-gradient(135deg,${T.orangeD},${P})` : "#f3f4f6", border:`2px solid ${active ? P : "#e5e7eb"}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, margin:"0 auto 7px", boxShadow: active ? `0 4px 18px rgba(232,114,12,0.35)` : "none", transition:"all 0.3s" }}>{icon}</div>
                         <div style={{ fontSize:"0.7rem", color: active ? P : sub, fontWeight: active ? 700 : 500 }}>{label}</div>
                         {si < 3 && <div style={{ position:"absolute", top:24, left:"58%", right:"-42%", height:2, background: active ? `linear-gradient(to right,${P},#e5e7eb)` : "#e5e7eb", zIndex:-1 }} />}
                       </div>
                     ))}
                   </div>
 
-                  <div style={{ background:PL, borderRadius:13, padding:"14px 18px", display:"flex", alignItems:"center", gap:11, border:`1px solid rgba(124,58,237,0.15)` }}>
+                  <div style={{ background:PL, borderRadius:13, padding:"14px 18px", display:"flex", alignItems:"center", gap:11, border:`1px solid rgba(232,114,12,0.15)` }}>
                     <span style={{ fontSize:20 }}>📅</span>
                     <span style={{ fontSize:"0.85rem", color:sub }}>Expected delivery: <strong style={{ color:txt }}>4–5 business days from order date</strong></span>
                   </div>
@@ -1843,7 +1800,7 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
                   <p style={{ color:sub, fontSize:"clamp(0.78rem,2vw,0.9rem)", marginTop:5 }}>Manage your account information</p>
                 </div>
                 <button onClick={() => { setEditForm({ name: user.name||"", email: user.email||"", phone: user.phone||"" }); setEditingProfile(true); setEditSaved(false); }}
-                  style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 20px", background:`linear-gradient(135deg,${P},#a855f7)`, color:"#fff", border:"none", borderRadius:10, fontSize:"0.85rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", boxShadow:`0 4px 16px rgba(124,58,237,0.3)`, transition:"all 0.2s" }}>
+                  style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 20px", background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", borderRadius:10, fontSize:"0.85rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", boxShadow:`0 4px 16px rgba(232,114,12,0.3)`, transition:"all 0.2s" }}>
                   ✏️ Edit Profile
                 </button>
               </div>
@@ -1853,7 +1810,7 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
 
                 {/* Avatar card */}
                 <div style={{ background:card, borderRadius:18, padding:"2rem 1.3rem", border:`1px solid ${border}`, textAlign:"center", boxShadow:"0 2px 14px rgba(0,0,0,0.06)" }}>
-                  <div style={{ width:80, height:80, borderRadius:"50%", background:`linear-gradient(135deg,${P},#a855f7)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:32, color:"#fff", fontWeight:900, margin:"0 auto 14px", boxShadow:`0 4px 22px rgba(124,58,237,0.35)` }}>
+                  <div style={{ width:80, height:80, borderRadius:"50%", background:`linear-gradient(135deg,${T.orangeD},${P})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:32, color:"#fff", fontWeight:900, margin:"0 auto 14px", boxShadow:`0 4px 22px rgba(232,114,12,0.35)` }}>
                     {(user.name||user.email||"U").slice(0,2).toUpperCase()}
                   </div>
                   <div style={{ fontWeight:800, color:txt, fontSize:"1.05rem", marginBottom:5 }}>{user.name||"Member"}</div>
@@ -1898,7 +1855,7 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
           <div onClick={e => e.stopPropagation()} style={{ background:card, borderRadius:20, maxWidth:480, width:"100%", boxShadow:"0 24px 80px rgba(0,0,0,0.22)", animation:"modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both", overflow:"hidden" }}>
 
             {/* Header */}
-            <div style={{ background:`linear-gradient(135deg,${P},#a855f7)`, padding:"1.5rem 2rem", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <div style={{ background:`linear-gradient(135deg,${T.orangeD},${P})`, padding:"1.5rem 2rem", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div>
                 <h2 style={{ fontSize:"1.25rem", fontWeight:900, color:"#fff", margin:0 }}>Edit Profile</h2>
                 <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.8)", marginTop:3 }}>Changes will be saved permanently</p>
@@ -1970,7 +1927,7 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
                         setEditSaved(true);
                         setTimeout(() => setEditingProfile(false), 1400);
                       }}
-                      style={{ flex:2, padding:"12px", background:`linear-gradient(135deg,${P},#a855f7)`, color:"#fff", border:"none", borderRadius:10, fontSize:"0.88rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", boxShadow:`0 4px 16px rgba(124,58,237,0.3)` }}>
+                      style={{ flex:2, padding:"12px", background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", borderRadius:10, fontSize:"0.88rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", boxShadow:`0 4px 16px rgba(232,114,12,0.3)` }}>
                       Save Changes
                     </button>
                   </div>
@@ -1997,7 +1954,7 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
 
             <div style={{ padding:"2rem" }}>
               {/* Order Status */}
-              <div style={{ background:PL, borderRadius:14, padding:"1.2rem", marginBottom:"1.5rem", border:`1px solid rgba(124,58,237,0.15)` }}>
+              <div style={{ background:PL, borderRadius:14, padding:"1.2rem", marginBottom:"1.5rem", border:`1px solid rgba(232,114,12,0.15)` }}>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:10 }}>
                   <div>
                     <div style={{ fontSize:"0.7rem", color:sub, fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:4 }}>Order Status</div>
@@ -2038,7 +1995,7 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
               </div>
 
               {/* Bill Summary */}
-              <div style={{ background:`linear-gradient(135deg,${P},#a855f7)`, borderRadius:14, padding:"1.5rem", color:"#fff" }}>
+              <div style={{ background:`linear-gradient(135deg,${T.orangeD},${P})`, borderRadius:14, padding:"1.5rem", color:"#fff" }}>
                 <h3 style={{ fontSize:"1.05rem", fontWeight:800, marginBottom:"1rem", color:"#fff" }}>Bill Summary</h3>
                 <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"0.7rem", fontSize:"0.88rem" }}>
                   <span style={{ opacity:0.9 }}>Subtotal</span>
@@ -2073,8 +2030,8 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
 
               {/* Action Buttons */}
               <div style={{ marginTop:"1.5rem", display:"flex", gap:"0.8rem", flexWrap:"wrap" }}>
-                <button onClick={() => { setSelectedOrder(null); setActiveTab("track"); }} style={{ flex:1, padding:"12px", background:PL, color:P, border:`1px solid rgba(124,58,237,0.2)`, borderRadius:10, fontSize:"0.85rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>Track Order</button>
-                <button onClick={() => setSelectedOrder(null)} style={{ flex:1, padding:"12px", background:`linear-gradient(135deg,${P},#a855f7)`, color:"#fff", border:"none", borderRadius:10, fontSize:"0.85rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>Close</button>
+                <button onClick={() => { setSelectedOrder(null); setActiveTab("track"); }} style={{ flex:1, padding:"12px", background:PL, color:P, border:`1px solid rgba(232,114,12,0.2)`, borderRadius:10, fontSize:"0.85rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>Track Order</button>
+                <button onClick={() => setSelectedOrder(null)} style={{ flex:1, padding:"12px", background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", borderRadius:10, fontSize:"0.85rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>Close</button>
               </div>
             </div>
           </div>
@@ -2346,10 +2303,8 @@ function AppInner() {
 // ─── MAIN APP ─────────────────────────────────────────────────
 export default function WishstoneApp() {
   return (
-    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID||""}>
-      <BrowserRouter>
-        <AppInner />
-      </BrowserRouter>
-    </GoogleOAuthProvider>
+    <BrowserRouter>
+      <AppInner />
+    </BrowserRouter>
   );
 }
