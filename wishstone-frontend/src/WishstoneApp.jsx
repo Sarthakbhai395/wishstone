@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams, Navigate } from "react-router-dom";
 
 const T = {
   bg: "#F5F0E8", bgDark: "#2C3320",
@@ -1054,18 +1055,18 @@ function ProductPage({ product: p, onAdd, onWish, wished, cart, onShop }) {
     </div>
     <BestSellersStrip onShop={onShop} />
     {/* Sticky Add to Cart Bar */}
-    <div style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:999, background:"rgba(255,255,255,0.97)", backdropFilter:"blur(12px)", borderTop:`1.5px solid ${T.border}`, padding:"8px clamp(0.75rem,3vw,1.5rem)", display:"flex", alignItems:"center", gap:"0.75rem", boxShadow:"0 -2px 16px rgba(0,0,0,0.08)" }}>
+    <div style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:999, background:"rgba(255,255,255,0.98)", backdropFilter:"blur(14px)", borderTop:`1.5px solid ${T.border}`, padding:"clamp(10px,2vw,16px) clamp(1rem,4vw,2.5rem)", display:"flex", alignItems:"center", gap:"clamp(0.6rem,2vw,1.2rem)", boxShadow:"0 -4px 24px rgba(0,0,0,0.1)" }}>
       <div style={{ flex:1, minWidth:0 }}>
-        <div style={{ fontSize:"0.72rem", fontWeight:700, color:T.text, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", lineHeight:1.2 }}>{p.name}</div>
-        <div style={{ fontSize:"0.82rem", color:T.orange, fontWeight:800, lineHeight:1.3 }}>Rs.{p.price.toLocaleString()}</div>
+        <div style={{ fontSize:"clamp(0.78rem,1.5vw,0.9rem)", fontWeight:700, color:T.text, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", lineHeight:1.3 }}>{p.name}</div>
+        <div style={{ fontSize:"clamp(0.9rem,2vw,1.05rem)", color:T.orange, fontWeight:800, lineHeight:1.3 }}>Rs.{p.price.toLocaleString()}</div>
       </div>
-      <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.border}`, borderRadius:7, overflow:"hidden", flexShrink:0, height:34 }}>
-        <button onClick={() => setQty(q => Math.max(1,q-1))} style={{ width:28, height:34, background:"none", border:"none", cursor:"pointer", fontSize:14, color:T.text, lineHeight:1 }}>−</button>
-        <span style={{ width:28, textAlign:"center", fontWeight:700, color:T.text, fontSize:"0.82rem" }}>{qty}</span>
-        <button onClick={() => setQty(q => q+1)} style={{ width:28, height:34, background:"none", border:"none", cursor:"pointer", fontSize:14, color:T.text, lineHeight:1 }}>+</button>
+      <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.border}`, borderRadius:9, overflow:"hidden", flexShrink:0, height:"clamp(38px,5vw,46px)" }}>
+        <button onClick={() => setQty(q => Math.max(1,q-1))} style={{ width:"clamp(32px,4vw,42px)", height:"clamp(38px,5vw,46px)", background:"none", border:"none", cursor:"pointer", fontSize:"clamp(15px,2vw,18px)", color:T.text, lineHeight:1 }}>−</button>
+        <span style={{ width:"clamp(30px,3vw,38px)", textAlign:"center", fontWeight:700, color:T.text, fontSize:"clamp(0.88rem,1.5vw,1rem)" }}>{qty}</span>
+        <button onClick={() => setQty(q => q+1)} style={{ width:"clamp(32px,4vw,42px)", height:"clamp(38px,5vw,46px)", background:"none", border:"none", cursor:"pointer", fontSize:"clamp(15px,2vw,18px)", color:T.text, lineHeight:1 }}>+</button>
       </div>
-      <button className="btn-orange" onClick={() => { for(let i=0;i<qty;i++) onAdd(p); }} style={{ padding:"7px 16px", fontSize:"0.75rem", borderRadius:7, flexShrink:0, height:34 }}>
-        Add to Cart{cartQty > 0 && <span style={{ background:"rgba(255,255,255,0.3)", borderRadius:8, padding:"1px 6px", marginLeft:5, fontSize:"0.68rem" }}>{cartQty}</span>}
+      <button className="btn-orange" onClick={() => { for(let i=0;i<qty;i++) onAdd(p); }} style={{ padding:"clamp(9px,1.5vw,13px) clamp(18px,3vw,28px)", fontSize:"clamp(0.8rem,1.5vw,0.92rem)", borderRadius:9, flexShrink:0, height:"clamp(38px,5vw,46px)", whiteSpace:"nowrap" }}>
+        Add to Cart{cartQty > 0 && <span style={{ background:"rgba(255,255,255,0.3)", borderRadius:8, padding:"1px 7px", marginLeft:6, fontSize:"clamp(0.7rem,1.2vw,0.8rem)" }}>{cartQty}</span>}
       </button>
     </div>
     </>
@@ -2210,16 +2211,32 @@ function PromoModal({ show, onClose, onShop }) {
     </div>
   );
 }
-// ─── MAIN APP ─────────────────────────────────────────────────
-export default function WishstoneApp() {
-  const [page, setPage] = useState("home");
+// ─── PRODUCT PAGE WRAPPER (reads :id from URL) ────────────────
+function ProductPageWrapper({ onAdd, onWish, wished, cart, onShop }) {
+  const { id } = useParams();
+  const product = PRODUCTS.find(p => p.id === parseInt(id));
+  if (!product) return <Navigate to="/shop" replace />;
+  return <ProductPage product={product} onAdd={onAdd} onWish={onWish} wished={wished} cart={cart} onShop={onShop} />;
+}
+
+// ─── SCROLL TO TOP ON ROUTE CHANGE ────────────────────────────
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
+
+// ─── APP INNER (needs to be inside BrowserRouter) ─────────────
+function AppInner() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [cart, setCart] = useState([]);
   const [wished, setWished] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState(() => { try { return JSON.parse(localStorage.getItem("ws_orders")||"[]"); } catch { return []; } });
-  const [authMode, setAuthMode] = useState("login");
   const [orderConfirm, setOrderConfirm] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("ws_user");
@@ -2228,7 +2245,6 @@ export default function WishstoneApp() {
 
   useEffect(() => { localStorage.setItem("ws_orders", JSON.stringify(orders)); }, [orders]);
 
-  const [showModal, setShowModal] = useState(false);
   useEffect(() => { const t = setTimeout(() => setShowModal(true), 5000); return () => clearTimeout(t); }, []);
 
   const addToCart = p => {
@@ -2247,34 +2263,74 @@ export default function WishstoneApp() {
     setCart([]);
     setOrderConfirm(newOrder);
   };
-  const handleLogin = (u) => { const ud = { ...u, joinedAt: u.joinedAt || new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) }; setUser(ud); localStorage.setItem("ws_user", JSON.stringify(ud)); if (!localStorage.getItem("ws_token")) localStorage.setItem("ws_token", "local_" + Date.now()); nav("home"); };
-  const handleLogout = () => { setUser(null); localStorage.removeItem("ws_token"); localStorage.removeItem("ws_user"); nav("home"); };
-  const nav = p => { setPage(p); window.scrollTo(0,0); };
+  const handleLogin = (u) => { const ud = { ...u, joinedAt: u.joinedAt || new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) }; setUser(ud); localStorage.setItem("ws_user", JSON.stringify(ud)); if (!localStorage.getItem("ws_token")) localStorage.setItem("ws_token", "local_" + Date.now()); navigate("/"); };
+  const handleLogout = () => { setUser(null); localStorage.removeItem("ws_token"); localStorage.removeItem("ws_user"); navigate("/"); };
+
+  // nav("key") called from child components → maps to URL
+  const nav = pageKey => {
+    const MAP = {
+      home:"/", products:"/shop", rituals:"/rituals", benefits:"/benefits",
+      stories:"/stories", cart:"/cart", checkout:"/checkout",
+      wishlist:"/wishlist", auth:"/login", dashboard:"/dashboard",
+    };
+    navigate(MAP[pageKey] || "/");
+  };
+
+  // derive active page key from URL so Header highlights correctly
+  const currentPage = (() => {
+    const p = location.pathname;
+    if (p === "/") return "home";
+    if (p.startsWith("/shop") || p.startsWith("/product")) return "products";
+    if (p.startsWith("/rituals")) return "rituals";
+    if (p.startsWith("/benefits")) return "benefits";
+    if (p.startsWith("/stories")) return "stories";
+    if (p.startsWith("/cart")) return "cart";
+    if (p.startsWith("/wishlist")) return "wishlist";
+    if (p.startsWith("/login") || p.startsWith("/signup")) return "auth";
+    if (p.startsWith("/dashboard")) return "dashboard";
+    return "home";
+  })();
+
+  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
   const cartCount = cart.reduce((s,i)=>s+i.qty,0);
+  const goToProduct = p => navigate("/product/" + p.id);
 
   return (
-    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID||""}>
     <div style={{ fontFamily:"'Inter',sans-serif", background:T.bg, minHeight:"100vh" }}>
+      <ScrollToTop />
       <style>{GLOBAL_CSS}</style>
-      <Header cartCount={cartCount} wishCount={wished.length} onNav={nav} currentPage={page} user={user} onLogout={handleLogout} />
-      {page==="home"      && <HomePage onShop={()=>nav("products")} onRitual={()=>nav("rituals")} onNav={nav} />}
-      {page==="products"  && <ProductsPage onAdd={addToCart} onWish={toggleWish} wished={wished} onClick={p=>{setSelectedProduct(p);nav("product");}} cart={cart} />}
-      {page==="product"   && selectedProduct && <ProductPage product={selectedProduct} onAdd={addToCart} onWish={toggleWish} wished={wished} cart={cart} />}
-      {page==="rituals"   && <RitualsPage />}
-      {page==="benefits"  && <BenefitsPage />}
-      {page==="stories"   && <StoriesPage />}
-      {page==="cart"      && <CartPage cart={cart} onQty={updateQty} onRemove={removeFromCart} onCheckout={()=>nav("checkout")} />}
-      {page==="checkout"  && <CheckoutPage cart={cart} onPlaceOrder={handlePlaceOrder} />}
-      {page==="wishlist"  && <WishlistPage ids={wished} onAdd={addToCart} onWish={toggleWish} onClick={p=>{setSelectedProduct(p);nav("product");}} />}
-      {page==="auth" && authMode==="signup" && <SignupPage onSignup={handleLogin} onSwitch={()=>setAuthMode("login")} />}
-      {page==="auth" && authMode==="login"  && <LoginPage  onLogin={handleLogin} onSwitch={()=>setAuthMode("signup")} />}
-      {page==="dashboard" && user && <UserDashboard user={user} orders={orders} onLogout={handleLogout} onNav={nav} onUpdateUser={u => { setUser(u); localStorage.setItem("ws_user", JSON.stringify(u)); }} />}
-      {page!=="auth" && <Footer />}
+      <Header cartCount={cartCount} wishCount={wished.length} onNav={nav} currentPage={currentPage} user={user} onLogout={handleLogout} />
+      <Routes>
+        <Route path="/" element={<HomePage onShop={()=>nav("products")} onRitual={()=>nav("rituals")} onNav={nav} />} />
+        <Route path="/shop" element={<ProductsPage onAdd={addToCart} onWish={toggleWish} wished={wished} onClick={goToProduct} cart={cart} />} />
+        <Route path="/product/:id" element={<ProductPageWrapper onAdd={addToCart} onWish={toggleWish} wished={wished} cart={cart} onShop={()=>nav("products")} />} />
+        <Route path="/rituals" element={<RitualsPage />} />
+        <Route path="/benefits" element={<BenefitsPage />} />
+        <Route path="/stories" element={<StoriesPage />} />
+        <Route path="/cart" element={<CartPage cart={cart} onQty={updateQty} onRemove={removeFromCart} onCheckout={()=>nav("checkout")} />} />
+        <Route path="/checkout" element={<CheckoutPage cart={cart} onPlaceOrder={handlePlaceOrder} />} />
+        <Route path="/wishlist" element={<WishlistPage ids={wished} onAdd={addToCart} onWish={toggleWish} onClick={goToProduct} />} />
+        <Route path="/login" element={<LoginPage onLogin={handleLogin} onSwitch={()=>navigate("/signup")} />} />
+        <Route path="/signup" element={<SignupPage onSignup={handleLogin} onSwitch={()=>navigate("/login")} />} />
+        <Route path="/dashboard" element={user ? <UserDashboard user={user} orders={orders} onLogout={handleLogout} onNav={nav} onUpdateUser={u => { setUser(u); localStorage.setItem("ws_user", JSON.stringify(u)); }} /> : <Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      {!isAuthPage && <Footer />}
       {/* ── Promo Modal ── */}
       <PromoModal show={showModal} onClose={() => setShowModal(false)} onShop={() => { setShowModal(false); nav("products"); }} />
       {/* ── Order Confirm Modal ── */}
       {orderConfirm && <OrderConfirmModal order={orderConfirm} onClose={() => { setOrderConfirm(null); nav("dashboard"); }} />}
     </div>
+  );
+}
+
+// ─── MAIN APP ─────────────────────────────────────────────────
+export default function WishstoneApp() {
+  return (
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID||""}>
+      <BrowserRouter>
+        <AppInner />
+      </BrowserRouter>
     </GoogleOAuthProvider>
   );
 }
