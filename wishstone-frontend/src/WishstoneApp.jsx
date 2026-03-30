@@ -176,6 +176,7 @@ const GLOBAL_CSS = `
     .show-mobile-flex{display:flex !important;}
     .dashboard-stats{grid-template-columns:repeat(2,1fr) !important;}
     .founder-grid{grid-template-columns:1fr !important;}
+    .founder-img-col{min-height:300px !important; height:300px !important;}
     .video-card{width:180px !important;}
     .dashboard-layout{grid-template-columns:1fr !important; gap:1.2rem !important;}
     .dash-sidebar{margin-bottom:1rem !important;}
@@ -633,12 +634,18 @@ function FounderNoteSection() {
           }}
         >
           {/* LEFT: Founder photo */}
-          <div style={{ position:"relative", minHeight:0 }}>
+          <div className="founder-img-col" style={{ position:"relative", minHeight:320, overflow:"hidden" }}>
             <img
-              src="/vikas sir gutargoo.png"
+              src={`${process.env.PUBLIC_URL || ""}/founder.png`}
               alt="Vikash Malik - Co-founder, WishStone"
-              style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center top", display:"block", position:"absolute", inset:0 }}
+              onError={e => { e.target.style.display="none"; e.target.nextSibling.style.display="flex"; }}
+              style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center top", display:"block", position:"absolute", inset:0, minHeight:320 }}
             />
+            {/* Fallback if image fails */}
+            <div style={{ display:"none", position:"absolute", inset:0, background:`linear-gradient(135deg,${T.bgDark},${T.orange})`, alignItems:"center", justifyContent:"center", flexDirection:"column", gap:12 }}>
+              <div style={{ width:90, height:90, borderRadius:"50%", background:"rgba(255,255,255,0.15)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:40 }}>👤</div>
+              <div style={{ color:"#fff", fontWeight:700, fontSize:"0.9rem", opacity:0.8 }}>Vikash Malik</div>
+            </div>
             {/* Overlay gradient */}
             <div style={{ position:"absolute", inset:0, background:"linear-gradient(135deg, rgba(44,51,32,0.25), rgba(232,114,12,0.08))" }} />
 
