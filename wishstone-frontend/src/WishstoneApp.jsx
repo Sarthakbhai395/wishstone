@@ -2344,16 +2344,32 @@ function AppInner() {
   const [cart, setCart] = useState([]);
   const [wished, setWished] = useState([]);
   const [user, setUser] = useState(null);
-  const [orders, setOrders] = useState(() => { try { return JSON.parse(localStorage.getItem("ws_orders")||"[]"); } catch { return []; } });
+  const [orders, setOrders] = useState([]);
   const [orderConfirm, setOrderConfirm] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
+  // Load user-specific data on mount
   useEffect(() => {
     const savedUser = localStorage.getItem("ws_user");
-    if (savedUser) { try { setUser(JSON.parse(savedUser)); } catch(e) { localStorage.removeItem("ws_user"); } }
+    if (savedUser) {
+      try {
+        const u = JSON.parse(savedUser);
+        setUser(u);
+        // Load this user's orders using their email as key
+        const userKey = `ws_orders_${u.email||"guest"}`;
+        const savedOrders = localStorage.getItem(userKey);
+        setOrders(savedOrders ? JSON.parse(savedOrders) : []);
+      } catch(e) { localStorage.removeItem("ws_user"); }
+    }
   }, []);
 
-  useEffect(() => { localStorage.setItem("ws_orders", JSON.stringify(orders)); }, [orders]);
+  // Save orders under user-specific key
+  useEffect(() => {
+    if (user) {
+      const userKey = `ws_orders_${user.email||"guest"}`;
+      localStorage.setItem(userKey, JSON.stringify(orders));
+    }
+  }, [orders, user]);
 
   useEffect(() => { const t = setTimeout(() => setShowModal(true), 5000); return () => clearTimeout(t); }, []);
 
@@ -2387,12 +2403,39 @@ function AppInner() {
   const removeFromCart = id => setCart(c => c.filter(i=>i.id!==id));
   const handlePlaceOrder = data => {
     const newOrder = {...data, _id:Date.now().toString(), status:"Confirmed", createdAt:new Date().toISOString()};
-    setOrders(o => { const updated = [newOrder, ...o]; localStorage.setItem("ws_orders", JSON.stringify(updated)); return updated; });
+    setOrders(o => {
+      const updated = [newOrder, ...o];
+      if (user) localStorage.setItem(`ws_orders_${user.email||"guest"}`, JSON.stringify(updated));
+      return updated;
+    });
     setCart([]);
     setOrderConfirm(newOrder);
   };
-  const handleLogin = (u) => { const ud = { ...u, joinedAt: u.joinedAt || new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) }; setUser(ud); localStorage.setItem("ws_user", JSON.stringify(ud)); if (!localStorage.getItem("ws_token")) localStorage.setItem("ws_token", "local_" + Date.now()); navigate("/"); };
-  const handleLogout = () => { setUser(null); localStorage.removeItem("ws_token"); localStorage.removeItem("ws_user"); navigate("/"); };
+
+  const handleLogin = (u) => {
+    const ud = { ...u, joinedAt: u.joinedAt || new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) };
+    setUser(ud);
+    localStorage.setItem("ws_user", JSON.stringify(ud));
+    if (!localStorage.getItem("ws_token")) localStorage.setItem("ws_token", "local_" + Date.now());
+    // Load this user's orders
+    const userKey = `ws_orders_${ud.email||"guest"}`;
+    const savedOrders = localStorage.getItem(userKey);
+    setOrders(savedOrders ? JSON.parse(savedOrders) : []);
+    // Clear cart and wishlist for fresh session
+    setCart([]);
+    setWished([]);
+    navigate("/");
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setOrders([]);
+    setCart([]);
+    setWished([]);
+    localStorage.removeItem("ws_token");
+    localStorage.removeItem("ws_user");
+    navigate("/");
+  };
 
   // nav("key") called from child components → maps to URL
   const nav = pageKey => {
