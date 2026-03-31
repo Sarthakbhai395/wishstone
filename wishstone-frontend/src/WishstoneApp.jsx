@@ -74,14 +74,14 @@ const POWERS = [
     image:"https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80" },
 ];
 
-// ── Community Videos with Pixabay URLs ──
+// ── Community Videos — local public folder ──
 const COMMUNITY_VIDEOS = [
-  { id:1, videoUrl:"https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",   title:"Balance",    caption:"Finding stillness in motion",   tag:"MINDFULNESS" },
-  { id:2, videoUrl:"https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",  title:"Gratitude",  caption:"Everyday abundance",            tag:"GRATITUDE" },
-  { id:3, videoUrl:"https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",      title:"Clarity",    caption:"Intention becomes reality",     tag:"MANIFESTATION" },
-  { id:4, videoUrl:"https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4", title:"Surrender",  caption:"Let go, let flow",              tag:"SURRENDER" },
-  { id:5, videoUrl:"https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",title:"Abundance",  caption:"Calling in what is mine",       tag:"ABUNDANCE" },
-  { id:6, videoUrl:"https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4", title:"Presence", caption:"Here. Now. Always.", tag:"PRESENCE" },
+  { id:1, videoUrl:`${process.env.PUBLIC_URL||""}/v1.mp4`, title:"Balance",    caption:"Finding stillness in motion",   tag:"MINDFULNESS" },
+  { id:2, videoUrl:`${process.env.PUBLIC_URL||""}/v2.mp4`, title:"Gratitude",  caption:"Everyday abundance",            tag:"GRATITUDE" },
+  { id:3, videoUrl:`${process.env.PUBLIC_URL||""}/v3.mp4`, title:"Clarity",    caption:"Intention becomes reality",     tag:"MANIFESTATION" },
+  { id:4, videoUrl:`${process.env.PUBLIC_URL||""}/v4.mp4`, title:"Surrender",  caption:"Let go, let flow",              tag:"SURRENDER" },
+  { id:5, videoUrl:`${process.env.PUBLIC_URL||""}/v5.mp4`, title:"Abundance",  caption:"Calling in what is mine",       tag:"ABUNDANCE" },
+  { id:6, videoUrl:`${process.env.PUBLIC_URL||""}/v6.mp4`, title:"Presence",   caption:"Here. Now. Always.",            tag:"PRESENCE" },
 ];
 
 const GLOBAL_CSS = `
@@ -440,18 +440,37 @@ function CommunityVideoSection() {
   const [activeVideo, setActiveVideo] = useState(null);
   const [playing, setPlaying] = useState(false);
 
+  // Auto-play videos when they enter viewport
+  useEffect(() => {
+    const observers = [];
+    videoRefs.current.forEach((vid, i) => {
+      if (!vid) return;
+      vid.muted = true;
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            vid.play().catch(() => {});
+          } else {
+            vid.pause();
+          }
+        },
+        { threshold: 0.3 }
+      );
+      obs.observe(vid);
+      observers.push(obs);
+    });
+    return () => observers.forEach(o => o.disconnect());
+  }, []);
+
   const handleClick = (i) => {
     const vid = videoRefs.current[i];
     if (!vid) return;
-
     if (activeVideo === i) {
-      // same video — toggle play/pause
       if (vid.paused) { vid.play().catch(() => {}); setPlaying(true); }
       else { vid.pause(); setPlaying(false); }
     } else {
-      // different video — pause all others, play this one with sound
       videoRefs.current.forEach((v, idx) => {
-        if (v && idx !== i) { v.pause(); v.muted = true; v.currentTime = 0; }
+        if (v && idx !== i) { v.pause(); v.muted = true; v.currentTime = 0; v.play().catch(() => {}); }
       });
       vid.muted = false;
       vid.play().catch(() => {});
