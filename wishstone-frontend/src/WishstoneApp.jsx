@@ -1353,7 +1353,6 @@ function CheckoutPage({ cart, onPlaceOrder }) {
     e.preventDefault(); setError("");
     if (!form.name||!form.email||!form.phone||!form.address||!form.city||!form.pincode) return setError("Please fill all required fields.");
     setLoading(true);
-    await new Promise(r => setTimeout(r,1200));
     onPlaceOrder({ items:cart, address:form, totalAmount:total, coupon, discount, isGift, giftNote });
     setLoading(false);
   };
@@ -1742,71 +1741,114 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
           {/* ── MY ORDERS ── */}
           {activeTab==="orders" && (
             <div style={{ animation:"slideUp 0.35s ease both" }}>
-              <div style={{ marginBottom:"1.5rem" }}>
-                <h1 style={{ fontSize:"1.75rem", fontWeight:900, color:txt, margin:0 }}>My Orders</h1>
-                <p style={{ color:sub, fontSize:"0.9rem", marginTop:5 }}>Track and manage your orders</p>
+
+              {/* Header */}
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1.6rem", flexWrap:"wrap", gap:10 }}>
+                <div>
+                  <h1 style={{ fontSize:"1.75rem", fontWeight:900, color:txt, margin:0, letterSpacing:"-0.02em" }}>Order History</h1>
+                  <p style={{ color:sub, fontSize:"0.85rem", marginTop:4 }}>{allOrders.length} order{allOrders.length!==1?"s":""} placed</p>
+                </div>
+                <button onClick={() => onNav("products")} style={{ display:"flex", alignItems:"center", gap:7, padding:"10px 20px", background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", borderRadius:10, fontSize:"0.82rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", boxShadow:`0 4px 16px rgba(232,114,12,0.3)` }}>
+                  + New Order
+                </button>
               </div>
 
               {/* Stat cards */}
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"1.1rem", marginBottom:"1.5rem" }} className="dashboard-stats">
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"1rem", marginBottom:"1.8rem" }} className="dashboard-stats">
                 {statCards.map((s,i) => (
-                  <div key={s.label} className="dash-stat" style={{ background:card, borderRadius:16, padding:"1.3rem 1.1rem", border:`1px solid ${border}`, display:"flex", justifyContent:"space-between", alignItems:"center", boxShadow:"0 2px 12px rgba(0,0,0,0.06)", transition:"all 0.2s", animation:`popIn 0.3s ease ${i*0.07}s both` }}>
-                    <div>
-                      <div style={{ fontSize:"0.75rem", color:sub, fontWeight:500, marginBottom:5 }}>{s.label}</div>
-                      <div style={{ fontSize:"1.5rem", fontWeight:900, color:txt, lineHeight:1 }}>{s.value}</div>
+                  <div key={s.label} className="dash-stat" style={{ background:card, borderRadius:16, padding:"1.2rem 1rem", border:`1px solid ${border}`, display:"flex", flexDirection:"column", gap:8, boxShadow:"0 2px 12px rgba(0,0,0,0.05)", transition:"all 0.25s", animation:`popIn 0.4s ease ${i*0.08}s both`, cursor:"default" }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+                      <div style={{ width:42, height:42, borderRadius:12, background:s.light, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20 }}>{s.icon}</div>
+                      <div style={{ fontSize:"1.6rem", fontWeight:900, color:s.color, lineHeight:1 }}>{s.value}</div>
                     </div>
-                    <div style={{ width:48, height:48, borderRadius:13, background:s.light, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>{s.icon}</div>
+                    <div style={{ fontSize:"0.72rem", color:sub, fontWeight:600, letterSpacing:"0.04em" }}>{s.label}</div>
+                    <div style={{ height:3, borderRadius:2, background:`linear-gradient(90deg,${s.color},transparent)`, opacity:0.4 }} />
                   </div>
                 ))}
               </div>
 
               {/* Order list */}
               {loadingOrders ? (
-                <div style={{ background:card, borderRadius:18, padding:"3.5rem", textAlign:"center", border:`1px solid ${border}` }}>
-                  <div style={{ width:40, height:40, border:`3px solid ${PL}`, borderTop:`3px solid ${P}`, borderRadius:"50%", animation:"spin 0.8s linear infinite", margin:"0 auto 14px" }} />
-                  <p style={{ color:sub, fontSize:"0.92rem" }}>Loading orders...</p>
+                <div style={{ background:card, borderRadius:20, padding:"4rem", textAlign:"center", border:`1px solid ${border}` }}>
+                  <div style={{ width:44, height:44, border:`3px solid ${PL}`, borderTop:`3px solid ${P}`, borderRadius:"50%", animation:"spin 0.8s linear infinite", margin:"0 auto 16px" }} />
+                  <p style={{ color:sub, fontSize:"0.9rem" }}>Loading your orders...</p>
                 </div>
               ) : allOrders.length === 0 ? (
-                <div style={{ background:card, borderRadius:18, padding:"4rem 2.5rem", textAlign:"center", border:`1px solid ${border}` }}>
-                  <div style={{ fontSize:64, marginBottom:18 }}>📦</div>
-                  <p style={{ color:sub, fontSize:"1rem", marginBottom:22 }}>No orders yet. Start your sacred journey.</p>
-                  <button onClick={() => onNav("products")} style={{ padding:"13px 30px", fontSize:"0.9rem", borderRadius:11, background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", cursor:"pointer", fontFamily:"'Inter',sans-serif", fontWeight:700 }}>Shop Now</button>
+                <div style={{ background:card, borderRadius:20, padding:"5rem 2rem", textAlign:"center", border:`1px solid ${border}`, animation:"fadeUp 0.5s ease both" }}>
+                  <div style={{ width:80, height:80, borderRadius:"50%", background:PL, display:"flex", alignItems:"center", justifyContent:"center", fontSize:36, margin:"0 auto 20px" }}>📦</div>
+                  <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.3rem", fontWeight:800, color:txt, marginBottom:8 }}>No orders yet</h3>
+                  <p style={{ color:sub, fontSize:"0.88rem", marginBottom:24, maxWidth:280, margin:"0 auto 24px" }}>Start your sacred journey and your orders will appear here.</p>
+                  <button onClick={() => onNav("products")} style={{ padding:"13px 32px", fontSize:"0.88rem", borderRadius:12, background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", cursor:"pointer", fontFamily:"'Inter',sans-serif", fontWeight:700, boxShadow:`0 4px 20px rgba(232,114,12,0.3)` }}>Explore Products</button>
                 </div>
               ) : allOrders.map((o,i) => {
-                // Get product images from order items
                 const orderImages = o.items ? o.items.slice(0,3).map(item => {
                   const product = PRODUCTS.find(p => p.id === item.productId || p.name === item.name);
                   return product ? product.image : item.image;
                 }).filter(Boolean) : [];
-                
+                const status = o.status || o.orderStatus || "Confirmed";
+                const statusConfig = {
+                  "Delivered": { bg:"#ecfdf5", color:"#059669", dot:"#10b981", label:"Delivered" },
+                  "Shipped":   { bg:"#eff6ff", color:"#2563eb", dot:"#3b82f6", label:"Shipped" },
+                  "Cancelled": { bg:"#fef2f2", color:"#dc2626", dot:"#ef4444", label:"Cancelled" },
+                  "Processing":{ bg:"#faf5ff", color:"#7c3aed", dot:"#8b5cf6", label:"Processing" },
+                }[status] || { bg:"#fff7ed", color:"#c2410c", dot:P, label:status };
+
                 return (
-                <div key={i} className="dash-order-card" style={{ background:card, borderRadius:16, padding:"1.4rem 1.6rem", marginBottom:"1rem", border:`1px solid ${border}`, animation:`slideUp 0.3s ease ${i*0.06}s both`, boxShadow:"0 2px 12px rgba(0,0,0,0.06)", transition:"all 0.2s", display:"flex", alignItems:"center", gap:16, flexWrap:"wrap" }}>
-                  {/* Product Images Preview */}
-                  <div style={{ display:"flex", gap:6, flexShrink:0 }}>
-                    {orderImages.length > 0 ? orderImages.map((img, idx) => (
-                      <div key={idx} style={{ width:56, height:56, borderRadius:12, overflow:"hidden", border:`2px solid ${border}`, background:"#f9fafb" }}>
-                        <img src={img} alt="Product" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                  <div key={i} className="dash-order-card" style={{ background:card, borderRadius:18, marginBottom:"1rem", border:`1px solid ${border}`, animation:`slideUp 0.35s ease ${i*0.07}s both`, boxShadow:"0 2px 16px rgba(0,0,0,0.05)", transition:"all 0.25s", overflow:"hidden" }}>
+                    {/* Top accent bar */}
+                    <div style={{ height:3, background:`linear-gradient(90deg,${P},${T.orangeL},transparent)` }} />
+
+                    <div style={{ padding:"1.4rem 1.6rem", display:"flex", alignItems:"center", gap:16, flexWrap:"wrap" }}>
+                      {/* Product images stack */}
+                      <div style={{ display:"flex", flexShrink:0 }}>
+                        {orderImages.length > 0 ? orderImages.map((img, idx) => (
+                          <div key={idx} style={{ width:54, height:54, borderRadius:12, overflow:"hidden", border:`2.5px solid #fff`, background:"#f9fafb", marginLeft: idx > 0 ? -14 : 0, boxShadow:"0 2px 8px rgba(0,0,0,0.1)", zIndex: orderImages.length - idx }}>
+                            <img src={img} alt="Product" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                          </div>
+                        )) : (
+                          <div style={{ width:54, height:54, borderRadius:12, background:PL, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24 }}>🛍</div>
+                        )}
                       </div>
-                    )) : (
-                      <div style={{ width:56, height:56, borderRadius:12, background:PL, display:"flex", alignItems:"center", justifyContent:"center", fontSize:26, flexShrink:0 }}>🛍</div>
-                    )}
-                  </div>
-                  
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontWeight:700, color:txt, fontSize:"0.98rem", marginBottom:2 }}>Order #{o._id ? o._id.slice(-6).toUpperCase() : String(i+1).padStart(6,"0")}</div>
-                    <div style={{ fontSize:"0.78rem", color:sub, marginTop:4, display:"flex", gap:14, flexWrap:"wrap" }}>
-                      <span>📅 {o.createdAt ? new Date(o.createdAt).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) : "—"}</span>
-                      <span>💰 ₹{o.totalAmount ? o.totalAmount.toLocaleString() : "—"}</span>
-                      {o.items && <span>📦 {o.items.length} item{o.items.length!==1?"s":""}</span>}
+
+                      {/* Order info */}
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:5, flexWrap:"wrap" }}>
+                          <span style={{ fontWeight:800, color:txt, fontSize:"0.95rem" }}>#{o._id ? o._id.slice(-6).toUpperCase() : String(i+1).padStart(6,"0")}</span>
+                          <span style={{ display:"inline-flex", alignItems:"center", gap:5, background:statusConfig.bg, color:statusConfig.color, padding:"3px 10px", borderRadius:20, fontSize:"0.68rem", fontWeight:700 }}>
+                            <span style={{ width:6, height:6, borderRadius:"50%", background:statusConfig.dot, display:"inline-block" }} />
+                            {statusConfig.label}
+                          </span>
+                        </div>
+                        <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
+                          <span style={{ fontSize:"0.75rem", color:sub, display:"flex", alignItems:"center", gap:4 }}>
+                            <span style={{ opacity:0.6 }}>📅</span>
+                            {o.createdAt ? new Date(o.createdAt).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) : "—"}
+                          </span>
+                          <span style={{ fontSize:"0.75rem", fontWeight:700, color:P, display:"flex", alignItems:"center", gap:4 }}>
+                            <span style={{ opacity:0.7 }}>₹</span>
+                            {o.totalAmount ? o.totalAmount.toLocaleString() : "—"}
+                          </span>
+                          {o.items && <span style={{ fontSize:"0.75rem", color:sub }}>{o.items.length} item{o.items.length!==1?"s":""}</span>}
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
+                        <button onClick={() => setActiveTab("track")} style={{ padding:"8px 14px", background:PL, color:P, border:`1px solid rgba(232,114,12,0.25)`, borderRadius:9, fontSize:"0.75rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", transition:"all 0.2s" }}
+                          onMouseEnter={e => { e.currentTarget.style.background=P; e.currentTarget.style.color="#fff"; }}
+                          onMouseLeave={e => { e.currentTarget.style.background=PL; e.currentTarget.style.color=P; }}>
+                          Track
+                        </button>
+                        <button onClick={() => setSelectedOrder(o)} style={{ padding:"8px 16px", background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", borderRadius:9, fontSize:"0.75rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", boxShadow:`0 3px 12px rgba(232,114,12,0.3)`, transition:"all 0.2s" }}
+                          onMouseEnter={e => e.currentTarget.style.transform="translateY(-1px)"}
+                          onMouseLeave={e => e.currentTarget.style.transform="translateY(0)"}>
+                          View Details
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <div style={{ display:"flex", alignItems:"center", gap:9, flexShrink:0, flexWrap:"wrap" }}>
-                    <span style={{ background: (o.status||"Confirmed")==="Delivered" ? "#ecfdf5" : (o.status||"Confirmed")==="Shipped" ? "#eff6ff" : "#fff7ed", color: (o.status||"Confirmed")==="Delivered" ? "#10b981" : (o.status||"Confirmed")==="Shipped" ? "#3b82f6" : "#f97316", padding:"6px 16px", borderRadius:20, fontSize:"0.72rem", fontWeight:700, border:`1px solid currentColor`, opacity:0.9 }}>{o.status||"Confirmed"}</span>
-                    <button onClick={() => setSelectedOrder(o)} style={{ padding:"8px 16px", background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", borderRadius:9, fontSize:"0.78rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>View</button>
-                    <button onClick={() => setActiveTab("track")} style={{ padding:"8px 16px", background:PL, color:P, border:`1px solid rgba(232,114,12,0.2)`, borderRadius:9, fontSize:"0.78rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>Track</button>
-                  </div>
-                </div>
-              )})}
+                );
+              })}
             </div>
           )}
 
@@ -2401,8 +2443,9 @@ function AppInner() {
   };
   const updateQty = (id,delta) => setCart(c => c.map(i=>i.id===id?{...i,qty:Math.max(0,i.qty+delta)}:i).filter(i=>i.qty>0));
   const removeFromCart = id => setCart(c => c.filter(i=>i.id!==id));
-  const handlePlaceOrder = data => {
+  const handlePlaceOrder = async data => {
     const newOrder = {...data, _id:Date.now().toString(), status:"Confirmed", createdAt:new Date().toISOString()};
+    // Save locally first (instant feedback)
     setOrders(o => {
       const updated = [newOrder, ...o];
       if (user) localStorage.setItem(`ws_orders_${user.email||"guest"}`, JSON.stringify(updated));
@@ -2410,6 +2453,47 @@ function AppInner() {
     });
     setCart([]);
     setOrderConfirm(newOrder);
+
+    // Also send to backend so admin panel can see it
+    try {
+      const API = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
+      const addr = data.address || {};
+      const payload = {
+        customer: {
+          name:  addr.name  || user?.name  || "Guest",
+          email: addr.email || user?.email || "guest@wishstone.com",
+          phone: addr.phone || user?.phone || "0000000000",
+        },
+        shippingAddress: {
+          flat:     addr.address || addr.flat || "",
+          area:     addr.city    || addr.area  || "",
+          landmark: addr.landmark || "",
+          city:     addr.city    || "",
+          state:    addr.state   || "",
+          pincode:  addr.pincode || "",
+          country:  "India",
+        },
+        items: (data.items || []).map(i => ({
+          productId: String(i.id || i.productId || ""),
+          name:      i.name     || "Product",
+          price:     i.price    || 0,
+          quantity:  i.qty      || i.quantity || 1,
+          image:     i.image    || "",
+        })),
+        paymentMethod: "cod",
+        couponCode: data.coupon || "",
+      };
+      const controller = new AbortController();
+      setTimeout(() => controller.abort(), 8000);
+      await fetch(`${API}/api/orders/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+    } catch(e) {
+      // Silent fail — local order already saved
+    }
   };
 
   const handleLogin = (u) => {

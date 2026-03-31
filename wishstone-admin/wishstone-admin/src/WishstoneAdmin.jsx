@@ -127,12 +127,12 @@ const css = `
 
 // ─── API HELPER ───────────────────────────────────────────────
 const api = {
-  get: (url, token) => axios.get(`${API}${url}`, { headers: { Authorization: `Bearer ${token}` } }),
-  post: (url, data, token) => axios.post(`${API}${url}`, data, { headers: { Authorization: `Bearer ${token}` } }),
-  put: (url, data, token) => axios.put(`${API}${url}`, data, { headers: { Authorization: `Bearer ${token}` } }),
-  delete: (url, token) => axios.delete(`${API}${url}`, { headers: { Authorization: `Bearer ${token}` } }),
-  postForm: (url, data, token) => axios.post(`${API}${url}`, data, { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } }),
-  putForm: (url, data, token) => axios.put(`${API}${url}`, data, { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } }),
+  get: (url, token) => axios.get(`${API}${url}`, { headers: { Authorization: `Bearer ${token}` }, timeout: 12000 }),
+  post: (url, data, token) => axios.post(`${API}${url}`, data, { headers: { Authorization: `Bearer ${token}` }, timeout: 12000 }),
+  put: (url, data, token) => axios.put(`${API}${url}`, data, { headers: { Authorization: `Bearer ${token}` }, timeout: 12000 }),
+  delete: (url, token) => axios.delete(`${API}${url}`, { headers: { Authorization: `Bearer ${token}` }, timeout: 12000 }),
+  postForm: (url, data, token) => axios.post(`${API}${url}`, data, { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" }, timeout: 20000 }),
+  putForm: (url, data, token) => axios.put(`${API}${url}`, data, { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" }, timeout: 20000 }),
 };
 
 // ─── SMALL COMPONENTS ─────────────────────────────────────────
@@ -849,12 +849,31 @@ function Customers({ token, showToast }) {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState(null);
+  const [confirmDeleteAll, setConfirmDeleteAll] = useState(false);
+  const [deletingAll, setDeletingAll] = useState(false);
 
-  useEffect(() => {
+  const loadCustomers = () => {
+    setLoading(true);
     api.get("/admin/customers", token)
       .then(r => { setCustomers(r.data.customers); setLoading(false); })
       .catch(() => { showToast("Failed to load customers", "error"); setLoading(false); });
-  }, []);
+  };
+
+  useEffect(() => { loadCustomers(); }, []);
+
+  const handleDeleteAll = async () => {
+    setDeletingAll(true);
+    try {
+      await api.delete("/admin/users-clear-all", token);
+      setCustomers([]);
+      setConfirmDeleteAll(false);
+      showToast("All customers deleted successfully", "success");
+    } catch {
+      showToast("Failed to delete customers", "error");
+    } finally {
+      setDeletingAll(false);
+    }
+  };
 
   const filtered = customers.filter(c =>
     c.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -891,8 +910,41 @@ function Customers({ token, showToast }) {
             <span style={{ fontSize: 16 }}>👥</span>
             <span style={{ color: "#a78bfa", fontWeight: 700, fontSize: "1.1rem", fontFamily: "'Syne', sans-serif" }}>{customers.length}</span>
           </div>
+          {customers.filter(c => !c.isGuest).length > 0 && (
+            <button onClick={() => setConfirmDeleteAll(true)}
+              style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", color: "#f87171", borderRadius: 10, padding: "9px 18px", cursor: "pointer", fontSize: "0.82rem", fontWeight: 700, fontFamily: "'Space Grotesk',sans-serif", transition: "all 0.2s" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "rgba(239,68,68,0.2)"; e.currentTarget.style.borderColor = "rgba(239,68,68,0.5)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "rgba(239,68,68,0.1)"; e.currentTarget.style.borderColor = "rgba(239,68,68,0.3)"; }}>
+              🗑️ Delete All
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Confirm Delete All Modal */}
+      {confirmDeleteAll && (
+        <div onClick={() => !deletingAll && setConfirmDeleteAll(false)} style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: "#13151a", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 20, maxWidth: 420, width: "100%", padding: "2rem", boxShadow: "0 24px 80px rgba(0,0,0,0.5)", animation: "fadeInScale 0.3s ease" }}>
+            <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, margin: "0 auto 1.2rem" }}>🗑️</div>
+            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: "1.2rem", fontWeight: 800, color: "#fff", textAlign: "center", marginBottom: 8 }}>Delete All Customers?</h2>
+            <p style={{ color: "#64748b", fontSize: "0.85rem", textAlign: "center", marginBottom: "1.8rem", lineHeight: 1.6 }}>
+              This will permanently delete <strong style={{ color: "#f87171" }}>{customers.filter(c => !c.isGuest).length} registered customers</strong> and all their data from the database. This action cannot be undone.
+            </p>
+            <div style={{ display: "flex", gap: "0.8rem" }}>
+              <button onClick={() => setConfirmDeleteAll(false)} disabled={deletingAll}
+                style={{ flex: 1, padding: "12px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#94a3b8", borderRadius: 10, cursor: "pointer", fontSize: "0.88rem", fontWeight: 600, fontFamily: "'Space Grotesk',sans-serif" }}>
+                Cancel
+              </button>
+              <button onClick={handleDeleteAll} disabled={deletingAll}
+                style={{ flex: 1, padding: "12px", background: deletingAll ? "rgba(239,68,68,0.3)" : "linear-gradient(135deg,#dc2626,#ef4444)", border: "none", color: "#fff", borderRadius: 10, cursor: deletingAll ? "not-allowed" : "pointer", fontSize: "0.88rem", fontWeight: 700, fontFamily: "'Space Grotesk',sans-serif", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                {deletingAll ? (
+                  <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} /> Deleting...</>
+                ) : "🗑️ Delete All"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Search */}
       <div style={{ marginBottom: "1.5rem" }}>
