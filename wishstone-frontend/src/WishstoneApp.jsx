@@ -146,6 +146,40 @@ const GLOBAL_CSS = `
     70% { transform:scale(0.85) rotate(5deg); }
     100%{ transform:scale(1) rotate(0deg); }
   }
+  @keyframes flyBucket{
+    0%  { transform:translate(0,0) scale(1.2); opacity:1; }
+    15% { transform:translate(calc(var(--dx)*0.08), calc(var(--dy)*0.05 - 90px)) scale(1.6); opacity:1; }
+    50% { transform:translate(calc(var(--dx)*0.5), calc(var(--dy)*0.4 - 60px)) scale(1.1); opacity:1; }
+    85% { transform:translate(calc(var(--dx)*0.9), calc(var(--dy)*0.9 - 10px)) scale(0.6); opacity:0.8; }
+    100%{ transform:translate(var(--dx), var(--dy)) scale(0.1); opacity:0; }
+  }
+  @keyframes cartIconPop{
+    0%  { transform:scale(1); }
+    30% { transform:scale(1.5) rotate(-8deg); }
+    60% { transform:scale(0.85) rotate(5deg); }
+    80% { transform:scale(1.15) rotate(-2deg); }
+    100%{ transform:scale(1) rotate(0deg); }
+  }
+  @keyframes sparkBurst{
+    0%  { transform:translate(-50%,-50%) scale(0) rotate(0deg); opacity:1; }
+    50% { transform:translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(1.3) rotate(var(--sr)); opacity:1; }
+    100%{ transform:translate(calc(-50% + var(--sx)*2.2), calc(-50% + var(--sy)*2.2)) scale(0); opacity:0; }
+  }
+  @keyframes ringExpand{
+    0%  { transform:translate(-50%,-50%) scale(0); opacity:0.9; }
+    60% { transform:translate(-50%,-50%) scale(1.8); opacity:0.4; }
+    100%{ transform:translate(-50%,-50%) scale(2.8); opacity:0; }
+  }
+  @keyframes gemFly{
+    0%  { transform:translate(0,0) scale(1) rotate(0deg); opacity:1; }
+    20% { transform:translate(calc(var(--gx)*0.2), calc(var(--gy)*0.2 - 50px)) scale(1.4) rotate(120deg); opacity:1; }
+    60% { transform:translate(calc(var(--gx)*0.65), calc(var(--gy)*0.55 - 30px)) scale(1) rotate(240deg); opacity:0.9; }
+    100%{ transform:translate(var(--gx), var(--gy)) scale(0.2) rotate(360deg); opacity:0; }
+  }
+  @keyframes dashPageIn{
+    from{opacity:0;transform:translateX(32px) scale(0.98);}
+    to{opacity:1;transform:translateX(0) scale(1);}
+  }
   .nav-link{background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#1a1a1a;padding:4px 0;transition:color 0.2s;}
   .nav-link:hover,.nav-link.active{color:#E8720C;}
   .prod-card{background:#fff;border-radius:14px;overflow:hidden;border:1px solid rgba(26,26,26,0.08);transition:all 0.3s;cursor:pointer;}
@@ -224,6 +258,7 @@ const GLOBAL_CSS = `
     .dashboard-stats{grid-template-columns:repeat(2,1fr) !important;}
     .video-card{width:160px !important;}
     .checkout-grid{grid-template-columns:1fr !important;}
+    .checkout-form-grid{grid-template-columns:1fr !important;}
     .profile-grid{grid-template-columns:1fr !important;}
     .profile-info-grid{grid-template-columns:1fr !important;}
   }
@@ -234,6 +269,7 @@ const GLOBAL_CSS = `
     .dash-order-card{flex-direction:column !important; align-items:flex-start !important;}
     .profile-grid{grid-template-columns:1fr !important;}
     .profile-info-grid{grid-template-columns:1fr !important;}
+    .checkout-form-grid{grid-template-columns:1fr !important;}
   }
 `;
 
@@ -284,12 +320,12 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
           <button onClick={() => navTo("cart")} style={{ background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:6, fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.1em", textTransform:"uppercase", color:T.text, position:"relative", padding:"6px 4px", borderRadius:8, transition:"background 0.2s" }}
             onMouseEnter={e => e.currentTarget.style.background="rgba(0,0,0,0.05)"}
             onMouseLeave={e => e.currentTarget.style.background="none"}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <svg id="cart-nav-desktop" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
             Cart
-            {cartCount > 0 && <span style={{ background:T.orange, color:"#fff", borderRadius:"50%", width:16, height:16, fontSize:"0.58rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700, position:"absolute", top:-4, right:-6 }}>{cartCount}</span>}
+            {cartCount > 0 && <span style={{ background:"#1a1a1a", color:"#fff", borderRadius:"50%", width:16, height:16, fontSize:"0.58rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700, position:"absolute", top:-4, right:-6 }}>{cartCount}</span>}
           </button>
         </nav>
 
@@ -305,14 +341,14 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
           </button>
 
           {/* Cart icon mobile — black */}
-          <button onClick={() => navTo("cart")} className="show-mobile-flex" style={{ display:"none", background:"none", border:"none", cursor:"pointer", position:"relative", padding:"6px", alignItems:"center", justifyContent:"center", borderRadius:8, transition:"background 0.2s" }}
+          <button id="cart-nav-btn" onClick={() => navTo("cart")} className="show-mobile-flex" style={{ display:"none", background:"none", border:"none", cursor:"pointer", position:"relative", padding:"6px", alignItems:"center", justifyContent:"center", borderRadius:8, transition:"background 0.2s" }}
             onMouseEnter={e => e.currentTarget.style.background="rgba(0,0,0,0.06)"}
             onMouseLeave={e => e.currentTarget.style.background="none"}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display:"block" }}>
               <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
-            {cartCount > 0 && <span style={{ position:"absolute", top:0, right:0, background:T.orange, color:"#fff", borderRadius:"50%", width:15, height:15, fontSize:"0.52rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700 }}>{cartCount}</span>}
+            {cartCount > 0 && <span style={{ position:"absolute", top:0, right:0, background:"#1a1a1a", color:"#fff", borderRadius:"50%", width:15, height:15, fontSize:"0.52rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700 }}>{cartCount}</span>}
           </button>
           {user ? (
             <>
@@ -1004,7 +1040,7 @@ function BestSellersStrip({ onShop }) {
   );
 }
 // ─── PRODUCTS PAGE ────────────────────────────────────────────
-function ProductsPage({ onAdd, onWish, wished, onClick, cart }) {
+function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const getQty = (id) => cart.filter(i => i.id === id).reduce((s,i) => s + i.qty, 0);
@@ -1049,10 +1085,10 @@ function ProductsPage({ onAdd, onWish, wished, onClick, cart }) {
                     <div onClick={e => e.stopPropagation()} style={{ display:"flex", alignItems:"center", gap:0, border:`1.5px solid ${T.orange}`, borderRadius:8, overflow:"hidden", width:"100%" }}>
                       <button onClick={() => onAdd({ ...p, qty:-1 })} style={{ flex:1, height:38, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.orange, fontWeight:700 }}>−</button>
                       <span style={{ flex:1, textAlign:"center", fontWeight:800, color:T.orange, fontSize:"0.95rem" }}>{qty}</span>
-                      <button onClick={() => onAdd(p)} style={{ flex:1, height:38, background:T.orange, border:"none", cursor:"pointer", fontSize:18, color:"#fff", fontWeight:700 }}>+</button>
+                      <button onClick={(e) => { e.stopPropagation(); onAddAnim ? onAddAnim(e, p) : onAdd(p); }} style={{ flex:1, height:38, background:T.orange, border:"none", cursor:"pointer", fontSize:18, color:"#fff", fontWeight:700 }}>+</button>
                     </div>
                   ) : (
-                    <button className="btn-orange" onClick={e => { e.stopPropagation(); onAdd(p); }} style={{ width:"100%", padding:"10px", fontSize:"0.72rem", borderRadius:7 }}>Add to Cart</button>
+                    <button className="btn-orange" onClick={e => { e.stopPropagation(); onAddAnim ? onAddAnim(e, p) : onAdd(p); }} style={{ width:"100%", padding:"10px", fontSize:"0.72rem", borderRadius:7 }}>Add to Cart</button>
                   )}
                 </div>
               </div>
@@ -1065,13 +1101,18 @@ function ProductsPage({ onAdd, onWish, wished, onClick, cart }) {
   );
 }
 // ─── PRODUCT DETAIL ───────────────────────────────────────────
-function ProductPage({ product: p, onAdd, onWish, wished, cart, onShop }) {
-  const [qty, setQty] = useState(1);
+function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onShop }) {
   const [tab, setTab] = useState("desc");
   const [activeImg, setActiveImg] = useState(0);
   const cartQty = cart ? cart.filter(i => i.id === p?.id).reduce((s,i) => s + i.qty, 0) : 0;
   if (!p) return null;
   const imgs = p.images || [p.image];
+
+  // Add one to cart with animation
+  const handleAdd = (e) => { onAddAnim ? onAddAnim(e, p) : onAdd(p); };
+  // Remove one from cart
+  const handleDec = () => { onAdd({ ...p, qty: -1 }); };
+
   return (
     <>
     <div style={{ paddingTop:90, paddingBottom:80, background:T.bg, minHeight:"100vh" }}>
@@ -1111,13 +1152,21 @@ function ProductPage({ product: p, onAdd, onWish, wished, cart, onShop }) {
               {tab==="suitable" && <p style={{ fontSize:"0.86rem", color:T.textMid, lineHeight:1.7 }}>{p.suitableFor}</p>}
             </div>
             <div style={{ display:"flex", gap:"1rem", alignItems:"center", marginBottom:"1rem" }}>
-              <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.border}`, borderRadius:8, overflow:"hidden" }}>
-                <button onClick={() => setQty(q => Math.max(1,q-1))} style={{ width:36, height:40, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.text }}>−</button>
-                <span style={{ width:40, textAlign:"center", fontWeight:700, color:T.text }}>{qty}</span>
-                <button onClick={() => setQty(q => q+1)} style={{ width:36, height:40, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.text }}>+</button>
-              </div>
-              <button className="btn-orange" onClick={() => { for(let i=0;i<qty;i++) onAdd(p); }} style={{ flex:1, padding:"12px", fontSize:"0.8rem", borderRadius:8 }}>
-                Add to Cart {cartQty > 0 && <span style={{ background:"rgba(255,255,255,0.25)", borderRadius:10, padding:"1px 7px", marginLeft:6, fontSize:"0.72rem" }}>{cartQty} in cart</span>}
+              {cartQty > 0 ? (
+                <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.orange}`, borderRadius:8, overflow:"hidden" }}>
+                  <button onClick={handleDec} style={{ width:36, height:40, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.orange, fontWeight:700 }}>−</button>
+                  <span style={{ width:40, textAlign:"center", fontWeight:800, color:T.orange, fontSize:"1rem" }}>{cartQty}</span>
+                  <button onClick={handleAdd} style={{ width:36, height:40, background:T.orange, border:"none", cursor:"pointer", fontSize:18, color:"#fff", fontWeight:700 }}>+</button>
+                </div>
+              ) : (
+                <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.border}`, borderRadius:8, overflow:"hidden" }}>
+                  <button style={{ width:36, height:40, background:"none", border:"none", cursor:"default", fontSize:18, color:T.textMid, opacity:0.4 }}>−</button>
+                  <span style={{ width:40, textAlign:"center", fontWeight:700, color:T.text }}>0</span>
+                  <button style={{ width:36, height:40, background:"none", border:"none", cursor:"default", fontSize:18, color:T.textMid, opacity:0.4 }}>+</button>
+                </div>
+              )}
+              <button className="btn-orange" onClick={handleAdd} style={{ flex:1, padding:"12px", fontSize:"0.8rem", borderRadius:8 }}>
+                {cartQty > 0 ? `Add More  (${cartQty} in cart)` : "Add to Cart"}
               </button>
               <button onClick={e => onWish(e, p.id)} style={{ width:44, height:44, borderRadius:8, border:`1.5px solid ${T.border}`, background:"#fff", cursor:"pointer", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center" }}>{wished.includes(p.id) ? "❤️" : "🤍"}</button>
             </div>
@@ -1139,13 +1188,21 @@ function ProductPage({ product: p, onAdd, onWish, wished, cart, onShop }) {
         <div style={{ fontSize:"clamp(0.78rem,1.5vw,0.9rem)", fontWeight:700, color:T.text, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", lineHeight:1.3 }}>{p.name}</div>
         <div style={{ fontSize:"clamp(0.9rem,2vw,1.05rem)", color:T.orange, fontWeight:800, lineHeight:1.3 }}>Rs.{p.price.toLocaleString()}</div>
       </div>
-      <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.border}`, borderRadius:9, overflow:"hidden", flexShrink:0, height:"clamp(38px,5vw,46px)" }}>
-        <button onClick={() => setQty(q => Math.max(1,q-1))} style={{ width:"clamp(32px,4vw,42px)", height:"clamp(38px,5vw,46px)", background:"none", border:"none", cursor:"pointer", fontSize:"clamp(15px,2vw,18px)", color:T.text, lineHeight:1 }}>−</button>
-        <span style={{ width:"clamp(30px,3vw,38px)", textAlign:"center", fontWeight:700, color:T.text, fontSize:"clamp(0.88rem,1.5vw,1rem)" }}>{qty}</span>
-        <button onClick={() => setQty(q => q+1)} style={{ width:"clamp(32px,4vw,42px)", height:"clamp(38px,5vw,46px)", background:"none", border:"none", cursor:"pointer", fontSize:"clamp(15px,2vw,18px)", color:T.text, lineHeight:1 }}>+</button>
-      </div>
-      <button className="btn-orange" onClick={() => { for(let i=0;i<qty;i++) onAdd(p); }} style={{ padding:"clamp(9px,1.5vw,13px) clamp(18px,3vw,28px)", fontSize:"clamp(0.8rem,1.5vw,0.92rem)", borderRadius:9, flexShrink:0, height:"clamp(38px,5vw,46px)", whiteSpace:"nowrap" }}>
-        Add to Cart{cartQty > 0 && <span style={{ background:"rgba(255,255,255,0.3)", borderRadius:8, padding:"1px 7px", marginLeft:6, fontSize:"clamp(0.7rem,1.2vw,0.8rem)" }}>{cartQty}</span>}
+      {cartQty > 0 ? (
+        <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.orange}`, borderRadius:9, overflow:"hidden", flexShrink:0, height:"clamp(38px,5vw,46px)" }}>
+          <button onClick={handleDec} style={{ width:"clamp(32px,4vw,42px)", height:"clamp(38px,5vw,46px)", background:"none", border:"none", cursor:"pointer", fontSize:"clamp(15px,2vw,18px)", color:T.orange, fontWeight:700, lineHeight:1 }}>−</button>
+          <span style={{ width:"clamp(30px,3vw,38px)", textAlign:"center", fontWeight:800, color:T.orange, fontSize:"clamp(0.88rem,1.5vw,1rem)" }}>{cartQty}</span>
+          <button onClick={handleAdd} style={{ width:"clamp(32px,4vw,42px)", height:"clamp(38px,5vw,46px)", background:T.orange, border:"none", cursor:"pointer", fontSize:"clamp(15px,2vw,18px)", color:"#fff", fontWeight:700, lineHeight:1 }}>+</button>
+        </div>
+      ) : (
+        <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.border}`, borderRadius:9, overflow:"hidden", flexShrink:0, height:"clamp(38px,5vw,46px)" }}>
+          <button style={{ width:"clamp(32px,4vw,42px)", height:"clamp(38px,5vw,46px)", background:"none", border:"none", cursor:"default", fontSize:"clamp(15px,2vw,18px)", color:T.textMid, opacity:0.4, lineHeight:1 }}>−</button>
+          <span style={{ width:"clamp(30px,3vw,38px)", textAlign:"center", fontWeight:700, color:T.text, fontSize:"clamp(0.88rem,1.5vw,1rem)" }}>0</span>
+          <button style={{ width:"clamp(32px,4vw,42px)", height:"clamp(38px,5vw,46px)", background:"none", border:"none", cursor:"default", fontSize:"clamp(15px,2vw,18px)", color:T.textMid, opacity:0.4, lineHeight:1 }}>+</button>
+        </div>
+      )}
+      <button className="btn-orange" onClick={handleAdd} style={{ padding:"clamp(9px,1.5vw,13px) clamp(18px,3vw,28px)", fontSize:"clamp(0.8rem,1.5vw,0.92rem)", borderRadius:9, flexShrink:0, height:"clamp(38px,5vw,46px)", whiteSpace:"nowrap" }}>
+        {cartQty > 0 ? `Add More (${cartQty})` : "Add to Cart"}
       </button>
     </div>
     </>
@@ -1254,7 +1311,7 @@ function StoriesPage() {
 }
 
 // ─── CART PAGE ────────────────────────────────────────────────
-function CartPage({ cart, onQty, onRemove, onCheckout }) {
+function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick }) {
   const sub = cart.reduce((s,i) => s + i.price*i.qty, 0);
   const ship = sub >= 999 ? 0 : 99;
   const total = sub + ship;
@@ -1273,9 +1330,13 @@ function CartPage({ cart, onQty, onRemove, onCheckout }) {
           <div>
             {cart.map(item => (
               <div key={item.id} style={{ background:"#fff", borderRadius:12, padding:"1.2rem", marginBottom:"1rem", display:"flex", gap:"1rem", alignItems:"center", border:`1px solid ${T.border}` }}>
-                <img src={item.image} alt={item.name} style={{ width:76, height:76, objectFit:"cover", borderRadius:8, flexShrink:0 }} />
+                <img src={item.image} alt={item.name} onClick={() => onProductClick && onProductClick(item)} style={{ width:76, height:76, objectFit:"cover", borderRadius:8, flexShrink:0, cursor: onProductClick ? "pointer" : "default", transition:"opacity 0.2s" }}
+                  onMouseEnter={e => { if(onProductClick) e.currentTarget.style.opacity="0.8"; }}
+                  onMouseLeave={e => e.currentTarget.style.opacity="1"} />
                 <div style={{ flex:1 }}>
-                  <h4 style={{ fontSize:"0.88rem", fontWeight:700, color:T.text, marginBottom:4 }}>{item.name}</h4>
+                  <h4 onClick={() => onProductClick && onProductClick(item)} style={{ fontSize:"0.88rem", fontWeight:700, color:T.text, marginBottom:4, cursor: onProductClick ? "pointer" : "default" }}
+                    onMouseEnter={e => { if(onProductClick) e.currentTarget.style.color=T.orange; }}
+                    onMouseLeave={e => e.currentTarget.style.color=T.text}>{item.name}</h4>
                   <p style={{ fontSize:"0.78rem", color:T.textMid, marginBottom:8 }}>Rs.{item.price.toLocaleString()} each</p>
                   <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                     <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.border}`, borderRadius:6, overflow:"hidden" }}>
@@ -1312,6 +1373,7 @@ function CartPage({ cart, onQty, onRemove, onCheckout }) {
 
 // ─── CHECKOUT PAGE ────────────────────────────────────────────
 function CheckoutPage({ cart, onPlaceOrder }) {
+  const navigate = useNavigate();
   const [form, setForm] = useState({ name:"", email:"", phone:"", address:"", city:"", state:"", pincode:"" });
   const [coupon, setCoupon] = useState("");
   const [discount, setDiscount] = useState(0);
@@ -1375,7 +1437,7 @@ function CheckoutPage({ cart, onPlaceOrder }) {
           <form onSubmit={handleSubmit}>
             <div style={{ background:"#fff", borderRadius:16, padding:"1.5rem", border:`1px solid ${T.border}`, marginBottom:"1.2rem" }}>
               <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1rem", fontWeight:700, marginBottom:"1.2rem" }}>Delivery Details</h3>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1rem" }}>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1rem" }} className="checkout-form-grid">
                 {inp("name","Full Name")} {inp("email","Email Address","email")}
                 {inp("phone","Phone Number","tel")} {inp("address","Street Address")}
                 {inp("city","City","text",true)} {inp("state","State","text",true)}
@@ -1420,12 +1482,23 @@ function CheckoutPage({ cart, onPlaceOrder }) {
           </form>
           <div style={{ background:"#fff", borderRadius:16, padding:"1.5rem", border:`1px solid ${T.border}`, position:"sticky", top:90 }}>
             <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.05rem", fontWeight:700, marginBottom:"1.2rem" }}>Order Summary</h3>
-            {cart.map(i => (
-              <div key={i.id} style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
-                <span style={{ fontSize:"0.8rem", color:T.textMid }}>{i.name} x{i.qty}</span>
-                <span style={{ fontSize:"0.8rem", fontWeight:600, color:T.text }}>Rs.{(i.price*i.qty).toLocaleString()}</span>
-              </div>
-            ))}
+            {cart.map(i => {
+              const prod = PRODUCTS.find(p => p.id === i.id);
+              return (
+                <div key={i.id} onClick={() => navigate(`/product/${i.id}`)} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10, cursor:"pointer", borderRadius:10, padding:"6px 4px", transition:"background 0.15s" }}
+                  onMouseEnter={e => e.currentTarget.style.background="rgba(232,114,12,0.05)"}
+                  onMouseLeave={e => e.currentTarget.style.background="transparent"}>
+                  <div style={{ width:48, height:48, borderRadius:8, overflow:"hidden", flexShrink:0, border:`1px solid ${T.border}` }}>
+                    <img src={prod?.image || i.image || ""} alt={i.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                  </div>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontSize:"0.78rem", color:T.text, fontWeight:600, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{i.name}</div>
+                    <div style={{ fontSize:"0.7rem", color:T.textMid }}>x{i.qty}</div>
+                  </div>
+                  <span style={{ fontSize:"0.82rem", fontWeight:700, color:T.text, flexShrink:0 }}>Rs.{(i.price*i.qty).toLocaleString()}</span>
+                </div>
+              );
+            })}
             {ship > 0 && (
               <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
                 <span style={{ fontSize:"0.8rem", color:T.textMid }}>Shipping</span>
@@ -1498,60 +1571,40 @@ function SignupPage({ onSignup, onSwitch }) {
   const [form, setForm] = useState({ name:"", email:"", password:"", confirm:"" });
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
-  const handle = async e => {
+  const handle = e => {
     e.preventDefault(); setError("");
     if (!form.name||!form.email||!form.password) return setError("All fields are required.");
     if (form.password!==form.confirm) return setError("Passwords do not match.");
     if (form.password.length<6) return setError("Password must be at least 6 characters.");
-    setLoading(true);
-    try {
-      const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
-      const res = await fetch(`${API_BASE}/api/auth/register`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ name:form.name, email:form.email, password:form.password }) });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message||"Registration failed");
-      setSuccess(true);
-      setTimeout(() => onSwitch(), 2000);
-    } catch(err) {
-      if (err.message.includes("fetch") || err.message.includes("network") || err.message.includes("Failed")) { setSuccess(true); setTimeout(() => onSwitch(), 2000); }
-      else setError(err.message);
-    } finally { setLoading(false); }
+    // Redirect immediately — fire API in background silently
+    const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
+    fetch(`${API_BASE}/api/auth/register`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ name:form.name, email:form.email, password:form.password }) }).catch(() => {});
+    onSwitch();
   };
 
   return (
     <div style={{ minHeight:"100vh", background:T.bg, display:"flex", alignItems:"center", justifyContent:"center", paddingTop:100, paddingBottom:"2rem", paddingLeft:"2rem", paddingRight:"2rem" }}>
       <div style={{ background:"#fff", borderRadius:16, padding:"2.5rem", width:"100%", maxWidth:420, boxShadow:"0 8px 40px rgba(0,0,0,0.1)", border:`1px solid ${T.border}`, animation:"cardIn 0.5s ease both" }}>
-        {success ? (
-          <div style={{ textAlign:"center", padding:"1rem 0" }}>
-            <div style={{ fontSize:52, marginBottom:16 }}>🎉</div>
-            <h2 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.4rem", fontWeight:900, marginBottom:8 }}>Account Created!</h2>
-            <p style={{ color:T.textMid, fontSize:"0.85rem" }}>Redirecting you to sign in...</p>
-          </div>
-        ) : (
-          <>
-            <div style={{ textAlign:"center", marginBottom:"2rem" }}>
-              <div style={{ fontSize:38, marginBottom:8 }}>💎</div>
-              <h2 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.5rem", fontWeight:900, margin:0 }}>Create Account</h2>
+        <div style={{ textAlign:"center", marginBottom:"2rem" }}>
+          <div style={{ fontSize:38, marginBottom:8 }}>💎</div>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.5rem", fontWeight:900, margin:0 }}>Create Account</h2>
+        </div>
+        <form onSubmit={handle}>
+          {[["name","Full Name","text"],["email","Email Address","email"],["password","Password","password"],["confirm","Confirm Password","password"]].map(([k,l,t]) => (
+            <div key={k} style={{ marginBottom:"1rem" }}>
+              <label style={{ display:"block", fontSize:"0.68rem", fontWeight:700, color:T.textMid, marginBottom:5, letterSpacing:"0.08em", textTransform:"uppercase" }}>{l}</label>
+              <input type={k==="password"||k==="confirm"?(showPw?"text":t):t} placeholder={l} value={form[k]} onChange={e => setForm({...form,[k]:e.target.value})}
+                style={{ width:"100%", padding:"11px 13px", border:`1.5px solid ${T.border}`, borderRadius:8, fontSize:"0.88rem", background:"#fff", color:T.text, outline:"none", boxSizing:"border-box" }}
+                onFocus={e => e.target.style.borderColor=T.orange} onBlur={e => e.target.style.borderColor=T.border} />
             </div>
-            <form onSubmit={handle}>
-              {[["name","Full Name","text"],["email","Email Address","email"],["password","Password","password"],["confirm","Confirm Password","password"]].map(([k,l,t]) => (
-                <div key={k} style={{ marginBottom:"1rem" }}>
-                  <label style={{ display:"block", fontSize:"0.68rem", fontWeight:700, color:T.textMid, marginBottom:5, letterSpacing:"0.08em", textTransform:"uppercase" }}>{l}</label>
-                  <input type={k==="password"||k==="confirm"?(showPw?"text":t):t} placeholder={l} value={form[k]} onChange={e => setForm({...form,[k]:e.target.value})}
-                    style={{ width:"100%", padding:"11px 13px", border:`1.5px solid ${T.border}`, borderRadius:8, fontSize:"0.88rem", background:"#fff", color:T.text, outline:"none", boxSizing:"border-box" }}
-                    onFocus={e => e.target.style.borderColor=T.orange} onBlur={e => e.target.style.borderColor=T.border} />
-                </div>
-              ))}
-              {error && <p style={{ color:"#c0392b", fontSize:"0.78rem", marginBottom:"1rem" }}>{error}</p>}
-              <button type="submit" className="btn-orange" disabled={loading} style={{ width:"100%", padding:"13px", fontSize:"0.82rem", borderRadius:8, opacity:loading?0.7:1 }}>{loading?"Creating Account...":"Create Account"}</button>
-            </form>
-            <p style={{ textAlign:"center", marginTop:"1.5rem", fontSize:"0.82rem", color:T.textMid }}>
-              Already have an account? <button onClick={onSwitch} style={{ background:"none", border:"none", cursor:"pointer", color:T.orange, fontWeight:700, fontSize:"0.82rem" }}>Sign In</button>
-            </p>
-          </>
-        )}
+          ))}
+          {error && <p style={{ color:"#c0392b", fontSize:"0.78rem", marginBottom:"1rem" }}>{error}</p>}
+          <button type="submit" className="btn-orange" style={{ width:"100%", padding:"13px", fontSize:"0.82rem", borderRadius:8 }}>Create Account</button>
+        </form>
+        <p style={{ textAlign:"center", marginTop:"1.5rem", fontSize:"0.82rem", color:T.textMid }}>
+          Already have an account? <button onClick={onSwitch} style={{ background:"none", border:"none", cursor:"pointer", color:T.orange, fontWeight:700, fontSize:"0.82rem" }}>Sign In</button>
+        </p>
       </div>
     </div>
   );
@@ -1561,28 +1614,18 @@ function LoginPage({ onLogin, onSwitch }) {
   const [form, setForm] = useState({ email:"", password:"" });
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handle = async e => {
+  const handle = e => {
     e.preventDefault(); setError("");
     if (!form.email||!form.password) return setError("Email and password are required.");
-    setLoading(true);
-    // Try backend with 4s timeout, fallback to local immediately
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 4000);
-      const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
-      const res = await fetch(`${API_BASE}/api/auth/login`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ email:form.email, password:form.password }), signal:controller.signal });
-      clearTimeout(timeout);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message||"Login failed");
-      if (data.token) localStorage.setItem("ws_token", data.token);
-      onLogin(data.user || { email:form.email, name: data.user?.name || form.email.split("@")[0] });
-    } catch(err) {
-      // Network error, timeout, or backend down → instant local login
-      if (!localStorage.getItem("ws_token")) localStorage.setItem("ws_token", "local_" + Date.now());
-      onLogin({ email:form.email, name: form.email.split("@")[0] });
-    } finally { setLoading(false); }
+    // Login instantly — fire API in background to get real token
+    if (!localStorage.getItem("ws_token")) localStorage.setItem("ws_token", "local_" + Date.now());
+    const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
+    fetch(`${API_BASE}/api/auth/login`, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ email:form.email, password:form.password }) })
+      .then(r => r.json())
+      .then(d => { if (d.token) localStorage.setItem("ws_token", d.token); })
+      .catch(() => {});
+    onLogin({ email:form.email, name: form.email.split("@")[0] });
   };
 
   return (
@@ -1609,7 +1652,7 @@ function LoginPage({ onLogin, onSwitch }) {
             </div>
           </div>
           {error && <p style={{ color:"#c0392b", fontSize:"0.78rem", marginBottom:"1rem" }}>{error}</p>}
-          <button type="submit" className="btn-orange" disabled={loading} style={{ width:"100%", padding:"13px", fontSize:"0.82rem", borderRadius:8, opacity:loading?0.7:1 }}>{loading?"Signing In...":"Sign In"}</button>
+          <button type="submit" className="btn-orange" style={{ width:"100%", padding:"13px", fontSize:"0.82rem", borderRadius:8 }}>Sign In</button>
         </form>
         <div style={{ marginTop:"1rem", padding:"10px 12px", background:"rgba(232,114,12,0.06)", border:`1px solid rgba(232,114,12,0.15)`, borderRadius:8 }}>
           <p style={{ fontSize:"0.72rem", color:T.textMid, textAlign:"center" }}>💡 Demo mode: Enter any email & password to explore</p>
@@ -1631,6 +1674,7 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
   const [editingProfile, setEditingProfile] = useState(false);
   const [editForm, setEditForm] = useState({ name: user.name||"", email: user.email||"", phone: user.phone||"" });
   const [editSaved, setEditSaved] = useState(false);
+  const [trackModal, setTrackModal] = useState(null); // order object or "empty"
 
   const totalSpent = orders.reduce((s,o) => s+(o.totalAmount||0), 0);
   const pending    = orders.filter(o => (o.status||"Confirmed") === "Pending").length;
@@ -1680,9 +1724,21 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
       <style>{`
         @keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
         @keyframes popIn{from{opacity:0;transform:scale(0.94)}to{opacity:1;transform:scale(1)}}
+        @keyframes dashPageIn{
+          from{opacity:0;transform:translateX(30px) scale(0.97);}
+          to{opacity:1;transform:translateX(0) scale(1);}
+        }
         .dash-nav-btn:hover{background:${PL} !important;color:${P} !important;}
         .dash-order-card:hover{box-shadow:0 8px 32px rgba(0,0,0,0.1) !important;transform:translateY(-2px);}
         .dash-stat:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(0,0,0,0.1) !important;}
+        @media(max-width:1024px){
+          .dash-main-content{animation:dashPageIn 0.35s cubic-bezier(0.34,1.2,0.64,1) both;}
+        }
+        @media(max-width:768px){
+          .dash-main-content{position:fixed;inset:0;top:64px;z-index:500;background:${bg};overflow-y:auto;padding:1.2rem 1rem 5rem;animation:dashPageIn 0.35s cubic-bezier(0.34,1.2,0.64,1) both;}
+          .dash-mobile-bottomnav{display:flex !important;}
+        }
+        .dash-mobile-bottomnav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:600;background:#fff;border-top:1px solid ${border};padding:6px 0 env(safe-area-inset-bottom,6px);}
       `}</style>
 
       <div style={{ maxWidth:1450, margin:"0 auto", padding:"1.5rem clamp(1rem,2.5vw,2rem)", display:"grid", gridTemplateColumns:"280px 1fr", gap:"1.8rem", alignItems:"start" }} className="dashboard-layout">
@@ -1736,11 +1792,11 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
         </aside>
 
         {/* ── MAIN CONTENT ── */}
-        <main style={{ minWidth:0 }}>
+        <main style={{ minWidth:0 }} className="dash-main-content">
 
           {/* ── MY ORDERS ── */}
           {activeTab==="orders" && (
-            <div style={{ animation:"slideUp 0.35s ease both" }}>
+            <div key="orders" style={{ animation:"dashPageIn 0.35s cubic-bezier(0.34,1.2,0.64,1) both" }}>
 
               {/* Header */}
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1.6rem", flexWrap:"wrap", gap:10 }}>
@@ -1834,7 +1890,7 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
 
                       {/* Actions */}
                       <div style={{ display:"flex", alignItems:"center", gap:8, flexShrink:0 }}>
-                        <button onClick={() => setActiveTab("track")} style={{ padding:"8px 14px", background:PL, color:P, border:`1px solid rgba(232,114,12,0.25)`, borderRadius:9, fontSize:"0.75rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", transition:"all 0.2s" }}
+                        <button onClick={() => setTrackModal(o)} style={{ padding:"8px 14px", background:PL, color:P, border:`1px solid rgba(232,114,12,0.25)`, borderRadius:9, fontSize:"0.75rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", transition:"all 0.2s" }}
                           onMouseEnter={e => { e.currentTarget.style.background=P; e.currentTarget.style.color="#fff"; }}
                           onMouseLeave={e => { e.currentTarget.style.background=PL; e.currentTarget.style.color=P; }}>
                           Track
@@ -1854,42 +1910,35 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
 
           {/* ── TRACK ORDERS ── */}
           {activeTab==="track" && (
-            <div style={{ animation:"slideUp 0.35s ease both" }}>
+            <div key="track" style={{ animation:"dashPageIn 0.32s cubic-bezier(0.34,1.2,0.64,1) both" }}>
               <div style={{ marginBottom:"1.5rem" }}>
                 <h1 style={{ fontSize:"1.75rem", fontWeight:900, color:txt, margin:0 }}>Track Orders</h1>
-                <p style={{ color:sub, fontSize:"0.9rem", marginTop:5 }}>Monitor your package in real-time</p>
+                <p style={{ color:sub, fontSize:"0.9rem", marginTop:5 }}>Click on any order to view live tracking</p>
               </div>
               {allOrders.length === 0 ? (
                 <div style={{ background:card, borderRadius:18, padding:"4rem 2.5rem", textAlign:"center", border:`1px solid ${border}` }}>
                   <div style={{ fontSize:64, marginBottom:18 }}>🚚</div>
-                  <p style={{ color:sub, fontSize:"1rem", marginBottom:22 }}>No orders to track yet.</p>
+                  <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.2rem", fontWeight:800, color:txt, marginBottom:8 }}>No Orders to Track</h3>
+                  <p style={{ color:sub, fontSize:"0.88rem", marginBottom:22 }}>Place an order first to track your delivery.</p>
                   <button onClick={() => onNav("products")} style={{ padding:"13px 30px", fontSize:"0.9rem", borderRadius:11, background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", cursor:"pointer", fontFamily:"'Inter',sans-serif", fontWeight:700 }}>Shop Now</button>
                 </div>
               ) : allOrders.map((o,i) => (
-                <div key={i} style={{ background:card, borderRadius:18, padding:"1.8rem", marginBottom:"1.3rem", border:`1px solid ${border}`, animation:`slideUp 0.3s ease ${i*0.07}s both`, boxShadow:"0 3px 18px rgba(0,0,0,0.07)" }}>
-                  <div style={{ display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:9, marginBottom:"1.5rem" }}>
+                <div key={i} style={{ background:card, borderRadius:16, padding:"1.2rem 1.6rem", marginBottom:"1rem", border:`1px solid ${border}`, animation:`slideUp 0.3s ease ${i*0.07}s both`, boxShadow:"0 2px 12px rgba(0,0,0,0.05)", display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, flexWrap:"wrap" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:14 }}>
+                    <div style={{ width:46, height:46, borderRadius:12, background:PL, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>📦</div>
                     <div>
-                      <div style={{ fontWeight:700, color:txt, fontSize:"1.05rem" }}>Order #{o._id ? o._id.slice(-6).toUpperCase() : String(i+1).padStart(6,"0")}</div>
-                      <div style={{ fontSize:"0.78rem", color:sub, marginTop:4 }}>Placed on {o.createdAt ? new Date(o.createdAt).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) : "—"}</div>
-                    </div>
-                    <span style={{ background:"#ecfdf5", color:"#10b981", padding:"6px 18px", borderRadius:20, fontSize:"0.75rem", fontWeight:700, border:"1px solid rgba(16,185,129,0.25)", height:"fit-content" }}>✓ {o.status||"Confirmed"}</span>
-                  </div>
-
-                  {/* Timeline */}
-                  <div style={{ display:"flex", alignItems:"flex-start", marginBottom:"1.5rem", position:"relative" }}>
-                    {[["✅","Order Placed",true],["📦","Processing",false],["🚚","Shipped",false],["🏠","Delivered",false]].map(([icon,label,active],si) => (
-                      <div key={si} style={{ flex:1, textAlign:"center", position:"relative", zIndex:1 }}>
-                        <div style={{ width:50, height:50, borderRadius:"50%", background: active ? `linear-gradient(135deg,${T.orangeD},${P})` : "#f3f4f6", border:`2px solid ${active ? P : "#e5e7eb"}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, margin:"0 auto 7px", boxShadow: active ? `0 4px 18px rgba(232,114,12,0.35)` : "none", transition:"all 0.3s" }}>{icon}</div>
-                        <div style={{ fontSize:"0.7rem", color: active ? P : sub, fontWeight: active ? 700 : 500 }}>{label}</div>
-                        {si < 3 && <div style={{ position:"absolute", top:24, left:"58%", right:"-42%", height:2, background: active ? `linear-gradient(to right,${P},#e5e7eb)` : "#e5e7eb", zIndex:-1 }} />}
+                      <div style={{ fontWeight:800, color:txt, fontSize:"0.95rem" }}>Order #{o._id ? o._id.slice(-6).toUpperCase() : String(i+1).padStart(6,"0")}</div>
+                      <div style={{ fontSize:"0.75rem", color:sub, marginTop:3 }}>
+                        {o.createdAt ? new Date(o.createdAt).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) : "—"}
+                        {o.totalAmount ? ` · ₹${o.totalAmount.toLocaleString()}` : ""}
                       </div>
-                    ))}
+                    </div>
                   </div>
-
-                  <div style={{ background:PL, borderRadius:13, padding:"14px 18px", display:"flex", alignItems:"center", gap:11, border:`1px solid rgba(232,114,12,0.15)` }}>
-                    <span style={{ fontSize:20 }}>📅</span>
-                    <span style={{ fontSize:"0.85rem", color:sub }}>Expected delivery: <strong style={{ color:txt }}>4–5 business days from order date</strong></span>
-                  </div>
+                  <button onClick={() => setTrackModal(o)} style={{ padding:"10px 22px", background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", borderRadius:10, fontSize:"0.82rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", boxShadow:`0 3px 12px rgba(232,114,12,0.3)`, transition:"all 0.2s", flexShrink:0 }}
+                    onMouseEnter={e => e.currentTarget.style.transform="translateY(-1px)"}
+                    onMouseLeave={e => e.currentTarget.style.transform="translateY(0)"}>
+                    Track Order →
+                  </button>
                 </div>
               ))}
             </div>
@@ -1897,7 +1946,7 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
 
           {/* ── PROFILE ── */}
           {activeTab==="profile" && (
-            <div style={{ animation:"slideUp 0.35s ease both" }}>
+            <div key="profile" style={{ animation:"dashPageIn 0.32s cubic-bezier(0.34,1.2,0.64,1) both" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1.5rem", flexWrap:"wrap", gap:10 }}>
                 <div>
                   <h1 style={{ fontSize:"clamp(1.3rem,4vw,1.75rem)", fontWeight:900, color:txt, margin:0 }}>My Profile</h1>
@@ -2134,9 +2183,102 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
 
               {/* Action Buttons */}
               <div style={{ marginTop:"1.5rem", display:"flex", gap:"0.8rem", flexWrap:"wrap" }}>
-                <button onClick={() => { setSelectedOrder(null); setActiveTab("track"); }} style={{ flex:1, padding:"12px", background:PL, color:P, border:`1px solid rgba(232,114,12,0.2)`, borderRadius:10, fontSize:"0.85rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>Track Order</button>
+                <button onClick={() => { setSelectedOrder(null); setTrackModal(allOrders[0] || "empty"); }} style={{ flex:1, padding:"12px", background:PL, color:P, border:`1px solid rgba(232,114,12,0.2)`, borderRadius:10, fontSize:"0.85rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>Track Order</button>
                 <button onClick={() => setSelectedOrder(null)} style={{ flex:1, padding:"12px", background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", borderRadius:10, fontSize:"0.85rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif" }}>Close</button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MOBILE BOTTOM NAV ── */}
+      <nav className="dash-mobile-bottomnav" style={{ justifyContent:"space-around", alignItems:"center" }}>
+        {[
+          { key:"orders", icon:"🛍", label:"Orders" },
+          { key:"track",  icon:"📦", label:"Track" },
+          { key:"profile",icon:"👤", label:"Profile" },
+          { key:"wishlist",icon:"🤍", label:"Wishlist" },
+          { key:"cart",   icon:"🛒", label:"Cart" },
+        ].map(t => (
+          <button key={t.key}
+            onClick={() => { if(t.key==="wishlist") onNav("wishlist"); else if(t.key==="cart") onNav("cart"); else setActiveTab(t.key); }}
+            style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:2, background:"none", border:"none", cursor:"pointer", padding:"6px 0", fontFamily:"'Inter',sans-serif" }}>
+            <span style={{ fontSize:20 }}>{t.icon}</span>
+            <span style={{ fontSize:"0.58rem", fontWeight:700, color: activeTab===t.key ? P : "#9ca3af", letterSpacing:"0.04em" }}>{t.label}</span>
+            {activeTab===t.key && <span style={{ width:18, height:2, borderRadius:2, background:P, display:"block" }} />}
+          </button>
+        ))}
+      </nav>
+
+      {/* ── TRACK ORDER MODAL ── */}
+      {trackModal && (
+        <div onClick={() => setTrackModal(null)} style={{ position:"fixed", inset:0, zIndex:9999, background:"rgba(0,0,0,0.6)", backdropFilter:"blur(6px)", display:"flex", alignItems:"center", justifyContent:"center", padding:"1rem" }}>
+          <div onClick={e => e.stopPropagation()} style={{ background:card, borderRadius:22, maxWidth:460, width:"100%", boxShadow:"0 28px 80px rgba(0,0,0,0.25)", animation:"modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both", overflow:"hidden" }}>
+            {/* Header */}
+            <div style={{ background:`linear-gradient(135deg,${T.orangeD},${P})`, padding:"1.6rem 2rem", position:"relative" }}>
+              <button onClick={() => setTrackModal(null)} style={{ position:"absolute", top:14, right:16, background:"rgba(255,255,255,0.2)", border:"none", cursor:"pointer", fontSize:18, color:"#fff", lineHeight:1, padding:"5px 9px", borderRadius:7 }}>✕</button>
+              <div style={{ fontSize:36, marginBottom:8 }}>📦</div>
+              <h2 style={{ fontSize:"1.3rem", fontWeight:900, color:"#fff", margin:0 }}>Order Tracking</h2>
+              <p style={{ fontSize:"0.78rem", color:"rgba(255,255,255,0.8)", marginTop:4 }}>Real-time delivery status</p>
+            </div>
+
+            <div style={{ padding:"1.8rem 2rem" }}>
+              {trackModal === "empty" || allOrders.length === 0 ? (
+                <>
+                  <div style={{ textAlign:"center", padding:"1rem 0 1.5rem" }}>
+                    <div style={{ fontSize:56, marginBottom:14 }}>🛒</div>
+                    <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.2rem", fontWeight:800, color:txt, marginBottom:8 }}>No Orders to Track</h3>
+                    <p style={{ color:sub, fontSize:"0.85rem", lineHeight:1.6, marginBottom:"1.5rem" }}>You haven't placed any orders yet. Start your sacred journey and your tracking details will appear here.</p>
+                    <button onClick={() => { setTrackModal(null); onNav("products"); }} style={{ padding:"12px 28px", background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", borderRadius:11, fontSize:"0.88rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", boxShadow:`0 4px 18px rgba(232,114,12,0.3)` }}>
+                      Shop Now →
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Order info */}
+                  <div style={{ background:PL, borderRadius:13, padding:"1rem 1.2rem", marginBottom:"1.4rem", border:`1px solid rgba(232,114,12,0.15)`, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:8 }}>
+                    <div>
+                      <div style={{ fontSize:"0.68rem", color:sub, fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:3 }}>Order ID</div>
+                      <div style={{ fontWeight:800, color:txt, fontSize:"1rem" }}>#{(typeof trackModal === "object" && trackModal._id) ? trackModal._id.slice(-6).toUpperCase() : "—"}</div>
+                    </div>
+                    <span style={{ background:"#ecfdf5", color:"#059669", padding:"5px 14px", borderRadius:20, fontSize:"0.72rem", fontWeight:700, border:"1px solid rgba(16,185,129,0.2)" }}>✓ Confirmed</span>
+                  </div>
+
+                  {/* Delivery timeline */}
+                  <div style={{ display:"flex", alignItems:"flex-start", marginBottom:"1.4rem", position:"relative" }}>
+                    {[["✅","Placed",true],["📦","Packed",true],["🚚","Shipped",false],["🏠","Delivered",false]].map(([icon,label,done],si) => (
+                      <div key={si} style={{ flex:1, textAlign:"center", position:"relative", zIndex:1 }}>
+                        <div style={{ width:44, height:44, borderRadius:"50%", background: done ? `linear-gradient(135deg,${T.orangeD},${P})` : "#f3f4f6", border:`2px solid ${done ? P : "#e5e7eb"}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, margin:"0 auto 6px", boxShadow: done ? `0 3px 14px rgba(232,114,12,0.35)` : "none" }}>{icon}</div>
+                        <div style={{ fontSize:"0.62rem", color: done ? P : sub, fontWeight: done ? 700 : 500 }}>{label}</div>
+                        {si < 3 && <div style={{ position:"absolute", top:21, left:"58%", right:"-42%", height:2, background: done ? `linear-gradient(to right,${P},#e5e7eb)` : "#e5e7eb", zIndex:-1 }} />}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Delivery message */}
+                  <div style={{ background:"linear-gradient(135deg,#ecfdf5,#d1fae5)", borderRadius:14, padding:"1.2rem 1.4rem", marginBottom:"1.2rem", border:"1px solid rgba(16,185,129,0.2)" }}>
+                    <div style={{ display:"flex", alignItems:"flex-start", gap:12 }}>
+                      <span style={{ fontSize:28, flexShrink:0 }}>🎉</span>
+                      <div>
+                        <div style={{ fontWeight:800, color:"#065f46", fontSize:"0.95rem", marginBottom:4 }}>Your item is on its way!</div>
+                        <div style={{ fontSize:"0.82rem", color:"#047857", lineHeight:1.6 }}>
+                          Expected delivery within <strong>4 to 5 working days</strong> from the date of order placement. Our team is carefully packaging your sacred items.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ background:PL, borderRadius:11, padding:"10px 14px", display:"flex", alignItems:"center", gap:9, border:`1px solid rgba(232,114,12,0.15)`, marginBottom:"1.4rem" }}>
+                    <span style={{ fontSize:16 }}>📞</span>
+                    <span style={{ fontSize:"0.78rem", color:sub }}>Need help? Contact us at <strong style={{ color:P }}>support@wishstone.in</strong></span>
+                  </div>
+
+                  <button onClick={() => setTrackModal(null)} style={{ width:"100%", padding:"13px", background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", borderRadius:11, fontSize:"0.88rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", boxShadow:`0 4px 18px rgba(232,114,12,0.3)` }}>
+                    Got it, Thanks!
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -2209,14 +2351,22 @@ function OrderConfirmModal({ order, onClose }) {
 }
 
 // ─── PROMO MODAL ──────────────────────────────────────────────
-function PromoModal({ show, onClose, onShop }) {
+function PromoModal({ show, onClose, onShop, userEmail }) {
   const [email, setEmail] = useState("");
   const [claimed, setClaimed] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [emailError, setEmailError] = useState("");
   const COUPON = "WOW300";
 
   const handleClaim = () => {
-    if (!email.trim()) return;
+    if (!email.trim()) { setEmailError("Please enter your email."); return; }
+    if (userEmail && email.trim().toLowerCase() !== userEmail.toLowerCase()) {
+      setEmailError("Invalid email. Please use your registered email address.");
+      return;
+    }
+    setEmailError("");
+    // Mark as permanently claimed for this user
+    if (userEmail) localStorage.setItem(`ws_coupon_claimed_${userEmail}`, "1");
     setClaimed(true);
   };
 
@@ -2252,13 +2402,15 @@ function PromoModal({ show, onClose, onShop }) {
             <input
               type="email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={e => { setEmail(e.target.value); setEmailError(""); }}
               placeholder="Email address"
-              style={{ width:"100%", padding:"13px 16px", border:"1.5px solid #e5e5e5", borderRadius:10, fontSize:"0.9rem", color:T.text, outline:"none", boxSizing:"border-box", marginBottom:"0.9rem", fontFamily:"'Inter',sans-serif" }}
-              onFocus={e => e.target.style.borderColor=T.orange}
-              onBlur={e => e.target.style.borderColor="#e5e5e5"}
+              style={{ width:"100%", padding:"13px 16px", border:`1.5px solid ${emailError ? "#c0392b" : "#e5e5e5"}`, borderRadius:10, fontSize:"0.9rem", color:T.text, outline:"none", boxSizing:"border-box", marginBottom:"0.4rem", fontFamily:"'Inter',sans-serif" }}
+              onFocus={e => e.target.style.borderColor=emailError?"#c0392b":T.orange}
+              onBlur={e => e.target.style.borderColor=emailError?"#c0392b":"#e5e5e5"}
               onKeyDown={e => e.key==="Enter" && handleClaim()}
             />
+            {emailError && <p style={{ fontSize:"0.72rem", color:"#c0392b", marginBottom:"0.7rem", textAlign:"left" }}>{emailError}</p>}
+            {!emailError && <div style={{ marginBottom:"0.5rem" }} />}
             <button onClick={handleClaim} style={{ width:"100%", padding:"14px", background:T.text, color:"#fff", border:"none", borderRadius:10, fontSize:"0.9rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", letterSpacing:"0.04em", transition:"background 0.2s" }}
               onMouseEnter={e => e.currentTarget.style.background=T.orange}
               onMouseLeave={e => e.currentTarget.style.background=T.text}>
@@ -2291,11 +2443,100 @@ function PromoModal({ show, onClose, onShop }) {
   );
 }
 // ─── PRODUCT PAGE WRAPPER (reads :id from URL) ────────────────
-function ProductPageWrapper({ onAdd, onWish, wished, cart, onShop }) {
+function ProductPageWrapper({ onAdd, onAddAnim, onWish, wished, cart, onShop }) {
   const { id } = useParams();
   const product = PRODUCTS.find(p => p.id === parseInt(id));
   if (!product) return <Navigate to="/shop" replace />;
-  return <ProductPage product={product} onAdd={onAdd} onWish={onWish} wished={wished} cart={cart} onShop={onShop} />;
+  return <ProductPage product={product} onAdd={onAdd} onAddAnim={onAddAnim} onWish={onWish} wished={wished} cart={cart} onShop={onShop} />;
+}
+
+// ─── FLY CART PARTICLE — spectacular burst animation to cart icon ──
+function FlyCartParticle({ startX, startY, endX, endY }) {
+  const dx = endX - startX;
+  const dy = endY - startY;
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      const btn = document.getElementById("cart-nav-btn") || document.getElementById("cart-nav-desktop");
+      if (btn) {
+        btn.style.animation = "cartIconPop 0.5s cubic-bezier(0.34,1.56,0.64,1)";
+        setTimeout(() => { btn.style.animation = ""; }, 500);
+      }
+    }, 700);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Spark particles — 8 colorful sparks burst from origin
+  const sparks = [
+    { sx:-32, sy:-28, sr:"-40deg", color:"#E8720C", emoji:"✦" },
+    { sx: 32, sy:-28, sr: "40deg", color:"#FF9A3C", emoji:"✦" },
+    { sx:-38, sy:  4, sr:"-60deg", color:"#C45E00", emoji:"◆" },
+    { sx: 38, sy:  4, sr: "60deg", color:"#FFB347", emoji:"◆" },
+    { sx: -8, sy:-40, sr:"-15deg", color:"#E8720C", emoji:"★" },
+    { sx:  8, sy:-40, sr: "15deg", color:"#FF9A3C", emoji:"★" },
+    { sx:-22, sy: 30, sr:"-35deg", color:"#C45E00", emoji:"✦" },
+    { sx: 22, sy: 30, sr: "35deg", color:"#FFB347", emoji:"✦" },
+  ];
+
+  // Gem trail — 3 gems following the main particle
+  const gems = [
+    { gx: dx * 0.3 + 20,  gy: dy * 0.3 - 40, delay:"0.05s", emoji:"💎" },
+    { gx: dx * 0.6 - 15,  gy: dy * 0.6 - 25, delay:"0.12s", emoji:"✨" },
+    { gx: dx * 0.85 + 8,  gy: dy * 0.85 - 10, delay:"0.2s", emoji:"⭐" },
+  ];
+
+  return (
+    <>
+      {/* Expanding ring at origin */}
+      <div style={{
+        position:"fixed", left:startX, top:startY,
+        width:40, height:40, borderRadius:"50%",
+        border:"2.5px solid #E8720C",
+        zIndex:99998, pointerEvents:"none",
+        animation:"ringExpand 0.55s ease-out forwards",
+      }} />
+      <div style={{
+        position:"fixed", left:startX, top:startY,
+        width:24, height:24, borderRadius:"50%",
+        border:"2px solid #FF9A3C",
+        zIndex:99998, pointerEvents:"none",
+        animation:"ringExpand 0.45s ease-out 0.06s forwards",
+      }} />
+
+      {/* Spark burst */}
+      {sparks.map((s, i) => (
+        <div key={i} style={{
+          position:"fixed", left:startX, top:startY,
+          fontSize:11, color:s.color,
+          zIndex:99999, pointerEvents:"none",
+          animation:`sparkBurst 0.6s ease-out ${i * 0.03}s forwards`,
+          "--sx":`${s.sx}px`, "--sy":`${s.sy}px`, "--sr":s.sr,
+        }}>{s.emoji}</div>
+      ))}
+
+      {/* Gem trail */}
+      {gems.map((g, i) => (
+        <div key={i} style={{
+          position:"fixed", left:startX - 10, top:startY - 10,
+          fontSize:16, zIndex:99998, pointerEvents:"none",
+          animation:`gemFly 0.75s cubic-bezier(0.25,0.46,0.45,0.94) ${g.delay} forwards`,
+          "--gx":`${g.gx}px`, "--gy":`${g.gy}px`,
+          filter:"drop-shadow(0 2px 8px rgba(232,114,12,0.7))",
+        }}>{g.emoji}</div>
+      ))}
+
+      {/* Main flying particle — glowing orb */}
+      <div style={{
+        position:"fixed", left:startX - 14, top:startY - 14,
+        width:28, height:28, borderRadius:"50%",
+        background:"radial-gradient(circle, #FFB347 0%, #E8720C 60%, #C45E00 100%)",
+        zIndex:99999, pointerEvents:"none",
+        animation:"flyBucket 0.75s cubic-bezier(0.25,0.46,0.45,0.94) forwards",
+        "--dx":`${dx}px`, "--dy":`${dy}px`,
+        boxShadow:"0 0 16px 4px rgba(232,114,12,0.7), 0 0 32px 8px rgba(232,114,12,0.3)",
+      }} />
+    </>
+  );
 }
 
 // ─── FLY PARTICLE — heart flies from product to wishlist icon ──
@@ -2441,7 +2682,17 @@ function AppInner() {
     }
   }, [orders, user]);
 
-  useEffect(() => { const t = setTimeout(() => setShowModal(true), 5000); return () => clearTimeout(t); }, []);
+  useEffect(() => { 
+    if (!user) return;
+    // Per-user key — never show again once claimed
+    const claimedKey = `ws_coupon_claimed_${user.email||"guest"}`;
+    const shownKey   = `ws_coupon_shown_${user.email||"guest"}`;
+    if (localStorage.getItem(claimedKey) || localStorage.getItem(shownKey)) return;
+    // Mark as shown for this user so it never auto-opens again
+    localStorage.setItem(shownKey, "1");
+    const t = setTimeout(() => setShowModal(true), 2000);
+    return () => clearTimeout(t);
+  }, [user?.email]);
 
   const addToCart = p => {
     if (p.qty === -1) {
@@ -2468,6 +2719,21 @@ function AppInner() {
     const pid = Date.now();
     setFlyParticles(p => [...p, { id: pid, startX, startY, endX, endY }]);
     setTimeout(() => setFlyParticles(p => p.filter(x => x.id !== pid)), 1500);
+  };
+
+  // Flying bucket animation from click position to cart icon
+  const [flyCartParticles, setFlyCartParticles] = useState([]);
+  const flyToCart = (e, product) => {
+    addToCart(product);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const startX = rect.left + rect.width / 2;
+    const startY = rect.top + rect.height / 2;
+    const cartBtn = document.getElementById("cart-nav-btn") || document.getElementById("cart-nav-desktop");
+    const endX = cartBtn ? cartBtn.getBoundingClientRect().left + 11 : window.innerWidth - 120;
+    const endY = cartBtn ? cartBtn.getBoundingClientRect().top + 11 : 32;
+    const pid = Date.now() + Math.random();
+    setFlyCartParticles(p => [...p, { id: pid, startX, startY, endX, endY }]);
+    setTimeout(() => setFlyCartParticles(p => p.filter(x => x.id !== pid)), 1200);
   };
   const updateQty = (id,delta) => setCart(c => c.map(i=>i.id===id?{...i,qty:Math.max(0,i.qty+delta)}:i).filter(i=>i.qty>0));
   const removeFromCart = id => setCart(c => c.filter(i=>i.id!==id));
@@ -2585,12 +2851,12 @@ function AppInner() {
       <Header cartCount={cartCount} wishCount={wished.length} onNav={nav} currentPage={currentPage} user={user} onLogout={handleLogout} />
       <Routes>
         <Route path="/" element={<HomePage onShop={()=>nav("products")} onRitual={()=>nav("rituals")} onNav={nav} />} />
-        <Route path="/shop" element={<ProductsPage onAdd={addToCart} onWish={flyToWishlist} wished={wished} onClick={goToProduct} cart={cart} />} />
-        <Route path="/product/:id" element={<ProductPageWrapper onAdd={addToCart} onWish={flyToWishlist} wished={wished} cart={cart} onShop={()=>nav("products")} />} />
+        <Route path="/shop" element={<ProductsPage onAdd={addToCart} onAddAnim={flyToCart} onWish={flyToWishlist} wished={wished} onClick={goToProduct} cart={cart} />} />
+        <Route path="/product/:id" element={<ProductPageWrapper onAdd={addToCart} onAddAnim={flyToCart} onWish={flyToWishlist} wished={wished} cart={cart} onShop={()=>nav("products")} />} />
         <Route path="/rituals" element={<RitualsPage />} />
         <Route path="/benefits" element={<BenefitsPage />} />
         <Route path="/stories" element={<StoriesPage />} />
-        <Route path="/cart" element={<CartPage cart={cart} onQty={updateQty} onRemove={removeFromCart} onCheckout={()=>nav("checkout")} />} />
+        <Route path="/cart" element={<CartPage cart={cart} onQty={updateQty} onRemove={removeFromCart} onCheckout={()=>nav("checkout")} onProductClick={p => navigate("/product/" + p.id)} />} />
         <Route path="/checkout" element={<CheckoutPage cart={cart} onPlaceOrder={handlePlaceOrder} />} />
         <Route path="/wishlist" element={<WishlistPage ids={wished} onAdd={addToCart} onWish={toggleWish} onClick={goToProduct} />} />
         <Route path="/login" element={<LoginPage onLogin={handleLogin} onSwitch={()=>navigate("/signup")} />} />
@@ -2600,13 +2866,18 @@ function AppInner() {
       </Routes>
       {!isAuthPage && <Footer />}
       {/* ── Promo Modal ── */}
-      <PromoModal show={showModal} onClose={() => setShowModal(false)} onShop={() => { setShowModal(false); nav("products"); }} />
+      <PromoModal show={showModal} onClose={() => setShowModal(false)} onShop={() => { setShowModal(false); nav("products"); }} userEmail={user?.email} />
       {/* ── Order Confirm Modal ── */}
       {orderConfirm && <OrderConfirmModal order={orderConfirm} onClose={() => { setOrderConfirm(null); nav("dashboard"); }} />}
 
       {/* ── Flying Wishlist Particles ── */}
       {flyParticles.map(p => (
         <FlyParticle key={p.id} startX={p.startX} startY={p.startY} endX={p.endX} endY={p.endY} />
+      ))}
+
+      {/* ── Flying Cart Bucket Particles ── */}
+      {flyCartParticles.map(p => (
+        <FlyCartParticle key={p.id} startX={p.startX} startY={p.startY} endX={p.endX} endY={p.endY} />
       ))}
     </div>
   );
