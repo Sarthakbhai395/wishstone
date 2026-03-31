@@ -2405,6 +2405,34 @@ function AppInner() {
     }
   }, []);
 
+  // Periodically verify user still exists in backend — auto-logout if deleted by admin
+  useEffect(() => {
+    const checkUserExists = async () => {
+      const token = localStorage.getItem("ws_token");
+      if (!token || token.startsWith("local_") || token.startsWith("google_")) return;
+      try {
+        const API = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), 5000);
+        const res = await fetch(`${API}/api/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+          signal: controller.signal,
+        });
+        if (!res.ok) {
+          // User deleted or token invalid — force logout
+          setUser(null); setOrders([]); setCart([]); setWished([]);
+          localStorage.removeItem("ws_token"); localStorage.removeItem("ws_user");
+          navigate("/login");
+        }
+      } catch(e) { /* network error — ignore, don't logout */ }
+    };
+    if (user) {
+      checkUserExists();
+      const interval = setInterval(checkUserExists, 30000); // check every 30s
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
   // Save orders under user-specific key
   useEffect(() => {
     if (user) {
