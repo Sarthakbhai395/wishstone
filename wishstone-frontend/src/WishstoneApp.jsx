@@ -115,6 +115,20 @@ const GLOBAL_CSS = `
   @keyframes badgeFloat2{0%,100%{transform:translateY(0px)}50%{transform:translateY(-10px)}}
   @keyframes badgeFloat3{0%,100%{transform:translateY(0px)}50%{transform:translateY(-6px)}}
   @keyframes videoSlide{from{transform:translateX(0)}to{transform:translateX(calc(-220px * 4 - 1rem * 4))}}
+  @keyframes wishJump{
+    0%{transform:scale(1) translateY(0);}
+    20%{transform:scale(1.35) translateY(-8px);}
+    40%{transform:scale(0.9) translateY(0);}
+    60%{transform:scale(1.15) translateY(-4px);}
+    80%{transform:scale(0.97) translateY(0);}
+    100%{transform:scale(1) translateY(0);}
+  }
+  @keyframes flyHeart{
+    0%  { transform:translate(0,0) scale(1);   opacity:1; }
+    30% { transform:translate(calc(var(--dx)*0.3), calc(var(--dy)*0.3 - 40px)) scale(1.3); opacity:1; }
+    70% { transform:translate(calc(var(--dx)*0.75), calc(var(--dy)*0.75 - 20px)) scale(0.9); opacity:0.9; }
+    100%{ transform:translate(var(--dx), var(--dy)) scale(0.4); opacity:0; }
+  }
   .nav-link{background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#1a1a1a;padding:4px 0;transition:color 0.2s;}
   .nav-link:hover,.nav-link.active{color:#E8720C;}
   .prod-card{background:#fff;border-radius:14px;overflow:hidden;border:1px solid rgba(26,26,26,0.08);transition:all 0.3s;cursor:pointer;}
@@ -210,12 +224,24 @@ const GLOBAL_CSS = `
 function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [wishAnim, setWishAnim] = useState(false);
+  const prevWishCount = useRef(wishCount);
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", fn);
     return () => window.removeEventListener("scroll", fn);
   }, []);
+
+  // Trigger jump animation when wishCount increases
+  useEffect(() => {
+    if (wishCount > prevWishCount.current) {
+      setWishAnim(true);
+      const t = setTimeout(() => setWishAnim(false), 600);
+      return () => clearTimeout(t);
+    }
+    prevWishCount.current = wishCount;
+  }, [wishCount]);
 
   const links = [["products","Shop"],["rituals","The Ritual"],["benefits","Benefits"],["stories","Stories"]];
   const navTo = (k) => { onNav(k); setMobileOpen(false); };
@@ -252,13 +278,13 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
 
         <div style={{ display:"flex", alignItems:"center", gap:"0.7rem" }}>
           {/* Wishlist icon — black default, red when items exist */}
-          <button onClick={() => navTo("wishlist")} style={{ background:"none", border:"none", cursor:"pointer", position:"relative", padding:"6px", display:"flex", alignItems:"center", justifyContent:"center", borderRadius:8, transition:"background 0.2s" }}
+          <button id="wishlist-nav-btn" onClick={() => navTo("wishlist")} style={{ background:"none", border:"none", cursor:"pointer", position:"relative", padding:"6px", display:"flex", alignItems:"center", justifyContent:"center", borderRadius:8, transition:"background 0.2s" }}
             onMouseEnter={e => e.currentTarget.style.background="rgba(0,0,0,0.06)"}
             onMouseLeave={e => e.currentTarget.style.background="none"}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill={wishCount > 0 ? "#e53e3e" : "none"} stroke={wishCount > 0 ? "#e53e3e" : "#1a1a1a"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition:"all 0.25s ease", display:"block" }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill={wishCount > 0 ? "#e53e3e" : "none"} stroke={wishCount > 0 ? "#e53e3e" : "#1a1a1a"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition:"all 0.25s ease", display:"block", animation: wishAnim ? "wishJump 0.6s cubic-bezier(0.36,0.07,0.19,0.97)" : "none" }}>
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
             </svg>
-            {wishCount > 0 && <span style={{ position:"absolute", top:0, right:0, background:"#e53e3e", color:"#fff", borderRadius:"50%", width:15, height:15, fontSize:"0.52rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700 }}>{wishCount}</span>}
+            {wishCount > 0 && <span style={{ position:"absolute", top:0, right:0, background:"#1a1a1a", color:"#fff", borderRadius:"50%", width:15, height:15, fontSize:"0.52rem", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700 }}>{wishCount}</span>}
           </button>
 
           {/* Cart icon mobile — black */}
@@ -990,7 +1016,7 @@ function ProductsPage({ onAdd, onWish, wished, onClick, cart }) {
                     onMouseEnter={e => e.currentTarget.style.transform="scale(1.06)"}
                     onMouseLeave={e => e.currentTarget.style.transform="scale(1)"} />
                   <div style={{ position:"absolute", top:10, left:10, background:T.orange, color:"#fff", borderRadius:4, padding:"3px 10px", fontSize:"0.65rem", fontWeight:800 }}>-{p.discount}%</div>
-                  <button onClick={e => { e.stopPropagation(); onWish(p.id); }} style={{ position:"absolute", top:8, right:8, background:"rgba(255,255,255,0.9)", border:"none", borderRadius:"50%", width:32, height:32, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:14, transition:"transform 0.2s" }}
+                  <button onClick={e => { e.stopPropagation(); onWish(e, p.id); }} style={{ position:"absolute", top:8, right:8, background:"rgba(255,255,255,0.9)", border:"none", borderRadius:"50%", width:32, height:32, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:14, transition:"transform 0.2s" }}
                     onMouseEnter={e => e.currentTarget.style.transform="scale(1.15)"} onMouseLeave={e => e.currentTarget.style.transform="scale(1)"}
                   >{wished.includes(p.id) ? "❤️" : "🤍"}</button>
                   {p.bestSeller && <div style={{ position:"absolute", bottom:8, left:8, background:T.bgDark, color:T.orange, borderRadius:4, padding:"2px 8px", fontSize:"0.6rem", fontWeight:700, letterSpacing:"0.08em" }}>BEST SELLER</div>}
@@ -1076,7 +1102,7 @@ function ProductPage({ product: p, onAdd, onWish, wished, cart, onShop }) {
               <button className="btn-orange" onClick={() => { for(let i=0;i<qty;i++) onAdd(p); }} style={{ flex:1, padding:"12px", fontSize:"0.8rem", borderRadius:8 }}>
                 Add to Cart {cartQty > 0 && <span style={{ background:"rgba(255,255,255,0.25)", borderRadius:10, padding:"1px 7px", marginLeft:6, fontSize:"0.72rem" }}>{cartQty} in cart</span>}
               </button>
-              <button onClick={() => onWish(p.id)} style={{ width:44, height:44, borderRadius:8, border:`1.5px solid ${T.border}`, background:"#fff", cursor:"pointer", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center" }}>{wished.includes(p.id) ? "❤️" : "🤍"}</button>
+              <button onClick={e => onWish(e, p.id)} style={{ width:44, height:44, borderRadius:8, border:`1.5px solid ${T.border}`, background:"#fff", cursor:"pointer", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center" }}>{wished.includes(p.id) ? "❤️" : "🤍"}</button>
             </div>
             <div style={{ display:"flex", gap:"1.2rem", flexWrap:"wrap" }}>
               {["Free shipping above Rs.999","7-day returns","100% natural"].map(f => (
@@ -2213,6 +2239,32 @@ function ProductPageWrapper({ onAdd, onWish, wished, cart, onShop }) {
   return <ProductPage product={product} onAdd={onAdd} onWish={onWish} wished={wished} cart={cart} onShop={onShop} />;
 }
 
+// ─── FLY PARTICLE — heart flies from product to wishlist icon ──
+function FlyParticle({ startX, startY, endX, endY }) {
+  const dx = endX - startX;
+  const dy = endY - startY;
+  const style = {
+    position: "fixed",
+    left: startX,
+    top: startY,
+    width: 22,
+    height: 22,
+    borderRadius: "50%",
+    background: "linear-gradient(135deg,#e53e3e,#ff6b6b)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: 13,
+    zIndex: 99999,
+    pointerEvents: "none",
+    boxShadow: "0 4px 16px rgba(229,62,62,0.5)",
+    animation: "flyHeart 0.65s cubic-bezier(0.25,0.46,0.45,0.94) forwards",
+    "--dx": `${dx}px`,
+    "--dy": `${dy}px`,
+  };
+  return <div style={style}>❤️</div>;
+}
+
 // ─── SCROLL TO TOP ON ROUTE CHANGE ────────────────────────────
 // v2.1 - routing fix
 function ScrollToTop() {
@@ -2250,6 +2302,24 @@ function AppInner() {
     }
   };
   const toggleWish = id => setWished(w => w.includes(id)?w.filter(x=>x!==id):[...w,id]);
+
+  // Flying heart animation from click position to wishlist icon
+  const [flyParticles, setFlyParticles] = useState([]);
+  const flyToWishlist = (e, id) => {
+    // Only animate when adding (not removing)
+    if (wished.includes(id)) { toggleWish(id); return; }
+    toggleWish(id);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const startX = rect.left + rect.width / 2;
+    const startY = rect.top + rect.height / 2;
+    // Find wishlist icon position (top-right area)
+    const wishBtn = document.getElementById("wishlist-nav-btn");
+    const endX = wishBtn ? wishBtn.getBoundingClientRect().left + 11 : window.innerWidth - 80;
+    const endY = wishBtn ? wishBtn.getBoundingClientRect().top + 11 : 32;
+    const pid = Date.now();
+    setFlyParticles(p => [...p, { id: pid, startX, startY, endX, endY }]);
+    setTimeout(() => setFlyParticles(p => p.filter(x => x.id !== pid)), 700);
+  };
   const updateQty = (id,delta) => setCart(c => c.map(i=>i.id===id?{...i,qty:Math.max(0,i.qty+delta)}:i).filter(i=>i.qty>0));
   const removeFromCart = id => setCart(c => c.filter(i=>i.id!==id));
   const handlePlaceOrder = data => {
@@ -2297,8 +2367,8 @@ function AppInner() {
       <Header cartCount={cartCount} wishCount={wished.length} onNav={nav} currentPage={currentPage} user={user} onLogout={handleLogout} />
       <Routes>
         <Route path="/" element={<HomePage onShop={()=>nav("products")} onRitual={()=>nav("rituals")} onNav={nav} />} />
-        <Route path="/shop" element={<ProductsPage onAdd={addToCart} onWish={toggleWish} wished={wished} onClick={goToProduct} cart={cart} />} />
-        <Route path="/product/:id" element={<ProductPageWrapper onAdd={addToCart} onWish={toggleWish} wished={wished} cart={cart} onShop={()=>nav("products")} />} />
+        <Route path="/shop" element={<ProductsPage onAdd={addToCart} onWish={flyToWishlist} wished={wished} onClick={goToProduct} cart={cart} />} />
+        <Route path="/product/:id" element={<ProductPageWrapper onAdd={addToCart} onWish={flyToWishlist} wished={wished} cart={cart} onShop={()=>nav("products")} />} />
         <Route path="/rituals" element={<RitualsPage />} />
         <Route path="/benefits" element={<BenefitsPage />} />
         <Route path="/stories" element={<StoriesPage />} />
@@ -2315,6 +2385,11 @@ function AppInner() {
       <PromoModal show={showModal} onClose={() => setShowModal(false)} onShop={() => { setShowModal(false); nav("products"); }} />
       {/* ── Order Confirm Modal ── */}
       {orderConfirm && <OrderConfirmModal order={orderConfirm} onClose={() => { setOrderConfirm(null); nav("dashboard"); }} />}
+
+      {/* ── Flying Wishlist Particles ── */}
+      {flyParticles.map(p => (
+        <FlyParticle key={p.id} startX={p.startX} startY={p.startY} endX={p.endX} endY={p.endY} />
+      ))}
     </div>
   );
 }
