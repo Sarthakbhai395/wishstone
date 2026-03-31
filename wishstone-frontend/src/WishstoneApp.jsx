@@ -124,10 +124,27 @@ const GLOBAL_CSS = `
     100%{transform:scale(1) translateY(0);}
   }
   @keyframes flyHeart{
-    0%  { transform:translate(0,0) scale(1);   opacity:1; }
-    30% { transform:translate(calc(var(--dx)*0.3), calc(var(--dy)*0.3 - 40px)) scale(1.3); opacity:1; }
-    70% { transform:translate(calc(var(--dx)*0.75), calc(var(--dy)*0.75 - 20px)) scale(0.9); opacity:0.9; }
-    100%{ transform:translate(var(--dx), var(--dy)) scale(0.4); opacity:0; }
+    0%  { transform:translate(0,0) scale(1.2) rotate(-10deg); opacity:1; }
+    20% { transform:translate(calc(var(--dx)*0.15), calc(var(--dy)*0.1 - 80px)) scale(1.5) rotate(15deg); opacity:1; }
+    50% { transform:translate(calc(var(--dx)*0.5), calc(var(--dy)*0.4 - 60px)) scale(1.2) rotate(-5deg); opacity:1; }
+    80% { transform:translate(calc(var(--dx)*0.85), calc(var(--dy)*0.85 - 10px)) scale(0.8) rotate(5deg); opacity:0.9; }
+    100%{ transform:translate(var(--dx), var(--dy)) scale(0.2) rotate(0deg); opacity:0; }
+  }
+  @keyframes flyTrail{
+    0%  { transform:translate(0,0) scale(0.7); opacity:0.7; }
+    60% { transform:translate(calc(var(--dx)*0.5), calc(var(--dy)*0.4 - 40px)) scale(0.4); opacity:0.4; }
+    100%{ transform:translate(var(--dx), var(--dy)) scale(0.1); opacity:0; }
+  }
+  @keyframes burstPop{
+    0%  { transform:translate(-50%,-50%) scale(0) rotate(0deg); opacity:1; }
+    60% { transform:translate(calc(-50% + var(--bx)), calc(-50% + var(--by))) scale(1.2) rotate(var(--br)); opacity:0.9; }
+    100%{ transform:translate(calc(-50% + var(--bx)*1.8), calc(-50% + var(--by)*1.8)) scale(0); opacity:0; }
+  }
+  @keyframes wishIconPop{
+    0%  { transform:scale(1); }
+    40% { transform:scale(1.5) rotate(-8deg); }
+    70% { transform:scale(0.85) rotate(5deg); }
+    100%{ transform:scale(1) rotate(0deg); }
   }
   .nav-link{background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#1a1a1a;padding:4px 0;transition:color 0.2s;}
   .nav-link:hover,.nav-link.active{color:#E8720C;}
@@ -2240,29 +2257,75 @@ function ProductPageWrapper({ onAdd, onWish, wished, cart, onShop }) {
 }
 
 // ─── FLY PARTICLE — heart flies from product to wishlist icon ──
-function FlyParticle({ startX, startY, endX, endY }) {
+function FlyParticle({ startX, startY, endX, endY, onLand }) {
   const dx = endX - startX;
   const dy = endY - startY;
-  const style = {
-    position: "fixed",
-    left: startX,
-    top: startY,
-    width: 22,
-    height: 22,
-    borderRadius: "50%",
-    background: "linear-gradient(135deg,#e53e3e,#ff6b6b)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 13,
-    zIndex: 99999,
-    pointerEvents: "none",
-    boxShadow: "0 4px 16px rgba(229,62,62,0.5)",
-    animation: "flyHeart 0.65s cubic-bezier(0.25,0.46,0.45,0.94) forwards",
-    "--dx": `${dx}px`,
-    "--dy": `${dy}px`,
-  };
-  return <div style={style}>❤️</div>;
+
+  useEffect(() => {
+    // Trigger icon pop + burst when particle lands
+    const t = setTimeout(() => {
+      const btn = document.getElementById("wishlist-nav-btn");
+      if (btn) { btn.style.animation = "wishIconPop 0.45s cubic-bezier(0.36,0.07,0.19,0.97)"; setTimeout(() => { btn.style.animation = ""; }, 450); }
+      if (onLand) onLand();
+    }, 820);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Trail particles — 3 smaller hearts behind main
+  const trails = [
+    { delay: "0.08s", scale: 0.65, color: "#ff6b6b" },
+    { delay: "0.16s", scale: 0.45, color: "#ffa0a0" },
+    { delay: "0.24s", scale: 0.28, color: "#ffc0c0" },
+  ];
+
+  // Burst particles — 6 sparks on landing
+  const bursts = [
+    { bx:-28, by:-22, br:"-30deg", emoji:"✨" },
+    { bx: 28, by:-22, br: "30deg", emoji:"💫" },
+    { bx:-32, by:  8, br:"-50deg", emoji:"⭐" },
+    { bx: 32, by:  8, br: "50deg", emoji:"✨" },
+    { bx: -8, by:-34, br:"-10deg", emoji:"💫" },
+    { bx:  8, by:-34, br: "10deg", emoji:"⭐" },
+  ];
+
+  return (
+    <>
+      {/* Trail hearts */}
+      {trails.map((tr, i) => (
+        <div key={i} style={{
+          position:"fixed", left:startX, top:startY,
+          width:18, height:18, fontSize:12,
+          display:"flex", alignItems:"center", justifyContent:"center",
+          zIndex:99998, pointerEvents:"none",
+          animation:`flyTrail 0.9s cubic-bezier(0.25,0.46,0.45,0.94) ${tr.delay} forwards`,
+          "--dx":`${dx}px`, "--dy":`${dy}px`,
+          filter:`drop-shadow(0 2px 6px ${tr.color})`,
+        }}>❤️</div>
+      ))}
+
+      {/* Main flying heart */}
+      <div style={{
+        position:"fixed", left:startX - 14, top:startY - 14,
+        width:28, height:28, fontSize:20,
+        display:"flex", alignItems:"center", justifyContent:"center",
+        zIndex:99999, pointerEvents:"none",
+        animation:"flyHeart 0.85s cubic-bezier(0.25,0.46,0.45,0.94) forwards",
+        "--dx":`${dx}px`, "--dy":`${dy}px`,
+        filter:"drop-shadow(0 4px 12px rgba(229,62,62,0.8))",
+      }}>❤️</div>
+
+      {/* Burst sparks — appear at destination */}
+      {bursts.map((b, i) => (
+        <div key={i} style={{
+          position:"fixed", left:endX, top:endY,
+          fontSize:11, zIndex:99999, pointerEvents:"none",
+          animation:`burstPop 0.55s ease-out 0.78s forwards`,
+          "--bx":`${b.bx}px`, "--by":`${b.by}px`, "--br":b.br,
+          opacity:0,
+        }}>{b.emoji}</div>
+      ))}
+    </>
+  );
 }
 
 // ─── SCROLL TO TOP ON ROUTE CHANGE ────────────────────────────
@@ -2318,7 +2381,7 @@ function AppInner() {
     const endY = wishBtn ? wishBtn.getBoundingClientRect().top + 11 : 32;
     const pid = Date.now();
     setFlyParticles(p => [...p, { id: pid, startX, startY, endX, endY }]);
-    setTimeout(() => setFlyParticles(p => p.filter(x => x.id !== pid)), 700);
+    setTimeout(() => setFlyParticles(p => p.filter(x => x.id !== pid)), 1500);
   };
   const updateQty = (id,delta) => setCart(c => c.map(i=>i.id===id?{...i,qty:Math.max(0,i.qty+delta)}:i).filter(i=>i.qty>0));
   const removeFromCart = id => setCart(c => c.filter(i=>i.id!==id));
