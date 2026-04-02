@@ -146,35 +146,14 @@ const GLOBAL_CSS = `
     70% { transform:scale(0.85) rotate(5deg); }
     100%{ transform:scale(1) rotate(0deg); }
   }
-  @keyframes flyBucket{
-    0%  { transform:translate(0,0) scale(1.2); opacity:1; }
-    15% { transform:translate(calc(var(--dx)*0.08), calc(var(--dy)*0.05 - 90px)) scale(1.6); opacity:1; }
-    50% { transform:translate(calc(var(--dx)*0.5), calc(var(--dy)*0.4 - 60px)) scale(1.1); opacity:1; }
-    85% { transform:translate(calc(var(--dx)*0.9), calc(var(--dy)*0.9 - 10px)) scale(0.6); opacity:0.8; }
-    100%{ transform:translate(var(--dx), var(--dy)) scale(0.1); opacity:0; }
-  }
-  @keyframes cartIconPop{
-    0%  { transform:scale(1); }
-    30% { transform:scale(1.5) rotate(-8deg); }
-    60% { transform:scale(0.85) rotate(5deg); }
-    80% { transform:scale(1.15) rotate(-2deg); }
+  @keyframes cartIconAnim{
+    0%  { transform:scale(1) rotate(0deg); }
+    15% { transform:scale(1.4) rotate(-14deg); }
+    30% { transform:scale(1.25) rotate(10deg); }
+    50% { transform:scale(1.32) rotate(-8deg); }
+    65% { transform:scale(1.15) rotate(5deg); }
+    80% { transform:scale(1.08) rotate(-2deg); }
     100%{ transform:scale(1) rotate(0deg); }
-  }
-  @keyframes sparkBurst{
-    0%  { transform:translate(-50%,-50%) scale(0) rotate(0deg); opacity:1; }
-    50% { transform:translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(1.3) rotate(var(--sr)); opacity:1; }
-    100%{ transform:translate(calc(-50% + var(--sx)*2.2), calc(-50% + var(--sy)*2.2)) scale(0); opacity:0; }
-  }
-  @keyframes ringExpand{
-    0%  { transform:translate(-50%,-50%) scale(0); opacity:0.9; }
-    60% { transform:translate(-50%,-50%) scale(1.8); opacity:0.4; }
-    100%{ transform:translate(-50%,-50%) scale(2.8); opacity:0; }
-  }
-  @keyframes gemFly{
-    0%  { transform:translate(0,0) scale(1) rotate(0deg); opacity:1; }
-    20% { transform:translate(calc(var(--gx)*0.2), calc(var(--gy)*0.2 - 50px)) scale(1.4) rotate(120deg); opacity:1; }
-    60% { transform:translate(calc(var(--gx)*0.65), calc(var(--gy)*0.55 - 30px)) scale(1) rotate(240deg); opacity:0.9; }
-    100%{ transform:translate(var(--gx), var(--gy)) scale(0.2) rotate(360deg); opacity:0; }
   }
   @keyframes dashPageIn{
     from{opacity:0;transform:translateX(32px) scale(0.98);}
@@ -271,14 +250,31 @@ const GLOBAL_CSS = `
     .profile-info-grid{grid-template-columns:1fr !important;}
     .checkout-form-grid{grid-template-columns:1fr !important;}
   }
-`;
+  /* ── GLOBAL RESPONSIVE FIXES ── */
+  img{max-width:100%;}
+  *{box-sizing:border-box;}
+  @media(max-width:768px){
+    .max-w{padding-left:1rem !important;padding-right:1rem !important;}
+    h1,h2{word-break:break-word;}
+    .prod-detail-grid > div:first-child{margin-bottom:1rem;}
+    .prod-detail-grid .scroll-hide{flex-wrap:nowrap;}
+  }
+  @media(max-width:400px){
+    .prod-grid{grid-template-columns:1fr !important;}
+    .dashboard-stats{grid-template-columns:1fr 1fr !important;}
+    .footer-grid{grid-template-columns:1fr !important;}
+    .checkout-grid{grid-template-columns:1fr !important;}
+    .checkout-form-grid{grid-template-columns:1fr !important;}
+  }`;
 
 // ─── HEADER ───────────────────────────────────────────────────
 function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [wishAnim, setWishAnim] = useState(false);
+  const [cartAnim, setCartAnim] = useState(false);
   const prevWishCount = useRef(wishCount);
+  const prevCartCount = useRef(cartCount);
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 30);
@@ -286,7 +282,6 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
-  // Trigger jump animation when wishCount increases
   useEffect(() => {
     if (wishCount > prevWishCount.current) {
       setWishAnim(true);
@@ -295,6 +290,16 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
     }
     prevWishCount.current = wishCount;
   }, [wishCount]);
+
+  // Trigger cart icon animation when cartCount increases
+  useEffect(() => {
+    if (cartCount > prevCartCount.current) {
+      setCartAnim(true);
+      const t = setTimeout(() => setCartAnim(false), 700);
+      return () => clearTimeout(t);
+    }
+    prevCartCount.current = cartCount;
+  }, [cartCount]);
 
   const links = [["products","Shop"],["rituals","The Ritual"],["benefits","Benefits"],["stories","Stories"]];
   const navTo = (k) => { onNav(k); setMobileOpen(false); };
@@ -320,7 +325,7 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
           <button onClick={() => navTo("cart")} style={{ background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:6, fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.1em", textTransform:"uppercase", color:T.text, position:"relative", padding:"6px 4px", borderRadius:8, transition:"background 0.2s" }}
             onMouseEnter={e => e.currentTarget.style.background="rgba(0,0,0,0.05)"}
             onMouseLeave={e => e.currentTarget.style.background="none"}>
-            <svg id="cart-nav-desktop" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <svg id="cart-nav-desktop" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display:"block", animation: cartAnim ? "cartIconAnim 0.7s cubic-bezier(0.36,0.07,0.19,0.97)" : "none" }}>
               <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
@@ -344,7 +349,7 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
           <button id="cart-nav-btn" onClick={() => navTo("cart")} className="show-mobile-flex" style={{ display:"none", background:"none", border:"none", cursor:"pointer", position:"relative", padding:"6px", alignItems:"center", justifyContent:"center", borderRadius:8, transition:"background 0.2s" }}
             onMouseEnter={e => e.currentTarget.style.background="rgba(0,0,0,0.06)"}
             onMouseLeave={e => e.currentTarget.style.background="none"}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display:"block" }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display:"block", animation: cartAnim ? "cartIconAnim 0.7s cubic-bezier(0.36,0.07,0.19,0.97)" : "none" }}>
               <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
@@ -653,7 +658,7 @@ function PowersSection({ onNav }) {
               onMouseEnter={e => { e.currentTarget.style.transform="translateY(-5px)"; e.currentTarget.style.boxShadow="0 16px 48px rgba(232,114,12,0.12)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 4px 20px rgba(0,0,0,0.04)"; }}>
               <div style={{ position:"relative", height:200, overflow:"hidden" }}>
-                <img src={p.image} alt={p.title} style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.5s" }}
+                <img referrerPolicy="no-referrer" src={p.image} alt={p.title} style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.5s" }}
                   onMouseEnter={e => e.currentTarget.style.transform="scale(1.06)"}
                   onMouseLeave={e => e.currentTarget.style.transform="scale(1)"} />
                 <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,0.35), transparent)" }} />
@@ -917,7 +922,7 @@ function HomePage({ onShop, onRitual, onNav }) {
                   onMouseEnter={e => { e.currentTarget.style.transform="translateY(-5px)"; e.currentTarget.style.boxShadow="0 16px 40px rgba(0,0,0,0.1)"; }}
                   onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="none"; }}>
                   <div style={{ position:"relative", aspectRatio:"1", overflow:"hidden" }}>
-                    <img src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                    <img referrerPolicy="no-referrer" src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                     <div style={{ position:"absolute", top:8, left:8, background:T.orange, color:"#fff", borderRadius:4, padding:"2px 8px", fontSize:"0.6rem", fontWeight:800 }}>-{p.discount}%</div>
                     {p.bestSeller && <div style={{ position:"absolute", bottom:6, left:6, background:T.bgDark, color:T.orange, borderRadius:4, padding:"2px 7px", fontSize:"0.58rem", fontWeight:700 }}>BEST SELLER</div>}
                   </div>
@@ -1021,7 +1026,7 @@ function BestSellersStrip({ onShop }) {
               onMouseEnter={e => { e.currentTarget.style.transform="translateY(-5px)"; e.currentTarget.style.boxShadow="0 16px 40px rgba(0,0,0,0.1)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="none"; }}>
               <div style={{ position:"relative", aspectRatio:"1", overflow:"hidden" }}>
-                <img src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                <img referrerPolicy="no-referrer" src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                 <div style={{ position:"absolute", top:8, left:8, background:T.orange, color:"#fff", borderRadius:4, padding:"2px 8px", fontSize:"0.6rem", fontWeight:800 }}>-{p.discount}%</div>
                 {p.bestSeller && <div style={{ position:"absolute", bottom:6, left:6, background:T.bgDark, color:T.orange, borderRadius:4, padding:"2px 7px", fontSize:"0.58rem", fontWeight:700 }}>BEST SELLER</div>}
               </div>
@@ -1065,7 +1070,7 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
             return (
               <div key={p.id} className="prod-card" onClick={() => onClick(p)}>
                 <div style={{ position:"relative", aspectRatio:"4/3", overflow:"hidden" }}>
-                  <img src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.4s" }}
+                  <img referrerPolicy="no-referrer" src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.4s" }}
                     onMouseEnter={e => e.currentTarget.style.transform="scale(1.06)"}
                     onMouseLeave={e => e.currentTarget.style.transform="scale(1)"} />
                   <div style={{ position:"absolute", top:10, left:10, background:T.orange, color:"#fff", borderRadius:4, padding:"3px 10px", fontSize:"0.65rem", fontWeight:800 }}>-{p.discount}%</div>
@@ -1102,6 +1107,7 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
 }
 // ─── PRODUCT DETAIL ───────────────────────────────────────────
 function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onShop }) {
+  const navigate = useNavigate();
   const [tab, setTab] = useState("desc");
   const [activeImg, setActiveImg] = useState(0);
   const cartQty = cart ? cart.filter(i => i.id === p?.id).reduce((s,i) => s + i.qty, 0) : 0;
@@ -1120,12 +1126,12 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"3rem", alignItems:"start" }} className="prod-detail-grid">
           <div>
             <div style={{ borderRadius:16, overflow:"hidden", boxShadow:"0 8px 40px rgba(0,0,0,0.1)", marginBottom:"0.9rem", aspectRatio:"1", background:"#f0ece4" }}>
-              <img src={imgs[activeImg]} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover", transition:"opacity 0.3s" }} />
+              <img referrerPolicy="no-referrer" src={imgs[activeImg]} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover", transition:"opacity 0.3s" }} />
             </div>
             <div style={{ display:"flex", gap:"0.6rem", overflowX:"auto" }} className="scroll-hide">
               {imgs.map((img, i) => (
                 <button key={i} onClick={() => setActiveImg(i)} style={{ flexShrink:0, width:72, height:72, borderRadius:10, overflow:"hidden", padding:0, border:`2.5px solid ${activeImg===i ? T.orange : "transparent"}`, cursor:"pointer", transition:"border-color 0.2s", boxShadow: activeImg===i ? `0 0 0 1px ${T.orange}` : "0 2px 8px rgba(0,0,0,0.08)" }}>
-                  <img src={img} alt={`view ${i+1}`} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                  <img referrerPolicy="no-referrer" src={img} alt={`view ${i+1}`} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                 </button>
               ))}
             </div>
@@ -1156,7 +1162,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                 <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.orange}`, borderRadius:8, overflow:"hidden" }}>
                   <button onClick={handleDec} style={{ width:36, height:40, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.orange, fontWeight:700 }}>−</button>
                   <span style={{ width:40, textAlign:"center", fontWeight:800, color:T.orange, fontSize:"1rem" }}>{cartQty}</span>
-                  <button onClick={handleAdd} style={{ width:36, height:40, background:T.orange, border:"none", cursor:"pointer", fontSize:18, color:"#fff", fontWeight:700 }}>+</button>
+                  <button onClick={handleAdd} disabled={cartQty>=10} style={{ width:36, height:40, background: cartQty>=10 ? "#e5e7eb" : T.orange, border:"none", cursor: cartQty>=10 ? "not-allowed" : "pointer", fontSize:18, color:"#fff", fontWeight:700 }}>+</button>
                 </div>
               ) : (
                 <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.border}`, borderRadius:8, overflow:"hidden" }}>
@@ -1165,8 +1171,8 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                   <button style={{ width:36, height:40, background:"none", border:"none", cursor:"default", fontSize:18, color:T.textMid, opacity:0.4 }}>+</button>
                 </div>
               )}
-              <button className="btn-orange" onClick={handleAdd} style={{ flex:1, padding:"12px", fontSize:"0.8rem", borderRadius:8 }}>
-                {cartQty > 0 ? `Add More  (${cartQty} in cart)` : "Add to Cart"}
+              <button className="btn-orange" onClick={handleAdd} disabled={cartQty>=10} style={{ flex:1, padding:"12px", fontSize:"0.8rem", borderRadius:8, opacity: cartQty>=10 ? 0.5 : 1, cursor: cartQty>=10 ? "not-allowed" : "pointer" }}>
+                {cartQty >= 10 ? "Max 10 reached" : cartQty > 0 ? `Add More (${cartQty}/10)` : "Add to Cart"}
               </button>
               <button onClick={e => onWish(e, p.id)} style={{ width:44, height:44, borderRadius:8, border:`1.5px solid ${T.border}`, background:"#fff", cursor:"pointer", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center" }}>{wished.includes(p.id) ? "❤️" : "🤍"}</button>
             </div>
@@ -1183,28 +1189,38 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
     </div>
     <BestSellersStrip onShop={onShop} />
     {/* Sticky Add to Cart Bar */}
-    <div style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:999, background:"rgba(255,255,255,0.98)", backdropFilter:"blur(14px)", borderTop:`1.5px solid ${T.border}`, padding:"clamp(10px,2vw,16px) clamp(1rem,4vw,2.5rem)", display:"flex", alignItems:"center", gap:"clamp(0.6rem,2vw,1.2rem)", boxShadow:"0 -4px 24px rgba(0,0,0,0.1)" }}>
-      <div style={{ flex:1, minWidth:0 }}>
-        <div style={{ fontSize:"clamp(0.78rem,1.5vw,0.9rem)", fontWeight:700, color:T.text, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", lineHeight:1.3 }}>{p.name}</div>
-        <div style={{ fontSize:"clamp(0.9rem,2vw,1.05rem)", color:T.orange, fontWeight:800, lineHeight:1.3 }}>Rs.{p.price.toLocaleString()}</div>
-      </div>
+    <div style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:999, background:"rgba(255,255,255,0.98)", backdropFilter:"blur(14px)", borderTop:`1.5px solid ${T.border}`, padding:"clamp(10px,2vw,14px) clamp(1rem,4vw,2.5rem)", display:"flex", alignItems:"center", gap:"clamp(0.6rem,2vw,1rem)", boxShadow:"0 -4px 24px rgba(0,0,0,0.1)" }}>
       {cartQty > 0 ? (
-        <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.orange}`, borderRadius:9, overflow:"hidden", flexShrink:0, height:"clamp(38px,5vw,46px)" }}>
-          <button onClick={handleDec} style={{ width:"clamp(32px,4vw,42px)", height:"clamp(38px,5vw,46px)", background:"none", border:"none", cursor:"pointer", fontSize:"clamp(15px,2vw,18px)", color:T.orange, fontWeight:700, lineHeight:1 }}>−</button>
-          <span style={{ width:"clamp(30px,3vw,38px)", textAlign:"center", fontWeight:800, color:T.orange, fontSize:"clamp(0.88rem,1.5vw,1rem)" }}>{cartQty}</span>
-          <button onClick={handleAdd} style={{ width:"clamp(32px,4vw,42px)", height:"clamp(38px,5vw,46px)", background:T.orange, border:"none", cursor:"pointer", fontSize:"clamp(15px,2vw,18px)", color:"#fff", fontWeight:700, lineHeight:1 }}>+</button>
-        </div>
+        <>
+          {/* qty counter */}
+          <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.orange}`, borderRadius:9, overflow:"hidden", flexShrink:0, height:46 }}>
+            <button onClick={handleDec} style={{ width:40, height:46, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.orange, fontWeight:700, lineHeight:1 }}>−</button>
+            <span style={{ width:36, textAlign:"center", fontWeight:800, color:T.orange, fontSize:"1rem" }}>{cartQty}</span>
+            <button onClick={handleAdd} disabled={cartQty>=10} style={{ width:40, height:46, background: cartQty>=10 ? "#e5e7eb" : T.orange, border:"none", cursor: cartQty>=10 ? "not-allowed" : "pointer", fontSize:18, color:"#fff", fontWeight:700, lineHeight:1 }}>+</button>
+          </div>
+          {/* View Cart — full remaining width */}
+          <button onClick={() => navigate("/cart")} style={{ flex:1, height:46, background:`linear-gradient(135deg,${T.bgDark},#1a1a1a)`, color:"#fff", border:"none", borderRadius:9, fontSize:"clamp(0.82rem,2vw,0.95rem)", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", letterSpacing:"0.04em", display:"flex", alignItems:"center", justifyContent:"center", gap:8, transition:"all 0.25s", boxShadow:"0 4px 18px rgba(0,0,0,0.18)", animation:"stickyBtnIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both" }}
+            onMouseEnter={e => e.currentTarget.style.background=`linear-gradient(135deg,${T.orangeD},${T.orange})`}
+            onMouseLeave={e => e.currentTarget.style.background=`linear-gradient(135deg,${T.bgDark},#1a1a1a)`}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            View Cart ({cartQty})
+          </button>
+        </>
       ) : (
-        <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.border}`, borderRadius:9, overflow:"hidden", flexShrink:0, height:"clamp(38px,5vw,46px)" }}>
-          <button style={{ width:"clamp(32px,4vw,42px)", height:"clamp(38px,5vw,46px)", background:"none", border:"none", cursor:"default", fontSize:"clamp(15px,2vw,18px)", color:T.textMid, opacity:0.4, lineHeight:1 }}>−</button>
-          <span style={{ width:"clamp(30px,3vw,38px)", textAlign:"center", fontWeight:700, color:T.text, fontSize:"clamp(0.88rem,1.5vw,1rem)" }}>0</span>
-          <button style={{ width:"clamp(32px,4vw,42px)", height:"clamp(38px,5vw,46px)", background:"none", border:"none", cursor:"default", fontSize:"clamp(15px,2vw,18px)", color:T.textMid, opacity:0.4, lineHeight:1 }}>+</button>
-        </div>
+        /* Add to Cart — full width */
+        <button className="btn-orange" onClick={handleAdd} style={{ flex:1, height:46, fontSize:"clamp(0.82rem,2vw,0.95rem)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", gap:8, transition:"all 0.25s", animation:"stickyBtnIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both" }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          </svg>
+          Add to Cart
+        </button>
       )}
-      <button className="btn-orange" onClick={handleAdd} style={{ padding:"clamp(9px,1.5vw,13px) clamp(18px,3vw,28px)", fontSize:"clamp(0.8rem,1.5vw,0.92rem)", borderRadius:9, flexShrink:0, height:"clamp(38px,5vw,46px)", whiteSpace:"nowrap" }}>
-        {cartQty > 0 ? `Add More (${cartQty})` : "Add to Cart"}
-      </button>
     </div>
+    <style>{`@keyframes stickyBtnIn{from{opacity:0;transform:scale(0.94) translateY(4px);}to{opacity:1;transform:scale(1) translateY(0);}}`}</style>
     </>
   );
 }
@@ -1330,7 +1346,7 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick }) {
           <div>
             {cart.map(item => (
               <div key={item.id} style={{ background:"#fff", borderRadius:12, padding:"1.2rem", marginBottom:"1rem", display:"flex", gap:"1rem", alignItems:"center", border:`1px solid ${T.border}` }}>
-                <img src={item.image} alt={item.name} onClick={() => onProductClick && onProductClick(item)} style={{ width:76, height:76, objectFit:"cover", borderRadius:8, flexShrink:0, cursor: onProductClick ? "pointer" : "default", transition:"opacity 0.2s" }}
+                <img referrerPolicy="no-referrer" src={item.image} alt={item.name} onClick={() => onProductClick && onProductClick(item)} style={{ width:76, height:76, objectFit:"cover", borderRadius:8, flexShrink:0, cursor: onProductClick ? "pointer" : "default", transition:"opacity 0.2s" }}
                   onMouseEnter={e => { if(onProductClick) e.currentTarget.style.opacity="0.8"; }}
                   onMouseLeave={e => e.currentTarget.style.opacity="1"} />
                 <div style={{ flex:1 }}>
@@ -1489,7 +1505,7 @@ function CheckoutPage({ cart, onPlaceOrder }) {
                   onMouseEnter={e => e.currentTarget.style.background="rgba(232,114,12,0.05)"}
                   onMouseLeave={e => e.currentTarget.style.background="transparent"}>
                   <div style={{ width:48, height:48, borderRadius:8, overflow:"hidden", flexShrink:0, border:`1px solid ${T.border}` }}>
-                    <img src={prod?.image || i.image || ""} alt={i.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                    <img referrerPolicy="no-referrer" src={prod?.image || i.image || ""} alt={i.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ fontSize:"0.78rem", color:T.text, fontWeight:600, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{i.name}</div>
@@ -1546,7 +1562,7 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
           {items.map(p => (
             <div key={p.id} className="prod-card" onClick={() => onClick(p)}>
               <div style={{ position:"relative", aspectRatio:"4/3", overflow:"hidden" }}>
-                <img src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                <img referrerPolicy="no-referrer" src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                 <div style={{ position:"absolute", top:10, left:10, background:T.orange, color:"#fff", borderRadius:4, padding:"3px 10px", fontSize:"0.65rem", fontWeight:800 }}>-{p.discount}%</div>
                 <button onClick={e => { e.stopPropagation(); onWish(p.id); }} style={{ position:"absolute", top:8, right:8, background:"rgba(255,255,255,0.9)", border:"none", borderRadius:"50%", width:32, height:32, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:14 }}>❤️</button>
               </div>
@@ -1859,7 +1875,7 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
                       <div style={{ display:"flex", flexShrink:0 }}>
                         {orderImages.length > 0 ? orderImages.map((img, idx) => (
                           <div key={idx} style={{ width:54, height:54, borderRadius:12, overflow:"hidden", border:`2.5px solid #fff`, background:"#f9fafb", marginLeft: idx > 0 ? -14 : 0, boxShadow:"0 2px 8px rgba(0,0,0,0.1)", zIndex: orderImages.length - idx }}>
-                            <img src={img} alt="Product" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                            <img referrerPolicy="no-referrer" src={img} alt="Product" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                           </div>
                         )) : (
                           <div style={{ width:54, height:54, borderRadius:12, background:PL, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24 }}>🛍</div>
@@ -1999,6 +2015,32 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
               </div>
             </div>
           )}
+          
+          {/* ── WISHLIST PANEL (mobile/tab inline) ── */}
+          {activeTab==="wishlist" && (
+            <div key="wishlist" style={{ animation:"dashPageIn 0.35s cubic-bezier(0.34,1.2,0.64,1) both" }}>
+              <div style={{ marginBottom:"1.5rem" }}>
+                <h1 style={{ fontSize:"1.75rem", fontWeight:900, color:txt, margin:0 }}>My Wishlist</h1>
+                <p style={{ color:sub, fontSize:"0.85rem", marginTop:4 }}>Items you've saved for later</p>
+              </div>
+              <button onClick={() => onNav("wishlist")} style={{ width:"100%", padding:"14px", background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", borderRadius:12, fontSize:"0.88rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", boxShadow:`0 4px 18px rgba(232,114,12,0.3)`, display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
+                <span style={{ fontSize:20 }}>🤍</span> View Full Wishlist →
+              </button>
+            </div>
+          )}
+
+          {/* ── CART PANEL (mobile/tab inline) ── */}
+          {activeTab==="cart" && (
+            <div key="cart" style={{ animation:"dashPageIn 0.35s cubic-bezier(0.34,1.2,0.64,1) both" }}>
+              <div style={{ marginBottom:"1.5rem" }}>
+                <h1 style={{ fontSize:"1.75rem", fontWeight:900, color:txt, margin:0 }}>My Cart</h1>
+                <p style={{ color:sub, fontSize:"0.85rem", marginTop:4 }}>Items ready for checkout</p>
+              </div>
+              <button onClick={() => onNav("cart")} style={{ width:"100%", padding:"14px", background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", borderRadius:12, fontSize:"0.88rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", boxShadow:`0 4px 18px rgba(232,114,12,0.3)`, display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
+                <span style={{ fontSize:20 }}>🛒</span> View Full Cart →
+              </button>
+            </div>
+          )}
         </main>
       </div>
 
@@ -2128,7 +2170,7 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
                   return (
                     <div key={idx} style={{ background:bg, borderRadius:12, padding:"1rem", marginBottom:"0.8rem", display:"flex", gap:14, alignItems:"center", border:`1px solid ${border}` }}>
                       <div style={{ width:70, height:70, borderRadius:10, overflow:"hidden", flexShrink:0, background:"#fff" }}>
-                        <img src={product?.image || item.image || "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80"} alt={item.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                        <img referrerPolicy="no-referrer" src={product?.image || item.image || "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80"} alt={item.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                       </div>
                       <div style={{ flex:1, minWidth:0 }}>
                         <div style={{ fontWeight:700, color:txt, fontSize:"0.95rem", marginBottom:3 }}>{item.name || product?.name || "Product"}</div>
@@ -2194,14 +2236,14 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
       {/* ── MOBILE BOTTOM NAV ── */}
       <nav className="dash-mobile-bottomnav" style={{ justifyContent:"space-around", alignItems:"center" }}>
         {[
-          { key:"orders", icon:"🛍", label:"Orders" },
-          { key:"track",  icon:"📦", label:"Track" },
-          { key:"profile",icon:"👤", label:"Profile" },
+          { key:"orders",  icon:"🛍", label:"Orders" },
+          { key:"track",   icon:"📦", label:"Track" },
+          { key:"profile", icon:"👤", label:"Profile" },
           { key:"wishlist",icon:"🤍", label:"Wishlist" },
-          { key:"cart",   icon:"🛒", label:"Cart" },
+          { key:"cart",    icon:"🛒", label:"Cart" },
         ].map(t => (
           <button key={t.key}
-            onClick={() => { if(t.key==="wishlist") onNav("wishlist"); else if(t.key==="cart") onNav("cart"); else setActiveTab(t.key); }}
+            onClick={() => setActiveTab(t.key)}
             style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:2, background:"none", border:"none", cursor:"pointer", padding:"6px 0", fontFamily:"'Inter',sans-serif" }}>
             <span style={{ fontSize:20 }}>{t.icon}</span>
             <span style={{ fontSize:"0.58rem", fontWeight:700, color: activeTab===t.key ? P : "#9ca3af", letterSpacing:"0.04em" }}>{t.label}</span>
@@ -2212,70 +2254,78 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
 
       {/* ── TRACK ORDER MODAL ── */}
       {trackModal && (
-        <div onClick={() => setTrackModal(null)} style={{ position:"fixed", inset:0, zIndex:9999, background:"rgba(0,0,0,0.6)", backdropFilter:"blur(6px)", display:"flex", alignItems:"center", justifyContent:"center", padding:"1rem" }}>
-          <div onClick={e => e.stopPropagation()} style={{ background:card, borderRadius:22, maxWidth:460, width:"100%", boxShadow:"0 28px 80px rgba(0,0,0,0.25)", animation:"modalIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both", overflow:"hidden" }}>
+        <div onClick={() => setTrackModal(null)} style={{ position:"fixed", inset:0, zIndex:9999, background:"rgba(0,0,0,0.65)", backdropFilter:"blur(8px)", display:"flex", alignItems:"center", justifyContent:"center", padding:"1rem" }}>
+          <div onClick={e => e.stopPropagation()} style={{ background:card, borderRadius:24, maxWidth:440, width:"100%", boxShadow:"0 32px 100px rgba(0,0,0,0.3)", animation:"trackModalIn 0.45s cubic-bezier(0.34,1.56,0.64,1) both", overflow:"hidden" }}>
+            <style>{`
+              @keyframes trackModalIn{
+                from{opacity:0;transform:translateY(40px) scale(0.93);}
+                to{opacity:1;transform:translateY(0) scale(1);}
+              }
+              @keyframes fadeSlideUp{
+                from{opacity:0;transform:translateY(18px);}
+                to{opacity:1;transform:translateY(0);}
+              }
+              @keyframes pulseRing{
+                0%{box-shadow:0 0 0 0 rgba(232,114,12,0.5);}
+                70%{box-shadow:0 0 0 14px rgba(232,114,12,0);}
+                100%{box-shadow:0 0 0 0 rgba(232,114,12,0);}
+              }
+            `}</style>
+
             {/* Header */}
-            <div style={{ background:`linear-gradient(135deg,${T.orangeD},${P})`, padding:"1.6rem 2rem", position:"relative" }}>
-              <button onClick={() => setTrackModal(null)} style={{ position:"absolute", top:14, right:16, background:"rgba(255,255,255,0.2)", border:"none", cursor:"pointer", fontSize:18, color:"#fff", lineHeight:1, padding:"5px 9px", borderRadius:7 }}>✕</button>
-              <div style={{ fontSize:36, marginBottom:8 }}>📦</div>
-              <h2 style={{ fontSize:"1.3rem", fontWeight:900, color:"#fff", margin:0 }}>Order Tracking</h2>
-              <p style={{ fontSize:"0.78rem", color:"rgba(255,255,255,0.8)", marginTop:4 }}>Real-time delivery status</p>
+            <div style={{ background:`linear-gradient(135deg,${T.orangeD},${P},${T.orangeL})`, padding:"1.8rem 2rem 1.4rem", position:"relative", textAlign:"center" }}>
+              <button onClick={() => setTrackModal(null)} style={{ position:"absolute", top:14, right:16, background:"rgba(255,255,255,0.18)", border:"none", cursor:"pointer", fontSize:17, color:"#fff", lineHeight:1, padding:"6px 10px", borderRadius:8, transition:"background 0.2s" }}
+                onMouseEnter={e => e.currentTarget.style.background="rgba(255,255,255,0.3)"}
+                onMouseLeave={e => e.currentTarget.style.background="rgba(255,255,255,0.18)"}>✕</button>
+              <div style={{ width:64, height:64, borderRadius:"50%", background:"rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:30, margin:"0 auto 12px", animation:"pulseRing 2s ease-out infinite" }}>📦</div>
+              <h2 style={{ fontSize:"1.25rem", fontWeight:900, color:"#fff", margin:0, letterSpacing:"-0.01em" }}>Order Tracking</h2>
+              <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.82)", marginTop:5 }}>Live delivery status</p>
             </div>
 
-            <div style={{ padding:"1.8rem 2rem" }}>
+            <div style={{ padding:"1.6rem 1.8rem" }}>
               {trackModal === "empty" || allOrders.length === 0 ? (
-                <>
-                  <div style={{ textAlign:"center", padding:"1rem 0 1.5rem" }}>
-                    <div style={{ fontSize:56, marginBottom:14 }}>🛒</div>
-                    <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.2rem", fontWeight:800, color:txt, marginBottom:8 }}>No Orders to Track</h3>
-                    <p style={{ color:sub, fontSize:"0.85rem", lineHeight:1.6, marginBottom:"1.5rem" }}>You haven't placed any orders yet. Start your sacred journey and your tracking details will appear here.</p>
-                    <button onClick={() => { setTrackModal(null); onNav("products"); }} style={{ padding:"12px 28px", background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", borderRadius:11, fontSize:"0.88rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", boxShadow:`0 4px 18px rgba(232,114,12,0.3)` }}>
-                      Shop Now →
-                    </button>
-                  </div>
-                </>
+                <div style={{ textAlign:"center", padding:"0.8rem 0 1.2rem", animation:"fadeSlideUp 0.4s ease 0.1s both" }}>
+                  <div style={{ fontSize:52, marginBottom:12 }}>🛒</div>
+                  <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.15rem", fontWeight:800, color:txt, marginBottom:8 }}>No Orders to Track</h3>
+                  <p style={{ color:sub, fontSize:"0.83rem", lineHeight:1.65, marginBottom:"1.4rem" }}>You haven't placed any orders yet. Start your sacred journey and your tracking details will appear here.</p>
+                  <button onClick={() => { setTrackModal(null); onNav("products"); }} style={{ padding:"12px 28px", background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", borderRadius:11, fontSize:"0.88rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", boxShadow:`0 4px 18px rgba(232,114,12,0.3)` }}>
+                    Shop Now →
+                  </button>
+                </div>
               ) : (
                 <>
-                  {/* Order info */}
-                  <div style={{ background:PL, borderRadius:13, padding:"1rem 1.2rem", marginBottom:"1.4rem", border:`1px solid rgba(232,114,12,0.15)`, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:8 }}>
+                  {/* Order ID row */}
+                  <div style={{ background:PL, borderRadius:12, padding:"0.9rem 1.1rem", marginBottom:"1.2rem", border:`1px solid rgba(232,114,12,0.15)`, display:"flex", justifyContent:"space-between", alignItems:"center", animation:"fadeSlideUp 0.38s ease 0.08s both" }}>
                     <div>
-                      <div style={{ fontSize:"0.68rem", color:sub, fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom:3 }}>Order ID</div>
-                      <div style={{ fontWeight:800, color:txt, fontSize:"1rem" }}>#{(typeof trackModal === "object" && trackModal._id) ? trackModal._id.slice(-6).toUpperCase() : "—"}</div>
+                      <div style={{ fontSize:"0.62rem", color:sub, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", marginBottom:2 }}>Order ID</div>
+                      <div style={{ fontWeight:800, color:txt, fontSize:"0.98rem" }}>#{(typeof trackModal === "object" && trackModal._id) ? trackModal._id.slice(-6).toUpperCase() : "—"}</div>
                     </div>
-                    <span style={{ background:"#ecfdf5", color:"#059669", padding:"5px 14px", borderRadius:20, fontSize:"0.72rem", fontWeight:700, border:"1px solid rgba(16,185,129,0.2)" }}>✓ Confirmed</span>
-                  </div>
-
-                  {/* Delivery timeline */}
-                  <div style={{ display:"flex", alignItems:"flex-start", marginBottom:"1.4rem", position:"relative" }}>
-                    {[["✅","Placed",true],["📦","Packed",true],["🚚","Shipped",false],["🏠","Delivered",false]].map(([icon,label,done],si) => (
-                      <div key={si} style={{ flex:1, textAlign:"center", position:"relative", zIndex:1 }}>
-                        <div style={{ width:44, height:44, borderRadius:"50%", background: done ? `linear-gradient(135deg,${T.orangeD},${P})` : "#f3f4f6", border:`2px solid ${done ? P : "#e5e7eb"}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, margin:"0 auto 6px", boxShadow: done ? `0 3px 14px rgba(232,114,12,0.35)` : "none" }}>{icon}</div>
-                        <div style={{ fontSize:"0.62rem", color: done ? P : sub, fontWeight: done ? 700 : 500 }}>{label}</div>
-                        {si < 3 && <div style={{ position:"absolute", top:21, left:"58%", right:"-42%", height:2, background: done ? `linear-gradient(to right,${P},#e5e7eb)` : "#e5e7eb", zIndex:-1 }} />}
-                      </div>
-                    ))}
+                    <span style={{ background:"#ecfdf5", color:"#059669", padding:"4px 12px", borderRadius:20, fontSize:"0.7rem", fontWeight:700, border:"1px solid rgba(16,185,129,0.2)" }}>✓ Confirmed</span>
                   </div>
 
                   {/* Delivery message */}
-                  <div style={{ background:"linear-gradient(135deg,#ecfdf5,#d1fae5)", borderRadius:14, padding:"1.2rem 1.4rem", marginBottom:"1.2rem", border:"1px solid rgba(16,185,129,0.2)" }}>
-                    <div style={{ display:"flex", alignItems:"flex-start", gap:12 }}>
-                      <span style={{ fontSize:28, flexShrink:0 }}>🎉</span>
+                  <div style={{ background:"linear-gradient(135deg,#ecfdf5,#d1fae5)", borderRadius:14, padding:"1.1rem 1.3rem", marginBottom:"1.1rem", border:"1px solid rgba(16,185,129,0.18)", animation:"fadeSlideUp 0.38s ease 0.18s both" }}>
+                    <div style={{ display:"flex", alignItems:"flex-start", gap:11 }}>
+                      <span style={{ fontSize:26, flexShrink:0 }}>🎉</span>
                       <div>
-                        <div style={{ fontWeight:800, color:"#065f46", fontSize:"0.95rem", marginBottom:4 }}>Your item is on its way!</div>
-                        <div style={{ fontSize:"0.82rem", color:"#047857", lineHeight:1.6 }}>
-                          Expected delivery within <strong>4 to 5 working days</strong> from the date of order placement. Our team is carefully packaging your sacred items.
+                        <div style={{ fontWeight:800, color:"#065f46", fontSize:"0.92rem", marginBottom:4 }}>Your item is on its way!</div>
+                        <div style={{ fontSize:"0.8rem", color:"#047857", lineHeight:1.65 }}>
+                          Expected delivery within <strong>4 to 5 working days</strong> from order placement. Our team is carefully packaging your sacred items.
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div style={{ background:PL, borderRadius:11, padding:"10px 14px", display:"flex", alignItems:"center", gap:9, border:`1px solid rgba(232,114,12,0.15)`, marginBottom:"1.4rem" }}>
-                    <span style={{ fontSize:16 }}>📞</span>
-                    <span style={{ fontSize:"0.78rem", color:sub }}>Need help? Contact us at <strong style={{ color:P }}>support@wishstone.in</strong></span>
+                  {/* Support row */}
+                  <div style={{ background:PL, borderRadius:10, padding:"9px 13px", display:"flex", alignItems:"center", gap:8, border:`1px solid rgba(232,114,12,0.13)`, marginBottom:"1.3rem", animation:"fadeSlideUp 0.38s ease 0.26s both" }}>
+                    <span style={{ fontSize:15 }}>📞</span>
+                    <span style={{ fontSize:"0.76rem", color:sub }}>Need help? <strong style={{ color:P }}>support@wishstone.in</strong></span>
                   </div>
 
-                  <button onClick={() => setTrackModal(null)} style={{ width:"100%", padding:"13px", background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", borderRadius:11, fontSize:"0.88rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", boxShadow:`0 4px 18px rgba(232,114,12,0.3)` }}>
-                    Got it, Thanks!
+                  <button onClick={() => setTrackModal(null)} style={{ width:"100%", padding:"13px", background:`linear-gradient(135deg,${T.orangeD},${P})`, color:"#fff", border:"none", borderRadius:11, fontSize:"0.88rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", boxShadow:`0 4px 18px rgba(232,114,12,0.28)`, transition:"transform 0.15s", animation:"fadeSlideUp 0.38s ease 0.32s both" }}
+                    onMouseEnter={e => e.currentTarget.style.transform="translateY(-1px)"}
+                    onMouseLeave={e => e.currentTarget.style.transform="translateY(0)"}>
+                    Got it, Thanks! 👍
                   </button>
                 </>
               )}
@@ -2450,95 +2500,6 @@ function ProductPageWrapper({ onAdd, onAddAnim, onWish, wished, cart, onShop }) 
   return <ProductPage product={product} onAdd={onAdd} onAddAnim={onAddAnim} onWish={onWish} wished={wished} cart={cart} onShop={onShop} />;
 }
 
-// ─── FLY CART PARTICLE — spectacular burst animation to cart icon ──
-function FlyCartParticle({ startX, startY, endX, endY }) {
-  const dx = endX - startX;
-  const dy = endY - startY;
-
-  useEffect(() => {
-    const t = setTimeout(() => {
-      const btn = document.getElementById("cart-nav-btn") || document.getElementById("cart-nav-desktop");
-      if (btn) {
-        btn.style.animation = "cartIconPop 0.5s cubic-bezier(0.34,1.56,0.64,1)";
-        setTimeout(() => { btn.style.animation = ""; }, 500);
-      }
-    }, 700);
-    return () => clearTimeout(t);
-  }, []);
-
-  // Spark particles — 8 colorful sparks burst from origin
-  const sparks = [
-    { sx:-32, sy:-28, sr:"-40deg", color:"#E8720C", emoji:"✦" },
-    { sx: 32, sy:-28, sr: "40deg", color:"#FF9A3C", emoji:"✦" },
-    { sx:-38, sy:  4, sr:"-60deg", color:"#C45E00", emoji:"◆" },
-    { sx: 38, sy:  4, sr: "60deg", color:"#FFB347", emoji:"◆" },
-    { sx: -8, sy:-40, sr:"-15deg", color:"#E8720C", emoji:"★" },
-    { sx:  8, sy:-40, sr: "15deg", color:"#FF9A3C", emoji:"★" },
-    { sx:-22, sy: 30, sr:"-35deg", color:"#C45E00", emoji:"✦" },
-    { sx: 22, sy: 30, sr: "35deg", color:"#FFB347", emoji:"✦" },
-  ];
-
-  // Gem trail — 3 gems following the main particle
-  const gems = [
-    { gx: dx * 0.3 + 20,  gy: dy * 0.3 - 40, delay:"0.05s", emoji:"💎" },
-    { gx: dx * 0.6 - 15,  gy: dy * 0.6 - 25, delay:"0.12s", emoji:"✨" },
-    { gx: dx * 0.85 + 8,  gy: dy * 0.85 - 10, delay:"0.2s", emoji:"⭐" },
-  ];
-
-  return (
-    <>
-      {/* Expanding ring at origin */}
-      <div style={{
-        position:"fixed", left:startX, top:startY,
-        width:40, height:40, borderRadius:"50%",
-        border:"2.5px solid #E8720C",
-        zIndex:99998, pointerEvents:"none",
-        animation:"ringExpand 0.55s ease-out forwards",
-      }} />
-      <div style={{
-        position:"fixed", left:startX, top:startY,
-        width:24, height:24, borderRadius:"50%",
-        border:"2px solid #FF9A3C",
-        zIndex:99998, pointerEvents:"none",
-        animation:"ringExpand 0.45s ease-out 0.06s forwards",
-      }} />
-
-      {/* Spark burst */}
-      {sparks.map((s, i) => (
-        <div key={i} style={{
-          position:"fixed", left:startX, top:startY,
-          fontSize:11, color:s.color,
-          zIndex:99999, pointerEvents:"none",
-          animation:`sparkBurst 0.6s ease-out ${i * 0.03}s forwards`,
-          "--sx":`${s.sx}px`, "--sy":`${s.sy}px`, "--sr":s.sr,
-        }}>{s.emoji}</div>
-      ))}
-
-      {/* Gem trail */}
-      {gems.map((g, i) => (
-        <div key={i} style={{
-          position:"fixed", left:startX - 10, top:startY - 10,
-          fontSize:16, zIndex:99998, pointerEvents:"none",
-          animation:`gemFly 0.75s cubic-bezier(0.25,0.46,0.45,0.94) ${g.delay} forwards`,
-          "--gx":`${g.gx}px`, "--gy":`${g.gy}px`,
-          filter:"drop-shadow(0 2px 8px rgba(232,114,12,0.7))",
-        }}>{g.emoji}</div>
-      ))}
-
-      {/* Main flying particle — glowing orb */}
-      <div style={{
-        position:"fixed", left:startX - 14, top:startY - 14,
-        width:28, height:28, borderRadius:"50%",
-        background:"radial-gradient(circle, #FFB347 0%, #E8720C 60%, #C45E00 100%)",
-        zIndex:99999, pointerEvents:"none",
-        animation:"flyBucket 0.75s cubic-bezier(0.25,0.46,0.45,0.94) forwards",
-        "--dx":`${dx}px`, "--dy":`${dy}px`,
-        boxShadow:"0 0 16px 4px rgba(232,114,12,0.7), 0 0 32px 8px rgba(232,114,12,0.3)",
-      }} />
-    </>
-  );
-}
-
 // ─── FLY PARTICLE — heart flies from product to wishlist icon ──
 function FlyParticle({ startX, startY, endX, endY, onLand }) {
   const dx = endX - startX;
@@ -2684,21 +2645,30 @@ function AppInner() {
 
   useEffect(() => { 
     if (!user) return;
-    // Per-user key — never show again once claimed
-    const claimedKey = `ws_coupon_claimed_${user.email||"guest"}`;
-    const shownKey   = `ws_coupon_shown_${user.email||"guest"}`;
-    if (localStorage.getItem(claimedKey) || localStorage.getItem(shownKey)) return;
-    // Mark as shown for this user so it never auto-opens again
-    localStorage.setItem(shownKey, "1");
+    const email = user.email || "guest";
+    // Never show if already claimed
+    if (localStorage.getItem(`ws_coupon_claimed_${email}`)) return;
+    // Show once per session (each login/refresh = one show)
+    const sessionKey = `ws_coupon_session_${email}`;
+    if (sessionStorage.getItem(sessionKey)) return;
+    sessionStorage.setItem(sessionKey, "1");
     const t = setTimeout(() => setShowModal(true), 2000);
     return () => clearTimeout(t);
   }, [user?.email]);
 
   const addToCart = p => {
+    const MAX = 10;
     if (p.qty === -1) {
       setCart(c => c.map(i => i.id===p.id ? {...i, qty:i.qty-1} : i).filter(i => i.qty > 0));
     } else {
-      setCart(c => { const ex=c.find(i=>i.id===p.id); if(ex) return c.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i); return [...c,{...p,qty:1}]; });
+      setCart(c => {
+        const ex = c.find(i => i.id===p.id);
+        if (ex) {
+          if (ex.qty >= MAX) return c; // cap at 10
+          return c.map(i => i.id===p.id ? {...i, qty:i.qty+1} : i);
+        }
+        return [...c, {...p, qty:1}];
+      });
     }
   };
   const toggleWish = id => setWished(w => w.includes(id)?w.filter(x=>x!==id):[...w,id]);
@@ -2734,8 +2704,7 @@ function AppInner() {
     const pid = Date.now() + Math.random();
     setFlyCartParticles(p => [...p, { id: pid, startX, startY, endX, endY }]);
     setTimeout(() => setFlyCartParticles(p => p.filter(x => x.id !== pid)), 1200);
-  };
-  const updateQty = (id,delta) => setCart(c => c.map(i=>i.id===id?{...i,qty:Math.max(0,i.qty+delta)}:i).filter(i=>i.qty>0));
+  };  const updateQty = (id,delta) => setCart(c => c.map(i=>i.id===id?{...i,qty:Math.max(0,i.qty+delta)}:i).filter(i=>i.qty>0));
   const removeFromCart = id => setCart(c => c.filter(i=>i.id!==id));
   const handlePlaceOrder = async data => {
     const newOrder = {...data, _id:Date.now().toString(), status:"Confirmed", createdAt:new Date().toISOString()};
@@ -2851,8 +2820,8 @@ function AppInner() {
       <Header cartCount={cartCount} wishCount={wished.length} onNav={nav} currentPage={currentPage} user={user} onLogout={handleLogout} />
       <Routes>
         <Route path="/" element={<HomePage onShop={()=>nav("products")} onRitual={()=>nav("rituals")} onNav={nav} />} />
-        <Route path="/shop" element={<ProductsPage onAdd={addToCart} onAddAnim={flyToCart} onWish={flyToWishlist} wished={wished} onClick={goToProduct} cart={cart} />} />
-        <Route path="/product/:id" element={<ProductPageWrapper onAdd={addToCart} onAddAnim={flyToCart} onWish={flyToWishlist} wished={wished} cart={cart} onShop={()=>nav("products")} />} />
+        <Route path="/shop" element={<ProductsPage onAdd={addToCart} onAddAnim={(e,p) => addToCart(p)} onWish={flyToWishlist} wished={wished} onClick={goToProduct} cart={cart} />} />
+        <Route path="/product/:id" element={<ProductPageWrapper onAdd={addToCart} onAddAnim={(e,p) => addToCart(p)} onWish={flyToWishlist} wished={wished} cart={cart} onShop={()=>nav("products")} />} />
         <Route path="/rituals" element={<RitualsPage />} />
         <Route path="/benefits" element={<BenefitsPage />} />
         <Route path="/stories" element={<StoriesPage />} />
@@ -2873,11 +2842,6 @@ function AppInner() {
       {/* ── Flying Wishlist Particles ── */}
       {flyParticles.map(p => (
         <FlyParticle key={p.id} startX={p.startX} startY={p.startY} endX={p.endX} endY={p.endY} />
-      ))}
-
-      {/* ── Flying Cart Bucket Particles ── */}
-      {flyCartParticles.map(p => (
-        <FlyCartParticle key={p.id} startX={p.startX} startY={p.startY} endX={p.endX} endY={p.endY} />
       ))}
     </div>
   );
