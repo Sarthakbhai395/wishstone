@@ -313,9 +313,8 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
       transition:"all 0.3s",
     }}>
       <div className="max-w" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", height:64, padding:"0 clamp(1rem,4vw,2.5rem)" }}>
-        <button onClick={() => navTo("home")} style={{ background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", gap:9, flexShrink:0 }}>
-          <div style={{ width:32, height:32, borderRadius:8, background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>💎</div>
-          <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.15rem", fontWeight:900, color:T.text }}>WishStone</span>
+        <button onClick={() => navTo("home")} style={{ background:"none", border:"none", cursor:"pointer", display:"flex", alignItems:"center", flexShrink:0 }}>
+          <img src={`${process.env.PUBLIC_URL || ""}/wishstone svg.svg`} alt="WishStone" style={{ height:28, width:"auto", display:"block" }} />
         </button>
 
         <nav className="header-nav" style={{ display:"flex", gap:"2.2rem", alignItems:"center" }}>
@@ -864,7 +863,7 @@ function Footer() {
         <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", gap:"3rem", marginBottom:"3rem" }} className="footer-grid">
           <div>
             <div style={{ display:"flex", alignItems:"center", gap:9, marginBottom:"1rem" }}>
-              <div style={{ width:30, height:30, borderRadius:7, background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:14 }}>💎</div>
+              <img src={`${process.env.PUBLIC_URL || ""}/wishstone final logo-2.png`} alt="WishStone Logo" style={{ height:19, width:"auto", objectFit:"contain", display:"block", background:"#ffffff", borderRadius:4 }} />
               <span style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.1rem", fontWeight:900, color:T.white }}>WishStone</span>
             </div>
             <p style={{ fontSize:"0.8rem", color:"rgba(255,255,255,0.5)", lineHeight:1.7, maxWidth:240 }}>India's sacred manifestation stone — hand-crafted with ancient yantra to help you manifest your deepest desires.</p>
@@ -1603,7 +1602,7 @@ function SignupPage({ onSignup, onSwitch }) {
     <div style={{ minHeight:"100vh", background:T.bg, display:"flex", alignItems:"center", justifyContent:"center", paddingTop:100, paddingBottom:"2rem", paddingLeft:"2rem", paddingRight:"2rem" }}>
       <div style={{ background:"#fff", borderRadius:16, padding:"2.5rem", width:"100%", maxWidth:420, boxShadow:"0 8px 40px rgba(0,0,0,0.1)", border:`1px solid ${T.border}`, animation:"cardIn 0.5s ease both" }}>
         <div style={{ textAlign:"center", marginBottom:"2rem" }}>
-          <div style={{ fontSize:38, marginBottom:8 }}>💎</div>
+          <img src={`${process.env.PUBLIC_URL || ""}/wishstone final logo-2.png`} alt="WishStone Logo" style={{ height:38, width:"auto", objectFit:"contain", display:"block", margin:"0 auto 8px", background:"#ffffff", borderRadius:6 }} />
           <h2 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.5rem", fontWeight:900, margin:0 }}>Create Account</h2>
         </div>
         <form onSubmit={handle}>
@@ -1764,7 +1763,7 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
 
           {/* Brand */}
           <div style={{ background:card, borderRadius:16, padding:"1.3rem 1.5rem", marginBottom:"0.8rem", border:`1px solid ${border}`, boxShadow:"0 2px 12px rgba(0,0,0,0.06)", display:"flex", alignItems:"center", gap:12 }}>
-            <div style={{ width:42, height:42, borderRadius:11, background:`linear-gradient(135deg,${T.orangeD},${P})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0 }}>💎</div>
+            <img src={`${process.env.PUBLIC_URL || ""}/wishstone final logo-2.png`} alt="WishStone Logo" style={{ height:18, width:"auto", objectFit:"contain", display:"block", flexShrink:0, background:"#ffffff", borderRadius:4 }} />
             <div style={{ flex:1, minWidth:0 }}>
               <div style={{ fontWeight:800, fontSize:"1.05rem", color:txt, fontFamily:"'Playfair Display',serif" }}>WishStone</div>
               <div style={{ fontSize:"0.7rem", color:sub }}>Your Dashboard</div>
@@ -2438,7 +2437,7 @@ function PromoModal({ show, onClose, onShop, userEmail }) {
         {/* Logo */}
         <div style={{ marginBottom:"1.4rem" }}>
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, marginBottom:4 }}>
-            <div style={{ width:36, height:36, background:`linear-gradient(135deg,${T.bgDark},${T.orange})`, borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18 }}>💎</div>
+            <img src={`${process.env.PUBLIC_URL || ""}/wishstone final logo-2.png`} alt="WishStone Logo" style={{ height:32, width:"auto", objectFit:"contain", display:"block", background:"#ffffff", borderRadius:6 }} />
           </div>
           <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"2rem", fontWeight:900, color:T.text, letterSpacing:"0.08em", lineHeight:1 }}>WISHSTONE</div>
           <div style={{ fontSize:"0.65rem", letterSpacing:"0.22em", color:T.textMid, marginTop:2 }}>SACRED STORE</div>
