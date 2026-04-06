@@ -2412,8 +2412,11 @@ function PromoModal({ show, onClose, onShop, userEmail }) {
       return;
     }
     setEmailError("");
-    // Mark as permanently claimed for this user
-    if (userEmail) localStorage.setItem(`ws_coupon_claimed_${userEmail}`, "1");
+    // Mark as permanently claimed — for logged-in users use email key, for guests use device key
+    const claimKey = userEmail 
+      ? `ws_coupon_claimed_${userEmail}` 
+      : `ws_coupon_claimed_guest`;
+    localStorage.setItem(claimKey, "1");
     setClaimed(true);
   };
 
@@ -2640,15 +2643,16 @@ function AppInner() {
   }, [orders, user]);
 
   useEffect(() => { 
-    if (!user) return;
-    const email = user.email || "guest";
+    // Use a stable key — for logged-in users use email, for guests use a device key
+    const claimKey = user?.email 
+      ? `ws_coupon_claimed_${user.email}` 
+      : `ws_coupon_claimed_guest`;
+
     // Never show if already claimed
-    if (localStorage.getItem(`ws_coupon_claimed_${email}`)) return;
-    // Show once per session (each login/refresh = one show)
-    const sessionKey = `ws_coupon_session_${email}`;
-    if (sessionStorage.getItem(sessionKey)) return;
-    sessionStorage.setItem(sessionKey, "1");
-    const t = setTimeout(() => setShowModal(true), 2000);
+    if (localStorage.getItem(claimKey)) return;
+
+    // Show 5 sec after every page load/refresh until claimed
+    const t = setTimeout(() => setShowModal(true), 5000);
     return () => clearTimeout(t);
   }, [user?.email]);
 
