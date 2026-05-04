@@ -103,7 +103,7 @@ const GLOBAL_CSS = `
   @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
   @keyframes quoteIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
   @keyframes cardIn{from{opacity:0;transform:translateY(30px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
-  @keyframes shimmerBar{from{width:0%}to{width:100%}}
+  @keyframes shimmerBar{0%{background-position:-400px 0}100%{background-position:400px 0}}
   @keyframes stone3d{
     0%   { transform: rotateY(-18deg) rotateX(6deg) translateY(0px); }
     25%  { transform: rotateY(8deg)  rotateX(-4deg) translateY(-10px); }
@@ -1044,10 +1044,83 @@ function BestSellersStrip({ onShop }) {
 }
 // ─── PRODUCTS PAGE ────────────────────────────────────────────
 function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
-  const [filter, setFilter] = useState("all");
-  const [search, setSearch] = useState("");
-  const getQty = (id) => cart.filter(i => i.id === id).reduce((s,i) => s + i.qty, 0);
-  const filtered = PRODUCTS.filter(p => (filter==="all" || p.category===filter) && p.name.toLowerCase().includes(search.toLowerCase()));
+  const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
+  const [filter, setFilter]       = useState("all");
+  const [search, setSearch]       = useState("");
+  const [products, setProducts]   = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading]     = useState(true);
+
+  // Fetch categories + products from backend
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [catRes, prodRes] = await Promise.all([
+          fetch(`${API_BASE}/api/categories`).then(r => r.json()),
+          fetch(`${API_BASE}/api/products?limit=100`).then(r => r.json()),
+        ]);
+        if (catRes.success)  setCategories(catRes.categories  || []);
+        if (prodRes.success) setProducts(prodRes.products || []);
+      } catch {
+        // Fallback to hardcoded products if backend unreachable
+        setProducts(PRODUCTS.map(p => ({
+          _id: String(p.id), id: p.id, name: p.name,
+          category: { slug: p.category, name: p.category },
+          price: p.price, originalPrice: p.originalPrice,
+          discount: p.discount, images: [p.image],
+          shortDesc: p.shortDesc, isBestSeller: p.bestSeller,
+          stock: 99, isActive: true,
+        })));
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, [API_BASE]);
+
+  const getQty = (id) => cart.filter(i => i.id === id || i.id === String(id)).reduce((s, i) => s + i.qty, 0);
+
+  // Normalize product for consistent usage
+  const normalize = (p) => ({
+    id:            p._id || p.id,
+    _id:           p._id || String(p.id),
+    name:          p.name,
+    category:      p.category?.slug || p.category || "",
+    categoryName:  p.category?.name || p.category || "",
+    price:         p.price,
+    originalPrice: p.originalPrice || p.price,
+    discount:      p.discount || (p.originalPrice ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) : 0),
+    image:         p.images?.[0] || p.image || "",
+    images:        p.images || (p.image ? [p.image] : []),
+    shortDesc:     p.shortDesc || "",
+    isBestSeller:  p.isBestSeller || p.bestSeller || false,
+    stock:         p.stock ?? 99,
+    benefits:      p.benefits || [],
+    tags:          p.tags || [],
+    suitableFor:   p.suitableFor || "",
+  });
+
+  const normalized = products.map(normalize);
+
+  const filtered = normalized.filter(p => {
+    const matchCat = filter === "all" || p.category === filter || p._id === filter;
+    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
+    return matchCat && matchSearch;
+  });
+
+  // Build category tabs from backend + fallback
+  const catTabs = [
+    { value: "all", label: "All" },
+    ...categories.map(c => ({ value: c.slug, label: c.name })),
+  ];
+  // If no backend categories yet, show hardcoded fallback tabs
+  const tabs = catTabs.length > 1 ? catTabs : [
+    { value: "all", label: "All" },
+    { value: "manifestation", label: "Manifestation" },
+    { value: "therapy", label: "Therapy" },
+    { value: "habit-builder", label: "Habit Builder" },
+  ];
+
   return (
     <div style={{ paddingTop:90, background:T.bg, minHeight:"100vh" }}>
       <div className="max-w" style={{ padding:"clamp(1.5rem,4vw,3rem)" }}>
@@ -1057,48 +1130,70 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..." style={{ flex:1, minWidth:180, padding:"10px 14px", border:`1.5px solid ${T.border}`, borderRadius:8, fontSize:"0.85rem", background:"#fff", color:T.text, outline:"none" }}
             onFocus={e => e.target.style.borderColor=T.orange} onBlur={e => e.target.style.borderColor=T.border} />
           <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-            {[["all","All"],["manifestation","Manifestation"],["therapy","Therapy"],["habit-builder","Habit Builder"]].map(([v,l]) => (
-              <button key={v} onClick={() => setFilter(v)} style={{ padding:"8px 16px", borderRadius:20, border:`1.5px solid ${filter===v ? T.orange : T.border}`, background: filter===v ? T.orange : "#fff", color: filter===v ? "#fff" : T.textMid, fontSize:"0.75rem", fontWeight:600, cursor:"pointer", transition:"all 0.2s" }}>{l}</button>
+            {tabs.map(({ value, label }) => (
+              <button key={value} onClick={() => setFilter(value)} style={{ padding:"8px 16px", borderRadius:20, border:`1.5px solid ${filter===value ? T.orange : T.border}`, background: filter===value ? T.orange : "#fff", color: filter===value ? "#fff" : T.textMid, fontSize:"0.75rem", fontWeight:600, cursor:"pointer", transition:"all 0.2s" }}>{label}</button>
             ))}
           </div>
         </div>
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"1.5rem" }} className="prod-grid">
-          {filtered.map(p => {
-            const qty = getQty(p.id);
-            return (
-              <div key={p.id} className="prod-card" onClick={() => onClick(p)}>
-                <div style={{ position:"relative", aspectRatio:"4/3", overflow:"hidden" }}>
-                  <img referrerPolicy="no-referrer" src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.4s" }}
-                    onMouseEnter={e => e.currentTarget.style.transform="scale(1.06)"}
-                    onMouseLeave={e => e.currentTarget.style.transform="scale(1)"} />
-                  <div style={{ position:"absolute", top:10, left:10, background:T.orange, color:"#fff", borderRadius:4, padding:"3px 10px", fontSize:"0.65rem", fontWeight:800 }}>-{p.discount}%</div>
-                  <button onClick={e => { e.stopPropagation(); onWish(e, p.id); }} style={{ position:"absolute", top:8, right:8, background:"rgba(255,255,255,0.9)", border:"none", borderRadius:"50%", width:32, height:32, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:14, transition:"transform 0.2s" }}
-                    onMouseEnter={e => e.currentTarget.style.transform="scale(1.15)"} onMouseLeave={e => e.currentTarget.style.transform="scale(1)"}
-                  >{wished.includes(p.id) ? "❤️" : "🤍"}</button>
-                  {p.bestSeller && <div style={{ position:"absolute", bottom:8, left:8, background:T.bgDark, color:T.orange, borderRadius:4, padding:"2px 8px", fontSize:"0.6rem", fontWeight:700, letterSpacing:"0.08em" }}>BEST SELLER</div>}
-                </div>
+
+        {loading ? (
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"1.5rem" }} className="prod-grid">
+            {[1,2,3,4,5,6].map(i => (
+              <div key={i} style={{ borderRadius:14, overflow:"hidden", border:`1px solid ${T.border}`, background:"#fff" }}>
+                <div style={{ aspectRatio:"4/3", background:"linear-gradient(90deg,#ede8df 25%,#f5f0e8 50%,#ede8df 75%)", backgroundSize:"400px 100%", animation:"shimmerBar 1.4s infinite" }} />
                 <div style={{ padding:"1.2rem" }}>
-                  <h4 style={{ fontSize:"0.92rem", fontWeight:700, color:T.text, marginBottom:"0.4rem" }}>{p.name}</h4>
-                  <p style={{ fontSize:"0.76rem", color:T.textMid, marginBottom:"0.7rem", lineHeight:1.5 }}>{p.shortDesc.slice(0,65)}...</p>
-                  <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:"0.8rem" }}>
-                    <span style={{ fontSize:"1rem", color:T.orange, fontWeight:700 }}>Rs.{p.price.toLocaleString()}</span>
-                    <span style={{ color:T.textMid, fontSize:"0.75rem", textDecoration:"line-through" }}>Rs.{p.originalPrice.toLocaleString()}</span>
-                  </div>
-                  {qty > 0 ? (
-                    <div onClick={e => e.stopPropagation()} style={{ display:"flex", alignItems:"center", gap:0, border:`1.5px solid ${T.orange}`, borderRadius:8, overflow:"hidden", width:"100%" }}>
-                      <button onClick={() => onAdd({ ...p, qty:-1 })} style={{ flex:1, height:38, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.orange, fontWeight:700 }}>−</button>
-                      <span style={{ flex:1, textAlign:"center", fontWeight:800, color:T.orange, fontSize:"0.95rem" }}>{qty}</span>
-                      <button onClick={(e) => { e.stopPropagation(); onAddAnim ? onAddAnim(e, p) : onAdd(p); }} style={{ flex:1, height:38, background:T.orange, border:"none", cursor:"pointer", fontSize:18, color:"#fff", fontWeight:700 }}>+</button>
-                    </div>
-                  ) : (
-                    <button className="btn-orange" onClick={e => { e.stopPropagation(); onAddAnim ? onAddAnim(e, p) : onAdd(p); }} style={{ width:"100%", padding:"10px", fontSize:"0.72rem", borderRadius:7 }}>Add to Cart</button>
-                  )}
+                  <div style={{ height:14, borderRadius:6, background:"#ede8df", marginBottom:8, width:"70%" }} />
+                  <div style={{ height:10, borderRadius:6, background:"#ede8df", marginBottom:8, width:"90%" }} />
+                  <div style={{ height:10, borderRadius:6, background:"#ede8df", width:"50%" }} />
                 </div>
               </div>
-            );
-          })}
-        </div>
-        {filtered.length===0 && <div style={{ textAlign:"center", padding:"4rem", color:T.textMid }}><div style={{ fontSize:48, marginBottom:12 }}>🔍</div><p>No products found.</p></div>}
+            ))}
+          </div>
+        ) : (
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"1.5rem" }} className="prod-grid">
+            {filtered.map(p => {
+              const qty = getQty(p.id);
+              return (
+                <div key={p._id} className="prod-card" onClick={() => onClick(p)}>
+                  <div style={{ position:"relative", aspectRatio:"4/3", overflow:"hidden" }}>
+                    {p.image ? (
+                      <img referrerPolicy="no-referrer" src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.4s" }}
+                        onMouseEnter={e => e.currentTarget.style.transform="scale(1.06)"}
+                        onMouseLeave={e => e.currentTarget.style.transform="scale(1)"}
+                        onError={e => { e.currentTarget.style.display="none"; e.currentTarget.nextSibling.style.display="flex"; }} />
+                    ) : null}
+                    <div style={{ width:"100%", height:"100%", background:`linear-gradient(135deg,${T.bg},#ede8df)`, display: p.image ? "none" : "flex", alignItems:"center", justifyContent:"center", fontSize:48 }}>◆</div>
+                    {p.discount > 0 && <div style={{ position:"absolute", top:10, left:10, background:T.orange, color:"#fff", borderRadius:4, padding:"3px 10px", fontSize:"0.65rem", fontWeight:800 }}>-{p.discount}%</div>}
+                    <button onClick={e => { e.stopPropagation(); onWish(e, p.id); }} style={{ position:"absolute", top:8, right:8, background:"rgba(255,255,255,0.9)", border:"none", borderRadius:"50%", width:32, height:32, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:14, transition:"transform 0.2s" }}
+                      onMouseEnter={e => e.currentTarget.style.transform="scale(1.15)"} onMouseLeave={e => e.currentTarget.style.transform="scale(1)"}
+                    >{wished.includes(p.id) ? "❤️" : "🤍"}</button>
+                    {p.isBestSeller && <div style={{ position:"absolute", bottom:8, left:8, background:T.bgDark, color:T.orange, borderRadius:4, padding:"2px 8px", fontSize:"0.6rem", fontWeight:700, letterSpacing:"0.08em" }}>BEST SELLER</div>}
+                  </div>
+                  <div style={{ padding:"1.2rem" }}>
+                    <h4 style={{ fontSize:"0.92rem", fontWeight:700, color:T.text, marginBottom:"0.4rem" }}>{p.name}</h4>
+                    <p style={{ fontSize:"0.76rem", color:T.textMid, marginBottom:"0.7rem", lineHeight:1.5 }}>{(p.shortDesc||"").slice(0,65)}{p.shortDesc?.length>65?"...":""}</p>
+                    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:"0.8rem" }}>
+                      <span style={{ fontSize:"1rem", color:T.orange, fontWeight:700 }}>₹{p.price.toLocaleString()}</span>
+                      {p.originalPrice > p.price && <span style={{ color:T.textMid, fontSize:"0.75rem", textDecoration:"line-through" }}>₹{p.originalPrice.toLocaleString()}</span>}
+                    </div>
+                    {p.stock === 0 ? (
+                      <button disabled style={{ width:"100%", padding:"10px", fontSize:"0.72rem", borderRadius:7, background:"#e5e7eb", color:"#9ca3af", border:"none", cursor:"not-allowed" }}>Out of Stock</button>
+                    ) : qty > 0 ? (
+                      <div onClick={e => e.stopPropagation()} style={{ display:"flex", alignItems:"center", gap:0, border:`1.5px solid ${T.orange}`, borderRadius:8, overflow:"hidden", width:"100%" }}>
+                        <button onClick={() => onAdd({ ...p, qty:-1 })} style={{ flex:1, height:38, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.orange, fontWeight:700 }}>−</button>
+                        <span style={{ flex:1, textAlign:"center", fontWeight:800, color:T.orange, fontSize:"0.95rem" }}>{qty}</span>
+                        <button onClick={(e) => { e.stopPropagation(); onAddAnim ? onAddAnim(e, p) : onAdd(p); }} style={{ flex:1, height:38, background:T.orange, border:"none", cursor:"pointer", fontSize:18, color:"#fff", fontWeight:700 }}>+</button>
+                      </div>
+                    ) : (
+                      <button className="btn-orange" onClick={e => { e.stopPropagation(); onAddAnim ? onAddAnim(e, p) : onAdd(p); }} style={{ width:"100%", padding:"10px", fontSize:"0.72rem", borderRadius:7 }}>Add to Cart</button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        {!loading && filtered.length===0 && <div style={{ textAlign:"center", padding:"4rem", color:T.textMid }}><div style={{ fontSize:48, marginBottom:12 }}>🔍</div><p>No products found.</p></div>}
       </div>
     </div>
   );
