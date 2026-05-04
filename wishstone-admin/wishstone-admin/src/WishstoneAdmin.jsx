@@ -654,15 +654,33 @@ function Products({ token, showToast }) {
     setSaving(true);
     try {
       const fd = new FormData();
+      // Append all text fields
       Object.entries(form).forEach(([k, v]) => {
-        if (k === "benefits" || k === "tags") fd.append(k, JSON.stringify(v.split(",").map(s => s.trim()).filter(Boolean)));
-        else fd.append(k, v);
+        if (k === "benefits" || k === "tags") {
+          // Send as JSON array
+          const arr = typeof v === "string" ? v.split(",").map(s => s.trim()).filter(Boolean) : (v || []);
+          fd.append(k, JSON.stringify(arr));
+        } else if (k === "originalPrice") {
+          // If empty, default to price value
+          fd.append(k, v || form.price);
+        } else {
+          fd.append(k, v ?? "");
+        }
       });
+      // Append image file under "image" field name (backend accepts both "image" and "images")
       if (imageFile) fd.append("image", imageFile);
-      if (editing) { await api.putForm(`/admin/product/update/${editing._id}`, fd, token); showToast("Product updated!", "success"); }
-      else          { await api.postForm("/admin/product/add", fd, token);                  showToast("Product added!", "success"); }
+
+      if (editing) {
+        await api.putForm(`/admin/product/update/${editing._id}`, fd, token);
+        showToast("Product updated!", "success");
+      } else {
+        await api.postForm("/admin/product/add", fd, token);
+        showToast("Product added!", "success");
+      }
       setShowModal(false); load();
-    } catch (e) { showToast(e.response?.data?.message || "Error saving product", "error"); }
+    } catch (e) {
+      showToast(e.response?.data?.message || "Error saving product", "error");
+    }
     setSaving(false);
   };
 
@@ -1389,20 +1407,20 @@ function Coupons({ token, showToast }) {
       if (!payload.maxDiscount) delete payload.maxDiscount;
       if (!payload.usageLimit) delete payload.usageLimit;
       if (!payload.expiresAt) delete payload.expiresAt;
-      if (editing) { await api.put(`/admin/coupons/${editing._id}`, payload, token); showToast("Coupon updated!", "success"); }
-      else          { await api.post("/admin/coupons", payload, token);               showToast("Coupon created!", "success"); }
+      if (editing) { await api.put(`/admin/coupon/update/${editing._id}`, payload, token); showToast("Coupon updated!", "success"); }
+      else          { await api.post("/admin/coupon/create", payload, token);               showToast("Coupon created!", "success"); }
       setShowModal(false); load();
     } catch (e) { showToast(e.response?.data?.message || "Error saving coupon", "error"); }
     setSaving(false);
   };
 
   const handleDelete = async id => {
-    try { await api.delete(`/admin/coupons/${id}`, token); showToast("Coupon deleted.", "success"); setConfirm(null); load(); }
+    try { await api.delete(`/admin/coupon/delete/${id}`, token); showToast("Coupon deleted.", "success"); setConfirm(null); load(); }
     catch { showToast("Failed to delete coupon", "error"); }
   };
 
   const toggleActive = async c => {
-    try { await api.put(`/admin/coupons/${c._id}`, { isActive: !c.isActive }, token); showToast(`Coupon ${!c.isActive ? "activated" : "deactivated"}.`, "success"); load(); }
+    try { await api.put(`/admin/coupon/update/${c._id}`, { isActive: !c.isActive }, token); showToast(`Coupon ${!c.isActive ? "activated" : "deactivated"}.`, "success"); load(); }
     catch { showToast("Failed to update coupon", "error"); }
   };
 
@@ -1567,20 +1585,20 @@ function Categories({ token, showToast }) {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => fd.append(k, v));
       if (imageFile) fd.append("image", imageFile);
-      if (editing) { await api.putForm(`/admin/categories/${editing._id}`, fd, token); showToast("Category updated!", "success"); }
-      else          { await api.postForm("/admin/categories", fd, token);               showToast("Category created!", "success"); }
+      if (editing) { await api.putForm(`/admin/category/update/${editing._id}`, fd, token); showToast("Category updated!", "success"); }
+      else          { await api.postForm("/admin/category/add", fd, token);                  showToast("Category created!", "success"); }
       setShowModal(false); load();
     } catch (e) { showToast(e.response?.data?.message || "Error saving category", "error"); }
     setSaving(false);
   };
 
   const handleDelete = async id => {
-    try { await api.delete(`/admin/categories/${id}`, token); showToast("Category deleted.", "success"); setConfirm(null); load(); }
+    try { await api.delete(`/admin/category/delete/${id}`, token); showToast("Category deleted.", "success"); setConfirm(null); load(); }
     catch { showToast("Failed to delete category", "error"); }
   };
 
   const toggleActive = async c => {
-    try { await api.put(`/admin/categories/${c._id}`, { isActive: !c.isActive }, token); showToast(`Category ${!c.isActive ? "activated" : "deactivated"}.`, "success"); load(); }
+    try { await api.put(`/admin/category/update/${c._id}`, { isActive: !c.isActive }, token); showToast(`Category ${!c.isActive ? "activated" : "deactivated"}.`, "success"); load(); }
     catch { showToast("Failed to update category", "error"); }
   };
 

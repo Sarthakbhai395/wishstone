@@ -48,39 +48,94 @@ router.get("/products", async (req, res) => {
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-router.post("/product/add", upload.fields([{ name: "images", maxCount: 5 }, { name: "previewVideo", maxCount: 1 }, { name: "fullVideo", maxCount: 1 }]), async (req, res) => {
+router.post("/product/add", upload.fields([{ name: "images", maxCount: 5 }, { name: "image", maxCount: 1 }, { name: "previewVideo", maxCount: 1 }, { name: "fullVideo", maxCount: 1 }]), async (req, res) => {
   try {
-    const { name, category, shortDesc, price, originalPrice, stock, isBestSeller, isFeatured, benefits, tags } = req.body;
-    const slug = name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-    const images = req.files?.images?.map(f => f.path) || [];
-    const previewVideo = req.files?.previewVideo?.[0]?.path || "";
-    const fullVideo = req.files?.fullVideo?.[0]?.path || "";
+    const { name, category, shortDesc, fullDesc, suitableFor, howToUse, price, originalPrice, stock, isBestSeller, isFeatured, benefits, tags, weight } = req.body;
+
+    // Validation
+    if (!name || !name.trim()) return res.status(400).json({ success: false, message: "Product name is required." });
+    if (!category)             return res.status(400).json({ success: false, message: "Category is required." });
+    if (!price || isNaN(Number(price))) return res.status(400).json({ success: false, message: "Valid price is required." });
+
+    const parsedPrice    = Number(price);
+    const parsedOriginal = originalPrice && !isNaN(Number(originalPrice)) ? Number(originalPrice) : parsedPrice;
+
+    // Generate unique slug
+    const baseSlug = name.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+    let slug = baseSlug;
+    let counter = 1;
+    while (await Product.findOne({ slug })) { slug = `${baseSlug}-${counter++}`; }
+
+    // Handle images — support both "images" (multi) and "image" (single) field names
+    const baseUrl = process.env.BACKEND_URL || `https://wishstone.onrender.com`;
+    const mapPath = f => f.path.startsWith("http") ? f.path : `${baseUrl}/${f.path.replace(/\\/g, "/")}`;
+    const images = [
+      ...(req.files?.images || []).map(mapPath),
+      ...(req.files?.image  || []).map(mapPath),
+    ];
+    const previewVideo = req.files?.previewVideo?.[0] ? mapPath(req.files.previewVideo[0]) : "";
+    const fullVideo    = req.files?.fullVideo?.[0]    ? mapPath(req.files.fullVideo[0])    : "";
+
+    // Parse array fields safely
+    const parseBenefits = () => {
+      if (!benefits) return [];
+      try { return JSON.parse(benefits); } catch { return benefits.split(",").map(s => s.trim()).filter(Boolean); }
+    };
+    const parseTags = () => {
+      if (!tags) return [];
+      try { return JSON.parse(tags); } catch { return tags.split(",").map(s => s.trim()).filter(Boolean); }
+    };
+
     const product = await Product.create({
-      name, slug, category, shortDesc,
-      price: Number(price), originalPrice: Number(originalPrice),
+      name: name.trim(), slug, category,
+      shortDesc: shortDesc || "", fullDesc: fullDesc || "",
+      suitableFor: suitableFor || "", howToUse: howToUse || "",
+      price: parsedPrice, originalPrice: parsedOriginal,
       stock: Number(stock) || 0,
-      isBestSeller: isBestSeller === "true",
-      isFeatured: isFeatured === "true",
-      benefits: benefits ? JSON.parse(benefits) : [],
-      tags: tags ? JSON.parse(tags) : [],
+      isBestSeller: isBestSeller === "true" || isBestSeller === true,
+      isFeatured:   isFeatured   === "true" || isFeatured   === true,
+      benefits: parseBenefits(),
+      tags:     parseTags(),
+      weight:   weight || "",
       images, previewVideo, fullVideo,
     });
+
     res.status(201).json({ success: true, message: "Product created!", product });
-  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+  } catch (e) {
+    if (e.code === 11000) return res.status(400).json({ success: false, message: "A product with this name already exists." });
+    res.status(500).json({ success: false, message: e.message });
+  }
 });
 
-router.put("/product/update/:id", upload.fields([{ name: "images", maxCount: 5 }, { name: "previewVideo", maxCount: 1 }, { name: "fullVideo", maxCount: 1 }]), async (req, res) => {
+router.put("/product/update/:id", upload.fields([{ name: "images", maxCount: 5 }, { name: "image", maxCount: 1 }, { name: "previewVideo", maxCount: 1 }, { name: "fullVideo", maxCount: 1 }]), async (req, res) => {
   try {
     const updates = { ...req.body };
-    if (updates.price) updates.price = Number(updates.price);
+    if (updates.price)         updates.price         = Number(updates.price);
     if (updates.originalPrice) updates.originalPrice = Number(updates.originalPrice);
-    if (updates.stock) updates.stock = Number(updates.stock);
-    if (updates.benefits) updates.benefits = JSON.parse(updates.benefits);
-    if (updates.tags) updates.tags = JSON.parse(updates.tags);
-    if (req.files?.images) updates.images = req.files.images.map(f => f.path);
-    if (req.files?.previewVideo) updates.previewVideo = req.files.previewVideo[0].path;
-    if (req.files?.fullVideo) updates.fullVideo = req.files.fullVideo[0].path;
-    const product = await Product.findByIdAndUpdate(req.params.id, updates, { new: true });
+    if (updates.stock)         updates.stock         = Number(updates.stock);
+    if (updates.isBestSeller !== undefined) updates.isBestSeller = updates.isBestSeller === "true" || updates.isBestSeller === true;
+    if (updates.isFeatured   !== undefined) updates.isFeatured   = updates.isFeatured   === "true" || updates.isFeatured   === true;
+    if (updates.benefits) {
+      try { updates.benefits = JSON.parse(updates.benefits); }
+      catch { updates.benefits = updates.benefits.split(",").map(s => s.trim()).filter(Boolean); }
+    }
+    if (updates.tags) {
+      try { updates.tags = JSON.parse(updates.tags); }
+      catch { updates.tags = updates.tags.split(",").map(s => s.trim()).filter(Boolean); }
+    }
+
+    const baseUrl = process.env.BACKEND_URL || `https://wishstone.onrender.com`;
+    const mapPath = f => f.path.startsWith("http") ? f.path : `${baseUrl}/${f.path.replace(/\\/g, "/")}`;
+
+    const newImages = [
+      ...(req.files?.images || []).map(mapPath),
+      ...(req.files?.image  || []).map(mapPath),
+    ];
+    if (newImages.length > 0) updates.images = newImages;
+    if (req.files?.previewVideo) updates.previewVideo = mapPath(req.files.previewVideo[0]);
+    if (req.files?.fullVideo)    updates.fullVideo    = mapPath(req.files.fullVideo[0]);
+
+    const product = await Product.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: false });
     if (!product) return res.status(404).json({ success: false, message: "Product not found." });
     res.json({ success: true, product });
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
