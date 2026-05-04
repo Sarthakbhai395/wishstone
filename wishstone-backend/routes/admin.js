@@ -349,15 +349,65 @@ router.get("/customers/:id", async (req, res) => {
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
+// ── USERS (GET ALL) ──────────────────────────────────────────
+router.get("/users", async (req, res) => {
+  try {
+    const { search, role } = req.query;
+    const query = {};
+    if (role) query.role = role;
+    if (search) {
+      query.$or = [
+        { name:  { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+      ];
+    }
+    const users = await User.find(query)
+      .select("-password")
+      .sort({ createdAt: -1 });
+    res.json({ success: true, users });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// Create user (admin)
+router.post("/users", async (req, res) => {
+  try {
+    const { name, email, password, phone, role } = req.body;
+    if (!name || !email || !password)
+      return res.status(400).json({ success: false, message: "Name, email and password are required." });
+    const exists = await User.findOne({ email });
+    if (exists) return res.status(409).json({ success: false, message: "Email already registered." });
+    const user = await User.create({ name, email, password, phone, role: role || "user" });
+    res.status(201).json({ success: true, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// Update user
+router.put("/users/:id", async (req, res) => {
+  try {
+    const { name, email, phone, role, isActive, password } = req.body;
+    const updates = {};
+    if (name     !== undefined) updates.name     = name;
+    if (email    !== undefined) updates.email    = email;
+    if (phone    !== undefined) updates.phone    = phone;
+    if (role     !== undefined) updates.role     = role;
+    if (isActive !== undefined) updates.isActive = isActive;
+    // Only update password if provided
+    if (password) {
+      const bcrypt = require("bcryptjs");
+      updates.password = await bcrypt.hash(password, 12);
+    }
+    const user = await User.findByIdAndUpdate(req.params.id, updates, { new: true }).select("-password");
+    if (!user) return res.status(404).json({ success: false, message: "User not found." });
+    res.json({ success: true, user });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
 // Delete user
 router.delete("/users/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ success: false, message: "User not found." });
-    
-    // Permanent delete
     await User.findByIdAndDelete(req.params.id);
-    
     res.json({ success: true, message: "User deleted successfully." });
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });

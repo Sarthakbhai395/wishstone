@@ -42,13 +42,6 @@ const corsOptions = {
 // Handle preflight OPTIONS requests for all routes
 app.options("*", cors(corsOptions));
 app.use(cors(corsOptions));
-app.use(cors({
-  origin: [
-    "https://wishstone-one.vercel.app/",
-    "https://wishstone-admin.vercel.app/"
-  ],
-  credentials: true
-}));
 
 // ─── COMPRESSION ─────────────────────────────────────────────
 app.use(compression());
@@ -104,6 +97,25 @@ if (require("fs").existsSync(frontendBuild)) {
 }
 
 app.get("/", (req, res) => res.json({ status: "🔮 Wishstone API Running", version: "1.0.0" }));
+
+// ─── DEBUG: LIST ALL ROUTES ──────────────────────────────────
+app.get("/api/routes", (req, res) => {
+  const routes = [];
+  app._router.stack.forEach((middleware) => {
+    if (middleware.route) {
+      routes.push({ path: middleware.route.path, methods: Object.keys(middleware.route.methods) });
+    } else if (middleware.name === 'router' && middleware.handle.stack) {
+      const basePath = middleware.regexp.toString().replace('/^\\', '').replace('\\/?(?=\/|$)/i', '').replace('\\/', '/');
+      middleware.handle.stack.forEach((handler) => {
+        if (handler.route) {
+          const path = basePath + handler.route.path.replace(/\\/g, '');
+          routes.push({ path, methods: Object.keys(handler.route.methods) });
+        }
+      });
+    }
+  });
+  res.json({ success: true, routes: routes.filter(r => r.path.includes('/api')).sort((a, b) => a.path.localeCompare(b.path)) });
+});
 
 // ─── FRONTEND CATCH-ALL (SPA) ─────────────────────────────────
 const frontendIndex = path.join(__dirname, "../wishstone-frontend/build/index.html");
