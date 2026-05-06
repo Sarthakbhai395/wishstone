@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const { protect, adminOnly } = require("../middleware/auth");
-const upload = require("../middleware/upload");
+const { uploadProductImages, uploadCategoryImage, getFileUrls } = require("../middleware/uploadCloudinary");
 const Product = require("../models/Product");
 const Category = require("../models/Category");
 const Order = require("../models/Order");
@@ -48,7 +48,7 @@ router.get("/products", async (req, res) => {
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-router.post("/product/add", upload.fields([{ name: "images", maxCount: 5 }, { name: "image", maxCount: 1 }, { name: "previewVideo", maxCount: 1 }, { name: "fullVideo", maxCount: 1 }]), async (req, res) => {
+router.post("/product/add", uploadProductImages([{ name: "images", maxCount: 5 }, { name: "image", maxCount: 1 }, { name: "previewVideo", maxCount: 1 }, { name: "fullVideo", maxCount: 1 }]), async (req, res) => {
   try {
     const { name, category, shortDesc, fullDesc, suitableFor, howToUse, price, originalPrice, stock, isBestSeller, isFeatured, benefits, tags, weight } = req.body;
 
@@ -66,15 +66,8 @@ router.post("/product/add", upload.fields([{ name: "images", maxCount: 5 }, { na
     let counter = 1;
     while (await Product.findOne({ slug })) { slug = `${baseSlug}-${counter++}`; }
 
-    // Handle images — support both "images" (multi) and "image" (single) field names
-    const baseUrl = process.env.BACKEND_URL || `https://wishstone.onrender.com`;
-    const mapPath = f => f.path.startsWith("http") ? f.path : `${baseUrl}/${f.path.replace(/\\/g, "/")}`;
-    const images = [
-      ...(req.files?.images || []).map(mapPath),
-      ...(req.files?.image  || []).map(mapPath),
-    ];
-    const previewVideo = req.files?.previewVideo?.[0] ? mapPath(req.files.previewVideo[0]) : "";
-    const fullVideo    = req.files?.fullVideo?.[0]    ? mapPath(req.files.fullVideo[0])    : "";
+    // Handle images using Cloudinary or local storage
+    const { images, previewVideo, fullVideo } = getFileUrls(req);
 
     // Parse array fields safely
     const parseBenefits = () => {
@@ -107,7 +100,7 @@ router.post("/product/add", upload.fields([{ name: "images", maxCount: 5 }, { na
   }
 });
 
-router.put("/product/update/:id", upload.fields([{ name: "images", maxCount: 5 }, { name: "image", maxCount: 1 }, { name: "previewVideo", maxCount: 1 }, { name: "fullVideo", maxCount: 1 }]), async (req, res) => {
+router.put("/product/update/:id", uploadProductImages([{ name: "images", maxCount: 5 }, { name: "image", maxCount: 1 }, { name: "previewVideo", maxCount: 1 }, { name: "fullVideo", maxCount: 1 }]), async (req, res) => {
   try {
     const updates = { ...req.body };
     if (updates.price)         updates.price         = Number(updates.price);
@@ -124,16 +117,11 @@ router.put("/product/update/:id", upload.fields([{ name: "images", maxCount: 5 }
       catch { updates.tags = updates.tags.split(",").map(s => s.trim()).filter(Boolean); }
     }
 
-    const baseUrl = process.env.BACKEND_URL || `https://wishstone.onrender.com`;
-    const mapPath = f => f.path.startsWith("http") ? f.path : `${baseUrl}/${f.path.replace(/\\/g, "/")}`;
-
-    const newImages = [
-      ...(req.files?.images || []).map(mapPath),
-      ...(req.files?.image  || []).map(mapPath),
-    ];
+    // Handle images using Cloudinary or local storage
+    const { images: newImages, previewVideo, fullVideo } = getFileUrls(req);
     if (newImages.length > 0) updates.images = newImages;
-    if (req.files?.previewVideo) updates.previewVideo = mapPath(req.files.previewVideo[0]);
-    if (req.files?.fullVideo)    updates.fullVideo    = mapPath(req.files.fullVideo[0]);
+    if (req.files?.previewVideo) updates.previewVideo = previewVideo;
+    if (req.files?.fullVideo)    updates.fullVideo    = fullVideo;
 
     const product = await Product.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: false });
     if (!product) return res.status(404).json({ success: false, message: "Product not found." });
@@ -149,19 +137,21 @@ router.delete("/product/delete/:id", async (req, res) => {
 });
 
 // ── CATEGORIES ───────────────────────────────────────────────
-router.post("/category/add", upload.single("image"), async (req, res) => {
+router.post("/category/add", uploadCategoryImage(), async (req, res) => {
   try {
     const { name, description, sortOrder } = req.body;
     const slug = name.toLowerCase().replace(/\s+/g, "-");
-    const category = await Category.create({ name, slug, description, image: req.file?.path || "", sortOrder: Number(sortOrder) || 0 });
+    // Get image URL from Cloudinary or local storage
+    const image = req.file?.path || "";
+    const category = await Category.create({ name, slug, description, image, sortOrder: Number(sortOrder) || 0 });
     res.status(201).json({ success: true, category });
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
-router.put("/category/update/:id", upload.single("image"), async (req, res) => {
+router.put("/category/update/:id", uploadCategoryImage(), async (req, res) => {
   try {
     const updates = { ...req.body };
-    if (req.file) updates.image = req.file.path;
+    if (req.file) updates.image = req.file.path; // Cloudinary returns full URL in path
     const category = await Category.findByIdAndUpdate(req.params.id, updates, { new: true });
     res.json({ success: true, category });
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
