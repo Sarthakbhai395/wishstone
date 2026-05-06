@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams, Navigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 const T = {
   bg: "#F5F0E8", bgDark: "#2C3320",
@@ -971,77 +972,45 @@ function HomePage({ onShop, onRitual, onNav }) {
 
 // ─── BEST SELLERS STRIP (reusable) ───────────────────────────
 function BestSellersStrip({ onShop }) {
-  const scrollRef = useRef(null);
-  const isDragging = useRef(false);
-  const startX = useRef(0);
-  const scrollStart = useRef(0);
-
-  const scroll = (dir) => {
-    scrollRef.current.scrollBy({ left: dir * 240, behavior: "smooth" });
-  };
-
-  const onMouseDown = e => {
-    isDragging.current = true;
-    startX.current = e.pageX;
-    scrollStart.current = scrollRef.current.scrollLeft;
-    scrollRef.current.style.cursor = "grabbing";
-  };
-  const onMouseUp   = () => { isDragging.current = false; scrollRef.current.style.cursor = "grab"; };
-  const onMouseLeave= () => { isDragging.current = false; scrollRef.current.style.cursor = "grab"; };
-  const onMouseMove = e => {
-    if (!isDragging.current) return;
-    e.preventDefault();
-    scrollRef.current.scrollLeft = scrollStart.current - (e.pageX - startX.current);
-  };
+  const navigate = useNavigate();
+  const goToProduct = (p) => navigate(`/product/${p.id}`);
 
   return (
-    <section style={{ background:"#fff", paddingTop:"70px", paddingBottom:"70px" }}>
+    <section style={{ background:"#fff", paddingTop:"70px", paddingBottom:"70px", overflow:"hidden" }}>
       <div className="max-w" style={{ paddingLeft:"clamp(1.5rem,5vw,3.5rem)", paddingRight:"clamp(1.5rem,5vw,3.5rem)", marginBottom:"2rem" }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
           <div>
             <div style={{ fontSize:"0.65rem", fontWeight:700, color:T.orange, letterSpacing:"0.18em", textTransform:"uppercase", marginBottom:8 }}>BEST SELLERS</div>
             <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(1.6rem,3.5vw,2.2rem)", fontWeight:900, color:T.text, margin:0 }}>Most Loved Stones</h2>
           </div>
-          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-            <button onClick={() => scroll(-1)} style={{ width:38, height:38, borderRadius:"50%", border:`1.5px solid ${T.border}`, background:"#fff", cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.2s" }}
-              onMouseEnter={e => { e.currentTarget.style.background=T.orange; e.currentTarget.style.borderColor=T.orange; e.currentTarget.style.color="#fff"; }}
-              onMouseLeave={e => { e.currentTarget.style.background="#fff"; e.currentTarget.style.borderColor=T.border; e.currentTarget.style.color="#000"; }}>‹</button>
-            <button onClick={() => scroll(1)} style={{ width:38, height:38, borderRadius:"50%", border:`1.5px solid ${T.border}`, background:"#fff", cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.2s" }}
-              onMouseEnter={e => { e.currentTarget.style.background=T.orange; e.currentTarget.style.borderColor=T.orange; e.currentTarget.style.color="#fff"; }}
-              onMouseLeave={e => { e.currentTarget.style.background="#fff"; e.currentTarget.style.borderColor=T.border; e.currentTarget.style.color="#000"; }}>›</button>
-            <button className="btn-outline" onClick={onShop} style={{ padding:"10px 24px", fontSize:"0.78rem", borderRadius:8 }}>View All →</button>
-          </div>
+          <button className="btn-outline" onClick={onShop} style={{ padding:"10px 24px", fontSize:"0.78rem", borderRadius:8 }}>View All →</button>
         </div>
       </div>
-      <div
-        ref={scrollRef}
-        onMouseDown={onMouseDown}
-        onMouseUp={onMouseUp}
-        onMouseLeave={onMouseLeave}
-        onMouseMove={onMouseMove}
-        style={{ overflowX:"auto", overflowY:"hidden", display:"flex", gap:"1.2rem", paddingLeft:"clamp(1rem,4vw,3rem)", paddingRight:"clamp(1rem,4vw,3rem)", paddingBottom:8, cursor:"grab", userSelect:"none", scrollbarWidth:"none", msOverflowStyle:"none", WebkitOverflowScrolling:"touch" }}
-      >
-        {PRODUCTS.map((p, i) => (
-          <div key={i} onClick={onShop} style={{ width:220, flexShrink:0, cursor:"pointer" }}>
-            <div style={{ borderRadius:14, overflow:"hidden", border:`1px solid ${T.border}`, background:T.bg, transition:"transform 0.3s, box-shadow 0.3s" }}
-              onMouseEnter={e => { e.currentTarget.style.transform="translateY(-5px)"; e.currentTarget.style.boxShadow="0 16px 40px rgba(0,0,0,0.1)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="none"; }}>
-              <div style={{ position:"relative", aspectRatio:"1", overflow:"hidden" }}>
-                <img referrerPolicy="no-referrer" src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-                <div style={{ position:"absolute", top:8, left:8, background:T.orange, color:"#fff", borderRadius:4, padding:"2px 8px", fontSize:"0.6rem", fontWeight:800 }}>-{p.discount}%</div>
-                {p.bestSeller && <div style={{ position:"absolute", bottom:6, left:6, background:T.bgDark, color:T.orange, borderRadius:4, padding:"2px 7px", fontSize:"0.58rem", fontWeight:700 }}>BEST SELLER</div>}
-              </div>
-              <div style={{ padding:"0.9rem" }}>
-                <div style={{ fontSize:"0.8rem", fontWeight:700, color:T.text, marginBottom:4, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{p.name}</div>
-                <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                  <span style={{ fontSize:"0.9rem", color:T.orange, fontWeight:700 }}>Rs.{p.price.toLocaleString()}</span>
-                  <span style={{ color:T.textMid, fontSize:"0.7rem", textDecoration:"line-through" }}>Rs.{p.originalPrice.toLocaleString()}</span>
+      <div style={{ overflow:"hidden", position:"relative" }}>
+        <div style={{ display:"flex", animation:"autoScrollStrip 25s linear infinite", width:"max-content" }}>
+          {[...PRODUCTS, ...PRODUCTS, ...PRODUCTS].map((p, i) => (
+            <div key={i} onClick={() => goToProduct(p)} style={{ width:220, flexShrink:0, marginRight:"1.2rem", cursor:"pointer" }}>
+              <div style={{ borderRadius:14, overflow:"hidden", border:`1px solid ${T.border}`, background:T.bg, transition:"transform 0.3s, box-shadow 0.3s" }}
+                onMouseEnter={e => { e.currentTarget.style.transform="translateY(-5px)"; e.currentTarget.style.boxShadow="0 16px 40px rgba(0,0,0,0.1)"; }}
+                onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="none"; }}>
+                <div style={{ position:"relative", aspectRatio:"1", overflow:"hidden" }}>
+                  <img referrerPolicy="no-referrer" src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                  <div style={{ position:"absolute", top:8, left:8, background:T.orange, color:"#fff", borderRadius:4, padding:"2px 8px", fontSize:"0.6rem", fontWeight:800 }}>-{p.discount}%</div>
+                  {p.bestSeller && <div style={{ position:"absolute", bottom:6, left:6, background:T.bgDark, color:T.orange, borderRadius:4, padding:"2px 7px", fontSize:"0.58rem", fontWeight:700 }}>BEST SELLER</div>}
+                </div>
+                <div style={{ padding:"0.9rem" }}>
+                  <div style={{ fontSize:"0.8rem", fontWeight:700, color:T.text, marginBottom:4, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{p.name}</div>
+                  <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                    <span style={{ fontSize:"0.9rem", color:T.orange, fontWeight:700 }}>Rs.{p.price.toLocaleString()}</span>
+                    <span style={{ color:T.textMid, fontSize:"0.7rem", textDecoration:"line-through" }}>Rs.{p.originalPrice.toLocaleString()}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
+      <style>{`@keyframes autoScrollStrip{from{transform:translateX(0)}to{transform:translateX(-33.33%)}}`}</style>
     </section>
   );
 }
@@ -1206,6 +1175,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
   const navigate = useNavigate();
   const [tab, setTab] = useState("desc");
   const [activeImg, setActiveImg] = useState(0);
+  const [dragDirection, setDragDirection] = useState(0);
   const cartQty = cart ? cart.filter(i => i.id === p?.id).reduce((s,i) => s + i.qty, 0) : 0;
   if (!p) return null;
   const imgs = p.images || [p.image];
@@ -1215,20 +1185,166 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
   // Remove one from cart
   const handleDec = () => { onAdd({ ...p, qty: -1 }); };
 
+  // Navigate images
+  const nextImage = () => setActiveImg((prev) => (prev + 1) % imgs.length);
+  const prevImage = () => setActiveImg((prev) => (prev - 1 + imgs.length) % imgs.length);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "ArrowRight") nextImage();
+      if (e.key === "ArrowLeft") prevImage();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [imgs.length]);
+
+  // Swipe handling
+  const handleDragEnd = (_, info) => {
+    if (info.offset.x < -50) nextImage();
+    if (info.offset.x > 50) prevImage();
+  };
+
+  // Image animation variants
+  const imageVariants = {
+    enter: { opacity: 0, scale: 0.95, x: 20 },
+    center: { opacity: 1, scale: 1, x: 0 },
+    exit: { opacity: 0, scale: 0.95, x: -20 }
+  };
+
+  const thumbnailVariants = {
+    idle: { scale: 1, y: 0 },
+    hover: { scale: 1.08, y: -4 },
+    tap: { scale: 0.95 }
+  };
+
   return (
     <>
     <div style={{ paddingTop:90, paddingBottom:80, background:T.bg, minHeight:"100vh" }}>
       <div className="max-w" style={{ padding:"clamp(1.5rem,4vw,3rem)" }}>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"3rem", alignItems:"start" }} className="prod-detail-grid">
+          {/* Left Side - Image Gallery Nike Style */}
           <div>
-            <div style={{ borderRadius:16, overflow:"hidden", boxShadow:"0 8px 40px rgba(0,0,0,0.1)", marginBottom:"0.9rem", aspectRatio:"1", background:"#f0ece4" }}>
-              <img referrerPolicy="no-referrer" src={imgs[activeImg]} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover", transition:"opacity 0.3s" }} />
+            {/* Main Image with Animation */}
+            <div style={{ borderRadius:20, overflow:"hidden", boxShadow:"0 12px 48px rgba(0,0,0,0.12)", marginBottom:"1.2rem", aspectRatio:"1", background:"#f0ece4", position:"relative" }}>
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeImg}
+                  referrerPolicy="no-referrer"
+                  src={imgs[activeImg]}
+                  alt={p.name}
+                  variants={imageVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  style={{ width:"100%", height:"100%", objectFit:"cover", position:"absolute", top:0, left:0, cursor:"grab" }}
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.2}
+                  onDragEnd={handleDragEnd}
+                  whileDrag={{ cursor: "grabbing", scale: 0.98 }}
+                />
+              </AnimatePresence>
+
+              {/* Back Button */}
+              <motion.button
+                onClick={() => navigate(-1)}
+                whileHover={{ scale: 1.1, backgroundColor: "#fff" }}
+                whileTap={{ scale: 0.9 }}
+                style={{ position:"absolute", top:16, left:16, width:44, height:44, borderRadius:"50%", background:"rgba(255,255,255,0.95)", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 4px 16px rgba(0,0,0,0.15)", zIndex:10 }}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+              </motion.button>
+
+              {/* Navigation Arrows */}
+              {imgs.length > 1 && (
+                <>
+                  <motion.button
+                    onClick={prevImage}
+                    whileHover={{ scale: 1.1, x: -2 }}
+                    whileTap={{ scale: 0.9 }}
+                    style={{ position:"absolute", left:16, top:"50%", transform:"translateY(-50%)", width:44, height:44, borderRadius:"50%", background:"rgba(255,255,255,0.95)", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 4px 16px rgba(0,0,0,0.15)", zIndex:10 }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                  </motion.button>
+                  <motion.button
+                    onClick={nextImage}
+                    whileHover={{ scale: 1.1, x: 2 }}
+                    whileTap={{ scale: 0.9 }}
+                    style={{ position:"absolute", right:16, top:"50%", transform:"translateY(-50%)", width:44, height:44, borderRadius:"50%", background:"rgba(255,255,255,0.95)", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 4px 16px rgba(0,0,0,0.15)", zIndex:10 }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                  </motion.button>
+                </>
+              )}
+
+              {/* Image Counter */}
+              <div style={{ position:"absolute", bottom:16, right:16, background:"rgba(0,0,0,0.7)", color:"#fff", borderRadius:20, padding:"6px 14px", fontSize:"0.75rem", fontWeight:600, zIndex:10 }}>
+                {activeImg + 1} / {imgs.length}
+              </div>
             </div>
-            <div style={{ display:"flex", gap:"0.6rem", overflowX:"auto" }} className="scroll-hide">
+
+            {/* Thumbnail Strip - Nike Style */}
+            <div style={{ display:"flex", gap:"0.9rem", overflowX:"auto", padding:"8px 4px", justifyContent:"flex-start" }} className="scroll-hide">
               {imgs.map((img, i) => (
-                <button key={i} onClick={() => setActiveImg(i)} style={{ flexShrink:0, width:72, height:72, borderRadius:10, overflow:"hidden", padding:0, border:`2.5px solid ${activeImg===i ? T.orange : "transparent"}`, cursor:"pointer", transition:"border-color 0.2s", boxShadow: activeImg===i ? `0 0 0 1px ${T.orange}` : "0 2px 8px rgba(0,0,0,0.08)" }}>
-                  <img referrerPolicy="no-referrer" src={img} alt={`view ${i+1}`} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-                </button>
+                <motion.button
+                  key={i}
+                  onClick={() => setActiveImg(i)}
+                  variants={thumbnailVariants}
+                  initial="idle"
+                  whileHover="hover"
+                  whileTap="tap"
+                  animate={activeImg === i ? { scale: 1.02, y: -2 } : { scale: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  style={{
+                    flexShrink:0,
+                    width:86,
+                    height:86,
+                    borderRadius:14,
+                    overflow:"hidden",
+                    padding:4,
+                    background: activeImg===i ? "#fff" : "transparent",
+                    border: activeImg===i ? `3px solid ${T.orange}` : "3px solid transparent",
+                    cursor:"pointer",
+                    boxShadow: activeImg===i ? `0 8px 24px rgba(232,114,12,0.25)` : "0 2px 8px rgba(0,0,0,0.06)",
+                    position:"relative"
+                  }}
+                >
+                  <img
+                    referrerPolicy="no-referrer"
+                    src={img}
+                    alt={`view ${i+1}`}
+                    style={{
+                      width:"100%",
+                      height:"100%",
+                      objectFit:"cover",
+                      borderRadius:10,
+                      opacity: activeImg===i ? 1 : 0.7
+                    }}
+                  />
+                  {activeImg === i && (
+                    <motion.div
+                      layoutId="activeIndicator"
+                      style={{
+                        position:"absolute",
+                        bottom:-8,
+                        left:"50%",
+                        transform:"translateX(-50%)",
+                        width:6,
+                        height:6,
+                        borderRadius:"50%",
+                        background:T.orange
+                      }}
+                    />
+                  )}
+                </motion.button>
               ))}
             </div>
           </div>
@@ -1258,7 +1374,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                 <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.orange}`, borderRadius:8, overflow:"hidden" }}>
                   <button onClick={handleDec} style={{ width:36, height:40, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.orange, fontWeight:700 }}>−</button>
                   <span style={{ width:40, textAlign:"center", fontWeight:800, color:T.orange, fontSize:"1rem" }}>{cartQty}</span>
-                  <button onClick={handleAdd} disabled={cartQty>=10} style={{ width:36, height:40, background: cartQty>=10 ? "#e5e7eb" : T.orange, border:"none", cursor: cartQty>=10 ? "not-allowed" : "pointer", fontSize:18, color:"#fff", fontWeight:700 }}>+</button>
+                  <button onClick={handleAdd} disabled={cart?.reduce((s,i)=>s+i.qty,0)>=10} style={{ width:36, height:40, background: cart?.reduce((s,i)=>s+i.qty,0)>=10 ? "#e5e7eb" : T.orange, border:"none", cursor: cart?.reduce((s,i)=>s+i.qty,0)>=10 ? "not-allowed" : "pointer", fontSize:18, color:"#fff", fontWeight:700 }}>+</button>
                 </div>
               ) : (
                 <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.border}`, borderRadius:8, overflow:"hidden" }}>
@@ -1267,8 +1383,8 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                   <button style={{ width:36, height:40, background:"none", border:"none", cursor:"default", fontSize:18, color:T.textMid, opacity:0.4 }}>+</button>
                 </div>
               )}
-              <button className="btn-orange" onClick={handleAdd} disabled={cartQty>=10} style={{ flex:1, padding:"12px", fontSize:"0.8rem", borderRadius:8, opacity: cartQty>=10 ? 0.5 : 1, cursor: cartQty>=10 ? "not-allowed" : "pointer" }}>
-                {cartQty >= 10 ? "Max 10 reached" : cartQty > 0 ? `Add More (${cartQty}/10)` : "Add to Cart"}
+              <button className="btn-orange" onClick={handleAdd} disabled={cart?.reduce((s,i)=>s+i.qty,0)>=10} style={{ flex:1, padding:"12px", fontSize:"0.8rem", borderRadius:8, opacity: cart?.reduce((s,i)=>s+i.qty,0)>=10 ? 0.5 : 1, cursor: cart?.reduce((s,i)=>s+i.qty,0)>=10 ? "not-allowed" : "pointer" }}>
+                {cart?.reduce((s,i)=>s+i.qty,0) >= 10 ? "Cart Full (10/10)" : cartQty > 0 ? `Add More (${cart?.reduce((s,i)=>s+i.qty,0)}/10)` : "Add to Cart"}
               </button>
               <button onClick={e => onWish(e, p.id)} style={{ width:44, height:44, borderRadius:8, border:`1.5px solid ${T.border}`, background:"#fff", cursor:"pointer", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center" }}>{wished.includes(p.id) ? "❤️" : "🤍"}</button>
             </div>
@@ -1285,36 +1401,44 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
     </div>
     <BestSellersStrip onShop={onShop} />
     {/* Sticky Add to Cart Bar */}
-    <div style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:999, background:"rgba(255,255,255,0.98)", backdropFilter:"blur(14px)", borderTop:`1.5px solid ${T.border}`, padding:"clamp(10px,2vw,14px) clamp(1rem,4vw,2.5rem)", display:"flex", alignItems:"center", gap:"clamp(0.6rem,2vw,1rem)", boxShadow:"0 -4px 24px rgba(0,0,0,0.1)" }}>
-      {cartQty > 0 ? (
-        <>
-          {/* qty counter */}
-          <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.orange}`, borderRadius:9, overflow:"hidden", flexShrink:0, height:46 }}>
-            <button onClick={handleDec} style={{ width:40, height:46, background:"none", border:"none", cursor:"pointer", fontSize:18, color:T.orange, fontWeight:700, lineHeight:1 }}>−</button>
-            <span style={{ width:36, textAlign:"center", fontWeight:800, color:T.orange, fontSize:"1rem" }}>{cartQty}</span>
-            <button onClick={handleAdd} disabled={cartQty>=10} style={{ width:40, height:46, background: cartQty>=10 ? "#e5e7eb" : T.orange, border:"none", cursor: cartQty>=10 ? "not-allowed" : "pointer", fontSize:18, color:"#fff", fontWeight:700, lineHeight:1 }}>+</button>
-          </div>
-          {/* View Cart — full remaining width */}
-          <button onClick={() => navigate("/cart")} style={{ flex:1, height:46, background:`linear-gradient(135deg,${T.bgDark},#1a1a1a)`, color:"#fff", border:"none", borderRadius:9, fontSize:"clamp(0.82rem,2vw,0.95rem)", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", letterSpacing:"0.04em", display:"flex", alignItems:"center", justifyContent:"center", gap:8, transition:"all 0.25s", boxShadow:"0 4px 18px rgba(0,0,0,0.18)", animation:"stickyBtnIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both" }}
-            onMouseEnter={e => e.currentTarget.style.background=`linear-gradient(135deg,${T.orangeD},${T.orange})`}
-            onMouseLeave={e => e.currentTarget.style.background=`linear-gradient(135deg,${T.bgDark},#1a1a1a)`}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <div style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:999, background:"rgba(255,255,255,0.98)", backdropFilter:"blur(14px)", borderTop:`1px solid ${T.border}`, padding:"8px 16px", display:"flex", alignItems:"center", justifyContent:"center", gap:"12px", boxShadow:"0 -2px 20px rgba(0,0,0,0.08)" }}>
+      <div style={{ display:"flex", alignItems:"center", gap:"12px", maxWidth:"500px", width:"100%" }}>
+        {cartQty > 0 ? (
+          <>
+            {/* Compact qty counter */}
+            <div style={{ display:"flex", alignItems:"center", border:`1.5px solid ${T.orange}`, borderRadius:8, overflow:"hidden", flexShrink:0, height:42 }}>
+              <button onClick={handleDec} style={{ width:36, height:42, background:"none", border:"none", cursor:"pointer", fontSize:16, color:T.orange, fontWeight:700 }}>−</button>
+              <span style={{ width:32, textAlign:"center", fontWeight:800, color:T.orange, fontSize:"0.95rem" }}>{cartQty}</span>
+              <button onClick={handleAdd} disabled={cart?.reduce((s,i)=>s+i.qty,0)>=10} style={{ width:36, height:42, background: cart?.reduce((s,i)=>s+i.qty,0)>=10 ? "#e5e7eb" : T.orange, border:"none", cursor: cart?.reduce((s,i)=>s+i.qty,0)>=10 ? "not-allowed" : "pointer", fontSize:16, color:"#fff", fontWeight:700 }}>+</button>
+            </div>
+            {/* View Cart Button */}
+            <button onClick={() => navigate("/cart")} style={{ flex:1, height:42, background:`linear-gradient(135deg,${T.orangeD},${T.orange})`, color:"#fff", border:"none", borderRadius:8, fontSize:"0.85rem", fontWeight:700, cursor:"pointer", fontFamily:"'Inter',sans-serif", letterSpacing:"0.02em", display:"flex", alignItems:"center", justifyContent:"center", gap:6, transition:"all 0.2s", boxShadow:"0 3px 12px rgba(232,114,12,0.3)", animation:"stickyBtnIn 0.3s ease both" }}
+              onMouseEnter={e => e.currentTarget.style.transform="translateY(-1px)"}
+              onMouseLeave={e => e.currentTarget.style.transform="translateY(0)"}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+              </svg>
+              View Cart • ₹{(cartQty * p.price).toLocaleString()}
+            </button>
+          </>
+        ) : (
+          /* Add to Cart Button */
+          <button className="btn-orange" onClick={handleAdd} style={{ flex:1, height:42, fontSize:"0.9rem", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", gap:8, transition:"all 0.2s", animation:"stickyBtnIn 0.3s ease both", boxShadow:"0 3px 12px rgba(232,114,12,0.3)" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
-            View Cart ({cartQty})
+            Add to Cart — ₹{p.price.toLocaleString()}
           </button>
-        </>
-      ) : (
-        /* Add to Cart — full width */
-        <button className="btn-orange" onClick={handleAdd} style={{ flex:1, height:46, fontSize:"clamp(0.82rem,2vw,0.95rem)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", gap:8, transition:"all 0.25s", animation:"stickyBtnIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both" }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-          </svg>
-          Add to Cart
+        )}
+        {/* Wishlist heart */}
+        <button onClick={e => onWish(e, p.id)} style={{ width:42, height:42, borderRadius:8, border:`1.5px solid ${T.border}`, background:"#fff", cursor:"pointer", fontSize:18, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.2s", flexShrink:0 }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor=T.orange; e.currentTarget.style.transform="scale(1.05)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor=T.border; e.currentTarget.style.transform="scale(1)"; }}>
+          {wished.includes(p.id) ? "❤️" : "🤍"}
         </button>
-      )}
+      </div>
     </div>
     <style>{`@keyframes stickyBtnIn{from{opacity:0;transform:scale(0.94) translateY(4px);}to{opacity:1;transform:scale(1) translateY(0);}}`}</style>
     </>
@@ -2890,14 +3014,19 @@ function AppInner() {
   }, [user?.email]);
 
   const addToCart = p => {
-    const MAX = 10;
+    const MAX_TOTAL = 10; // Max 10 items total across all products
     if (p.qty === -1) {
       setCart(c => c.map(i => i.id===p.id ? {...i, qty:i.qty-1} : i).filter(i => i.qty > 0));
     } else {
       setCart(c => {
+        const totalQty = c.reduce((sum, item) => sum + item.qty, 0);
+        if (totalQty >= MAX_TOTAL) {
+          alert("Cart limit reached! You can only add up to 10 items total.");
+          return c; // Don't add if cart is full
+        }
         const ex = c.find(i => i.id===p.id);
         if (ex) {
-          if (ex.qty >= MAX) return c; // cap at 10
+          if (totalQty >= MAX_TOTAL) return c;
           return c.map(i => i.id===p.id ? {...i, qty:i.qty+1} : i);
         }
         return [...c, {...p, qty:1}];

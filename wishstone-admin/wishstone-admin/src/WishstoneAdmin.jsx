@@ -630,7 +630,8 @@ function Products({ token, showToast }) {
 
   const blank = { name: "", category: "", shortDesc: "", price: "", originalPrice: "", stock: "", isBestSeller: false, isFeatured: false, benefits: "", tags: "", weight: "", suitableFor: "" };
   const [form, setForm] = useState(blank);
-  const [imageFile, setImageFile] = useState(null);
+  const [imageFiles, setImageFiles] = useState([]); // Up to 5 images (main + 4 preview)
+  const [imagePreviews, setImagePreviews] = useState([]); // For displaying selected images
 
   const load = useCallback(async () => {
     try {
@@ -642,11 +643,36 @@ function Products({ token, showToast }) {
 
   useEffect(() => { load(); }, [load]);
 
-  const openAdd = () => { setEditing(null); setForm(blank); setImageFile(null); setShowModal(true); };
+  const openAdd = () => { setEditing(null); setForm(blank); setImageFiles([]); setImagePreviews([]); setShowModal(true); };
   const openEdit = p => {
     setEditing(p);
     setForm({ name: p.name || "", category: p.category?._id || "", shortDesc: p.shortDesc || "", price: p.price || "", originalPrice: p.originalPrice || "", stock: p.stock || "", isBestSeller: !!p.isBestSeller, isFeatured: !!p.isFeatured, benefits: (p.benefits || []).join(", "), tags: (p.tags || []).join(", "), weight: p.weight || "", suitableFor: p.suitableFor || "" });
-    setImageFile(null); setShowModal(true);
+    setImageFiles([]);
+    // Show existing images as previews when editing
+    setImagePreviews(p.images || []);
+    setShowModal(true);
+  };
+
+  // Handle multiple image selection
+  const handleImageSelect = (e) => {
+    const files = Array.from(e.target.files);
+    if (imageFiles.length + files.length > 5) {
+      showToast("Maximum 5 images allowed (1 main + 4 preview)", "error");
+      return;
+    }
+    const newFiles = [...imageFiles, ...files].slice(0, 5);
+    setImageFiles(newFiles);
+    // Generate previews
+    const newPreviews = files.map(file => URL.createObjectURL(file));
+    setImagePreviews([...imagePreviews, ...newPreviews].slice(0, 5));
+  };
+
+  // Remove selected image
+  const removeImage = (index) => {
+    const newFiles = imageFiles.filter((_, i) => i !== index);
+    const newPreviews = imagePreviews.filter((_, i) => i !== index);
+    setImageFiles(newFiles);
+    setImagePreviews(newPreviews);
   };
 
   const handleSubmit = async () => {
@@ -667,8 +693,10 @@ function Products({ token, showToast }) {
           fd.append(k, v ?? "");
         }
       });
-      // Append image file under "image" field name (backend accepts both "image" and "images")
-      if (imageFile) fd.append("image", imageFile);
+      // Append all image files (up to 5: 1 main + 4 preview)
+      imageFiles.forEach((file, index) => {
+        fd.append("images", file);
+      });
 
       if (editing) {
         await api.putForm(`/admin/product/update/${editing._id}`, fd, token);
@@ -812,9 +840,45 @@ function Products({ token, showToast }) {
               <input value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} style={inputSx} placeholder="crystal, healing, love"
                 onFocus={e => e.target.style.borderColor = T.orange} onBlur={e => e.target.style.borderColor = T.border} />
             </div>
-            <div>
-              <label style={labelSx}>Product Image</label>
-              <input type="file" accept="image/*" onChange={e => setImageFile(e.target.files[0])} style={{ ...inputSx, padding: "8px 14px" }} />
+            <div style={{ gridColumn: "1/-1" }}>
+              <label style={labelSx}>Product Images (Max 5: 1 Main + 4 Preview)</label>
+              <input 
+                type="file" 
+                accept="image/*" 
+                multiple 
+                onChange={handleImageSelect} 
+                style={{ ...inputSx, padding: "8px 14px" }}
+                disabled={imageFiles.length >= 5}
+              />
+              <p style={{ fontSize: "0.75rem", color: T.textLight, marginTop: 4 }}>
+                First image will be main image, rest will be preview images ({imageFiles.length}/5 selected)
+              </p>
+              
+              {/* Image Previews */}
+              {imagePreviews.length > 0 && (
+                <div style={{ display: "flex", gap: "12px", marginTop: "12px", flexWrap: "wrap" }}>
+                  {imagePreviews.map((preview, index) => (
+                    <div key={index} style={{ position: "relative", width: 80, height: 80, borderRadius: 10, overflow: "hidden", border: index === 0 ? `3px solid ${T.orange}` : `2px solid ${T.border}` }}>
+                      <img 
+                        src={preview.startsWith("http") || preview.startsWith("blob:") ? preview : `${API.replace("/api", "")}/${preview}`} 
+                        alt={`Preview ${index + 1}`} 
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                      />
+                      {index === 0 && (
+                        <div style={{ position: "absolute", top: 4, left: 4, background: T.orange, color: "#fff", fontSize: "0.6rem", padding: "2px 6px", borderRadius: 4, fontWeight: 700 }}>
+                          MAIN
+                        </div>
+                      )}
+                      <button
+                        onClick={() => removeImage(index)}
+                        style={{ position: "absolute", top: 4, right: 4, width: 20, height: 20, borderRadius: "50%", background: "rgba(255,0,0,0.8)", color: "#fff", border: "none", cursor: "pointer", fontSize: "0.7rem", display: "flex", alignItems: "center", justifyContent: "center" }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
               <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "0.85rem", color: T.textMid }}>

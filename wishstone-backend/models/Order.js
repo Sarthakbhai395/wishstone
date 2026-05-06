@@ -23,6 +23,7 @@ const orderSchema = new mongoose.Schema({
     landmark: String,
     city:     String,
     state:    String,
+    
     country:  { type: String, default: "India" },
     pincode:  String,
   },
