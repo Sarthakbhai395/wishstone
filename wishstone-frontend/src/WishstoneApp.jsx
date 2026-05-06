@@ -1651,31 +1651,106 @@ function CheckoutPage({ cart, onPlaceOrder }) {
 
 // ─── WISHLIST PAGE ────────────────────────────────────────────
 function WishlistPage({ ids, onAdd, onWish, onClick }) {
-  const items = PRODUCTS.filter(p => ids.includes(p.id));
+  const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
+  const [items, setItems]   = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!ids || ids.length === 0) { setItems([]); setLoading(false); return; }
+
+    // Fetch all wishlisted products from backend
+    const fetchWishlistItems = async () => {
+      setLoading(true);
+      try {
+        // Fetch each product by id — run in parallel
+        const results = await Promise.allSettled(
+          ids.map(id => fetch(`${API_BASE}/api/products/${id}`).then(r => r.json()))
+        );
+        const fetched = results
+          .filter(r => r.status === "fulfilled" && r.value?.success && r.value?.product)
+          .map(r => {
+            const p = r.value.product;
+            return {
+              ...p,
+              id:            p._id,
+              _id:           p._id,
+              image:         p.images?.[0] || "",
+              discount:      p.discount || (p.originalPrice ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) : 0),
+              isBestSeller:  p.isBestSeller || false,
+            };
+          });
+
+        // Fallback: for any ids that failed, try hardcoded PRODUCTS
+        const fetchedIds = new Set(fetched.map(p => p._id));
+        const fallbacks = ids
+          .filter(id => !fetchedIds.has(id))
+          .map(id => PRODUCTS.find(p => p.id === parseInt(id) || String(p.id) === id))
+          .filter(Boolean)
+          .map(p => ({ ...p, _id: String(p.id), image: p.image }));
+
+        setItems([...fetched, ...fallbacks]);
+      } catch {
+        // Full fallback to hardcoded
+        const fallback = ids
+          .map(id => PRODUCTS.find(p => p.id === parseInt(id) || String(p.id) === id))
+          .filter(Boolean)
+          .map(p => ({ ...p, _id: String(p.id), image: p.image }));
+        setItems(fallback);
+      }
+      setLoading(false);
+    };
+
+    fetchWishlistItems();
+  }, [ids, API_BASE]);
+
+  if (loading) return (
+    <div style={{ paddingTop:130, background:T.bg, minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center" }}>
+      <div style={{ textAlign:"center" }}>
+        <div style={{ width:40, height:40, border:"3px solid rgba(232,114,12,0.2)", borderTop:`3px solid ${T.orange}`, borderRadius:"50%", animation:"spin 0.8s linear infinite", margin:"0 auto 16px" }} />
+        <p style={{ color:T.textLight, fontSize:"0.88rem" }}>Loading wishlist…</p>
+      </div>
+    </div>
+  );
+
   if (!items.length) return (
     <div style={{ paddingTop:130, paddingBottom:40, paddingLeft:"2rem", paddingRight:"2rem", background:T.bg, minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, textAlign:"center" }}>
       <div style={{ fontSize:56 }}>🤍</div>
       <h2 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.8rem", fontWeight:900 }}>Your Wishlist is Empty</h2>
+      <p style={{ color:T.textMid, fontSize:"0.9rem" }}>Save products you love and find them here.</p>
     </div>
   );
+
   return (
     <div style={{ paddingTop:90, background:T.bg, minHeight:"100vh" }}>
       <div className="max-w" style={{ padding:"clamp(1.5rem,4vw,3rem)" }}>
         <h1 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"clamp(1.5rem,4vw,2rem)", fontWeight:900, marginBottom:"0.4rem" }}>Your Wishlist</h1>
-        <div style={{ width:60, height:3, background:`linear-gradient(90deg,${T.orange},transparent)`, marginBottom:"1.5rem" }} />
+        <div style={{ width:60, height:3, background:`linear-gradient(90deg,${T.orange},transparent)`, marginBottom:"0.5rem" }} />
+        <p style={{ color:T.textMid, fontSize:"0.85rem", marginBottom:"1.5rem" }}>{items.length} saved item{items.length !== 1 ? "s" : ""}</p>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"1.5rem" }} className="prod-grid">
           {items.map(p => (
-            <div key={p.id} className="prod-card" onClick={() => onClick(p)}>
+            <div key={p._id} className="prod-card" onClick={() => onClick(p)}>
               <div style={{ position:"relative", aspectRatio:"4/3", overflow:"hidden" }}>
-                <img referrerPolicy="no-referrer" src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-                <div style={{ position:"absolute", top:10, left:10, background:T.orange, color:"#fff", borderRadius:4, padding:"3px 10px", fontSize:"0.65rem", fontWeight:800 }}>-{p.discount}%</div>
-                <button onClick={e => { e.stopPropagation(); onWish(p.id); }} style={{ position:"absolute", top:8, right:8, background:"rgba(255,255,255,0.9)", border:"none", borderRadius:"50%", width:32, height:32, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:14 }}>❤️</button>
+                {p.image ? (
+                  <img referrerPolicy="no-referrer" src={p.image} alt={p.name}
+                    style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.4s" }}
+                    onMouseEnter={e => e.currentTarget.style.transform="scale(1.06)"}
+                    onMouseLeave={e => e.currentTarget.style.transform="scale(1)"}
+                    onError={e => { e.currentTarget.style.display="none"; e.currentTarget.nextSibling.style.display="flex"; }} />
+                ) : null}
+                <div style={{ width:"100%", height:"100%", background:`linear-gradient(135deg,${T.bg},#ede8df)`, display: p.image ? "none" : "flex", alignItems:"center", justifyContent:"center", fontSize:48 }}>◆</div>
+                {p.discount > 0 && <div style={{ position:"absolute", top:10, left:10, background:T.orange, color:"#fff", borderRadius:4, padding:"3px 10px", fontSize:"0.65rem", fontWeight:800 }}>-{p.discount}%</div>}
+                <button onClick={e => { e.stopPropagation(); onWish(p._id); }}
+                  style={{ position:"absolute", top:8, right:8, background:"rgba(255,255,255,0.9)", border:"none", borderRadius:"50%", width:32, height:32, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", fontSize:14, transition:"transform 0.2s" }}
+                  onMouseEnter={e => e.currentTarget.style.transform="scale(1.15)"}
+                  onMouseLeave={e => e.currentTarget.style.transform="scale(1)"}>❤️</button>
+                {p.isBestSeller && <div style={{ position:"absolute", bottom:8, left:8, background:T.bgDark, color:T.orange, borderRadius:4, padding:"2px 8px", fontSize:"0.6rem", fontWeight:700, letterSpacing:"0.08em" }}>BEST SELLER</div>}
               </div>
               <div style={{ padding:"1.2rem" }}>
                 <h4 style={{ fontSize:"0.92rem", fontWeight:700, color:T.text, marginBottom:"0.4rem" }}>{p.name}</h4>
+                {p.shortDesc && <p style={{ fontSize:"0.76rem", color:T.textMid, marginBottom:"0.7rem", lineHeight:1.5 }}>{p.shortDesc.slice(0,65)}{p.shortDesc.length>65?"...":""}</p>}
                 <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:"0.8rem" }}>
-                  <span style={{ fontSize:"1rem", color:T.orange, fontWeight:700 }}>Rs.{p.price.toLocaleString()}</span>
-                  <span style={{ color:T.textMid, fontSize:"0.75rem", textDecoration:"line-through" }}>Rs.{p.originalPrice.toLocaleString()}</span>
+                  <span style={{ fontSize:"1rem", color:T.orange, fontWeight:700 }}>₹{p.price.toLocaleString()}</span>
+                  {p.originalPrice > p.price && <span style={{ color:T.textMid, fontSize:"0.75rem", textDecoration:"line-through" }}>₹{p.originalPrice.toLocaleString()}</span>}
                 </div>
                 <button className="btn-orange" onClick={e => { e.stopPropagation(); onAdd(p); }} style={{ width:"100%", padding:"10px", fontSize:"0.72rem", borderRadius:7 }}>Add to Cart</button>
               </div>
