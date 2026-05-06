@@ -97,6 +97,7 @@ const GLOBAL_CSS = `
   .scroll-hide{-ms-overflow-style:none;scrollbar-width:none;}
   @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
   @keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes spin{to{transform:rotate(360deg)}}
   @keyframes modalIn{from{opacity:0;transform:translateY(40px) scale(0.96)}to{opacity:1;transform:translateY(0) scale(1)}}
   @keyframes couponSlide{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:translateX(0)}}
   @keyframes copyPop{0%{transform:scale(1)}50%{transform:scale(1.18)}100%{transform:scale(1)}}
@@ -895,6 +896,8 @@ function Footer() {
 // ─── HOME PAGE ────────────────────────────────────────────────
 function HomePage({ onShop, onRitual, onNav }) {
   const [openFaq, setOpenFaq] = useState(null);
+  const navigate = useNavigate();
+  const goToProduct = (p) => navigate(`/product/${p.id}`);
   return (
     <div>
       <Hero onShop={onShop} onRitual={onRitual} />
@@ -915,7 +918,7 @@ function HomePage({ onShop, onRitual, onNav }) {
         <div style={{ overflow:"hidden", position:"relative" }}>
           <div style={{ display:"flex", animation:"autoScroll 28s linear infinite", width:"max-content" }}>
             {[...PRODUCTS, ...PRODUCTS].map((p, i) => (
-              <div key={i} onClick={onShop} style={{ width:220, flexShrink:0, marginRight:"1.2rem", cursor:"pointer" }}>
+              <div key={i} onClick={() => goToProduct(p)} style={{ width:220, flexShrink:0, marginRight:"1.2rem", cursor:"pointer" }}>
                 <div style={{ borderRadius:14, overflow:"hidden", border:`1px solid ${T.border}`, background:T.bg, transition:"transform 0.3s, box-shadow 0.3s" }}
                   onMouseEnter={e => { e.currentTarget.style.transform="translateY(-5px)"; e.currentTarget.style.boxShadow="0 16px 40px rgba(0,0,0,0.1)"; }}
                   onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="none"; }}>
@@ -1154,10 +1157,10 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
             {filtered.map(p => {
               const qty = getQty(p.id);
               return (
-                <div key={p._id} className="prod-card" onClick={() => onClick(p)}>
-                  <div style={{ position:"relative", aspectRatio:"4/3", overflow:"hidden" }}>
+                <div key={p._id} className="prod-card">
+                  <div style={{ position:"relative", aspectRatio:"4/3", overflow:"hidden" }} onClick={() => onClick(p)}>
                     {p.image ? (
-                      <img referrerPolicy="no-referrer" src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.4s" }}
+                      <img referrerPolicy="no-referrer" src={p.image} alt={p.name} style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.4s", cursor:"pointer" }}
                         onMouseEnter={e => e.currentTarget.style.transform="scale(1.06)"}
                         onMouseLeave={e => e.currentTarget.style.transform="scale(1)"}
                         onError={e => { e.currentTarget.style.display="none"; e.currentTarget.nextSibling.style.display="flex"; }} />
@@ -1170,7 +1173,7 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
                     {p.isBestSeller && <div style={{ position:"absolute", bottom:8, left:8, background:T.bgDark, color:T.orange, borderRadius:4, padding:"2px 8px", fontSize:"0.6rem", fontWeight:700, letterSpacing:"0.08em" }}>BEST SELLER</div>}
                   </div>
                   <div style={{ padding:"1.2rem" }}>
-                    <h4 style={{ fontSize:"0.92rem", fontWeight:700, color:T.text, marginBottom:"0.4rem" }}>{p.name}</h4>
+                    <h4 onClick={() => onClick(p)} style={{ fontSize:"0.92rem", fontWeight:700, color:T.text, marginBottom:"0.4rem", cursor:"pointer" }}>{p.name}</h4>
                     <p style={{ fontSize:"0.76rem", color:T.textMid, marginBottom:"0.7rem", lineHeight:1.5 }}>{(p.shortDesc||"").slice(0,65)}{p.shortDesc?.length>65?"...":""}</p>
                     <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:"0.8rem" }}>
                       <span style={{ fontSize:"1rem", color:T.orange, fontWeight:700 }}>₹{p.price.toLocaleString()}</span>
@@ -1594,11 +1597,20 @@ function CheckoutPage({ cart, onPlaceOrder }) {
             {cart.map(i => {
               const prod = PRODUCTS.find(p => p.id === i.id);
               return (
-                <div key={i.id} onClick={() => navigate(`/product/${i.id}`)} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10, cursor:"pointer", borderRadius:10, padding:"6px 4px", transition:"background 0.15s" }}
+                <div key={i.id} style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10, cursor:"pointer", borderRadius:10, padding:"6px 4px", transition:"background 0.15s" }}
+                  onClick={() => navigate(`/product/${i.id}`)}
                   onMouseEnter={e => e.currentTarget.style.background="rgba(232,114,12,0.05)"}
                   onMouseLeave={e => e.currentTarget.style.background="transparent"}>
                   <div style={{ width:48, height:48, borderRadius:8, overflow:"hidden", flexShrink:0, border:`1px solid ${T.border}` }}>
-                    <img referrerPolicy="no-referrer" src={prod?.image || i.image || ""} alt={i.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                    <img
+                      referrerPolicy="no-referrer"
+                      src={prod?.image || i.image || ""}
+                      alt={i.name}
+                      onClick={(e) => { e.stopPropagation(); navigate(`/product/${i.id}`); }}
+                      style={{ width:"100%", height:"100%", objectFit:"cover", cursor:"pointer", transition:"transform 0.2s" }}
+                      onMouseEnter={e => e.currentTarget.style.transform="scale(1.08)"}
+                      onMouseLeave={e => e.currentTarget.style.transform="scale(1)"}
+                    />
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ fontSize:"0.78rem", color:T.text, fontWeight:600, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{i.name}</div>
@@ -2586,10 +2598,61 @@ function PromoModal({ show, onClose, onShop, userEmail }) {
     </div>
   );
 }
-// ─── PRODUCT PAGE WRAPPER (reads :id from URL) ────────────────
+// ─── PRODUCT PAGE WRAPPER (reads :id from URL, fetches from backend) ──
 function ProductPageWrapper({ onAdd, onAddAnim, onWish, wished, cart, onShop }) {
   const { id } = useParams();
-  const product = PRODUCTS.find(p => p.id === parseInt(id));
+  const navigate = useNavigate();
+  const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) { navigate("/shop", { replace: true }); return; }
+
+    // Try backend first
+    fetch(`${API_BASE}/api/products/${id}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.product) {
+          const p = data.product;
+          // Normalize to match what ProductPage expects
+          setProduct({
+            ...p,
+            id:            p._id,
+            image:         p.images?.[0] || "",
+            images:        p.images || [],
+            category:      p.category?.slug || p.category || "",
+            categoryName:  p.category?.name || "",
+            discount:      p.discount || (p.originalPrice ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) : 0),
+            isBestSeller:  p.isBestSeller || false,
+            bestSeller:    p.isBestSeller || false,
+          });
+        } else {
+          // Fallback: try hardcoded PRODUCTS by numeric id
+          const fallback = PRODUCTS.find(p => p.id === parseInt(id) || String(p.id) === id);
+          if (fallback) setProduct(fallback);
+          else navigate("/shop", { replace: true });
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        // Network error — try hardcoded fallback
+        const fallback = PRODUCTS.find(p => p.id === parseInt(id) || String(p.id) === id);
+        if (fallback) setProduct(fallback);
+        else navigate("/shop", { replace: true });
+        setLoading(false);
+      });
+  }, [id, API_BASE, navigate]);
+
+  if (loading) return (
+    <div style={{ minHeight: "100vh", background: "#F5F0E8", display: "flex", alignItems: "center", justifyContent: "center", paddingTop: 90 }}>
+      <div style={{ textAlign: "center" }}>
+        <div style={{ width: 40, height: 40, border: "3px solid rgba(232,114,12,0.2)", borderTop: "3px solid #E8720C", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
+        <p style={{ color: "#8a8a8a", fontSize: "0.88rem" }}>Loading product…</p>
+      </div>
+    </div>
+  );
+
   if (!product) return <Navigate to="/shop" replace />;
   return <ProductPage product={product} onAdd={onAdd} onAddAnim={onAddAnim} onWish={onWish} wished={wished} cart={cart} onShop={onShop} />;
 }
@@ -2906,7 +2969,7 @@ function AppInner() {
 
   const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
   const cartCount = cart.reduce((s,i)=>s+i.qty,0);
-  const goToProduct = p => navigate("/product/" + p.id);
+  const goToProduct = p => navigate("/product/" + (p._id || p.id));
 
   return (
     <div style={{ fontFamily:"'Inter',sans-serif", background:T.bg, minHeight:"100vh" }}>
