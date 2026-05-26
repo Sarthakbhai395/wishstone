@@ -21,8 +21,10 @@ app.use(helmet({
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
+  process.env.ADMIN_URL_2,   // second admin deployment
   "http://localhost:3000",
   "http://localhost:3001",
+  "http://localhost:4000",
 ].filter(Boolean);
 
 const corsOptions = {
@@ -173,6 +175,23 @@ const startServer = async () => {
   const server = app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT} [${process.env.NODE_ENV || "development"}]`);
   });
+
+  // ─── KEEP-ALIVE PING (prevents Render free tier sleep) ──────
+  // Pings own /health endpoint every 14 minutes so server never sleeps
+  if (isProd) {
+    const https = require("https");
+    const http  = require("http");
+    const SELF_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+    setInterval(() => {
+      const lib = SELF_URL.startsWith("https") ? https : http;
+      lib.get(`${SELF_URL}/health`, (res) => {
+        console.log(`💓 Keep-alive ping → ${res.statusCode}`);
+      }).on("error", () => {
+        // Silent — don't crash on ping failure
+      });
+    }, 14 * 60 * 1000); // every 14 minutes
+    console.log(`💓 Keep-alive enabled → pinging ${SELF_URL}/health every 14 min`);
+  }
 
   // ─── GRACEFUL SHUTDOWN ──────────────────────────────────────
   const shutdown = (signal) => {
