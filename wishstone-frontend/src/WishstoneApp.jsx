@@ -459,11 +459,12 @@ function Hero({ onShop, onRitual }) {
           <div style={{ position:"absolute", bottom:8, left:"50%", transform:"translateX(-50%)", fontSize:"0.62rem", color:T.textMid, letterSpacing:"0.1em", textTransform:"uppercase", fontWeight:600, opacity:0.6, whiteSpace:"nowrap", zIndex:10 }}>↔ Drag to rotate</div>
           <div onMouseDown={onMouseDown} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
             style={{ position:"relative", zIndex:2, transformStyle:"preserve-3d", transform: autoAnim ? undefined : `rotateX(${rot.x}deg) rotateY(${rot.y}deg)`, animation: autoAnim ? "stone3d 8s ease-in-out infinite" : "none", cursor: dragging ? "grabbing" : "grab", transition: dragging ? "none" : "transform 0.4s ease", userSelect:"none" }}>
-            <div style={{ width:"clamp(190px,24vw,300px)", height:"clamp(230px,30vw,360px)", borderRadius:"50% 50% 48% 52% / 55% 55% 45% 45%", background:"radial-gradient(ellipse at 32% 28%, #f5b070 0%, #d06818 40%, #c85a10 65%, #7a3008 100%)", boxShadow:"0 40px 100px rgba(200,90,16,0.5), 0 0 0 1px rgba(200,90,16,0.1), inset 0 -25px 50px rgba(0,0,0,0.25), inset 0 12px 35px rgba(255,210,130,0.35)", position:"relative", overflow:"hidden" }}>
-              <div style={{ position:"absolute", top:"18%", left:"22%", width:"35%", height:"28%", borderRadius:"50%", background:"radial-gradient(circle, rgba(255,230,180,0.75) 0%, transparent 70%)", filter:"blur(6px)" }} />
-              <div style={{ position:"absolute", top:"10%", left:"15%", width:"20%", height:"14%", borderRadius:"50%", background:"rgba(255,245,220,0.45)", filter:"blur(4px)" }} />
-              <div style={{ position:"absolute", bottom:0, left:0, right:0, height:"35%", background:"linear-gradient(to top, rgba(0,0,0,0.3), transparent)", borderRadius:"0 0 50% 50%" }} />
-            </div>
+            <img
+              src={`${process.env.PUBLIC_URL || ""}/wishstonebgimage.jpeg`}
+              alt="WishStone"
+              draggable={false}
+              style={{ width:"clamp(190px,24vw,300px)", height:"clamp(230px,30vw,360px)", objectFit:"contain", display:"block", userSelect:"none", pointerEvents:"none" }}
+            />
             <div style={{ position:"absolute", bottom:-18, left:"50%", transform:"translateX(-50%)", width:"70%", height:20, borderRadius:"50%", background:"rgba(200,90,16,0.22)", filter:"blur(10px)" }} />
           </div>
           <div className="hero-badge" style={{ position:"absolute", top:"14%", left:"0%", background:T.white, borderRadius:14, paddingTop:10, paddingBottom:10, paddingLeft:14, paddingRight:14, boxShadow:"0 8px 32px rgba(0,0,0,0.12)", display:"flex", alignItems:"center", gap:10, minWidth:148, zIndex:3, animation:"badgeFloat1 4s ease-in-out infinite" }}>
@@ -1607,7 +1608,7 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick }) {
   );
 }
 
-// ─── CHECKOUT PAGE ────────────────────────────────────────────
+// ─── CHECKOUT PAGE (with Razorpay Integration) ───────────────
 function CheckoutPage({ cart, onPlaceOrder }) {
   const navigate = useNavigate();
   const [form, setForm] = useState({ name:"", email:"", phone:"", address:"", city:"", state:"", pincode:"" });
@@ -1618,16 +1619,37 @@ function CheckoutPage({ cart, onPlaceOrder }) {
   const [error, setError] = useState("");
   const [isGift, setIsGift] = useState(false);
   const [giftNote, setGiftNote] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("online");
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
+  const [razorpayReady, setRazorpayReady] = useState(false);
   const sub = cart.reduce((s,i) => s + i.price*i.qty, 0);
   const totalQty = cart.reduce((s,i) => s + i.qty, 0);
   const giftCharge = isGift ? totalQty * 50 : 0;
   const ship = sub >= 999 ? 0 : 99;
   const total = sub + ship + giftCharge - discount;
+  const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
+
+  // Check if Razorpay is configured on backend
+  useEffect(() => {
+    fetch(`${API_BASE}/api/payment/status`)
+      .then(r => r.json())
+      .then(d => { if (d.success && d.configured) setRazorpayReady(true); })
+      .catch(() => {});
+  }, [API_BASE]);
+
+  // Dynamically load Razorpay checkout script
+  useEffect(() => {
+    if (document.getElementById("razorpay-checkout-script")) return;
+    const script = document.createElement("script");
+    script.id = "razorpay-checkout-script";
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
 
   const applyCoupon = async () => {
     if (!coupon.trim()) return;
     try {
-      const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
       const res = await fetch(`${API_BASE}/api/coupons/validate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1647,12 +1669,231 @@ function CheckoutPage({ cart, onPlaceOrder }) {
     }
   };
 
+  // ── RAZORPAY ONLINE PAYMENT FLOW ──
+  const handleRazorpayPayment = async () => {
+    setError(""); setPaymentProcessing(true);
+    try {
+      const token = localStorage.getItem("ws_token") || "";
+
+      // Step 1: Create Razorpay order on backend
+      const orderPayload = {
+        items: cart.map(i => ({
+          productId: String(i.id || i._id || ""),
+          name: i.name || "Product",
+          price: i.price || 0,
+          quantity: i.qty || 1,
+          image: i.image || "",
+        })),
+        couponCode: coupon || "",
+        customer: {
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+        },
+        shippingAddress: {
+          address: form.address,
+          city: form.city,
+          state: form.state,
+          pincode: form.pincode,
+          country: "India",
+        },
+      };
+
+      const createRes = await fetch(`${API_BASE}/api/payment/create-order`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(orderPayload),
+      });
+      const createData = await createRes.json();
+
+      if (!createData.success) {
+        if (createData.configured === false) {
+          setError("Online payment is not available right now. Please use Cash on Delivery.");
+          setPaymentMethod("cod");
+        } else {
+          setError(createData.message || "Could not create payment order.");
+        }
+        setPaymentProcessing(false);
+        return;
+      }
+
+      // Step 2: Open Razorpay popup (or Mock Gateway)
+
+      // ── Define handler FIRST (used by both mock and real Razorpay) ──
+      const executePaymentHandler = async (response) => {
+        try {
+          setPaymentProcessing(true);
+          const verifyRes = await fetch(`${API_BASE}/api/payment/verify`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id:   response.razorpay_order_id,
+              razorpay_signature:  response.razorpay_signature,
+              items:           orderPayload.items,
+              customer:        orderPayload.customer,
+              shippingAddress: orderPayload.shippingAddress,
+              couponCode:      coupon || "",
+            }),
+          });
+          const verifyData = await verifyRes.json();
+          if (verifyData.success) {
+            onPlaceOrder({
+              items: cart, address: form,
+              totalAmount: verifyData.order?.totalAmount || total,
+              coupon, discount, isGift, giftNote,
+              paymentMethod: "razorpay",
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpayOrderId:   response.razorpay_order_id,
+              backendOrder: verifyData.order,
+            });
+          } else {
+            setError(verifyData.message || "Payment verification failed. Contact support if amount was deducted.");
+          }
+        } catch {
+          setError("Payment verification failed. If amount was deducted, please contact support.");
+        }
+        setPaymentProcessing(false);
+      };
+
+      if (createData.mockMode) {
+        // --- MOCK RAZORPAY GATEWAY (React-safe, no TDZ) ---
+        const overlay = document.createElement("div");
+        overlay.id = "ws-mock-overlay";
+        overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);font-family:'Inter',sans-serif;";
+        document.body.appendChild(overlay);
+
+        const box = document.createElement("div");
+        box.style.cssText = "background:#fff;border-radius:16px;width:360px;max-width:90vw;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,0.5);";
+        overlay.appendChild(box);
+
+        // Header
+        const header = document.createElement("div");
+        header.style.cssText = "background:#02042b;padding:20px;color:#fff;text-align:center;";
+        header.innerHTML = "<div style='font-size:18px;font-weight:700;margin-bottom:4px;'>Razorpay Test Mode</div><div style='font-size:13px;opacity:0.75;'>WishStone &bull; ₹" + (createData.amount / 100) + "</div>";
+        box.appendChild(header);
+
+        // Body
+        const body = document.createElement("div");
+        body.style.cssText = "padding:28px 24px;text-align:center;";
+        body.innerHTML = "<p style='font-size:13px;color:#555;margin-bottom:20px;line-height:1.6;'>Test mode active. Click below to simulate payment.</p>";
+        box.appendChild(body);
+
+        // Success button
+        const successBtn = document.createElement("button");
+        successBtn.textContent = "✓  Simulate Successful Payment";
+        successBtn.style.cssText = "background:#10b981;color:#fff;border:none;padding:13px 20px;border-radius:8px;width:100%;font-weight:700;cursor:pointer;font-size:14px;margin-bottom:10px;font-family:inherit;";
+        body.appendChild(successBtn);
+
+        // Fail button
+        const failBtn = document.createElement("button");
+        failBtn.textContent = "✕  Simulate Failed Payment";
+        failBtn.style.cssText = "background:#ef4444;color:#fff;border:none;padding:13px 20px;border-radius:8px;width:100%;font-weight:700;cursor:pointer;font-size:14px;font-family:inherit;";
+        body.appendChild(failBtn);
+
+        const closeMock = () => {
+          if (document.body.contains(overlay)) document.body.removeChild(overlay);
+        };
+
+        successBtn.onclick = async () => {
+          body.innerHTML = "<div style='padding:20px;color:#555;font-size:14px;'>Verifying payment…</div>";
+          const mockPaymentId = "pay_mock_" + Date.now();
+          try {
+            const enc = new TextEncoder();
+            const key = await window.crypto.subtle.importKey(
+              "raw", enc.encode("mock_demo_secret_123"),
+              { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
+            );
+            const sig = await window.crypto.subtle.sign(
+              "HMAC", key, enc.encode(createData.razorpayOrderId + "|" + mockPaymentId)
+            );
+            const mockSignature = Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2,"0")).join("");
+            closeMock();
+            await executePaymentHandler({
+              razorpay_payment_id: mockPaymentId,
+              razorpay_order_id:   createData.razorpayOrderId,
+              razorpay_signature:  mockSignature,
+            });
+          } catch (e) {
+            closeMock();
+            setError("Mock payment error: " + e.message);
+            setPaymentProcessing(false);
+          }
+        };
+
+        failBtn.onclick = () => {
+          closeMock();
+          setError("Payment failed (Simulated). Please try again.");
+          setPaymentProcessing(false);
+        };
+        return;
+      }
+
+      if (!window.Razorpay) {
+        setError("Payment gateway is loading. Please try again in a moment.");
+        setPaymentProcessing(false);
+        return;
+      }
+
+      const options = {
+        key: createData.keyId,
+        amount: createData.amount,
+        currency: createData.currency || "INR",
+        name: "WishStone",
+        description: `Order — ${cart.length} item${cart.length > 1 ? "s" : ""}`,
+        image: `${process.env.PUBLIC_URL || ""}/wishstone svg.svg`,
+        order_id: createData.razorpayOrderId,
+        prefill: createData.prefill || {},
+        theme: {
+          color: "#E8720C",
+          backdrop_color: "rgba(0,0,0,0.6)",
+        },
+        handler: executePaymentHandler,
+        modal: {
+          ondismiss: function () {
+            setPaymentProcessing(false);
+            setError("");
+          },
+          escape: true,
+          animation: true,
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.on("payment.failed", function (response) {
+        setPaymentProcessing(false);
+        setError(
+          response.error?.description ||
+          response.error?.reason ||
+          "Payment failed. Please try again."
+        );
+      });
+      razorpay.open();
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+      setPaymentProcessing(false);
+    }
+  };
+
   const handleSubmit = async e => {
     e.preventDefault(); setError("");
     if (!form.name||!form.email||!form.phone||!form.address||!form.city||!form.pincode) return setError("Please fill all required fields.");
-    setLoading(true);
-    onPlaceOrder({ items:cart, address:form, totalAmount:total, coupon, discount, isGift, giftNote });
-    setLoading(false);
+
+    if (paymentMethod === "online") {
+      // Online payment via Razorpay
+      handleRazorpayPayment();
+    } else {
+      // Cash on Delivery — existing flow
+      setLoading(true);
+      onPlaceOrder({ items:cart, address:form, totalAmount:total, coupon, discount, isGift, giftNote, paymentMethod: "cod" });
+      setLoading(false);
+    }
   };
 
   const inp = (key, label, type="text", half=false) => (
@@ -1663,6 +1904,8 @@ function CheckoutPage({ cart, onPlaceOrder }) {
         onFocus={e => e.target.style.borderColor=T.orange} onBlur={e => e.target.style.borderColor=T.border} />
     </div>
   );
+
+  const isProcessing = loading || paymentProcessing;
 
   return (
     <div style={{ paddingTop:90, background:T.bg, minHeight:"100vh" }}>
@@ -1690,6 +1933,31 @@ function CheckoutPage({ cart, onPlaceOrder }) {
               </div>
               {couponMsg && <p style={{ fontSize:"0.76rem", marginTop:6, color: discount>0 ? "#2d7a5a" : "#c0392b" }}>{couponMsg}</p>}
             </div>
+            {/* ─── PAYMENT METHOD SELECTOR ─── */}
+            <div style={{ background:"#fff", borderRadius:16, padding:"1.5rem", border:`1px solid ${T.border}`, marginBottom:"1.2rem" }}>
+              <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1rem", fontWeight:700, marginBottom:"1rem" }}>Payment Method</h3>
+              <div style={{ display:"flex", gap:"0.8rem", flexWrap:"wrap" }}>
+                {/* Online Payment — only option */}
+                <div style={{
+                    flex:1, minWidth:140, padding:"14px 16px", borderRadius:12,
+                    border: `2px solid ${T.orange}`,
+                    background: "rgba(232,114,12,0.06)",
+                    display:"flex", alignItems:"center", gap:12,
+                  }}>
+                  <div style={{ width:20, height:20, borderRadius:"50%", border:`6px solid ${T.orange}`, flexShrink:0 }} />
+                  <div style={{ textAlign:"left" }}>
+                    <div style={{ fontSize:"0.85rem", fontWeight:700, color:T.text }}>💳 Online Payment</div>
+                    <div style={{ fontSize:"0.68rem", color:T.textMid, marginTop:2 }}>UPI, Cards, Net Banking, Wallets</div>
+                  </div>
+                  <span style={{ marginLeft:"auto", background:T.orange, color:"#fff", borderRadius:4, padding:"2px 8px", fontSize:"0.6rem", fontWeight:800, letterSpacing:"0.06em" }}>SECURE</span>
+                </div>
+              </div>
+              {!razorpayReady && (
+                <div style={{ marginTop:"0.8rem", padding:"10px 14px", background:"rgba(232,114,12,0.06)", border:`1px solid rgba(232,114,12,0.15)`, borderRadius:8 }}>
+                  <p style={{ fontSize:"0.72rem", color:T.textMid, margin:0 }}>ℹ️ Connecting to payment gateway…</p>
+                </div>
+              )}
+            </div>
             {/* ─── GIFT WRAPPING ─── */}
             <div style={{ background:"#fff", borderRadius:16, padding:"1.5rem", border:`1px solid ${T.border}`, marginBottom:"1.2rem" }}>
               <label style={{ display:"flex", alignItems:"center", gap:"0.75rem", cursor:"pointer", userSelect:"none" }}>
@@ -1711,10 +1979,29 @@ function CheckoutPage({ cart, onPlaceOrder }) {
                 </div>
               )}
             </div>
-            {error && <p style={{ color:"#c0392b", fontSize:"0.78rem", marginBottom:"1rem" }}>{error}</p>}
-            <button type="submit" className="btn-orange" disabled={loading} style={{ width:"100%", padding:"14px", fontSize:"0.84rem", borderRadius:9, opacity:loading?0.7:1 }}>
-              {loading ? "Placing Order..." : "Place Order"}
+            {error && <div style={{ background:"rgba(192,57,43,0.06)", border:"1px solid rgba(192,57,43,0.2)", borderRadius:10, padding:"12px 16px", marginBottom:"1rem", display:"flex", alignItems:"flex-start", gap:10 }}>
+              <span style={{ fontSize:16, flexShrink:0, lineHeight:1 }}>⚠️</span>
+              <p style={{ color:"#c0392b", fontSize:"0.78rem", margin:0, lineHeight:1.5 }}>{error}</p>
+            </div>}
+            <button type="submit" className="btn-orange" disabled={isProcessing}
+              style={{ width:"100%", padding:"14px", fontSize:"0.84rem", borderRadius:9, opacity:isProcessing?0.7:1, display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
+              {isProcessing ? (
+                <>
+                  <div style={{ width:18, height:18, border:"2.5px solid rgba(255,255,255,0.3)", borderTop:"2.5px solid #fff", borderRadius:"50%", animation:"spin 0.8s linear infinite" }} />
+                  {paymentProcessing ? "Processing Payment..." : "Placing Order..."}
+                </>
+              ) : paymentMethod === "online" ? (
+                <><span>🔒</span> Pay Rs.{total.toLocaleString()} Securely</>
+              ) : (
+                "Place Order — Cash on Delivery"
+              )}
             </button>
+            {paymentMethod === "online" && (
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, marginTop:"0.8rem", opacity:0.5 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4a4a4a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                <span style={{ fontSize:"0.68rem", color:T.textMid }}>Secured by Razorpay — 256-bit SSL encrypted</span>
+              </div>
+            )}
           </form>
           <div style={{ background:"#fff", borderRadius:16, padding:"1.5rem", border:`1px solid ${T.border}`, position:"sticky", top:90 }}>
             <h3 style={{ fontFamily:"'Playfair Display',serif", color:T.text, fontSize:"1.05rem", fontWeight:700, marginBottom:"1.2rem" }}>Order Summary</h3>
@@ -1765,6 +2052,12 @@ function CheckoutPage({ cart, onPlaceOrder }) {
             <div style={{ borderTop:`1px solid ${T.border}`, paddingTop:"0.9rem", display:"flex", justifyContent:"space-between" }}>
               <span style={{ color:T.text, fontWeight:700 }}>Total</span>
               <span style={{ color:T.orange, fontSize:"1.1rem", fontWeight:800 }}>Rs.{total.toLocaleString()}</span>
+            </div>
+            {/* Payment method badge */}
+            <div style={{ marginTop:"0.8rem", padding:"8px 12px", background: paymentMethod==="online" ? "rgba(16,185,129,0.08)" : "rgba(232,114,12,0.06)", borderRadius:8, textAlign:"center" }}>
+              <span style={{ fontSize:"0.72rem", fontWeight:700, color: paymentMethod==="online" ? "#059669" : T.orange }}>
+                {paymentMethod==="online" ? "🔒 Secure Online Payment" : "🏠 Cash on Delivery"}
+              </span>
             </div>
           </div>
         </div>
@@ -2641,7 +2934,7 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
 }
 
 
-// ─── ORDER CONFIRM MODAL ──────────────────────────────────────
+// ─── ORDER CONFIRM MODAL (Enhanced with Razorpay details) ─────
 function OrderConfirmModal({ order, onClose }) {
   const [step, setStep] = useState(0);
   useEffect(() => {
@@ -2653,30 +2946,56 @@ function OrderConfirmModal({ order, onClose }) {
     return () => timers.forEach(clearTimeout);
   }, []);
 
+  const isPaid = order.paymentMethod === "razorpay" || order.paymentMethod === "online";
+  const orderId = order.backendOrder?.orderNumber || order.backendOrder?._id?.slice(-6)?.toUpperCase() || order._id?.slice(-6)?.toUpperCase() || "------";
+  const txnId = order.razorpayPaymentId || order.backendOrder?.razorpayPaymentId || "";
+
   return (
     <div style={{ position:"fixed", inset:0, zIndex:9999, background:"rgba(0,0,0,0.7)", backdropFilter:"blur(8px)", display:"flex", alignItems:"center", justifyContent:"center", padding:"1rem" }}>
-      <div style={{ background:"#fff", borderRadius:24, maxWidth:420, width:"100%", padding:"2.5rem 2rem", textAlign:"center", boxShadow:"0 32px 80px rgba(0,0,0,0.3)", animation:"modalIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both" }}>
+      <div style={{ background:"#fff", borderRadius:24, maxWidth:440, width:"100%", padding:"2.5rem 2rem", textAlign:"center", boxShadow:"0 32px 80px rgba(0,0,0,0.3)", animation:"modalIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both", overflow:"hidden" }}>
         {/* Animated checkmark */}
-        <div style={{ width:80, height:80, borderRadius:"50%", background:"linear-gradient(135deg,#2d7a5a,#10b981)", margin:"0 auto 1.5rem", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 8px 32px rgba(16,185,129,0.35)", animation: step>=1 ? "fadeInScale 0.5s ease both" : "none", opacity: step>=1 ? 1 : 0 }}>
+        <div style={{ width:80, height:80, borderRadius:"50%", background: isPaid ? "linear-gradient(135deg,#059669,#10b981)" : "linear-gradient(135deg,#2d7a5a,#10b981)", margin:"0 auto 1.5rem", display:"flex", alignItems:"center", justifyContent:"center", boxShadow: isPaid ? "0 8px 32px rgba(5,150,105,0.4)" : "0 8px 32px rgba(16,185,129,0.35)", animation: step>=1 ? "fadeInScale 0.5s ease both" : "none", opacity: step>=1 ? 1 : 0, position:"relative" }}>
           <span style={{ fontSize:36, color:"#fff" }}>✓</span>
+          {isPaid && <div style={{ position:"absolute", inset:-4, borderRadius:"50%", border:"3px solid rgba(16,185,129,0.3)", animation:"pulseRingConfirm 2s ease-out infinite" }} />}
         </div>
+        <style>{`@keyframes pulseRingConfirm{0%{transform:scale(1);opacity:1}70%{transform:scale(1.15);opacity:0}100%{transform:scale(1);opacity:0}}@keyframes fadeInScale{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}`}</style>
 
         <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"1.5rem", fontWeight:900, color:"#1a1a1a", marginBottom:"0.5rem", opacity: step>=2 ? 1 : 0, transform: step>=2 ? "translateY(0)" : "translateY(10px)", transition:"all 0.4s ease" }}>
-          Order Confirmed! 🎉
+          {isPaid ? "Payment Successful! 🎉" : "Order Confirmed! 🎉"}
         </h2>
         <p style={{ color:"#64748b", fontSize:"0.85rem", marginBottom:"1.5rem", opacity: step>=2 ? 1 : 0, transition:"all 0.4s ease 0.1s" }}>
-          Your sacred order has been placed successfully
+          {isPaid ? "Your payment has been verified and order confirmed" : "Your sacred order has been placed successfully"}
         </p>
 
+        {/* Payment success badge */}
+        {isPaid && (
+          <div style={{ display:"inline-flex", alignItems:"center", gap:6, background:"rgba(16,185,129,0.08)", border:"1px solid rgba(16,185,129,0.2)", borderRadius:20, padding:"6px 16px", marginBottom:"1.2rem", opacity: step>=2 ? 1 : 0, transition:"all 0.4s ease 0.15s" }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span style={{ fontSize:"0.72rem", fontWeight:700, color:"#059669" }}>Payment Verified via Razorpay</span>
+          </div>
+        )}
+
         {/* Order details */}
-        <div style={{ background:"#f8fafc", borderRadius:14, padding:"1.2rem", marginBottom:"1.5rem", opacity: step>=3 ? 1 : 0, transform: step>=3 ? "translateY(0)" : "translateY(12px)", transition:"all 0.4s ease 0.2s" }}>
+        <div style={{ background:"#f8fafc", borderRadius:14, padding:"1.2rem", marginBottom:"1.5rem", opacity: step>=3 ? 1 : 0, transform: step>=3 ? "translateY(0)" : "translateY(12px)", transition:"all 0.4s ease 0.2s", textAlign:"left" }}>
           <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
             <span style={{ fontSize:"0.78rem", color:"#64748b" }}>Order ID</span>
-            <span style={{ fontSize:"0.78rem", fontWeight:700, color:"#1a1a1a" }}>#{order._id.slice(-6).toUpperCase()}</span>
+            <span style={{ fontSize:"0.78rem", fontWeight:700, color:"#1a1a1a" }}>#{orderId}</span>
           </div>
           <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
-            <span style={{ fontSize:"0.78rem", color:"#64748b" }}>Amount Paid</span>
+            <span style={{ fontSize:"0.78rem", color:"#64748b" }}>{isPaid ? "Amount Paid" : "Amount Due"}</span>
             <span style={{ fontSize:"0.78rem", fontWeight:700, color:T.orange }}>Rs.{(order.totalAmount||0).toLocaleString()}</span>
+          </div>
+          {txnId && (
+            <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
+              <span style={{ fontSize:"0.78rem", color:"#64748b" }}>Transaction ID</span>
+              <span style={{ fontSize:"0.72rem", fontWeight:600, color:"#059669", fontFamily:"monospace" }}>{txnId.length > 18 ? txnId.slice(0,8)+"..."+ txnId.slice(-6) : txnId}</span>
+            </div>
+          )}
+          <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
+            <span style={{ fontSize:"0.78rem", color:"#64748b" }}>Payment</span>
+            <span style={{ background: isPaid ? "rgba(16,185,129,0.1)" : "rgba(232,114,12,0.1)", color: isPaid ? "#2d7a5a" : T.orange, padding:"3px 10px", borderRadius:20, fontSize:"0.7rem", fontWeight:700 }}>
+              {isPaid ? "✓ Paid Online" : "Cash on Delivery"}
+            </span>
           </div>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
             <span style={{ fontSize:"0.78rem", color:"#64748b" }}>Delivery</span>
@@ -2941,12 +3260,16 @@ function AppInner() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [cart, setCart] = useState([]);
-  const [wished, setWished] = useState([]);
+  const [cart, setCart]   = useState(() => { try { return JSON.parse(localStorage.getItem("ws_cart") || "[]"); } catch { return []; } });
+  const [wished, setWished] = useState(() => { try { return JSON.parse(localStorage.getItem("ws_wished") || "[]"); } catch { return []; } });
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
   const [orderConfirm, setOrderConfirm] = useState(null);
   const [showModal, setShowModal] = useState(false);
+
+  // Persist cart + wishlist to localStorage on every change
+  useEffect(() => { localStorage.setItem("ws_cart",   JSON.stringify(cart));   }, [cart]);
+  useEffect(() => { localStorage.setItem("ws_wished", JSON.stringify(wished)); }, [wished]);
 
   // Load user-specific data on mount
   useEffect(() => {
@@ -3069,7 +3392,22 @@ function AppInner() {
   };  const updateQty = (id,delta) => setCart(c => c.map(i=>i.id===id?{...i,qty:Math.max(0,i.qty+delta)}:i).filter(i=>i.qty>0));
   const removeFromCart = id => setCart(c => c.filter(i=>i.id!==id));
   const handlePlaceOrder = async data => {
-    const newOrder = {...data, _id:Date.now().toString(), status:"Confirmed", createdAt:new Date().toISOString()};
+    // If Razorpay payment was already verified on backend, use that order data
+    const isRazorpayPaid = data.paymentMethod === "razorpay" && data.razorpayPaymentId;
+
+    const newOrder = {
+      ...data,
+      _id: data.backendOrder?._id || Date.now().toString(),
+      orderNumber: data.backendOrder?.orderNumber || "",
+      status: isRazorpayPaid ? "Confirmed" : "Confirmed",
+      paymentStatus: isRazorpayPaid ? "paid" : "pending",
+      paymentMethod: data.paymentMethod || "cod",
+      razorpayPaymentId: data.razorpayPaymentId || "",
+      razorpayOrderId: data.razorpayOrderId || "",
+      createdAt: data.backendOrder?.createdAt || new Date().toISOString(),
+      backendOrder: data.backendOrder || null,
+    };
+
     // Save locally first (instant feedback)
     setOrders(o => {
       const updated = [newOrder, ...o];
@@ -3079,45 +3417,48 @@ function AppInner() {
     setCart([]);
     setOrderConfirm(newOrder);
 
-    // Also send to backend so admin panel can see it
-    try {
-      const API = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
-      const addr = data.address || {};
-      const payload = {
-        customer: {
-          name:  addr.name  || user?.name  || "Guest",
-          email: addr.email || user?.email || "guest@wishstone.com",
-          phone: addr.phone || user?.phone || "0000000000",
-        },
-        shippingAddress: {
-          flat:     addr.address || addr.flat || "",
-          area:     addr.city    || addr.area  || "",
-          landmark: addr.landmark || "",
-          city:     addr.city    || "",
-          state:    addr.state   || "",
-          pincode:  addr.pincode || "",
-          country:  "India",
-        },
-        items: (data.items || []).map(i => ({
-          productId: String(i.id || i.productId || ""),
-          name:      i.name     || "Product",
-          price:     i.price    || 0,
-          quantity:  i.qty      || i.quantity || 1,
-          image:     i.image    || "",
-        })),
-        paymentMethod: "cod",
-        couponCode: data.coupon || "",
-      };
-      const controller = new AbortController();
-      setTimeout(() => controller.abort(), 8000);
-      await fetch(`${API}/api/orders/create`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-      });
-    } catch(e) {
-      // Silent fail — local order already saved
+    // For Razorpay payments, order is already created on backend during verify
+    // Only send to backend for COD orders
+    if (!isRazorpayPaid) {
+      try {
+        const API = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
+        const addr = data.address || {};
+        const payload = {
+          customer: {
+            name:  addr.name  || user?.name  || "Guest",
+            email: addr.email || user?.email || "guest@wishstone.com",
+            phone: addr.phone || user?.phone || "0000000000",
+          },
+          shippingAddress: {
+            flat:     addr.address || addr.flat || "",
+            area:     addr.city    || addr.area  || "",
+            landmark: addr.landmark || "",
+            city:     addr.city    || "",
+            state:    addr.state   || "",
+            pincode:  addr.pincode || "",
+            country:  "India",
+          },
+          items: (data.items || []).map(i => ({
+            productId: String(i.id || i.productId || ""),
+            name:      i.name     || "Product",
+            price:     i.price    || 0,
+            quantity:  i.qty      || i.quantity || 1,
+            image:     i.image    || "",
+          })),
+          paymentMethod: "cod",
+          couponCode: data.coupon || "",
+        };
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), 8000);
+        await fetch(`${API}/api/orders/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        });
+      } catch(e) {
+        // Silent fail — local order already saved
+      }
     }
   };
 
