@@ -21,7 +21,7 @@ app.use(helmet({
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
-  process.env.ADMIN_URL_2,   // second admin deployment
+  process.env.ADMIN_URL_2,
   "http://localhost:3000",
   "http://localhost:3001",
   "http://localhost:4000",
@@ -31,9 +31,14 @@ const corsOptions = {
   origin: (origin, cb) => {
     // Allow requests with no origin (mobile apps, curl, Postman)
     if (!origin) return cb(null, true);
-    // Always allow localhost for development
+    // Always allow localhost
     if (origin.startsWith("http://localhost") || origin.startsWith("http://127.0.0.1")) return cb(null, true);
-    if (!isProd || allowedOrigins.includes(origin)) return cb(null, true);
+    // Allow ALL Vercel deployments for this project (any subdomain of vercel.app)
+    if (origin.endsWith(".vercel.app")) return cb(null, true);
+    // Allow explicitly listed origins
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    // In development, allow everything
+    if (!isProd) return cb(null, true);
     cb(new Error(`CORS: origin ${origin} not allowed`));
   },
   credentials: true,
@@ -90,6 +95,7 @@ app.use("/api/cart",       require("./routes/cart"));
 app.use("/api/wishlist",   require("./routes/wishlist"));
 app.use("/api/orders",     require("./routes/orders"));
 app.use("/api/coupons",    require("./routes/coupons"));
+app.use("/api/payment",    require("./routes/payment"));
 app.use("/api/admin",      require("./routes/admin"));
 
 // ─── STATIC FILES (after API routes) ─────────────────────────
