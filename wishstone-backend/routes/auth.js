@@ -41,13 +41,20 @@ router.post("/admin/login", async (req, res) => {
 });
 
 // Google OAuth — verify credential from frontend, find/create user
+const { OAuth2Client } = require("google-auth-library");
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 router.post("/google", async (req, res) => {
   try {
     const { credential } = req.body;
     if (!credential) return res.status(400).json({ success: false, message: "Google credential required." });
 
-    // Decode the Google JWT (id_token) — no library needed, just base64 decode the payload
-    const payload = JSON.parse(Buffer.from(credential.split(".")[1], "base64url").toString("utf8"));
+    // Securely verify the Google JWT (id_token) signature
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID, // Specify the CLIENT_ID of the app that accesses the backend
+    });
+    const payload = ticket.getPayload();
     const { sub: googleId, email, name, picture } = payload;
 
     if (!email) return res.status(400).json({ success: false, message: "Could not get email from Google." });
@@ -64,7 +71,10 @@ router.post("/google", async (req, res) => {
     }
 
     res.json({ success: true, token: sign(user._id), user: { id: user._id, name: user.name, email: user.email, avatar: user.avatar, role: user.role } });
-  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+  } catch (e) { 
+    console.error("Google Auth Error:", e);
+    res.status(500).json({ success: false, message: "Failed to authenticate with Google." }); 
+  }
 });
 
 // Me
