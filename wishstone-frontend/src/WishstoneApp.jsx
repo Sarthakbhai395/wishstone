@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams, Navigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import IntentionAnchoringPage from "./IntentionAnchoringPage";
-import FrequencyActivationPage from "./FrequencyActivationPage";
 
 const T = {
   bg: "#F5F0E8", bgDark: "#2C3320",
@@ -1734,43 +1732,49 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick }) {
 // ─── CHECKOUT PAGE ────────────────────────────────────────────
 function CheckoutPage({ cart, onPlaceOrder }) {
   const navigate = useNavigate();
-  const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
-
   const [form, setForm] = useState({ name: "", email: "", phone: "", address: "", city: "", state: "", pincode: "" });
   const [coupon, setCoupon] = useState("");
   const [discount, setDiscount] = useState(0);
   const [couponMsg, setCouponMsg] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isGift, setIsGift] = useState(false);
   const [giftNote, setGiftNote] = useState("");
-  const [paymentProcessing, setPaymentProcessing] = useState(false);
-
-  const sub        = cart.reduce((s, i) => s + i.price * i.qty, 0);
-  const totalQty   = cart.reduce((s, i) => s + i.qty, 0);
+  const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const totalQty = cart.reduce((s, i) => s + i.qty, 0);
   const giftCharge = isGift ? totalQty * 50 : 0;
-  const ship       = sub >= 999 ? 0 : 99;
-  const total      = sub + ship + giftCharge - discount;
-
-  // Load Razorpay script on mount
-  useEffect(() => {
-    if (document.getElementById("razorpay-script")) return;
-    const s = document.createElement("script");
-    s.id = "razorpay-script"; s.src = "https://checkout.razorpay.com/v1/checkout.js"; s.async = true;
-    document.body.appendChild(s);
-  }, []);
+  const ship = sub >= 999 ? 0 : 99;
+  const total = sub + ship + giftCharge - discount;
 
   const applyCoupon = async () => {
     if (!coupon.trim()) return;
     try {
-      const res = await fetch(`${API_BASE}/api/coupons/validate`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: coupon.trim().toUpperCase(), orderTotal: sub }) });
+      const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
+      const res = await fetch(`${API_BASE}/api/coupons/validate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: coupon.trim().toUpperCase(), orderTotal: sub })
+      });
       const data = await res.json();
-      if (data.success) { setDiscount(data.discount); setCouponMsg(data.message || "Coupon applied!"); }
-      else { setDiscount(0); setCouponMsg(data.message || "Invalid coupon code."); }
-    } catch { setDiscount(0); setCouponMsg("Could not validate coupon. Try again."); }
+      if (data.success) {
+        setDiscount(data.discount);
+        setCouponMsg(data.message || "Coupon applied!");
+      } else {
+        setDiscount(0);
+        setCouponMsg(data.message || "Invalid coupon code.");
+      }
+    } catch {
+      setDiscount(0);
+      setCouponMsg("Could not validate coupon. Try again.");
+    }
   };
 
-  const handleRazorpay = async () => {
-    setError(""); setPaymentProcessing(true);
+  const handleSubmit = async e => {
+    e.preventDefault(); setError("");
+    if (!form.name || !form.email || !form.phone || !form.address || !form.city || !form.pincode) return setError("Please fill all required fields.");
+    setLoading(true);
+
+    const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
     const token = localStorage.getItem("ws_token") || "";
     const orderPayload = {
       items: cart.map(i => ({ productId: String(i._id || i.id || ""), name: i.name || "Product", price: i.price || 0, quantity: i.qty || 1, image: i.image || "" })),
@@ -1778,10 +1782,20 @@ function CheckoutPage({ cart, onPlaceOrder }) {
       customer: { name: form.name, email: form.email, phone: form.phone },
       shippingAddress: { address: form.address, city: form.city, state: form.state, pincode: form.pincode, country: "India" },
     };
+
     try {
+      // Load Razorpay script if not loaded
+      if (!window.Razorpay && !document.getElementById("rzp-script")) {
+        await new Promise((res, rej) => {
+          const s = document.createElement("script"); s.id = "rzp-script";
+          s.src = "https://checkout.razorpay.com/v1/checkout.js"; s.onload = res; s.onerror = rej;
+          document.body.appendChild(s);
+        });
+      }
+
       const createRes  = await fetch(`${API_BASE}/api/payment/create-order`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(orderPayload) });
       const createData = await createRes.json();
-      if (!createData.success) { setError(createData.message || "Could not create payment order."); setPaymentProcessing(false); return; }
+      if (!createData.success) { setError(createData.message || "Could not create payment order."); setLoading(false); return; }
 
       const verifyPayment = async (response) => {
         try {
@@ -1790,15 +1804,16 @@ function CheckoutPage({ cart, onPlaceOrder }) {
           if (vData.success) { onPlaceOrder({ items: cart, address: form, totalAmount: vData.order?.totalAmount || total, coupon, discount, isGift, giftNote, paymentMethod: "razorpay", razorpayPaymentId: response.razorpay_payment_id, razorpayOrderId: response.razorpay_order_id, backendOrder: vData.order }); }
           else { setError(vData.message || "Payment verification failed. Contact support if amount was deducted."); }
         } catch { setError("Verification failed. If amount was deducted, please contact support."); }
-        setPaymentProcessing(false);
+        setLoading(false);
       };
 
+      // Mock mode (no real keys on server)
       if (createData.mockMode) {
         const ov = document.createElement("div");
         ov.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;";
         document.body.appendChild(ov);
         const bx = document.createElement("div"); bx.style.cssText = "background:#fff;border-radius:16px;width:360px;max-width:90vw;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,0.5);"; ov.appendChild(bx);
-        const hd = document.createElement("div"); hd.style.cssText = "background:#02042b;padding:20px;color:#fff;text-align:center;"; hd.innerHTML = "<div style='font-size:18px;font-weight:700;margin-bottom:4px;'>Razorpay Test Mode</div><div style='font-size:13px;opacity:0.75;'>WishStone &bull; ₹" + (createData.amount/100) + "</div>"; bx.appendChild(hd);
+        const hd = document.createElement("div"); hd.style.cssText = "background:#02042b;padding:20px;color:#fff;text-align:center;"; hd.innerHTML = "<div style='font-size:18px;font-weight:700;margin-bottom:4px;'>Razorpay Test Mode</div><div style='font-size:13px;opacity:0.75;'>WishStone &bull; ₹" + (createData.amount / 100) + "</div>"; bx.appendChild(hd);
         const bd = document.createElement("div"); bd.style.cssText = "padding:28px 24px;text-align:center;"; bd.innerHTML = "<p style='font-size:13px;color:#555;margin-bottom:20px;line-height:1.6;'>Test mode active. Simulate payment result below.</p>"; bx.appendChild(bd);
         const sb = document.createElement("button"); sb.textContent = "✓  Simulate Successful Payment"; sb.style.cssText = "background:#10b981;color:#fff;border:none;padding:13px 20px;border-radius:8px;width:100%;font-weight:700;cursor:pointer;font-size:14px;margin-bottom:10px;font-family:inherit;"; bd.appendChild(sb);
         const fb = document.createElement("button"); fb.textContent = "✕  Simulate Failed Payment"; fb.style.cssText = "background:#ef4444;color:#fff;border:none;padding:13px 20px;border-radius:8px;width:100%;font-weight:700;cursor:pointer;font-size:14px;font-family:inherit;"; bd.appendChild(fb);
@@ -1807,27 +1822,22 @@ function CheckoutPage({ cart, onPlaceOrder }) {
           bd.innerHTML = "<div style='padding:20px;color:#555;font-size:14px;'>Verifying payment…</div>";
           const mpid = "pay_mock_" + Date.now();
           try {
-            const enc = new TextEncoder(); const k = await window.crypto.subtle.importKey("raw", enc.encode("mock_demo_secret_123"), { name:"HMAC", hash:"SHA-256" }, false, ["sign"]);
+            const enc = new TextEncoder(); const k = await window.crypto.subtle.importKey("raw", enc.encode("mock_demo_secret_123"), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
             const sig = await window.crypto.subtle.sign("HMAC", k, enc.encode(createData.razorpayOrderId + "|" + mpid));
-            const ms = Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2,"0")).join("");
+            const ms = Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, "0")).join("");
             close(); await verifyPayment({ razorpay_payment_id: mpid, razorpay_order_id: createData.razorpayOrderId, razorpay_signature: ms });
-          } catch(e) { close(); setError("Mock error: " + e.message); setPaymentProcessing(false); }
+          } catch (e) { close(); setError("Mock error: " + e.message); setLoading(false); }
         };
-        fb.onclick = () => { close(); setError("Payment failed. Please try again."); setPaymentProcessing(false); };
+        fb.onclick = () => { close(); setError("Payment failed. Please try again."); setLoading(false); };
         return;
       }
 
-      if (!window.Razorpay) { setError("Payment gateway is loading. Please try again."); setPaymentProcessing(false); return; }
-      const rzp = new window.Razorpay({ key: createData.keyId, amount: createData.amount, currency: createData.currency || "INR", name: "WishStone", description: `Order — ${cart.length} item${cart.length>1?"s":""}`, image: `${process.env.PUBLIC_URL||""}/wishstone svg.svg`, order_id: createData.razorpayOrderId, prefill: createData.prefill || {}, theme: { color: "#E8720C" }, handler: verifyPayment, modal: { ondismiss: () => { setPaymentProcessing(false); setError(""); }, escape: true, animation: true } });
-      rzp.on("payment.failed", r => { setPaymentProcessing(false); setError(r.error?.description || r.error?.reason || "Payment failed. Please try again."); });
+      // Real Razorpay popup
+      if (!window.Razorpay) { setError("Payment gateway failed to load. Please refresh and try again."); setLoading(false); return; }
+      const rzp = new window.Razorpay({ key: createData.keyId, amount: createData.amount, currency: createData.currency || "INR", name: "WishStone", description: `Order — ${cart.length} item${cart.length > 1 ? "s" : ""}`, image: `${process.env.PUBLIC_URL || ""}/wishstone svg.svg`, order_id: createData.razorpayOrderId, prefill: createData.prefill || {}, theme: { color: "#E8720C" }, handler: verifyPayment, modal: { ondismiss: () => setLoading(false), escape: true, animation: true } });
+      rzp.on("payment.failed", r => { setLoading(false); setError(r.error?.description || r.error?.reason || "Payment failed. Please try again."); });
       rzp.open();
-    } catch { setError("Something went wrong. Please try again."); setPaymentProcessing(false); }
-  };
-
-  const handleSubmit = e => {
-    e.preventDefault(); setError("");
-    if (!form.name || !form.email || !form.phone || !form.address || !form.city || !form.pincode) return setError("Please fill all required fields.");
-    handleRazorpay();
+    } catch (err) { setError("Something went wrong. Please try again."); setLoading(false); }
   };
 
   const inp = (key, label, type = "text", half = false) => (
@@ -1886,13 +1896,11 @@ function CheckoutPage({ cart, onPlaceOrder }) {
                 </div>
               )}
             </div>
-            {error && <div style={{ background: "rgba(192,57,43,0.06)", border: "1px solid rgba(192,57,43,0.2)", borderRadius: 10, padding: "12px 16px", marginBottom: "1rem", display: "flex", gap: 10 }}><span>⚠️</span><p style={{ color: "#c0392b", fontSize: "0.78rem", margin: 0 }}>{error}</p></div>}
-            <button type="submit" className="btn-orange" disabled={paymentProcessing} style={{ width: "100%", padding: "14px", fontSize: "0.84rem", borderRadius: 9, opacity: paymentProcessing ? 0.7 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
-              {paymentProcessing ? <><div style={{ width: 18, height: 18, border: "2.5px solid rgba(255,255,255,0.3)", borderTop: "2.5px solid #fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />Processing Payment…</> : <><span>🔒</span> Pay ₹{total.toLocaleString()} Securely</>}
+            {error && <div style={{ background: "rgba(192,57,43,0.06)", border: "1px solid rgba(192,57,43,0.2)", borderRadius: 10, padding: "12px 16px", marginBottom: "1rem", display: "flex", gap: 8 }}><span>⚠️</span><p style={{ color: "#c0392b", fontSize: "0.78rem", margin: 0 }}>{error}</p></div>}
+            <button type="submit" className="btn-orange" disabled={loading} style={{ width: "100%", padding: "14px", fontSize: "0.84rem", borderRadius: 9, opacity: loading ? 0.7 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+              {loading ? <><div style={{ width: 18, height: 18, border: "2.5px solid rgba(255,255,255,0.3)", borderTop: "2.5px solid #fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />Processing Payment…</> : <><span>🔒</span> Pay ₹{total.toLocaleString()} Securely</>}
             </button>
-            <div style={{ textAlign: "center", marginTop: "0.75rem", opacity: 0.5 }}>
-              <span style={{ fontSize: "0.65rem", color: T.textMid }}>🔒 Secured by Razorpay — 256-bit SSL encrypted</span>
-            </div>
+            <p style={{ textAlign: "center", fontSize: "0.65rem", color: T.textMid, marginTop: "0.6rem", opacity: 0.6 }}>🔒 Secured by Razorpay — 256-bit SSL encrypted</p>
           </form>
           <div style={{ background: "#fff", borderRadius: 16, padding: "1.5rem", border: `1px solid ${T.border}`, position: "sticky", top: 90 }}>
             <h3 style={{ fontFamily: "'Playfair Display',serif", color: T.text, fontSize: "1.05rem", fontWeight: 700, marginBottom: "1.2rem" }}>Order Summary</h3>
@@ -2064,101 +2072,45 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
   );
 }
 
-// ─── GOOGLE OAUTH HELPER ──────────────────────────────────────
-function useGoogleAuth(onSuccess) {
-  const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
-  const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID || "342285664182-b68b0t0tmj66jgu9eg14hg7212a57h2r.apps.googleusercontent.com";
-
-  useEffect(() => {
-    // Load Google Identity Services script
-    if (document.getElementById("google-gsi-script")) return;
-    const script = document.createElement("script");
-    script.id = "google-gsi-script";
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-  }, []);
-
-  const handleGoogleResponse = async (response) => {
-    try {
-      const res = await fetch(`${API_BASE}/api/auth/google`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ credential: response.credential }),
-      });
-      const data = await res.json();
-      if (data.success && data.token) {
-        localStorage.setItem("ws_token", data.token);
-        localStorage.setItem("ws_user", JSON.stringify(data.user));
-        onSuccess(data.user);
-      }
-    } catch (e) {
-      console.error("Google auth error:", e);
-    }
-  };
-
-  const renderGoogleButton = (containerId) => {
-    if (!window.google) return;
-    window.google.accounts.id.initialize({
-      client_id: CLIENT_ID,
-      callback: handleGoogleResponse,
-      auto_select: false,
-      cancel_on_tap_outside: true,
-    });
-    window.google.accounts.id.renderButton(
-      document.getElementById(containerId),
-      {
-        theme: "outline",
-        size: "large",
-        width: "100%",
-        text: "continue_with",
-        shape: "rectangular",
-        logo_alignment: "left",
-      }
-    );
-  };
-
-  return { renderGoogleButton, CLIENT_ID };
-}
-
 // ─── AUTH PAGES ───────────────────────────────────────────────
 function SignupPage({ onSignup, onSwitch }) {
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
-
-  const { renderGoogleButton } = useGoogleAuth((user) => {
-    onSignup({ ...user, joinedAt: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) });
-  });
+  const GOOGLE_CLIENT_ID = "342285664182-b68b0t0tmj66jgu9eg14hg7212a57h2r.apps.googleusercontent.com";
 
   useEffect(() => {
-    const timer = setTimeout(() => renderGoogleButton("google-signup-btn"), 800);
-    return () => clearTimeout(timer);
+    // Load Google GSI script
+    if (!document.getElementById("gsi-script")) {
+      const s = document.createElement("script"); s.id = "gsi-script"; s.src = "https://accounts.google.com/gsi/client"; s.async = true; s.defer = true; document.head.appendChild(s);
+    }
+    const render = () => {
+      if (!window.google) { setTimeout(render, 300); return; }
+      window.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: async (resp) => {
+        try {
+          const res = await fetch(`${API_BASE}/api/auth/google`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ credential: resp.credential }) });
+          const data = await res.json();
+          if (data.success && data.token) { localStorage.setItem("ws_token", data.token); localStorage.setItem("ws_user", JSON.stringify(data.user)); onSignup({ ...data.user, joinedAt: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) }); }
+        } catch { setError("Google sign-in failed. Please try again."); }
+      }});
+      const el = document.getElementById("google-signup-btn");
+      if (el) window.google.accounts.id.renderButton(el, { theme: "outline", size: "large", width: el.offsetWidth || 340, text: "signup_with", shape: "rectangular", logo_alignment: "left" });
+    };
+    setTimeout(render, 500);
   }, []);
 
   const handle = async e => {
-    e.preventDefault(); setError(""); setLoading(true);
-    if (!form.name || !form.email || !form.password) { setError("All fields are required."); setLoading(false); return; }
-    if (form.password !== form.confirm) { setError("Passwords do not match."); setLoading(false); return; }
-    if (form.password.length < 6) { setError("Password must be at least 6 characters."); setLoading(false); return; }
+    e.preventDefault(); setError("");
+    if (!form.name || !form.email || !form.password) return setError("All fields are required.");
+    if (form.password !== form.confirm) return setError("Passwords do not match.");
+    if (form.password.length < 6) return setError("Password must be at least 6 characters.");
     try {
-      const res = await fetch(`${API_BASE}/api/auth/register`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name, email: form.email, password: form.password }),
-      });
+      const res = await fetch(`${API_BASE}/api/auth/register`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: form.name, email: form.email, password: form.password }) });
       const data = await res.json();
-      if (data.token) {
-        localStorage.setItem("ws_token", data.token);
-        localStorage.setItem("ws_user", JSON.stringify(data.user));
-        onSignup({ ...data.user, joinedAt: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) });
-      } else {
-        setError(data.message || "Registration failed. Please try again.");
-      }
+      if (data.token) { localStorage.setItem("ws_token", data.token); localStorage.setItem("ws_user", JSON.stringify(data.user)); onSignup({ ...data.user, joinedAt: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) }); }
+      else { setError(data.message || "Registration failed. Please try again."); }
     } catch { setError("Network error. Please try again."); }
-    setLoading(false);
   };
 
   return (
@@ -2168,17 +2120,13 @@ function SignupPage({ onSignup, onSwitch }) {
           <img src={`${process.env.PUBLIC_URL || ""}/wishstone svg.svg`} alt="WishStone" style={{ height: 40, width: "auto", display: "block", margin: "0 auto 8px" }} />
           <h2 style={{ fontFamily: "'Playfair Display',serif", color: T.text, fontSize: "1.5rem", fontWeight: 900, margin: 0 }}>Create Account</h2>
         </div>
-
-        {/* Google Sign-Up Button */}
+        {/* Google Sign-Up */}
         <div id="google-signup-btn" style={{ width: "100%", marginBottom: "1.25rem", minHeight: 44 }} />
-
-        {/* Divider */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: "1.25rem" }}>
           <div style={{ flex: 1, height: 1, background: T.border }} />
           <span style={{ fontSize: "0.72rem", color: T.textMid, fontWeight: 600, letterSpacing: "0.08em" }}>OR</span>
           <div style={{ flex: 1, height: 1, background: T.border }} />
         </div>
-
         <form onSubmit={handle}>
           {[["name", "Full Name", "text"], ["email", "Email Address", "email"], ["password", "Password", "password"], ["confirm", "Confirm Password", "password"]].map(([k, l, t]) => (
             <div key={k} style={{ marginBottom: "1rem" }}>
@@ -2189,9 +2137,7 @@ function SignupPage({ onSignup, onSwitch }) {
             </div>
           ))}
           {error && <p style={{ color: "#c0392b", fontSize: "0.78rem", marginBottom: "1rem" }}>{error}</p>}
-          <button type="submit" disabled={loading} className="btn-orange" style={{ width: "100%", padding: "13px", fontSize: "0.82rem", borderRadius: 8, opacity: loading ? 0.75 : 1 }}>
-            {loading ? "Creating Account…" : "Create Account"}
-          </button>
+          <button type="submit" className="btn-orange" style={{ width: "100%", padding: "13px", fontSize: "0.82rem", borderRadius: 8 }}>Create Account</button>
         </form>
         <p style={{ textAlign: "center", marginTop: "1.5rem", fontSize: "0.82rem", color: T.textMid }}>
           Already have an account? <button onClick={onSwitch} style={{ background: "none", border: "none", cursor: "pointer", color: T.orange, fontWeight: 700, fontSize: "0.82rem" }}>Sign In</button>
@@ -2205,36 +2151,37 @@ function LoginPage({ onLogin, onSwitch }) {
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
-
-  const { renderGoogleButton } = useGoogleAuth((user) => {
-    onLogin({ ...user, joinedAt: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) });
-  });
+  const GOOGLE_CLIENT_ID = "342285664182-b68b0t0tmj66jgu9eg14hg7212a57h2r.apps.googleusercontent.com";
 
   useEffect(() => {
-    const timer = setTimeout(() => renderGoogleButton("google-login-btn"), 800);
-    return () => clearTimeout(timer);
+    if (!document.getElementById("gsi-script")) {
+      const s = document.createElement("script"); s.id = "gsi-script"; s.src = "https://accounts.google.com/gsi/client"; s.async = true; s.defer = true; document.head.appendChild(s);
+    }
+    const render = () => {
+      if (!window.google) { setTimeout(render, 300); return; }
+      window.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: async (resp) => {
+        try {
+          const res = await fetch(`${API_BASE}/api/auth/google`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ credential: resp.credential }) });
+          const data = await res.json();
+          if (data.success && data.token) { localStorage.setItem("ws_token", data.token); localStorage.setItem("ws_user", JSON.stringify(data.user)); onLogin({ ...data.user, joinedAt: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) }); }
+        } catch { setError("Google sign-in failed. Please try again."); }
+      }});
+      const el = document.getElementById("google-login-btn");
+      if (el) window.google.accounts.id.renderButton(el, { theme: "outline", size: "large", width: el.offsetWidth || 320, text: "signin_with", shape: "rectangular", logo_alignment: "left" });
+    };
+    setTimeout(render, 500);
   }, []);
 
   const handle = async e => {
-    e.preventDefault(); setError(""); setLoading(true);
-    if (!form.email || !form.password) { setError("Email and password are required."); setLoading(false); return; }
+    e.preventDefault(); setError("");
+    if (!form.email || !form.password) return setError("Email and password are required.");
     try {
-      const res = await fetch(`${API_BASE}/api/auth/login`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email, password: form.password }),
-      });
+      const res = await fetch(`${API_BASE}/api/auth/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: form.email, password: form.password }) });
       const data = await res.json();
-      if (data.token) {
-        localStorage.setItem("ws_token", data.token);
-        localStorage.setItem("ws_user", JSON.stringify(data.user));
-        onLogin({ ...data.user, joinedAt: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) });
-      } else {
-        setError(data.message || "Invalid email or password.");
-      }
+      if (data.token) { localStorage.setItem("ws_token", data.token); localStorage.setItem("ws_user", JSON.stringify(data.user)); onLogin({ ...data.user, joinedAt: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) }); }
+      else { setError(data.message || "Invalid email or password."); }
     } catch { setError("Network error. Please try again."); }
-    setLoading(false);
   };
 
   return (
@@ -2244,17 +2191,13 @@ function LoginPage({ onLogin, onSwitch }) {
           <div style={{ fontSize: 38, marginBottom: 8 }}>🔮</div>
           <h2 style={{ fontFamily: "'Playfair Display',serif", color: T.text, fontSize: "1.5rem", fontWeight: 900, margin: 0 }}>Welcome Back</h2>
         </div>
-
-        {/* Google Sign-In Button */}
+        {/* Google Sign-In */}
         <div id="google-login-btn" style={{ width: "100%", marginBottom: "1.25rem", minHeight: 44 }} />
-
-        {/* Divider */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: "1.25rem" }}>
           <div style={{ flex: 1, height: 1, background: T.border }} />
           <span style={{ fontSize: "0.72rem", color: T.textMid, fontWeight: 600, letterSpacing: "0.08em" }}>OR</span>
           <div style={{ flex: 1, height: 1, background: T.border }} />
         </div>
-
         <form onSubmit={handle}>
           <div style={{ marginBottom: "1rem" }}>
             <label style={{ display: "block", fontSize: "0.68rem", fontWeight: 700, color: T.textMid, marginBottom: 5, letterSpacing: "0.08em", textTransform: "uppercase" }}>Email Address</label>
@@ -2262,7 +2205,7 @@ function LoginPage({ onLogin, onSwitch }) {
               style={{ width: "100%", padding: "11px 13px", border: `1.5px solid ${T.border}`, borderRadius: 8, fontSize: "0.88rem", background: "#fff", color: T.text, outline: "none", boxSizing: "border-box" }}
               onFocus={e => e.target.style.borderColor = T.orange} onBlur={e => e.target.style.borderColor = T.border} />
           </div>
-          <div style={{ marginBottom: "1.25rem" }}>
+          <div style={{ marginBottom: "1rem" }}>
             <label style={{ display: "block", fontSize: "0.68rem", fontWeight: 700, color: T.textMid, marginBottom: 5, letterSpacing: "0.08em", textTransform: "uppercase" }}>Password</label>
             <div style={{ position: "relative" }}>
               <input type={showPw ? "text" : "password"} placeholder="Enter your password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })}
@@ -2272,9 +2215,7 @@ function LoginPage({ onLogin, onSwitch }) {
             </div>
           </div>
           {error && <p style={{ color: "#c0392b", fontSize: "0.78rem", marginBottom: "1rem" }}>{error}</p>}
-          <button type="submit" disabled={loading} className="btn-orange" style={{ width: "100%", padding: "13px", fontSize: "0.82rem", borderRadius: 8, opacity: loading ? 0.75 : 1 }}>
-            {loading ? "Signing In…" : "Sign In"}
-          </button>
+          <button type="submit" className="btn-orange" style={{ width: "100%", padding: "13px", fontSize: "0.82rem", borderRadius: 8 }}>Sign In</button>
         </form>
         <p style={{ textAlign: "center", marginTop: "1.25rem", fontSize: "0.82rem", color: T.textMid }}>
           New to WishStone? <button onClick={onSwitch} style={{ background: "none", border: "none", cursor: "pointer", color: T.orange, fontWeight: 700, fontSize: "0.82rem" }}>Create Account</button>
@@ -3485,8 +3426,6 @@ function AppInner() {
         <Route path="/" element={<HomePage onShop={() => nav("products")} onRitual={() => nav("rituals")} onNav={nav} />} />
         <Route path="/shop" element={<ProductsPage onAdd={addToCart} onAddAnim={(e, p) => addToCart(p)} onWish={flyToWishlist} wished={wished} onClick={goToProduct} cart={cart} />} />
         <Route path="/product/:id" element={<ProductPageWrapper onAdd={addToCart} onAddAnim={(e, p) => addToCart(p)} onWish={flyToWishlist} wished={wished} cart={cart} onShop={() => nav("products")} />} />
-        <Route path="/intention-anchoring" element={<IntentionAnchoringPage />} />
-        <Route path="/frequency-activation" element={<FrequencyActivationPage />} />
         <Route path="/rituals" element={<RitualsPage />} />
         <Route path="/benefits" element={<BenefitsPage />} />
         <Route path="/stories" element={<StoriesPage />} />
