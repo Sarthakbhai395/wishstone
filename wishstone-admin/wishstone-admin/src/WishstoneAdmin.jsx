@@ -413,6 +413,212 @@ function Sidebar({ active, onNav, admin, onLogout, mobileOpen, onMobileClose }) 
   );
 }
 
+// ─── SPLASH SCREEN ────────────────────────────────────────────
+function SplashScreen({ onComplete }) {
+  const [percent, setPercent] = useState(0);
+  const [phase, setPhase] = useState("Initializing system...");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPercent(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        const inc = Math.floor(Math.random() * 12) + 6;
+        const next = Math.min(prev + inc, 100);
+        
+        if (next < 30) setPhase("Connecting to secure gateway...");
+        else if (next < 60) setPhase("Loading admin modules...");
+        else if (next < 85) setPhase("Verifying credentials database...");
+        else setPhase("Setting up secure dashboard session...");
+        
+        return next;
+      });
+    }, 120);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (percent === 100) {
+      const timer = setTimeout(() => {
+        onComplete();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [percent, onComplete]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0, scale: 1.05 }}
+      transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "#0c0b0a",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 999999,
+        overflow: "hidden",
+      }}
+    >
+      {/* Background glow overlay */}
+      <div style={{
+        position: "absolute",
+        width: "600px",
+        height: "600px",
+        borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(232, 114, 12, 0.12) 0%, transparent 70%)",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        pointerEvents: "none"
+      }} />
+
+      {/* Luxury pattern */}
+      <div style={{
+        position: "absolute",
+        inset: 0,
+        backgroundImage: "radial-gradient(rgba(232, 114, 12, 0.04) 1px, transparent 1px)",
+        backgroundSize: "32px 32px",
+        opacity: 0.8,
+        pointerEvents: "none"
+      }} />
+
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", zIndex: 10 }}>
+        
+        {/* Animated Rings */}
+        <div style={{ position: "relative", width: 180, height: 180, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          {/* Dashed outer spinner */}
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 15, ease: "linear" }}
+            style={{
+              position: "absolute",
+              width: 170,
+              height: 170,
+              borderRadius: "50%",
+              border: "2px dashed rgba(232, 114, 12, 0.25)",
+            }}
+          />
+
+          {/* Pulse ring */}
+          <motion.div
+            animate={{ scale: [1, 1.08, 1], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+            style={{
+              position: "absolute",
+              width: 140,
+              height: 140,
+              borderRadius: "50%",
+              border: "1px solid rgba(232, 114, 12, 0.4)",
+            }}
+          />
+
+          {/* Central Logo Box */}
+          <motion.div
+            initial={{ scale: 0.7, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.8, ease: "backOut" }}
+            style={{
+              width: 96,
+              height: 96,
+              borderRadius: "24px",
+              background: "linear-gradient(135deg, #FF9A3C 0%, #E8720C 100%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 12px 36px rgba(232, 114, 12, 0.45)",
+              transform: "rotate(45deg)"
+            }}
+          >
+            <span style={{
+              color: "#ffffff",
+              fontSize: 48,
+              fontWeight: 800,
+              fontFamily: "'Playfair Display', serif",
+              transform: "rotate(-45deg)",
+              textShadow: "0 3px 12px rgba(0,0,0,0.15)"
+            }}>
+              W
+            </span>
+          </motion.div>
+        </div>
+
+        {/* Text Area */}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.7, ease: "easeOut" }}
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: "2.8rem",
+            fontWeight: 800,
+            color: "#ffffff",
+            marginTop: "2.5rem",
+            letterSpacing: "2px",
+            textShadow: "0 4px 20px rgba(0,0,0,0.3)"
+          }}
+        >
+          WISHSTONE
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7, duration: 0.5 }}
+          style={{
+            color: "#E8720C",
+            fontSize: "0.85rem",
+            letterSpacing: "0.4em",
+            textTransform: "uppercase",
+            marginTop: "0.5rem",
+            fontWeight: 600,
+          }}
+        >
+          Premium Admin Gateway
+        </motion.p>
+
+        {/* Custom luxury progress bar */}
+        <div style={{
+          width: 280,
+          height: 4,
+          background: "rgba(255,255,255,0.06)",
+          borderRadius: 8,
+          overflow: "hidden",
+          marginTop: "3rem",
+          position: "relative"
+        }}>
+          <div
+            style={{
+              height: "100%",
+              width: `${percent}%`,
+              background: "linear-gradient(90deg, #FF9A3C 0%, #E8720C 100%)",
+              boxShadow: "0 0 12px rgba(232, 114, 12, 0.8)",
+              transition: "width 0.1s ease-out"
+            }}
+          />
+        </div>
+
+        {/* Progress Percent and Phase display */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "1.2rem", gap: "6px" }}>
+          <span style={{ color: "#ffffff", fontSize: "1.15rem", fontWeight: 700, fontFamily: "'Inter', sans-serif" }}>
+            {percent}%
+          </span>
+          <span style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.78rem", letterSpacing: "0.05em", fontWeight: 500 }}>
+            {phase}
+          </span>
+        </div>
+
+      </div>
+    </motion.div>
+  );
+}
+
 // ─── LOGIN PAGE ───────────────────────────────────────────────
 function LoginPage({ onLogin }) {
   const [email, setEmail] = useState("admin@wishstone.com");
@@ -1766,6 +1972,56 @@ export default function WishstoneAdmin() {
   const [page, setPage]         = useState("dashboard");
   const [toasts, setToasts]     = useState([]);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [loadingSplash, setLoadingSplash] = useState(true);
+
+  // Tab Title & Favicon Animation Effect
+  useEffect(() => {
+    const sequence = [
+      { title: "💎 WISHSTONE ADMIN 💎", emoji: "💎" },
+      { title: "✨ WISHSTONE ADMIN ✨", emoji: "✨" },
+      { title: "⚡ WISHSTONE ADMIN ⚡", emoji: "⚡" },
+      { title: "👑 WISHSTONE ADMIN 👑", emoji: "👑" },
+    ];
+    let idx = 0;
+
+    const updateFavicon = (emoji) => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = 32;
+        canvas.height = 32;
+        const ctx = canvas.getContext("2d");
+        ctx.font = "28px serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(emoji, 16, 16);
+
+        let link = document.querySelector("link[rel~='icon']");
+        if (!link) {
+          link = document.createElement("link");
+          link.rel = "icon";
+          document.head.appendChild(link);
+        }
+        link.href = canvas.toDataURL();
+      } catch (err) {
+        console.error("Error setting custom animated favicon: ", err);
+      }
+    };
+
+    const interval = setInterval(() => {
+      document.title = sequence[idx].title;
+      updateFavicon(sequence[idx].emoji);
+      idx = (idx + 1) % sequence.length;
+    }, 1500);
+
+    // Initial load set
+    document.title = sequence[0].title;
+    updateFavicon(sequence[0].emoji);
+
+    return () => {
+      clearInterval(interval);
+      document.title = "Wishstone Admin";
+    };
+  }, []);
 
   // Inject global CSS
   useEffect(() => {
@@ -1797,35 +2053,47 @@ export default function WishstoneAdmin() {
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
 
-  if (!token) return <LoginPage onLogin={handleLogin} />;
-
   const PAGES = { dashboard: Dashboard, products: Products, orders: Orders, customers: Customers, users: Users, coupons: Coupons, categories: Categories };
   const PageComponent = PAGES[page] || Dashboard;
 
   return (
     <div style={{ minHeight: "100vh", background: T.bg }}>
-      {/* Mobile top bar */}
-      <div className="ws-mobile-bar">
-        <button onClick={() => setMobileOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 22, color: T.text, display: "flex", alignItems: "center" }}>☰</button>
-        <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: "1rem", color: T.text }}>Wishstone Admin</div>
-      </div>
+      <AnimatePresence>
+        {loadingSplash && (
+          <SplashScreen onComplete={() => setLoadingSplash(false)} />
+        )}
+      </AnimatePresence>
 
-      <Sidebar active={page} onNav={setPage} admin={admin} onLogout={handleLogout} mobileOpen={mobileOpen} onMobileClose={() => setMobileOpen(false)} />
+      {!loadingSplash && (
+        !token ? (
+          <LoginPage onLogin={handleLogin} />
+        ) : (
+          <>
+            {/* Mobile top bar */}
+            <div className="ws-mobile-bar">
+              <button onClick={() => setMobileOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 22, color: T.text, display: "flex", alignItems: "center" }}>☰</button>
+              <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: "1rem", color: T.text }}>Wishstone Admin</div>
+            </div>
 
-      <main className="ws-main">
-        <AnimatePresence mode="wait">
-          <PageComponent key={page} token={token} showToast={showToast} />
-        </AnimatePresence>
-      </main>
+            <Sidebar active={page} onNav={setPage} admin={admin} onLogout={handleLogout} mobileOpen={mobileOpen} onMobileClose={() => setMobileOpen(false)} />
 
-      {/* Toasts */}
-      <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, display: "flex", flexDirection: "column", gap: 10 }}>
-        <AnimatePresence>
-          {toasts.map(t => (
-            <Toast key={t.id} message={t.message} type={t.type} onClose={() => removeToast(t.id)} />
-          ))}
-        </AnimatePresence>
-      </div>
+            <main className="ws-main">
+              <AnimatePresence mode="wait">
+                <PageComponent key={page} token={token} showToast={showToast} />
+              </AnimatePresence>
+            </main>
+
+            {/* Toasts */}
+            <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, display: "flex", flexDirection: "column", gap: 10 }}>
+              <AnimatePresence>
+                {toasts.map(t => (
+                  <Toast key={t.id} message={t.message} type={t.type} onClose={() => removeToast(t.id)} />
+                ))}
+              </AnimatePresence>
+            </div>
+          </>
+        )
+      )}
     </div>
   );
 }
