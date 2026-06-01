@@ -2087,7 +2087,7 @@ function SignupPage({ onSignup, onSwitch }) {
     }
     const render = () => {
       if (!window.google) { setTimeout(render, 300); return; }
-      window.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: async (resp) => {
+      window.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, use_fedcm_for_prompt: true, callback: async (resp) => {
         try {
           const res = await fetch(`${API_BASE}/api/auth/google`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ credential: resp.credential }) });
           const data = await res.json();
@@ -2160,7 +2160,7 @@ function LoginPage({ onLogin, onSwitch }) {
     }
     const render = () => {
       if (!window.google) { setTimeout(render, 300); return; }
-      window.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: async (resp) => {
+      window.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, use_fedcm_for_prompt: true, callback: async (resp) => {
         try {
           const res = await fetch(`${API_BASE}/api/auth/google`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ credential: resp.credential }) });
           const data = await res.json();
