@@ -1357,7 +1357,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
         <div className="max-w" style={{ padding: "clamp(1.5rem,4vw,3rem)" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 420px), 1fr))", gap: "2rem", alignItems: "start" }} className="prod-detail-grid">
             {/* Left Side - Image Gallery Nike Style */}
-            <div>
+            <div style={{ minWidth: 0, width: "100%" }}>
               {/* Main Image with Animation */}
               <div style={{ borderRadius: 20, overflow: "hidden", boxShadow: "0 12px 48px rgba(0,0,0,0.12)", marginBottom: "1.2rem", aspectRatio: "1", background: "#f0ece4", position: "relative", isolation: "isolate" }}>
                 <AnimatePresence mode="wait">
@@ -1492,21 +1492,16 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
               </div>
               <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "1rem" }}>
                 {cartQty > 0 ? (
-                  <div style={{ display: "flex", alignItems: "center", border: `1.5px solid ${T.orange}`, borderRadius: 8, overflow: "hidden" }}>
-                    <button onClick={handleDec} style={{ width: 36, height: 40, background: "none", border: "none", cursor: "pointer", fontSize: 18, color: T.orange, fontWeight: 700 }}>−</button>
-                    <span style={{ width: 40, textAlign: "center", fontWeight: 800, color: T.orange, fontSize: "1rem" }}>{cartQty}</span>
-                    <button onClick={handleAdd} disabled={cart?.reduce((s, i) => s + i.qty, 0) >= 10} style={{ width: 36, height: 40, background: cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? "#e5e7eb" : T.orange, border: "none", cursor: cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? "not-allowed" : "pointer", fontSize: 18, color: "#fff", fontWeight: 700 }}>+</button>
+                  <div style={{ display: "flex", alignItems: "center", border: `1.5px solid ${T.orange}`, borderRadius: 8, overflow: "hidden", height: 44, width: 160, justifyContent: "space-between", background: "#fff" }}>
+                    <button onClick={handleDec} style={{ width: 40, height: "100%", background: "none", border: "none", cursor: "pointer", fontSize: 20, color: T.orange, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
+                    <span style={{ width: 40, textAlign: "center", fontWeight: 800, color: T.orange, fontSize: "1.05rem" }}>{cartQty}</span>
+                    <button onClick={handleAdd} disabled={cart?.reduce((s, i) => s + i.qty, 0) >= 10} style={{ width: 40, height: "100%", background: cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? "#e5e7eb" : "none", border: "none", cursor: cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? "not-allowed" : "pointer", fontSize: 20, color: T.orange, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
                   </div>
                 ) : (
-                  <div style={{ display: "flex", alignItems: "center", border: `1.5px solid ${T.border}`, borderRadius: 8, overflow: "hidden" }}>
-                    <button style={{ width: 36, height: 40, background: "none", border: "none", cursor: "default", fontSize: 18, color: T.textMid, opacity: 0.4 }}>−</button>
-                    <span style={{ width: 40, textAlign: "center", fontWeight: 700, color: T.text }}>0</span>
-                    <button style={{ width: 36, height: 40, background: "none", border: "none", cursor: "default", fontSize: 18, color: T.textMid, opacity: 0.4 }}>+</button>
-                  </div>
+                  <button className="btn-orange" onClick={handleAdd} disabled={cart?.reduce((s, i) => s + i.qty, 0) >= 10} style={{ width: 160, height: 44, fontSize: "0.85rem", borderRadius: 8, opacity: cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? 0.5 : 1, cursor: cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    {cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? "Cart Full (10/10)" : "Add to Cart"}
+                  </button>
                 )}
-                <button className="btn-orange" onClick={handleAdd} disabled={cart?.reduce((s, i) => s + i.qty, 0) >= 10} style={{ flex: 1, padding: "12px", fontSize: "0.8rem", borderRadius: 8, opacity: cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? 0.5 : 1, cursor: cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? "not-allowed" : "pointer" }}>
-                  {cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? "Cart Full (10/10)" : cartQty > 0 ? `Add More (${cart?.reduce((s, i) => s + i.qty, 0)}/10)` : "Add to Cart"}
-                </button>
                 <button onClick={e => onWish(e, p.id)} style={{ width: 44, height: 44, borderRadius: 8, border: `1.5px solid ${T.border}`, background: "#fff", cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>{wished.includes(p.id) ? "❤️" : "🤍"}</button>
               </div>
               <div style={{ display: "flex", gap: "1.2rem", flexWrap: "wrap" }}>
