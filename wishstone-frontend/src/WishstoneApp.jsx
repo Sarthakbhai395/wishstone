@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams, Navigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import IntentionAnchoringPage from "./IntentionAnchoringPage";
 
 const T = {
   bg: "#F5F0E8", bgDark: "#2C3320",
@@ -663,10 +664,8 @@ function PowersSection({ onNav }) {
   const navigate = useNavigate();
 
   const handleLearnMore = (powerNum) => {
-    if (powerNum === "01") {
+    if (powerNum === "01" || powerNum === "02") {
       navigate("/intention-anchoring");
-    } else if (powerNum === "02") {
-      navigate("/frequency-activation");
     } else {
       onNav("benefits");
     }
@@ -3424,6 +3423,7 @@ function AppInner() {
       <Header cartCount={cartCount} wishCount={wished.length} onNav={nav} currentPage={currentPage} user={user} onLogout={handleLogout} />
       <Routes>
         <Route path="/" element={<HomePage onShop={() => nav("products")} onRitual={() => nav("rituals")} onNav={nav} />} />
+        <Route path="/intention-anchoring" element={<IntentionAnchoringPage />} />
         <Route path="/shop" element={<ProductsPage onAdd={addToCart} onAddAnim={(e, p) => addToCart(p)} onWish={flyToWishlist} wished={wished} onClick={goToProduct} cart={cart} />} />
         <Route path="/product/:id" element={<ProductPageWrapper onAdd={addToCart} onAddAnim={(e, p) => addToCart(p)} onWish={flyToWishlist} wished={wished} cart={cart} onShop={() => nav("products")} />} />
         <Route path="/rituals" element={<RitualsPage />} />
