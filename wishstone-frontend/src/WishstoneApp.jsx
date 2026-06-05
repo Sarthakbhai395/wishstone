@@ -894,7 +894,7 @@ const REFUND_EXCHANGE_CANCELLATION_POLICY = [
     heading: "",
     paragraphs: [
       "We want you to love every order you receive from Wishstone. Since our products are personal-use and prepared with care in small batches, we maintain a strict but transparent returns, exchange, and cancellation policy.",
-      "If you ever face an issue with your order, please reach out to us at support@wishstone.in or on WhatsApp at +91 6306 059912 and our team will assist you promptly."
+      "If you ever face an issue with your order, please reach out to us at support@wishstone.in or on WhatsApp at +91 81714 40017 and our team will assist you promptly."
     ]
   },
   {
@@ -937,7 +937,7 @@ const REFUND_EXCHANGE_CANCELLATION_POLICY = [
   {
     heading: "4. Order Cancellation",
     paragraphs: [
-      "Orders can only be cancelled before they are shipped. Please reach out to us at support@wishstone.in or on WhatsApp at +91 6306 059912 within 3 hours of placing your order for any cancellation requests.",
+      "Orders can only be cancelled before they are shipped. Please reach out to us at support@wishstone.in or on WhatsApp at +91 81714 40017 within 3 hours of placing your order for any cancellation requests.",
       "Once shipped, the order cannot be cancelled, returned, or refunded.",
       "For prepaid orders cancelled before dispatch, the refund will be processed to the original payment source. Please allow 7–14 business days for the amount to reflect in your account.",
       "Cancellation by Wishstone: In rare circumstances, Wishstone reserves the right to cancel an order if the product is out of stock after order placement, the delivery location is unserviceable by our courier partners, there is a suspicion of fraudulent activity, or there is a technical error in pricing. In all such cases, a full refund will be issued within 5–7 business days and you will be notified immediately."
@@ -1098,7 +1098,7 @@ const TERMS_AND_CONDITIONS = [
   {
     heading: "SECTION 21 — CONTACT INFORMATION",
     paragraphs: [
-      "For any questions about these Terms & Conditions, please contact Wishstone Manifesta & Co. at support@wishstone.in or on WhatsApp at +91 6306 059912."
+      "For any questions about these Terms & Conditions, please contact Wishstone Manifesta & Co. at support@wishstone.in or on WhatsApp at +91 81714 40017."
     ]
   }
 ];
@@ -1108,7 +1108,7 @@ const REFUND_EXCHANGE_POLICY = [
     heading: "",
     paragraphs: [
       "We want you to love every order you receive from Wishstone. Since our products are personal-use and prepared with care in small batches, we maintain a strict but transparent refund and exchange policy.",
-      "If you ever face an issue with your order, please reach out to us at support@wishstone.in or on WhatsApp at +91 6306 059912 and our team will assist you promptly."
+      "If you ever face an issue with your order, please reach out to us at support@wishstone.in or on WhatsApp at +91 81714 40017 and our team will assist you promptly."
     ]
   },
   {
@@ -1212,7 +1212,7 @@ const SHIPPING_CANCELLATION_POLICY = [
   {
     heading: "8. Order Cancellation",
     paragraphs: [
-      "Orders can only be cancelled before they are shipped. Please reach out to us at support@wishstone.in or on WhatsApp at +91 6306 059912 within 3 hours of placing your order for any cancellation requests. Once shipped, the order cannot be cancelled, returned, or refunded.",
+      "Orders can only be cancelled before they are shipped. Please reach out to us at support@wishstone.in or on WhatsApp at +91 81714 40017 within 3 hours of placing your order for any cancellation requests. Once shipped, the order cannot be cancelled, returned, or refunded.",
       "For prepaid orders cancelled before dispatch, the refund will be processed to the original payment source. Please allow 7–14 business days for the amount to reflect in your account.",
       "Cancellation by Wishstone: In rare circumstances, Wishstone reserves the right to cancel an order if the product is out of stock after order placement, the delivery location is unserviceable by our courier partners, there is a suspicion of fraudulent activity, or there is a technical error in pricing. In all such cases, a full refund will be issued within 5–7 business days and you will be notified immediately."
     ]
@@ -1220,7 +1220,7 @@ const SHIPPING_CANCELLATION_POLICY = [
   {
     heading: "9. Contact Us",
     paragraphs: [
-      "For any shipping, cancellation, or delivery-related queries, please reach out to us at support@wishstone.in or on WhatsApp at +91 6306 059912. Our team responds within 1–2 business days."
+      "For any shipping, cancellation, or delivery-related queries, please reach out to us at support@wishstone.in or on WhatsApp at +91 81714 40017. Our team responds within 1–2 business days."
     ]
   }
 ];
@@ -1559,6 +1559,161 @@ function ModernPolicyPage({ title, lastUpdated, sections }) {
   );
 }
 
+// ─── CONTACT US PAGE ──────────────────────────────────────────
+function ContactUsPage() {
+  const [hoveredCard, setHoveredCard] = useState(null);
+  const fontStack = "'Inter', 'SF Pro Display', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
+  const FloatingOrb = ({ size, top, left, delay, color }) => (
+    <motion.div
+      initial={{ opacity: 0, scale: 0 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay, duration: 1.2, ease: "easeOut" }}
+      style={{
+        position: "absolute", width: size, height: size, borderRadius: "50%",
+        background: color, filter: "blur(80px)", top, left, zIndex: 0, pointerEvents: "none"
+      }}
+    >
+      <motion.div
+        animate={{ y: [0, -15, 0, 12, 0], x: [0, 8, 0, -8, 0] }}
+        transition={{ duration: 8 + delay * 2, repeat: Infinity, ease: "easeInOut" }}
+        style={{ width: "100%", height: "100%", borderRadius: "50%" }}
+      />
+    </motion.div>
+  );
+
+  return (
+    <div style={{
+      paddingTop: 130, paddingBottom: 100, minHeight: "100vh",
+      background: "linear-gradient(180deg, #F5F0E8 0%, #EDE7DA 40%, #F0EBE1 100%)",
+      fontFamily: fontStack, position: "relative", overflow: "hidden"
+    }}>
+      <FloatingOrb size={350} top="5%" left="-10%" delay={0} color="rgba(232,114,12,0.08)" />
+      <FloatingOrb size={300} top="45%" left="80%" delay={0.3} color="rgba(255,154,60,0.06)" />
+
+      <div style={{
+        position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", opacity: 0.025,
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
+        backgroundRepeat: "repeat", backgroundSize: "128px 128px"
+      }} />
+
+      <div style={{ padding: "0 1.5rem", maxWidth: 680, margin: "0 auto", position: "relative", zIndex: 1 }}>
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          style={{ textAlign: "center", marginBottom: "3rem" }}
+        >
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            background: "rgba(232,114,12,0.08)",
+            border: "1px solid rgba(232,114,12,0.18)", borderRadius: 24,
+            padding: "6px 16px", marginBottom: "1.2rem"
+          }}>
+            <span style={{ color: T.orange, fontSize: 11 }}>✦</span>
+            <span style={{ fontSize: "0.65rem", fontWeight: 700, color: T.orange, letterSpacing: "0.14em", textTransform: "uppercase" }}>
+              Get In Touch
+            </span>
+          </div>
+          <h1 style={{
+            fontSize: "clamp(2.2rem, 5vw, 3rem)", fontWeight: 800,
+            margin: 0, letterSpacing: "-0.02em", color: T.text, lineHeight: 1.2
+          }}>Contact Us</h1>
+          <p style={{ fontSize: "0.95rem", color: "rgba(26,26,26,0.6)", marginTop: "1rem", lineHeight: 1.6 }}>
+            Have questions about our sacred manifestation stones or rituals? Our support team is here to guide you.
+          </p>
+        </motion.div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          {/* Card 1: Email */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            onMouseEnter={() => setHoveredCard("email")}
+            onMouseLeave={() => setHoveredCard(null)}
+            style={{
+              background: "rgba(255,255,255,0.65)",
+              borderRadius: 20, padding: "2rem",
+              border: `1px solid ${hoveredCard === "email" ? "rgba(232,114,12,0.25)" : "rgba(26,26,26,0.06)"}`,
+              transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+              boxShadow: "0 4px 24px rgba(0,0,0,0.02)",
+              transform: hoveredCard === "email" ? "translateY(-3px)" : "translateY(0)"
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <div style={{
+                width: 48, height: 48, borderRadius: 12,
+                background: "rgba(232,114,12,0.08)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color: T.orange, fontSize: 20
+              }}>✉</div>
+              <div>
+                <h4 style={{ margin: 0, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: T.orange, fontWeight: 700 }}>Email Support</h4>
+                <a href="mailto:support@wishstone.in" style={{ textDecoration: "none", fontSize: "1.2rem", fontWeight: 700, color: T.text, display: "block", marginTop: 4 }}>
+                  support@wishstone.in
+                </a>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Card 2: Phone */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            onMouseEnter={() => setHoveredCard("phone")}
+            onMouseLeave={() => setHoveredCard(null)}
+            style={{
+              background: "rgba(255,255,255,0.65)",
+              borderRadius: 20, padding: "2rem",
+              border: `1px solid ${hoveredCard === "phone" ? "rgba(232,114,12,0.25)" : "rgba(26,26,26,0.06)"}`,
+              transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+              boxShadow: "0 4px 24px rgba(0,0,0,0.02)",
+              transform: hoveredCard === "phone" ? "translateY(-3px)" : "translateY(0)"
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <div style={{
+                width: 48, height: 48, borderRadius: 12,
+                background: "rgba(232,114,12,0.08)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color: T.orange, fontSize: 20
+              }}>📞</div>
+              <div>
+                <h4 style={{ margin: 0, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em", color: T.orange, fontWeight: 700 }}>WhatsApp / Phone</h4>
+                <a href="https://wa.me/918171440017" target="_blank" rel="noreferrer" style={{ textDecoration: "none", fontSize: "1.2rem", fontWeight: 700, color: T.text, display: "block", marginTop: 4 }}>
+                  +91 81714 40017
+                </a>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Card 3: Business Details */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            style={{
+              background: "rgba(255,255,255,0.45)",
+              borderRadius: 20, padding: "2rem",
+              border: "1px solid rgba(26,26,26,0.06)",
+              fontSize: "0.85rem", color: "rgba(26,26,26,0.6)", lineHeight: 1.6
+            }}
+          >
+            <h4 style={{ margin: "0 0 1rem 0", fontSize: "0.9rem", fontWeight: 700, color: T.text }}>Business Information</h4>
+            <div style={{ display: "grid", gap: 8 }}>
+              <div><strong>Merchant Legal Entity Name:</strong> Wishstone Manifesta & Co.</div>
+              <div><strong>Operational Hours:</strong> 10:00 AM to 6:00 PM (Monday to Saturday)</div>
+              <div><strong>Response Time:</strong> We usually respond within 24 hours.</div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── FOOTER ───────────────────────────────────────────────────
 function Footer() {
   const navigate = useNavigate();
@@ -1579,7 +1734,7 @@ function Footer() {
       { label: "FAQ", action: () => navigate("/") },
     ],
     Support: [
-      { label: "Contact Us", action: () => window.open("mailto:support@wishstone.in") },
+      { label: "Contact Us", action: () => navigate("/contact-us") },
       { label: "Terms & Conditions", action: () => navigate("/terms-and-conditions") },
       { label: "Shipping Policy", action: () => navigate("/shipping-policy") },
       { label: "Return Policy", action: () => navigate("/return-policy") },
@@ -1599,7 +1754,7 @@ function Footer() {
             <p style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, maxWidth: 240 }}>India's sacred manifestation stone — hand-crafted with ancient yantra to help you manifest your deepest desires.</p>
             <p style={{ fontSize: "0.76rem", color: "rgba(255,255,255,0.4)", lineHeight: 1.6, marginTop: "1rem", borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "0.8rem", maxWidth: 240 }}>
               Email: support@wishstone.in<br />
-              WhatsApp: +91 6306 059912
+              WhatsApp / Phone: +91 81714 40017
             </p>
           </div>
           {Object.entries(FOOTER_LINKS).map(([title, links]) => (
@@ -4103,6 +4258,7 @@ function AppInner() {
         <Route path="/refund-policy" element={<ModernPolicyPage title="Refund, Exchange & Cancellation Policy" lastUpdated="June 2025" sections={REFUND_EXCHANGE_CANCELLATION_POLICY} />} />
         <Route path="/terms-and-conditions" element={<ModernPolicyPage title="Terms & Conditions" lastUpdated="June 2025" sections={TERMS_AND_CONDITIONS} />} />
         <Route path="/privacy-policy" element={<ModernPolicyPage title="Privacy Policy" lastUpdated="June 2025" sections={PRIVACY_POLICY} />} />
+        <Route path="/contact-us" element={<ContactUsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       {!isAuthPage && <Footer />}
