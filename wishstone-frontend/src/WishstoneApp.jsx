@@ -1939,6 +1939,7 @@ function BestSellersStrip({ onShop }) {
 }
 // ─── PRODUCTS PAGE ────────────────────────────────────────────
 function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
+  const navigate = useNavigate();
   const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
@@ -2529,6 +2530,12 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick }) {
   );
 }
 
+const FALLBACK_COUPONS = [
+  { code: "WELCOME10", discountType: "percentage", discountValue: 10, minOrderValue: 999, description: "Save 10% on your first order of sacred stones & tools" },
+  { code: "MANIFEST15", discountType: "percentage", discountValue: 15, minOrderValue: 1999, description: "Get 15% off on your manifestation journey" },
+  { code: "COSMIC20", discountType: "percentage", discountValue: 20, minOrderValue: 2999, description: "Unlock 20% off on our premium cosmic collections" }
+];
+
 // ─── CHECKOUT PAGE ────────────────────────────────────────────
 function CheckoutPage({ cart, onPlaceOrder }) {
   const navigate = useNavigate();
@@ -2542,6 +2549,8 @@ function CheckoutPage({ cart, onPlaceOrder }) {
   const [giftNote, setGiftNote] = useState("");
   const [availableCoupons, setAvailableCoupons] = useState([]);
   const [fetchingCoupons, setFetchingCoupons] = useState(false);
+  const [showCoupons, setShowCoupons] = useState(false);
+  const [copiedCode, setCopiedCode] = useState("");
 
   useEffect(() => {
     const fetchCoupons = async () => {
@@ -2583,7 +2592,16 @@ function CheckoutPage({ cart, onPlaceOrder }) {
       setCouponMsg("Could not validate coupon. Try again.");
     }
   };
+
+  const handleCopyCode = (e, code) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(""), 1500);
+  };
+
   const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const couponsToShow = availableCoupons.length > 0 ? availableCoupons : FALLBACK_COUPONS;
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
   const giftCharge = isGift ? totalQty * 50 : 0;
   const ship = sub >= 999 ? 0 : 99;
@@ -2750,83 +2768,193 @@ function CheckoutPage({ cart, onPlaceOrder }) {
               </div>
               {couponMsg && <p style={{ fontSize: "0.76rem", marginTop: 6, color: discount > 0 ? "#2d7a5a" : "#c0392b" }}>{couponMsg}</p>}
 
-              {/* Beautiful Coupons List */}
-              {availableCoupons.length > 0 && (
+              {/* Beautiful Coupons List Accordion */}
+              {couponsToShow.length > 0 && (
                 <div style={{ marginTop: "1.2rem", borderTop: `1px dashed ${T.border}`, paddingTop: "1rem" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.8rem" }}>
-                    <span style={{ fontSize: "0.72rem", fontWeight: 700, color: T.text, letterSpacing: "0.05em", textTransform: "uppercase" }}>🏷️ Available Offers</span>
-                    <span style={{ fontSize: "0.68rem", color: T.textMid, opacity: 0.8 }}>Click to Apply</span>
+                  <div 
+                    onClick={() => setShowCoupons(!showCoupons)} 
+                    style={{ 
+                      display: "flex", 
+                      alignItems: "center", 
+                      justifyContent: "space-between", 
+                      padding: "12px 16px", 
+                      background: "linear-gradient(135deg, rgba(232,114,12,0.05), rgba(245,240,232,0.5))", 
+                      border: `1.5px solid ${showCoupons ? T.orange : T.orange + "44"}`, 
+                      borderRadius: 12, 
+                      cursor: "pointer", 
+                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                      boxShadow: "0 2px 8px rgba(232,114,12,0.04)"
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.transform = "translateY(-1px)";
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(232,114,12,0.08)";
+                      e.currentTarget.style.borderColor = T.orange;
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "0 2px 8px rgba(232,114,12,0.04)";
+                      if (!showCoupons) {
+                        e.currentTarget.style.borderColor = T.orange + "44";
+                      }
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: "1.1rem", animation: "float 2s infinite" }}>🏷️</span>
+                      <span style={{ fontSize: "0.82rem", fontWeight: 700, color: T.text, letterSpacing: "0.02em" }}>
+                        Some offers are available! Grab them now
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ fontSize: "0.68rem", background: T.orange, color: "#fff", padding: "2px 8px", borderRadius: 20, fontWeight: 700 }}>
+                        {couponsToShow.length} Offers
+                      </span>
+                      <svg 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke={T.orange} 
+                        strokeWidth="2.5" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        style={{ 
+                          transform: showCoupons ? "rotate(180deg)" : "rotate(0deg)", 
+                          transition: "transform 0.3s ease" 
+                        }}
+                      >
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </div>
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10, maxHeight: 180, overflowY: "auto", paddingRight: 4 }} className="scroll-hide">
-                    {availableCoupons.map(c => {
-                      const isApplied = coupon.trim().toUpperCase() === c.code.toUpperCase() && discount > 0;
-                      return (
-                        <div
-                          key={c.code}
-                          onClick={() => selectAndApplyCoupon(c.code)}
-                          style={{
-                            background: isApplied ? "rgba(232,114,12,0.04)" : "rgba(0,0,0,0.02)",
-                            border: `1px dashed ${isApplied ? T.orange : "rgba(26,26,26,0.15)"}`,
-                            borderRadius: 12,
-                            padding: "10px 14px",
-                            cursor: "pointer",
-                            transition: "all 0.2s ease",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            position: "relative",
-                            overflow: "hidden"
-                          }}
-                          onMouseEnter={e => {
-                            e.currentTarget.style.borderColor = T.orange;
-                            e.currentTarget.style.background = "rgba(232,114,12,0.03)";
-                          }}
-                          onMouseLeave={e => {
-                            if (!isApplied) {
-                              e.currentTarget.style.borderColor = "rgba(26,26,26,0.15)";
-                              e.currentTarget.style.background = "rgba(0,0,0,0.02)";
-                            }
-                          }}
-                        >
-                          {/* Ticket notch left */}
-                          <div style={{ position: "absolute", left: -6, top: "50%", transform: "translateY(-50%)", width: 10, height: 10, borderRadius: "50%", background: "#fff", borderRight: "1px dashed rgba(26,26,26,0.15)" }} />
-                          {/* Ticket notch right */}
-                          <div style={{ position: "absolute", right: -6, top: "50%", transform: "translateY(-50%)", width: 10, height: 10, borderRadius: "50%", background: "#fff", borderLeft: "1px dashed rgba(26,26,26,0.15)" }} />
-                          
-                          <div style={{ paddingLeft: 6, paddingRight: 6 }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                              <span style={{ fontSize: "0.82rem", fontWeight: 800, color: T.text, letterSpacing: "0.05em" }}>{c.code}</span>
-                              <span style={{ fontSize: "0.7rem", fontWeight: 700, color: T.orange }}>
-                                {c.discountType === "flat" ? `₹${c.discountValue} Off` : `${c.discountValue}% Off`}
-                              </span>
-                            </div>
-                            {c.description && <div style={{ fontSize: "0.68rem", color: T.textMid, marginTop: 2 }}>{c.description}</div>}
-                            {c.minOrderValue > 0 && (
-                              <div style={{ fontSize: "0.62rem", color: "rgba(26,26,26,0.45)", marginTop: 2 }}>
-                                Min. Order: ₹{c.minOrderValue}
+
+                  <AnimatePresence>
+                    {showCoupons && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                        animate={{ height: "auto", opacity: 1, marginTop: 12 }}
+                        exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                        style={{ overflow: "hidden" }}
+                      >
+                        <div style={{ display: "flex", flexDirection: "column", gap: 10, maxHeight: 280, overflowY: "auto", padding: "4px 2px" }} className="scroll-hide">
+                          {couponsToShow.map(c => {
+                            const isApplied = coupon.trim().toUpperCase() === c.code.toUpperCase() && discount > 0;
+                            const isCopied = copiedCode === c.code;
+                            return (
+                              <div
+                                key={c.code}
+                                style={{
+                                  background: isApplied ? "rgba(232,114,12,0.04)" : "rgba(0,0,0,0.01)",
+                                  border: `1.5px dashed ${isApplied ? T.orange : "rgba(26,26,26,0.12)"}`,
+                                  borderRadius: 12,
+                                  padding: "12px 16px",
+                                  transition: "all 0.2s ease",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  position: "relative",
+                                  overflow: "hidden",
+                                  boxShadow: isApplied ? "0 4px 10px rgba(232,114,12,0.06)" : "none"
+                                }}
+                                onMouseEnter={e => {
+                                  e.currentTarget.style.borderColor = T.orange;
+                                  e.currentTarget.style.background = "rgba(232,114,12,0.03)";
+                                }}
+                                onMouseLeave={e => {
+                                  if (!isApplied) {
+                                    e.currentTarget.style.borderColor = "rgba(26,26,26,0.12)";
+                                    e.currentTarget.style.background = "rgba(0,0,0,0.01)";
+                                  }
+                                }}
+                              >
+                                {/* Ticket notch left */}
+                                <div style={{ position: "absolute", left: -8, top: "50%", transform: "translateY(-50%)", width: 14, height: 14, borderRadius: "50%", background: "#fff", borderRight: `1.5px dashed ${isApplied ? T.orange : "rgba(26,26,26,0.12)"}` }} />
+                                {/* Ticket notch right */}
+                                <div style={{ position: "absolute", right: -8, top: "50%", transform: "translateY(-50%)", width: 14, height: 14, borderRadius: "50%", background: "#fff", borderLeft: `1.5px dashed ${isApplied ? T.orange : "rgba(26,26,26,0.12)"}` }} />
+                                
+                                <div style={{ paddingLeft: 8, paddingRight: 8, flex: 1 }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                                    <span 
+                                      onClick={(e) => handleCopyCode(e, c.code)}
+                                      style={{ 
+                                        fontSize: "0.82rem", 
+                                        fontWeight: 850, 
+                                        color: T.text, 
+                                        letterSpacing: "0.06em",
+                                        background: "rgba(0,0,0,0.04)",
+                                        padding: "2px 6px",
+                                        borderRadius: 6,
+                                        cursor: "copy",
+                                        userSelect: "all",
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: 4,
+                                        transition: "all 0.2s"
+                                      }}
+                                      onMouseEnter={e => {
+                                        e.currentTarget.style.background = "rgba(232,114,12,0.08)";
+                                        e.currentTarget.style.color = T.orange;
+                                      }}
+                                      onMouseLeave={e => {
+                                        e.currentTarget.style.background = "rgba(0,0,0,0.04)";
+                                        e.currentTarget.style.color = T.text;
+                                      }}
+                                      title="Click to copy"
+                                    >
+                                      {c.code}
+                                      <span style={{ fontSize: "0.65rem", opacity: 0.6 }}>📋</span>
+                                    </span>
+                                    <span style={{ fontSize: "0.72rem", fontWeight: 700, color: T.orange }}>
+                                      {c.discountType === "flat" ? `₹${c.discountValue} Off` : `${c.discountValue}% Off`}
+                                    </span>
+                                  </div>
+                                  {c.description && <div style={{ fontSize: "0.7rem", color: T.textMid, marginTop: 4, lineHeight: 1.3 }}>{c.description}</div>}
+                                  {c.minOrderValue > 0 && (
+                                    <div style={{ fontSize: "0.64rem", color: "rgba(26,26,26,0.45)", marginTop: 2 }}>
+                                      Min. Order: ₹{c.minOrderValue}
+                                    </div>
+                                  )}
+                                </div>
+                                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, zIndex: 2 }}>
+                                  <button
+                                    type="button"
+                                    onClick={() => selectAndApplyCoupon(c.code)}
+                                    style={{
+                                      background: isApplied ? T.orange : "transparent",
+                                      border: `1.5px solid ${T.orange}`,
+                                      color: isApplied ? "#fff" : T.orange,
+                                      borderRadius: 8,
+                                      padding: "5px 12px",
+                                      fontSize: "0.7rem",
+                                      fontWeight: 700,
+                                      cursor: "pointer",
+                                      transition: "all 0.2s",
+                                      boxShadow: isApplied ? "0 2px 6px rgba(232,114,12,0.15)" : "none"
+                                    }}
+                                  >
+                                    {isApplied ? "Applied ✓" : "Apply"}
+                                  </button>
+                                  <span 
+                                    onClick={(e) => handleCopyCode(e, c.code)}
+                                    style={{ 
+                                      fontSize: "0.6rem", 
+                                      color: isCopied ? "#2d7a5a" : T.textMid, 
+                                      fontWeight: 600, 
+                                      cursor: "pointer",
+                                      opacity: isCopied ? 1 : 0.6,
+                                      transition: "all 0.2s"
+                                    }}
+                                  >
+                                    {isCopied ? "Copied!" : "Copy Code"}
+                                  </span>
+                                </div>
                               </div>
-                            )}
-                          </div>
-                          <button
-                            type="button"
-                            style={{
-                              background: isApplied ? T.orange : "transparent",
-                              border: `1.5px solid ${T.orange}`,
-                              color: isApplied ? "#fff" : T.orange,
-                              borderRadius: 8,
-                              padding: "4px 12px",
-                              fontSize: "0.7rem",
-                              fontWeight: 700,
-                              cursor: "pointer",
-                              transition: "all 0.2s"
-                            }}
-                          >
-                            {isApplied ? "Applied ✓" : "Apply"}
-                          </button>
+                            );
+                          })}
                         </div>
-                      );
-                    })}
-                  </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               )}
             </div>
