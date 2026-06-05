@@ -587,8 +587,6 @@ function CommunityVideoSection() {
 
   return (
     <section style={{ background: "linear-gradient(180deg, #2C3320 0%, #1F2417 100%)", paddingTop: "80px", paddingBottom: "80px", overflow: "hidden", position: "relative" }}>
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 0%, rgba(232,114,12,0.08) 0%, transparent 60%)", pointerEvents: "none" }} />
-
       {/* Header */}
       <div style={{ textAlign: "center", marginBottom: "3rem", position: "relative" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 14 }}>
