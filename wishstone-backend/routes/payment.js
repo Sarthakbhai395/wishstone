@@ -28,6 +28,7 @@ router.get("/status", (req, res) => {
     configured: isRazorpayConfigured() || useMockMode,
     mockMode: useMockMode,
     keyId: RAZORPAY_KEY_ID,
+    configId: process.env.RAZORPAY_CONFIG_ID || "",
   });
 });
 
@@ -167,6 +168,7 @@ router.post("/create-order", async (req, res) => {
       mockMode: useMockMode,
       razorpayOrderId: razorpayOrderId,
       keyId: RAZORPAY_KEY_ID,
+      configId: process.env.RAZORPAY_CONFIG_ID || "",
       amount: amountInPaise,
       currency: "INR",
       prefill: {

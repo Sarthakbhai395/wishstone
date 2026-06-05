@@ -889,42 +889,672 @@ function FounderNoteSection() {
 }
 
 // ─── POLICY DATA ──────────────────────────────────────────────
-const SHIPPING_POLICY = [
-  { heading: "Delivery Timeline", body: "Standard delivery: 5–7 business days. Express delivery: 2–3 business days. Orders placed before 2 PM IST are dispatched the same day (Mon–Sat)." },
-  { heading: "Free Shipping", body: "Enjoy free standard shipping on all orders above ₹999. Orders below ₹999 are charged a flat shipping fee of ₹99." },
-  { heading: "Tracking", body: "Once dispatched, you will receive a tracking link via SMS and email. You can also track your order from the Dashboard section of your account." },
-  { heading: "Serviceable Areas", body: "We ship across India including all metro and non-metro cities. For remote locations, delivery may take 2–3 additional days." },
-  { heading: "Damaged in Transit", body: "If your order arrives damaged, please email us at support@wishstone.in with photos within 48 hours of delivery and we will replace it immediately." },
-];
-const RETURN_POLICY = [
-  { heading: "7-Day Return Window", body: "We accept returns within 7 days of delivery. The product must be unused, in its original packaging, and in the same condition as received." },
-  { heading: "How to Initiate a Return", body: "Email support@wishstone.in with your order ID and reason for return. Our team will respond within 24 hours with the return address and instructions." },
-  { heading: "Refund Processing", body: "Refunds are processed within 3–5 business days after we receive and inspect the returned item. Amount is credited to the original payment method." },
-  { heading: "Non-Returnable Items", body: "Customised products, gift bundles that have been opened, and items purchased during special sale events are not eligible for return." },
-  { heading: "Exchange", body: "Exchanges are available for the same product in case of a defect. For a different product, please return the original and place a new order." },
-];
-const PRIVACY_POLICY = [
-  { heading: "Information We Collect", body: "We collect your name, email address, phone number, and shipping address when you place an order or create an account. We also collect browsing data to improve your experience." },
-  { heading: "How We Use Your Information", body: "Your information is used to process orders, send shipping updates, and occasionally inform you about new products or offers. We do not sell your data to third parties." },
-  { heading: "Cookies", body: "We use cookies to remember your cart, preferences, and session. You can disable cookies in your browser settings, though some features may not work as expected." },
-  { heading: "Data Security", body: "All transactions are secured with SSL encryption. We store your data on secure servers and follow industry best practices to protect your personal information." },
-  { heading: "Contact", body: "For any privacy-related concerns, write to us at privacy@wishstone.in. We will respond within 2 business days." },
+const REFUND_EXCHANGE_CANCELLATION_POLICY = [
+  {
+    heading: "",
+    paragraphs: [
+      "We want you to love every order you receive from Wishstone. Since our products are personal-use and prepared with care in small batches, we maintain a strict but transparent returns, exchange, and cancellation policy.",
+      "If you ever face an issue with your order, please reach out to us at support@wishstone.in or on WhatsApp at +91 6306 059912 and our team will assist you promptly."
+    ]
+  },
+  {
+    heading: "Important Disclaimer — Nature of Our Products",
+    paragraphs: [
+      "Wishstone and its products, including the Wishstone stone, Cosmic Eye, Reed Diffuser, Premium Camphor, and Habit Builder, are designed to support the process of manifestation and to work with the principles of the subconscious mind. These products are tools that aid focus, intention-setting, and the creation of a positive environment.",
+      "We do not claim, guarantee, or promise any specific outcome or result from the use of our products. Results depend entirely on the individual's personal practice, consistency, mindset, and engagement with the process of manifestation. Any outcomes experienced are subjective and may vary from person to person. By purchasing from Wishstone, you acknowledge and accept this understanding."
+    ]
+  },
+  {
+    heading: "1. Eligibility for Returns & Exchange",
+    paragraphs: [
+      "We accept return or exchange requests only if the product received meets one of the following conditions:",
+      "• The product arrived damaged or broken\n• The product is leaking or has leaked, applicable for Reed Diffuser and Camphor\n• The product is defective or not functioning as intended\n• You received the wrong product\n• The product does not match the item described in your order confirmation",
+      "To help us process your request faster, please share clear photos or videos of the issue within 48 hours of order delivery at support@wishstone.in.",
+      "Important: Please record a clear unboxing video while opening your package. This helps us verify and resolve your concern quickly. Claims made without an unboxing video may not be accepted."
+    ]
+  },
+  {
+    heading: "2. Refund Policy",
+    paragraphs: [
+      "Refunds are processed only after the returned product has been inspected and approved by our team.",
+      "Once approved:",
+      "• First-time customers: Refunds are issued as store credit, redeemable on your next purchase.\n• Repeat customers: Refunds may be processed back to the original payment source such as bank account, card, or UPI.",
+      "Please allow 7–14 business days for refunds to reflect in your source account.",
+      "Reverse Pickup Charges:",
+      "• If you want Wishstone to arrange a reverse pickup, a ₹100 pickup fee will be applicable.\n• If you prefer not to pay the pickup fee, you may self-courier the product back to us at your own cost.\n• Reverse pickup availability depends on the serviceability of your pincode.",
+      "Please Note:",
+      "• Shipping fees and COD charges paid during the original order are non-refundable.\n• Store credit cannot be converted into cash.\n• We do not accept return requests for reasons other than those listed above. All sales are otherwise final."
+    ]
+  },
+  {
+    heading: "3. Product-Specific Notes",
+    paragraphs: [
+      "Wishstone & Cosmic Eye: These are specially prepared physical objects designed to support the manifestation process. Once in your possession and used, returns or exchanges are not applicable unless there is a clear physical manufacturing defect or you received the wrong product.",
+      "Reed Diffuser & Premium Camphor: Due to the consumable and hygiene-sensitive nature of these fragrance products, returns are accepted only if the product is unused, sealed, and a defect or leakage is clearly visible and supported by an unboxing video.",
+      "Habit Builder Card Deck: Returns or exchanges are accepted only if cards are found to be misprinted or a card is missing from the sealed deck, verified through an unboxing video."
+    ]
+  },
+  {
+    heading: "4. Order Cancellation",
+    paragraphs: [
+      "Orders can only be cancelled before they are shipped. Please reach out to us at support@wishstone.in or on WhatsApp at +91 6306 059912 within 3 hours of placing your order for any cancellation requests.",
+      "Once shipped, the order cannot be cancelled, returned, or refunded.",
+      "For prepaid orders cancelled before dispatch, the refund will be processed to the original payment source. Please allow 7–14 business days for the amount to reflect in your account.",
+      "Cancellation by Wishstone: In rare circumstances, Wishstone reserves the right to cancel an order if the product is out of stock after order placement, the delivery location is unserviceable by our courier partners, there is a suspicion of fraudulent activity, or there is a technical error in pricing. In all such cases, a full refund will be issued within 5–7 business days and you will be notified immediately."
+    ]
+  },
+  {
+    heading: "5. Address Issues & Non-Delivery",
+    paragraphs: [
+      "Orders will not be refunded if:",
+      "• The shipping address entered is incomplete or incorrect\n• The phone number provided is incorrect\n• The customer is unreachable at the time of delivery\n• The customer refuses delivery",
+      "If the order is returned to us due to any of the above reasons, a reshipment charge of ₹100 will be applicable."
+    ]
+  },
+  {
+    heading: "6. How to Raise a Return, Exchange, or Refund Request",
+    paragraphs: [
+      "Please email us at support@wishstone.in with the following details:",
+      "• Order ID\n• Description of the issue\n• Clear photos or videos showing the problem, including the unboxing video",
+      "Our support team will respond within 24–48 hours."
+    ]
+  }
 ];
 
-// ─── POLICY PAGE ──────────────────────────────────────────────
-function PolicyPage({ title, sections }) {
+const TERMS_AND_CONDITIONS = [
+  {
+    heading: "",
+    paragraphs: [
+      "This website is operated by Wishstone Manifesta & Co. Throughout the site, the terms \"we\", \"us\", and \"our\" refer to Wishstone. Wishstone Manifesta & Co. offers this website, including all information, tools, and services available from this site to you, the user, conditioned upon your acceptance of all terms, conditions, policies, and notices stated here.",
+      "By visiting our site and/or purchasing something from us, you engage in our \"Service\" and agree to be bound by the following Terms and Conditions, including those additional terms and conditions and policies referenced herein. These Terms apply to all users of the site, including browsers, customers, and contributors of content.",
+      "Please read these Terms carefully before accessing or using our website. By accessing or using any part of the site, you agree to be bound by these Terms. If you do not agree to all the terms and conditions of this agreement, then you may not access the website or use any services.",
+      "We reserve the right to update, change, or replace any part of these Terms by posting updates to our website. It is your responsibility to check this page periodically for changes. Your continued use of the website following the posting of any changes constitutes your acceptance of those changes."
+    ]
+  },
+  {
+    heading: "SECTION 1 — PRODUCT DISCLAIMER & NATURE OF OFFERINGS",
+    paragraphs: [
+      "Wishstone and its products including the Wishstone stone, Cosmic Eye, Reed Diffuser, Premium Camphor, and Habit Builder are designed to support the process of manifestation and to work with the principles of the subconscious mind. These are tools that aid focus, intention-setting, and the creation of a positive environment.",
+      "We do not claim, guarantee, or promise any specific outcome or result from the use of our products. Results depend entirely on the individual's personal practice, consistency, mindset, and engagement with the process of manifestation. Any outcomes experienced are subjective and may vary from person to person. By purchasing from Wishstone, you acknowledge and accept this understanding fully.",
+      "Our products have no connection to any particular religion, faith, or belief system. They operate on the principles of cosmic energy and the subconscious mind and are completely neutral in nature."
+    ]
+  },
+  {
+    heading: "SECTION 2 — ONLINE STORE TERMS",
+    paragraphs: [
+      "By agreeing to these Terms, you confirm that you are of legal age in your state or territory of residence. You may not use our products for any illegal or unauthorised purpose, nor may you, in the use of the Service, violate any applicable laws. You must not transmit any worms, viruses, or any code of a destructive nature. A breach or violation of any of these Terms will result in immediate termination of your access to our Services."
+    ]
+  },
+  {
+    heading: "SECTION 3 — GENERAL CONDITIONS",
+    paragraphs: [
+      "We reserve the right to refuse service to anyone for any reason at any time. You agree not to reproduce, duplicate, copy, sell, resell, or exploit any portion of the Service or any content on this website without our express written permission. The headings used in this agreement are included for convenience only and will not limit or otherwise affect these Terms."
+    ]
+  },
+  {
+    heading: "SECTION 4 — ACCURACY OF INFORMATION",
+    paragraphs: [
+      "We are not responsible if information made available on this site is not accurate, complete, or current. The material on this site is provided for general information only and should not be relied upon as the sole basis for making decisions. Any reliance on the material on this site is at your own risk. We reserve the right to modify the contents of this site at any time without obligation to update any information. You agree that it is your responsibility to monitor changes to our site."
+    ]
+  },
+  {
+    heading: "SECTION 5 — MODIFICATIONS TO SERVICE AND PRICES",
+    paragraphs: [
+      "Prices for our products are subject to change without notice. All offers, deals, discounts, and coupons are at the sole discretion of Wishstone and may be discontinued at any time without prior notice. We reserve the right to modify or discontinue the Service or any part of it at any time without notice. We shall not be liable to you or any third party for any modification, price change, suspension, or discontinuance of the Service."
+    ]
+  },
+  {
+    heading: "SECTION 6 — PRODUCTS",
+    paragraphs: [
+      "Certain products may be available exclusively online through our website and may have limited quantities. They are subject to exchange only according to our Refund & Exchange Policy.",
+      "We have made every effort to display our products as accurately as possible. However, we cannot guarantee that your device's display of any colour or image will be fully accurate. We reserve the right to limit the sale of our products to any person, geographic region, or jurisdiction at our sole discretion. We reserve the right to discontinue any product at any time. Any offer for any product made on this site is void where prohibited by law."
+    ]
+  },
+  {
+    heading: "SECTION 7 — BILLING AND ACCOUNT INFORMATION",
+    paragraphs: [
+      "We reserve the right to refuse any order placed with us. We may, in our sole discretion, limit or cancel quantities purchased per person, per household, or per order. In the event that we modify or cancel an order, we will attempt to notify you using the contact information provided at the time of the order.",
+      "You agree to provide current, complete, and accurate purchase and account information for all purchases made on our website. You agree to promptly update your account information, including your email address and contact details, so that we can complete your transactions and reach you as needed."
+    ]
+  },
+  {
+    heading: "SECTION 8 — PAYMENT SECURITY",
+    paragraphs: [
+      "Wishstone does not store any payment-related information on its servers. Details such as UPI IDs, credit card numbers, debit card numbers, net banking credentials, and bank account numbers are never saved by us. All payment transactions are processed exclusively through secure, certified third-party payment gateways. Your financial information remains entirely within those encrypted gateway systems and is never accessible to us. We only retain your name, phone number, email address, and delivery address for the purpose of fulfilling your order."
+    ]
+  },
+  {
+    heading: "SECTION 9 — THIRD-PARTY LINKS AND TOOLS",
+    paragraphs: [
+      "Certain content or services available through our website may include materials from third parties. Third-party links on this site may direct you to websites that are not affiliated with us. We are not responsible for examining or evaluating the content or accuracy of those sites and will not have any liability for any third-party materials, websites, products, or services. Any use of third-party tools offered through our site is entirely at your own risk."
+    ]
+  },
+  {
+    heading: "SECTION 10 — USER COMMENTS, FEEDBACK, AND SUBMISSIONS",
+    paragraphs: [
+      "If you send us creative ideas, suggestions, feedback, or other materials, you agree that we may use them at any time without restriction or compensation. We are not obligated to maintain any submissions in confidence or respond to them. We reserve the right to monitor, edit, or remove content that we determine to be unlawful, offensive, defamatory, or otherwise objectionable. You are solely responsible for any comments or content you submit, and their accuracy. We will not tolerate any abusive language directed at our team, customers, or any other individuals through any mode of submission."
+    ]
+  },
+  {
+    heading: "SECTION 11 — PERSONAL INFORMATION",
+    paragraphs: [
+      "Your submission of personal information through our website is governed by our Privacy Policy, which is available on our website. We comply with the Digital Personal Data Protection Act, 2023 (DPDP Act) of India in all matters related to the collection, use, and protection of your personal data."
+    ]
+  },
+  {
+    heading: "SECTION 12 — ERRORS, INACCURACIES, AND OMISSIONS",
+    paragraphs: [
+      "Occasionally there may be information on our site that contains typographical errors, inaccuracies, or omissions relating to product descriptions, pricing, offers, shipping charges, or availability. We reserve the right to correct any such errors and to change or update information or cancel orders if any information is found to be inaccurate at any time without prior notice."
+    ]
+  },
+  {
+    heading: "SECTION 13 — PROHIBITED USES",
+    paragraphs: [
+      "You are prohibited from using this site or its content for any unlawful purpose; to solicit others to perform unlawful acts; to violate any applicable regulations, rules, or laws; to infringe upon our intellectual property rights or the rights of others; to harass, abuse, insult, harm, defame, or discriminate against any person based on gender, sexual orientation, religion, ethnicity, race, age, national origin, or disability; to submit false or misleading information; to upload or transmit viruses or malicious code; to collect the personal information of others without consent; or to interfere with or circumvent the security features of the Service or any related website. We reserve the right to terminate your use of the Service for violating any of the prohibited uses."
+    ]
+  },
+  {
+    heading: "SECTION 14 — DISCLAIMER OF WARRANTIES AND LIMITATION OF LIABILITY",
+    paragraphs: [
+      "We do not guarantee that your use of our service will be uninterrupted, timely, secure, or error-free. The service and all products delivered through it are provided on an \"as is\" and \"as available\" basis without any warranties or conditions of any kind, either express or implied. In no case shall Wishstone, its founders, employees, affiliates, agents, or service providers be liable for any injury, loss, claim, or any direct, indirect, incidental, punitive, special, or consequential damages of any kind, including lost profits, lost revenue, loss of data, or replacement costs, arising from your use of the Service or any products procured through it. Our liability shall be limited to the maximum extent permitted by applicable law."
+    ]
+  },
+  {
+    heading: "SECTION 15 — INDEMNIFICATION",
+    paragraphs: [
+      "You agree to indemnify, defend, and hold harmless Wishstone and its founders, employees, affiliates, agents, contractors, service providers, and suppliers from and against any claim or demand, including reasonable legal fees, made by any third party due to or arising out of your breach of these Terms, your violation of any law, or the violation of any rights of a third party."
+    ]
+  },
+  {
+    heading: "SECTION 16 — SEVERABILITY",
+    paragraphs: [
+      "If any provision of these Terms is found to be unlawful, void, or unenforceable, that provision shall nonetheless be enforceable to the fullest extent permitted by applicable law, and the unenforceable portion shall be deemed severed from these Terms. This determination shall not affect the validity and enforceability of any other remaining provisions."
+    ]
+  },
+  {
+    heading: "SECTION 17 — TERMINATION",
+    paragraphs: [
+      "These Terms are effective unless and until terminated by either you or us. You may terminate these Terms at any time by notifying us that you no longer wish to use our Services or by ceasing to use our site. If we determine, in our sole judgment, that you have failed to comply with any provision of these Terms, we may terminate this agreement at any time without notice. You will remain liable for all amounts due up to and including the date of termination."
+    ]
+  },
+  {
+    heading: "SECTION 18 — ENTIRE AGREEMENT",
+    paragraphs: [
+      "These Terms, together with any policies or operating rules posted on our site, constitute the entire agreement and understanding between you and us and govern your use of the Service, superseding any prior agreements, communications, or proposals between you and us."
+    ]
+  },
+  {
+    heading: "SECTION 19 — GOVERNING LAW",
+    paragraphs: [
+      "These Terms and any separate agreements through which we provide you Services shall be governed by and construed in accordance with the laws of India. Any disputes arising out of or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts of India."
+    ]
+  },
+  {
+    heading: "SECTION 20 — CHANGES TO TERMS",
+    paragraphs: [
+      "We reserve the right, at our sole discretion, to update, change, or replace any part of these Terms by posting updates on our website. It is your responsibility to check our website periodically for changes. Your continued use of our website or Service following the posting of any changes constitutes your acceptance of those changes."
+    ]
+  },
+  {
+    heading: "SECTION 21 — CONTACT INFORMATION",
+    paragraphs: [
+      "For any questions about these Terms & Conditions, please contact Wishstone Manifesta & Co. at support@wishstone.in or on WhatsApp at +91 6306 059912."
+    ]
+  }
+];
+
+const REFUND_EXCHANGE_POLICY = [
+  {
+    heading: "",
+    paragraphs: [
+      "We want you to love every order you receive from Wishstone. Since our products are personal-use and prepared with care in small batches, we maintain a strict but transparent refund and exchange policy.",
+      "If you ever face an issue with your order, please reach out to us at support@wishstone.in or on WhatsApp at +91 6306 059912 and our team will assist you promptly."
+    ]
+  },
+  {
+    heading: "Important Disclaimer — Nature of Our Products",
+    paragraphs: [
+      "Wishstone and its products, including the Wishstone stone, Cosmic Eye, Reed Diffuser, Premium Camphor, and Habit Builder, are designed to support the process of manifestation and to work with the principles of the subconscious mind. These products are tools that aid focus, intention-setting, and the creation of a positive environment.",
+      "We do not claim, guarantee, or promise any specific outcome or result from the use of our products. Results depend entirely on the individual's personal practice, consistency, mindset, and engagement with the process of manifestation. Any outcomes experienced are subjective and may vary from person to person. By purchasing from Wishstone, you acknowledge and accept this understanding."
+    ]
+  },
+  {
+    heading: "1. Eligibility for Returns & Exchange",
+    paragraphs: [
+      "We accept return or exchange requests only if the product received meets one of the following conditions:",
+      "• The product arrived damaged or broken\n• The product is leaking or has leaked, applicable for Reed Diffuser and Camphor\n• The product is defective or not functioning as intended\n• You received the wrong product\n• The product does not match the item described in your order confirmation",
+      "To help us process your request faster, please share clear photos or videos of the issue within 48 hours of order delivery at support@wishstone.in.",
+      "Important: Please record a clear unboxing video while opening your package. This helps us verify and resolve your concern quickly. Claims made without an unboxing video may not be accepted."
+    ]
+  },
+  {
+    heading: "2. Refund Policy",
+    paragraphs: [
+      "Refunds are processed only after the returned product has been inspected and approved by our team.",
+      "Once approved:",
+      "• First-time customers: Refunds are issued as store credit, redeemable on your next purchase.\n• Repeat customers: Refunds may be processed back to the original payment source such as bank account, card, or UPI.",
+      "Please allow 7–14 business days for refunds to reflect in your source account.",
+      "Reverse Pickup Charges:",
+      "• If you want Wishstone to arrange a reverse pickup, a ₹100 pickup fee will be applicable.\n• If you prefer not to pay the pickup fee, you may self-courier the product back to us at your own cost.\n• Reverse pickup availability depends on the serviceability of your pincode.",
+      "Please Note:",
+      "• Shipping fees and COD charges paid during the original order are non-refundable.\n• Store credit cannot be converted into cash.\n• We do not accept return requests for reasons other than those listed above. All sales are otherwise final."
+    ]
+  },
+  {
+    heading: "3. Product-Specific Notes",
+    paragraphs: [
+      "Wishstone & Cosmic Eye: These are specially prepared physical objects designed to support the manifestation process. Once in your possession and used, returns or exchanges are not applicable unless there is a clear physical manufacturing defect or you received the wrong product.",
+      "Reed Diffuser & Premium Camphor: Due to the consumable and hygiene-sensitive nature of these fragrance products, returns are accepted only if the product is unused, sealed, and a defect or leakage is clearly visible and supported by an unboxing video.",
+      "Habit Builder Card Deck: Returns or exchanges are accepted only if cards are found to be misprinted or a card is missing from the sealed deck, verified through an unboxing video."
+    ]
+  },
+  {
+    heading: "4. How to Raise a Return, Exchange, or Refund Request",
+    paragraphs: [
+      "Please email us at support@wishstone.in with the following details:",
+      "• Order ID\n• Description of the issue\n• Clear photos or videos showing the problem, including the unboxing video",
+      "Our support team will respond within 24–48 hours."
+    ]
+  }
+];
+
+const SHIPPING_CANCELLATION_POLICY = [
+  {
+    heading: "",
+    paragraphs: [
+      "We take great care in packing and dispatching every Wishstone order. Each product — from the Wishstone and Cosmic Eye to our premium Reed Diffuser, Camphor, and Habit Builder deck — is packaged with care to reach you in perfect condition."
+    ]
+  },
+  {
+    heading: "1. Order Processing Time",
+    paragraphs: [
+      "Once you place an order on our website, it will be processed within 1–2 business days. Orders placed after 5:00 PM will be processed on the next business day. You will receive an order confirmation via email or WhatsApp once your order is accepted."
+    ]
+  },
+  {
+    heading: "2. Delivery Time",
+    paragraphs: [
+      "After your order is processed and dispatched, delivery typically takes 5–7 business days depending on your location within India. We currently ship across India. International shipping is not available at this time."
+    ]
+  },
+  {
+    heading: "3. Shipping Charges",
+    paragraphs: [
+      "A standard flat shipping rate is applicable to all orders. Any applicable shipping fee will be displayed clearly at checkout before you confirm your purchase."
+    ]
+  },
+  {
+    heading: "4. Order Tracking",
+    paragraphs: [
+      "Once your order is dispatched, you will receive a shipment confirmation along with a tracking number via email or WhatsApp. You can use this tracking number to follow your package in real time. If you face any issues tracking your order or believe your package may be lost, please contact us immediately."
+    ]
+  },
+  {
+    heading: "5. Possible Delays",
+    paragraphs: [
+      "While we always aim to deliver within the committed timeline, certain situations beyond our control may cause delays — including national holidays, festivals, natural calamities, or courier service disruptions. We appreciate your patience in such cases and will keep you informed as much as possible."
+    ]
+  },
+  {
+    heading: "6. Packaging Note",
+    paragraphs: [
+      "All products are carefully packed to ensure safe delivery. The Wishstone and Cosmic Eye are dispatched in secure protective packaging. Reed Diffuser bottles are bubble-wrapped to prevent breakage during transit. If your package arrives visibly damaged, please photograph it immediately and contact us before opening the package."
+    ]
+  },
+  {
+    heading: "7. Address Issues & Non-Delivery",
+    paragraphs: [
+      "Orders will not be refunded if:",
+      "• The shipping address entered is incomplete or incorrect\n• The phone number provided is incorrect\n• The customer is unreachable at the time of delivery\n• The customer refuses delivery",
+      "If the order is returned to us due to any of the above reasons, a reshipment charge of ₹100 will be applicable."
+    ]
+  },
+  {
+    heading: "8. Order Cancellation",
+    paragraphs: [
+      "Orders can only be cancelled before they are shipped. Please reach out to us at support@wishstone.in or on WhatsApp at +91 6306 059912 within 3 hours of placing your order for any cancellation requests. Once shipped, the order cannot be cancelled, returned, or refunded.",
+      "For prepaid orders cancelled before dispatch, the refund will be processed to the original payment source. Please allow 7–14 business days for the amount to reflect in your account.",
+      "Cancellation by Wishstone: In rare circumstances, Wishstone reserves the right to cancel an order if the product is out of stock after order placement, the delivery location is unserviceable by our courier partners, there is a suspicion of fraudulent activity, or there is a technical error in pricing. In all such cases, a full refund will be issued within 5–7 business days and you will be notified immediately."
+    ]
+  },
+  {
+    heading: "9. Contact Us",
+    paragraphs: [
+      "For any shipping, cancellation, or delivery-related queries, please reach out to us at support@wishstone.in or on WhatsApp at +91 6306 059912. Our team responds within 1–2 business days."
+    ]
+  }
+];
+
+const PRIVACY_POLICY = [
+  {
+    heading: "Information We Collect",
+    paragraphs: ["We collect your name, email address, phone number, and shipping address when you place an order or create an account. We also collect browsing data to improve your experience."]
+  },
+  {
+    heading: "How We Use Your Information",
+    paragraphs: ["Your information is used to process orders, send shipping updates, and occasionally inform you about new products or offers. We do not sell your data to third parties."]
+  },
+  {
+    heading: "Cookies",
+    paragraphs: ["We use cookies to remember your cart, preferences, and session. You can disable cookies in your browser settings, though some features may not work as expected."]
+  },
+  {
+    heading: "Data Security",
+    paragraphs: ["All transactions are secured with SSL encryption. We store your data on secure servers and follow industry best practices to protect your personal information."]
+  },
+  {
+    heading: "Contact",
+    paragraphs: ["For any privacy-related concerns, write to us at privacy@wishstone.in. We will respond within 2 business days."]
+  }
+];
+
+// ─── MODERN POLICY PAGE ──────────────────────────────────────
+function ModernPolicyPage({ title, lastUpdated, sections }) {
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [showTop, setShowTop] = useState(false);
+  const [hoveredCard, setHoveredCard] = useState(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrolled = window.scrollY;
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress(maxScroll > 0 ? (scrolled / maxScroll) * 100 : 0);
+      setShowTop(scrolled > 400);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const fontStack = "'Inter', 'SF Pro Display', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
+  // Floating orb for light theme
+  const FloatingOrb = ({ size, top, left, delay, color }) => (
+    <motion.div
+      initial={{ opacity: 0, scale: 0 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay, duration: 1.2, ease: "easeOut" }}
+      style={{
+        position: "absolute", width: size, height: size, borderRadius: "50%",
+        background: color, filter: "blur(80px)", top, left, zIndex: 0, pointerEvents: "none"
+      }}
+    >
+      <motion.div
+        animate={{ y: [0, -15, 0, 12, 0], x: [0, 8, 0, -8, 0] }}
+        transition={{ duration: 8 + delay * 2, repeat: Infinity, ease: "easeInOut" }}
+        style={{ width: "100%", height: "100%", borderRadius: "50%" }}
+      />
+    </motion.div>
+  );
+
   return (
-    <div style={{ paddingTop: 90, background: T.bg, minHeight: "100vh" }}>
-      <div className="max-w" style={{ padding: "clamp(1.5rem,4vw,3rem)", maxWidth: 760 }}>
-        <h1 style={{ fontFamily: "'Playfair Display',serif", color: T.text, fontSize: "clamp(1.6rem,4vw,2.2rem)", fontWeight: 900, marginBottom: "0.4rem" }}>{title}</h1>
-        <div style={{ width: 60, height: 3, background: `linear-gradient(90deg,${T.orange},transparent)`, marginBottom: "2rem" }} />
-        {sections.map((s, i) => (
-          <div key={i} style={{ background: "#fff", borderRadius: 14, padding: "1.5rem", marginBottom: "1rem", border: `1px solid ${T.border}` }}>
-            <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1rem", fontWeight: 700, color: T.text, marginBottom: "0.5rem" }}>{s.heading}</h3>
-            <p style={{ fontSize: "0.86rem", color: T.textMid, lineHeight: 1.75 }}>{s.body}</p>
-          </div>
-        ))}
+    <div style={{
+      paddingTop: 110, paddingBottom: 100, minHeight: "100vh",
+      background: "linear-gradient(180deg, #F5F0E8 0%, #EDE7DA 40%, #F0EBE1 100%)",
+      fontFamily: fontStack, position: "relative", overflow: "hidden"
+    }}>
+      {/* Scroll Progress Bar */}
+      <motion.div
+        style={{
+          position: "fixed", top: 0, left: 0, height: 3, zIndex: 9999,
+          background: `linear-gradient(90deg, ${T.orange}, ${T.orangeL}, #FFD700)`,
+          width: `${scrollProgress}%`,
+          boxShadow: `0 0 12px ${T.orange}50`,
+        }}
+      />
+
+      {/* Floating Background Orbs — warm tones for light theme */}
+      <FloatingOrb size={350} top="2%" left="-8%" delay={0} color="rgba(232,114,12,0.07)" />
+      <FloatingOrb size={250} top="25%" left="82%" delay={0.3} color="rgba(255,154,60,0.06)" />
+      <FloatingOrb size={300} top="55%" left="-6%" delay={0.6} color="rgba(196,94,0,0.04)" />
+      <FloatingOrb size={200} top="80%" left="75%" delay={0.9} color="rgba(255,215,0,0.05)" />
+
+      {/* Subtle grain texture */}
+      <div style={{
+        position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", opacity: 0.025,
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
+        backgroundRepeat: "repeat", backgroundSize: "128px 128px"
+      }} />
+
+      <div style={{ padding: "0 1.5rem", maxWidth: 880, margin: "0 auto", position: "relative", zIndex: 1 }}>
+        {/* Hero Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          style={{ marginBottom: "3.5rem", textAlign: "left", position: "relative" }}
+        >
+          {/* Decorative line */}
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: 60 }}
+            transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
+            style={{ height: 2, background: `linear-gradient(90deg, ${T.orange}, transparent)`, marginBottom: "1.5rem" }}
+          />
+
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              background: "rgba(232,114,12,0.08)",
+              border: "1px solid rgba(232,114,12,0.18)", borderRadius: 24,
+              padding: "6px 16px", marginBottom: "1.2rem",
+            }}
+          >
+            <motion.span
+              animate={{ rotate: [0, 180, 360] }}
+              transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+              style={{ color: T.orange, fontSize: 11, display: "inline-block" }}
+            >✦</motion.span>
+            <span style={{ fontSize: "0.65rem", fontWeight: 700, color: T.orange, letterSpacing: "0.14em", textTransform: "uppercase" }}>
+              Official Policy Document
+            </span>
+          </motion.div>
+
+          {/* Title */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              fontSize: "clamp(2rem, 5vw, 3rem)", fontWeight: 800,
+              margin: 0, letterSpacing: "-0.03em", lineHeight: 1.1,
+              color: T.text
+            }}
+          >{title}</motion.h1>
+
+          {/* Subtitle bar */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            style={{ display: "flex", alignItems: "center", gap: 12, marginTop: "1.2rem", flexWrap: "wrap" }}
+          >
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: 32 }}
+              transition={{ delay: 0.8, duration: 0.6 }}
+              style={{ height: 3, background: `linear-gradient(90deg, ${T.orange}, ${T.orangeL})`, borderRadius: 2 }}
+            />
+            {lastUpdated && (
+              <span style={{ fontSize: "0.75rem", color: T.textMid, fontWeight: 500, letterSpacing: "0.04em" }}>
+                Last Updated: {lastUpdated}
+              </span>
+            )}
+            <span style={{ fontSize: "0.75rem", color: "rgba(26,26,26,0.2)" }}>•</span>
+            <span style={{ fontSize: "0.75rem", color: T.textMid, fontWeight: 500, opacity: 0.6 }}>
+              Wishstone — Manifest Your Reality
+            </span>
+          </motion.div>
+        </motion.div>
+
+        {/* Sections — scroll-triggered reveal */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          {sections.map((s, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 40, scale: 0.97 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ type: "spring", stiffness: 70, damping: 20, mass: 0.9, delay: 0.05 }}
+              onMouseEnter={() => setHoveredCard(i)}
+              onMouseLeave={() => setHoveredCard(null)}
+              style={{
+                position: "relative",
+                background: hoveredCard === i
+                  ? "rgba(255,255,255,0.85)"
+                  : "rgba(255,255,255,0.55)",
+                borderRadius: 20, padding: "2rem 2rem 2rem 2.2rem",
+                border: `1px solid ${hoveredCard === i ? "rgba(232,114,12,0.25)" : "rgba(26,26,26,0.06)"}`,
+                transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+                boxShadow: hoveredCard === i
+                  ? "0 20px 60px rgba(0,0,0,0.06), 0 0 0 1px rgba(232,114,12,0.08)"
+                  : "0 2px 16px rgba(0,0,0,0.03)",
+                backdropFilter: "blur(16px)",
+                transform: hoveredCard === i ? "translateY(-3px)" : "translateY(0)",
+                cursor: "default"
+              }}
+            >
+              {/* Top glow accent on hover */}
+              <div style={{
+                position: "absolute", top: 0, left: 0, right: 0, height: 2,
+                background: hoveredCard === i
+                  ? `linear-gradient(90deg, transparent, ${T.orange}30, ${T.orangeL}25, transparent)`
+                  : "transparent",
+                transition: "background 0.4s ease", borderRadius: "20px 20px 0 0"
+              }} />
+
+              {/* Section Number + Heading — scroll reveal */}
+              {s.heading && (
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ type: "spring", stiffness: 100, damping: 18, delay: 0.1 }}
+                  style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: "1.4rem" }}
+                >
+                  {/* Number Badge */}
+                  <div style={{
+                    minWidth: 36, height: 36, borderRadius: 10,
+                    background: `linear-gradient(135deg, rgba(232,114,12,0.12), rgba(196,94,0,0.06))`,
+                    border: "1px solid rgba(232,114,12,0.15)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: "0.75rem", fontWeight: 800, color: T.orange,
+                    fontFamily: fontStack, flexShrink: 0, marginTop: 2
+                  }}>
+                    {String(i + 1).padStart(2, "0")}
+                  </div>
+                  <h3 style={{
+                    fontSize: "1.15rem", fontWeight: 700, color: T.text,
+                    margin: 0, letterSpacing: "-0.01em", lineHeight: 1.35,
+                    fontFamily: fontStack
+                  }}>
+                    {s.heading}
+                  </h3>
+                </motion.div>
+              )}
+
+              {/* Paragraphs — each paragraph reveals on scroll */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem", paddingLeft: s.heading ? 50 : 0 }}>
+                {s.paragraphs.map((para, pi) => {
+                  const lines = para.split("\n");
+                  return (
+                    <motion.div
+                      key={pi}
+                      initial={{ opacity: 0, y: 12 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-30px" }}
+                      transition={{ duration: 0.5, delay: pi * 0.04, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                      {lines.map((line, li) => {
+                        const isLineBullet = line.trim().startsWith("•");
+                        return (
+                          <p
+                            key={li}
+                            style={{
+                              fontSize: "0.88rem",
+                              color: isLineBullet ? T.textMid : "rgba(26,26,26,0.65)",
+                              lineHeight: 1.8, margin: isLineBullet ? "0.3rem 0" : "0 0 0.15rem 0",
+                              fontFamily: fontStack, fontWeight: 400,
+                              paddingLeft: isLineBullet ? "1.2rem" : 0,
+                              textIndent: isLineBullet ? "-1.2rem" : 0,
+                            }}
+                          >
+                            {isLineBullet ? (
+                              <>
+                                <span style={{ color: T.orange, marginRight: 6, fontSize: "0.7rem", verticalAlign: "middle" }}>●</span>
+                                {line.trim().substring(1).trim()}
+                              </>
+                            ) : line}
+                          </p>
+                        );
+                      })}
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Bottom Branding */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          style={{
+            marginTop: "4rem", textAlign: "center", padding: "2rem 0",
+            borderTop: `1px solid ${T.border}`
+          }}
+        >
+          <p style={{ fontSize: "0.72rem", color: T.textMid, letterSpacing: "0.12em", fontWeight: 600, textTransform: "uppercase", fontFamily: fontStack, opacity: 0.5 }}>
+            Wishstone — Manifest Your Reality
+          </p>
+          <p style={{ fontSize: "0.68rem", color: T.textMid, marginTop: "0.5rem", fontFamily: fontStack, opacity: 0.35 }}>
+            For queries, contact support@wishstone.in
+          </p>
+        </motion.div>
       </div>
+
+      {/* Back to Top Button */}
+      <AnimatePresence>
+        {showTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.6, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.6, y: 20 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            style={{
+              position: "fixed", bottom: 32, right: 32, zIndex: 999,
+              width: 48, height: 48, borderRadius: 14,
+              border: "1px solid rgba(232,114,12,0.2)",
+              background: "rgba(255,255,255,0.9)", backdropFilter: "blur(20px)",
+              color: T.orange, fontSize: 18, cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.08), 0 0 0 1px rgba(232,114,12,0.05)",
+              transition: "all 0.3s ease"
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = `linear-gradient(135deg, ${T.orange}, ${T.orangeD})`;
+              e.currentTarget.style.color = "#fff";
+              e.currentTarget.style.transform = "scale(1.1)";
+              e.currentTarget.style.boxShadow = "0 12px 40px rgba(232,114,12,0.25)";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = "rgba(255,255,255,0.9)";
+              e.currentTarget.style.color = T.orange;
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.08)";
+            }}
+          >
+            ↑
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -950,9 +1580,10 @@ function Footer() {
     ],
     Support: [
       { label: "Contact Us", action: () => window.open("mailto:support@wishstone.in") },
+      { label: "Terms & Conditions", action: () => navigate("/terms-and-conditions") },
       { label: "Shipping Policy", action: () => navigate("/shipping-policy") },
       { label: "Return Policy", action: () => navigate("/return-policy") },
-      { label: "Track Order", action: () => navigate("/dashboard") },
+      { label: "Refund Policy", action: () => navigate("/refund-policy") },
       { label: "Privacy Policy", action: () => navigate("/privacy-policy") },
     ],
   };
@@ -966,6 +1597,10 @@ function Footer() {
               <img src={`${process.env.PUBLIC_URL || ""}/wishstone svg.svg`} alt="WishStone" style={{ height: 24, width: "auto", display: "block" }} />
             </div>
             <p style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, maxWidth: 240 }}>India's sacred manifestation stone — hand-crafted with ancient yantra to help you manifest your deepest desires.</p>
+            <p style={{ fontSize: "0.76rem", color: "rgba(255,255,255,0.4)", lineHeight: 1.6, marginTop: "1rem", borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "0.8rem", maxWidth: 240 }}>
+              Email: support@wishstone.in<br />
+              WhatsApp: +91 6306 059912
+            </p>
           </div>
           {Object.entries(FOOTER_LINKS).map(([title, links]) => (
             <div key={title}>
@@ -1828,7 +2463,39 @@ function CheckoutPage({ cart, onPlaceOrder }) {
 
       // Real Razorpay popup
       if (!window.Razorpay) { setError("Payment gateway failed to load. Please refresh and try again."); setLoading(false); return; }
-      const rzp = new window.Razorpay({ key: createData.keyId, amount: createData.amount, currency: createData.currency || "INR", name: "WishStone", description: `Order — ${cart.length} item${cart.length > 1 ? "s" : ""}`, image: `${process.env.PUBLIC_URL || ""}/wishstone svg.svg`, order_id: createData.razorpayOrderId, prefill: createData.prefill || {}, theme: { color: "#E8720C" }, handler: verifyPayment, modal: { ondismiss: () => setLoading(false), escape: true, animation: true } });
+      const rzp = new window.Razorpay({
+        key: createData.keyId,
+        amount: createData.amount,
+        currency: createData.currency || "INR",
+        name: "WishStone",
+        description: `Order — ${cart.length} item${cart.length > 1 ? "s" : ""}`,
+        image: `${process.env.PUBLIC_URL || ""}/wishstone svg.svg`,
+        order_id: createData.razorpayOrderId,
+        config_id: process.env.REACT_APP_RAZORPAY_CONFIG_ID || createData.configId || undefined,
+        config: {
+          display: {
+            blocks: {
+              upi: {
+                name: "Pay via UPI / QR Code",
+                instruments: [
+                  {
+                    method: "upi",
+                    flows: ["qr", "intent", "collect"]
+                  }
+                ]
+              }
+            },
+            sequence: ["block.upi"],
+            preferences: {
+              show_default_blocks: true
+            }
+          }
+        },
+        prefill: createData.prefill || {},
+        theme: { color: "#E8720C" },
+        handler: verifyPayment,
+        modal: { ondismiss: () => setLoading(false), escape: true, animation: true }
+      });
       rzp.on("payment.failed", r => { setLoading(false); setError(r.error?.description || r.error?.reason || "Payment failed. Please try again."); });
       rzp.open();
     } catch (err) { setError("Something went wrong. Please try again."); setLoading(false); }
@@ -3388,6 +4055,7 @@ function AppInner() {
       home: "/", products: "/shop", rituals: "/rituals", benefits: "/benefits",
       stories: "/stories", cart: "/cart", checkout: "/checkout",
       wishlist: "/wishlist", auth: "/login", dashboard: "/dashboard",
+      terms: "/terms-and-conditions", refund: "/refund-policy",
     };
     navigate(MAP[pageKey] || "/");
   };
@@ -3430,9 +4098,11 @@ function AppInner() {
         <Route path="/login" element={<LoginPage onLogin={handleLogin} onSwitch={() => navigate("/signup")} />} />
         <Route path="/signup" element={<SignupPage onSignup={handleLogin} onSwitch={() => navigate("/login")} />} />
         <Route path="/dashboard" element={user ? <UserDashboard user={user} orders={orders} onLogout={handleLogout} onNav={nav} onUpdateUser={u => { setUser(u); localStorage.setItem("ws_user", JSON.stringify(u)); }} /> : <Navigate to="/login" replace />} />
-        <Route path="/shipping-policy" element={<PolicyPage title="Shipping Policy" sections={SHIPPING_POLICY} />} />
-        <Route path="/return-policy" element={<PolicyPage title="Return Policy" sections={RETURN_POLICY} />} />
-        <Route path="/privacy-policy" element={<PolicyPage title="Privacy Policy" sections={PRIVACY_POLICY} />} />
+        <Route path="/shipping-policy" element={<ModernPolicyPage title="Shipping & Cancellation Policy" lastUpdated="June 2025" sections={SHIPPING_CANCELLATION_POLICY} />} />
+        <Route path="/return-policy" element={<ModernPolicyPage title="Refund & Exchange Policy" lastUpdated="June 2025" sections={REFUND_EXCHANGE_POLICY} />} />
+        <Route path="/refund-policy" element={<ModernPolicyPage title="Refund, Exchange & Cancellation Policy" lastUpdated="June 2025" sections={REFUND_EXCHANGE_CANCELLATION_POLICY} />} />
+        <Route path="/terms-and-conditions" element={<ModernPolicyPage title="Terms & Conditions" lastUpdated="June 2025" sections={TERMS_AND_CONDITIONS} />} />
+        <Route path="/privacy-policy" element={<ModernPolicyPage title="Privacy Policy" lastUpdated="June 2025" sections={PRIVACY_POLICY} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       {!isAuthPage && <Footer />}
