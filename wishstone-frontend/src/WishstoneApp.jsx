@@ -53,7 +53,7 @@ const FAQS = [
   { q: "WishStone kaise use karein?", a: "Apne stone ko moonlight ya sage smoke se cleanse karein. Dono haathon mein pakad ke apni intention set karein. Isse apne paas rakhein ya sacred space mein place karein." },
   { q: "Results kitne time mein dikhte hain?", a: "Zyaadatar customers 7-21 din ke consistent use mein subtle energy shifts notice karte hain. Results individual, intention clarity, aur usage consistency pe depend karte hain." },
   { q: "Kya saare products 100% natural hain?", a: "Haan. Har WishStone product ethically sourced, 100% natural, aur synthetic treatments se free hai." },
-  { q: "Shipping kitne time mein hoti hai?", a: "Standard delivery: 5-7 business days. Express delivery: 2-3 business days. Rs.999 se upar ke orders pe free shipping." },
+  { q: "Shipping kitne time mein hoti hai?", a: "Standard delivery: 5-7 business days. Express delivery: 2-3 business days. ₹999 se upar ke orders pe free shipping." },
   { q: "Return policy kya hai?", a: "Delivery ke 7 din ke andar hassle-free returns. Product unused aur original packaging mein hona chahiye. Refund 3-5 business days mein process hota hai." },
 ];
 
@@ -361,7 +361,7 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
           <button id="wishlist-nav-btn" onClick={() => navTo("wishlist")} style={{ background: "none", border: "none", cursor: "pointer", position: "relative", padding: "6px", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 8, transition: "background 0.2s" }}
             onMouseEnter={e => e.currentTarget.style.background = "rgba(0,0,0,0.06)"}
             onMouseLeave={e => e.currentTarget.style.background = "none"}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill={wishCount > 0 ? "#e53e3e" : "none"} stroke={wishCount > 0 ? "#e53e3e" : "#1a1a1a"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all 0.25s ease", display: "block", animation: wishAnim ? "wishJump 0.6s cubic-bezier(0.36,0.07,0.19,0.97)" : "none" }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill={wishCount > 0 ? "#e53e3e" : "none"} stroke={wishCount > 0 ? "#e53e3e" : "#000000"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all 0.25s ease", display: "block", animation: wishAnim ? "wishJump 0.6s cubic-bezier(0.36,0.07,0.19,0.97)" : "none" }}>
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
             {wishCount > 0 && <span style={{ position: "absolute", top: 0, right: 0, background: "#1a1a1a", color: "#fff", borderRadius: "50%", width: 15, height: 15, fontSize: "0.52rem", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700 }}>{wishCount}</span>}
@@ -586,7 +586,7 @@ function CommunityVideoSection() {
   };
 
   return (
-    <section style={{ background: T.bgDark, paddingTop: "80px", paddingBottom: "80px", overflow: "hidden", position: "relative" }}>
+    <section style={{ background: "linear-gradient(180deg, #2C3320 0%, #1F2417 100%)", paddingTop: "80px", paddingBottom: "80px", overflow: "hidden", position: "relative" }}>
       <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 0%, rgba(232,114,12,0.08) 0%, transparent 60%)", pointerEvents: "none" }} />
 
       {/* Header */}
@@ -1924,8 +1924,8 @@ function BestSellersStrip({ onShop }) {
                 <div style={{ padding: "0.9rem" }}>
                   <div style={{ fontSize: "0.8rem", fontWeight: 700, color: T.text, marginBottom: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <span style={{ fontSize: "0.9rem", color: T.orange, fontWeight: 700 }}>Rs.{p.price.toLocaleString()}</span>
-                    <span style={{ color: T.textMid, fontSize: "0.7rem", textDecoration: "line-through" }}>Rs.{p.originalPrice.toLocaleString()}</span>
+                    <span style={{ fontSize: "0.9rem", color: T.orange, fontWeight: 700 }}>₹{p.price.toLocaleString()}</span>
+                    <span style={{ color: T.textMid, fontSize: "0.7rem", textDecoration: "line-through" }}>₹{p.originalPrice.toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -2049,8 +2049,8 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
             {filtered.map(p => {
               const qty = getQty(p.id);
               return (
-                <div key={p._id} className="prod-card">
-                  <div style={{ position: "relative", aspectRatio: "4/3", overflow: "hidden" }} onClick={() => onClick(p)}>
+                <div key={p._id} className="prod-card" onClick={() => onClick(p)}>
+                  <div style={{ position: "relative", aspectRatio: "4/3", overflow: "hidden" }}>
                     {p.image ? (
                       <img referrerPolicy="no-referrer" src={p.image} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s", cursor: "pointer" }}
                         onMouseEnter={e => e.currentTarget.style.transform = "scale(1.06)"}
@@ -2059,13 +2059,17 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
                     ) : null}
                     <div style={{ width: "100%", height: "100%", background: `linear-gradient(135deg,${T.bg},#ede8df)`, display: p.image ? "none" : "flex", alignItems: "center", justifyContent: "center", fontSize: 48 }}>◆</div>
                     {p.discount > 0 && <div style={{ position: "absolute", top: 10, left: 10, background: T.orange, color: "#fff", borderRadius: 4, padding: "3px 10px", fontSize: "0.65rem", fontWeight: 800 }}>-{p.discount}%</div>}
-                    <button onClick={e => { e.stopPropagation(); onWish(e, p.id); }} style={{ position: "absolute", top: 8, right: 8, background: "rgba(255,255,255,0.9)", border: "none", borderRadius: "50%", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 14, transition: "transform 0.2s" }}
+                    <button onClick={e => { e.stopPropagation(); onWish(e, p.id); }} style={{ position: "absolute", top: 8, right: 8, background: "rgba(255,255,255,0.9)", border: "none", borderRadius: "50%", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "transform 0.2s" }}
                       onMouseEnter={e => e.currentTarget.style.transform = "scale(1.15)"} onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
-                    >{wished.includes(p.id) ? "❤️" : "🤍"}</button>
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill={wished.includes(p.id) ? "#e53e3e" : "none"} stroke={wished.includes(p.id) ? "#e53e3e" : "#000000"} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all 0.2s ease" }}>
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                      </svg>
+                    </button>
                     {p.isBestSeller && <div style={{ position: "absolute", bottom: 8, left: 8, background: T.bgDark, color: T.orange, borderRadius: 4, padding: "2px 8px", fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.08em" }}>BEST SELLER</div>}
                   </div>
                   <div style={{ padding: "1.2rem" }}>
-                    <h4 onClick={() => onClick(p)} style={{ fontSize: "0.92rem", fontWeight: 700, color: T.text, marginBottom: "0.4rem", cursor: "pointer" }}>{p.name}</h4>
+                    <h4 style={{ fontSize: "0.92rem", fontWeight: 700, color: T.text, marginBottom: "0.4rem", cursor: "pointer" }}>{p.name}</h4>
                     <p style={{ fontSize: "0.76rem", color: T.textMid, marginBottom: "0.7rem", lineHeight: 1.5 }}>{(p.shortDesc || "").slice(0, 65)}{p.shortDesc?.length > 65 ? "..." : ""}</p>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "0.8rem" }}>
                       <span style={{ fontSize: "1rem", color: T.orange, fontWeight: 700 }}>₹{p.price.toLocaleString()}</span>
@@ -2077,10 +2081,10 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
                       <div onClick={e => e.stopPropagation()} style={{ display: "flex", alignItems: "center", gap: 0, border: `1.5px solid ${T.orange}`, borderRadius: 8, overflow: "hidden", width: "100%" }}>
                         <button onClick={() => onAdd({ ...p, qty: -1 })} style={{ flex: 1, height: 38, background: "none", border: "none", cursor: "pointer", fontSize: 18, color: T.orange, fontWeight: 700 }}>−</button>
                         <span style={{ flex: 1, textAlign: "center", fontWeight: 800, color: T.orange, fontSize: "0.95rem" }}>{qty}</span>
-                        <button onClick={(e) => { e.stopPropagation(); onAddAnim ? onAddAnim(e, p) : onAdd(p); }} style={{ flex: 1, height: 38, background: T.orange, border: "none", cursor: "pointer", fontSize: 18, color: "#fff", fontWeight: 700 }}>+</button>
+                        <button onClick={(e) => { e.stopPropagation(); onAdd(p); navigate("/cart"); }} style={{ flex: 1, height: 38, background: T.orange, border: "none", cursor: "pointer", fontSize: 18, color: "#fff", fontWeight: 700 }}>+</button>
                       </div>
                     ) : (
-                      <button className="btn-orange" onClick={e => { e.stopPropagation(); onAddAnim ? onAddAnim(e, p) : onAdd(p); }} style={{ width: "100%", padding: "10px", fontSize: "0.72rem", borderRadius: 7 }}>Add to Cart</button>
+                      <button className="btn-orange" onClick={e => { e.stopPropagation(); onAdd(p); navigate("/cart"); }} style={{ width: "100%", padding: "10px", fontSize: "0.72rem", borderRadius: 7 }}>Add to Cart</button>
                     )}
                   </div>
                 </div>
@@ -2099,7 +2103,20 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
   const [tab, setTab] = useState("desc");
   const [activeImg, setActiveImg] = useState(0);
   const [dragDirection, setDragDirection] = useState(0);
+  const scrollContainerRef = useRef(null);
   const cartQty = cart ? cart.filter(i => i.id === p?.id).reduce((s, i) => s + i.qty, 0) : 0;
+
+  // Sync scroll position when activeImg changes
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      const targetScroll = activeImg * container.clientWidth;
+      if (Math.abs(container.scrollLeft - targetScroll) > 10) {
+        container.scrollTo({ left: targetScroll, behavior: "smooth" });
+      }
+    }
+  }, [activeImg]);
+
   if (!p) return null;
   const imgs = p.images || [p.image];
 
@@ -2122,12 +2139,6 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [imgs.length]);
 
-  // Swipe handling
-  const handleDragEnd = (_, info) => {
-    if (info.offset.x < -50) nextImage();
-    if (info.offset.x > 50) prevImage();
-  };
-
   // Image animation variants
   const imageVariants = {
     enter: { opacity: 0, scale: 0.95, x: 20 },
@@ -2148,51 +2159,67 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 420px), 1fr))", gap: "2rem", alignItems: "start" }} className="prod-detail-grid">
             {/* Left Side - Image Gallery Nike Style */}
             <div style={{ minWidth: 0, width: "100%" }}>
-              {/* Main Image with Animation */}
+              {/* Main Image with Native Scroll & Snap */}
               <div style={{ borderRadius: 20, overflow: "hidden", boxShadow: "0 12px 48px rgba(0,0,0,0.12)", marginBottom: "1.2rem", aspectRatio: "1", background: "#f0ece4", position: "relative", isolation: "isolate" }}>
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={activeImg}
-                    referrerPolicy="no-referrer"
-                    src={imgs[activeImg]}
-                    alt={p.name}
-                    variants={imageVariants}
-                    initial="enter"
-                    animate="center"
-                    exit="exit"
-                    transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", top: 0, left: 0, cursor: "grab" }}
-                    drag="x"
-                    dragConstraints={{ left: 0, right: 0 }}
-                    dragElastic={0.2}
-                    onDragEnd={handleDragEnd}
-                    whileDrag={{ cursor: "grabbing", scale: 0.98 }}
-                  />
-                </AnimatePresence>
+                <div
+                  ref={scrollContainerRef}
+                  onScroll={(e) => {
+                    const scrollLeft = e.currentTarget.scrollLeft;
+                    const width = e.currentTarget.clientWidth;
+                    if (width > 0) {
+                      const newIndex = Math.round(scrollLeft / width);
+                      if (newIndex !== activeImg && newIndex >= 0 && newIndex < imgs.length) {
+                        setActiveImg(newIndex);
+                      }
+                    }
+                  }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    overflowX: "auto",
+                    scrollSnapType: "x mandatory",
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none",
+                    WebkitOverflowScrolling: "touch"
+                  }}
+                >
+                  {imgs.map((img, i) => (
+                    <img
+                      key={i}
+                      referrerPolicy="no-referrer"
+                      src={img}
+                      alt={p.name}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        scrollSnapAlign: "start",
+                        flexShrink: 0
+                      }}
+                    />
+                  ))}
+                </div>
 
                 {/* Navigation Arrows */}
                 {imgs.length > 1 && (
                   <>
-                    <motion.button
+                    <button
                       onClick={prevImage}
-                      whileHover={{ scale: 1.1, x: -2 }}
-                      whileTap={{ scale: 0.9 }}
                       style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.95)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 16px rgba(0,0,0,0.15)", zIndex: 10 }}
                     >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M15 18l-6-6 6-6" />
                       </svg>
-                    </motion.button>
-                    <motion.button
+                    </button>
+                    <button
                       onClick={nextImage}
-                      whileHover={{ scale: 1.1, x: 2 }}
-                      whileTap={{ scale: 0.9 }}
                       style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.95)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 16px rgba(0,0,0,0.15)", zIndex: 10 }}
                     >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M9 18l6-6-6-6" />
                       </svg>
-                    </motion.button>
+                    </button>
                   </>
                 )}
 
@@ -2263,10 +2290,11 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
               {p.bestSeller && <div style={{ display: "inline-block", background: T.orange, color: "#fff", borderRadius: 4, padding: "3px 12px", fontSize: "0.65rem", fontWeight: 800, letterSpacing: "0.1em", marginBottom: "0.8rem" }}>BEST SELLER</div>}
               <h1 style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(1.4rem,3vw,2rem)", fontWeight: 900, color: T.text, marginBottom: "0.4rem" }}>{p.name}</h1>
               <p style={{ fontSize: "0.72rem", color: T.textMid, marginBottom: "1rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>{p.category}</p>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: "1.5rem" }}>
-                <span style={{ fontSize: "1.5rem", color: T.orange, fontWeight: 800 }}>Rs.{p.price.toLocaleString()}</span>
-                <span style={{ color: T.textMid, fontSize: "0.95rem", textDecoration: "line-through" }}>Rs.{p.originalPrice.toLocaleString()}</span>
-                <span style={{ background: "rgba(232,114,12,0.1)", color: T.orange, borderRadius: 4, padding: "3px 10px", fontSize: "0.72rem", fontWeight: 700 }}>{p.discount}% OFF</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: "1.5rem", flexWrap: "wrap" }}>
+                <span style={{ fontSize: "1.5rem", color: T.orange, fontWeight: 800 }}>₹{p.price.toLocaleString()}</span>
+                {p.originalPrice > p.price && <span style={{ color: T.textMid, fontSize: "0.95rem", textDecoration: "line-through" }}>₹{p.originalPrice.toLocaleString()}</span>}
+                {p.discount > 0 && <span style={{ background: "rgba(232,114,12,0.1)", color: T.orange, borderRadius: 4, padding: "3px 10px", fontSize: "0.72rem", fontWeight: 700 }}>{p.discount}% OFF</span>}
+                <span style={{ fontSize: "0.72rem", color: T.textMid, fontWeight: 500 }}>(incl. of all taxes)</span>
               </div>
               <div style={{ display: "flex", gap: 8, marginBottom: "1.2rem" }}>
                 {["desc", "benefits", "suitable"].map(t => (
@@ -2280,22 +2308,8 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                 {tab === "benefits" && <ul style={{ paddingLeft: "1.2rem" }}>{p.benefits.map(b => <li key={b} style={{ fontSize: "0.86rem", color: T.textMid, marginBottom: 6, lineHeight: 1.6 }}>{b}</li>)}</ul>}
                 {tab === "suitable" && <p style={{ fontSize: "0.86rem", color: T.textMid, lineHeight: 1.7 }}>{p.suitableFor}</p>}
               </div>
-              <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "1rem" }}>
-                {cartQty > 0 ? (
-                  <div style={{ display: "flex", alignItems: "center", border: `1.5px solid ${T.orange}`, borderRadius: 8, overflow: "hidden", height: 44, width: 160, justifyContent: "space-between", background: "#fff" }}>
-                    <button onClick={handleDec} style={{ width: 40, height: "100%", background: "none", border: "none", cursor: "pointer", fontSize: 20, color: T.orange, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
-                    <span style={{ width: 40, textAlign: "center", fontWeight: 800, color: T.orange, fontSize: "1.05rem" }}>{cartQty}</span>
-                    <button onClick={handleAdd} disabled={cart?.reduce((s, i) => s + i.qty, 0) >= 10} style={{ width: 40, height: "100%", background: cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? "#e5e7eb" : "none", border: "none", cursor: cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? "not-allowed" : "pointer", fontSize: 20, color: T.orange, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
-                  </div>
-                ) : (
-                  <button className="btn-orange" onClick={handleAdd} disabled={cart?.reduce((s, i) => s + i.qty, 0) >= 10} style={{ width: 160, height: 44, fontSize: "0.85rem", borderRadius: 8, opacity: cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? 0.5 : 1, cursor: cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    {cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? "Cart Full (10/10)" : "Add to Cart"}
-                  </button>
-                )}
-                <button onClick={e => onWish(e, p.id)} style={{ width: 44, height: 44, borderRadius: 8, border: `1.5px solid ${T.border}`, background: "#fff", cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>{wished.includes(p.id) ? "❤️" : "🤍"}</button>
-              </div>
               <div style={{ display: "flex", gap: "1.2rem", flexWrap: "wrap" }}>
-                {["Free shipping above Rs.999", "7-day returns", "100% natural"].map(f => (
+                {["Free shipping above ₹999", "7-day returns", "100% natural"].map(f => (
                   <div key={f} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: "0.7rem", color: T.textMid }}>
                     <span style={{ color: T.orange }}>✓</span> {f}
                   </div>
@@ -2339,10 +2353,12 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
             </button>
           )}
           {/* Wishlist heart */}
-          <button onClick={e => onWish(e, p.id)} style={{ width: 42, height: 42, borderRadius: 8, border: `1.5px solid ${T.border}`, background: "#fff", cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s", flexShrink: 0 }}
+          <button onClick={e => onWish(e, p.id)} style={{ width: 42, height: 42, borderRadius: 8, border: `1.5px solid ${T.border}`, background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s", flexShrink: 0 }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = T.orange; e.currentTarget.style.transform = "scale(1.05)"; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.transform = "scale(1)"; }}>
-            {wished.includes(p.id) ? "❤️" : "🤍"}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill={wished.includes(p.id) ? "#e53e3e" : "none"} stroke={wished.includes(p.id) ? "#e53e3e" : "#000000"} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all 0.2s ease" }}>
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
           </button>
         </div>
       </div>
@@ -2524,6 +2540,49 @@ function CheckoutPage({ cart, onPlaceOrder }) {
   const [error, setError] = useState("");
   const [isGift, setIsGift] = useState(false);
   const [giftNote, setGiftNote] = useState("");
+  const [availableCoupons, setAvailableCoupons] = useState([]);
+  const [fetchingCoupons, setFetchingCoupons] = useState(false);
+
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      setFetchingCoupons(true);
+      try {
+        const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
+        const res = await fetch(`${API_BASE}/api/coupons`);
+        const data = await res.json();
+        if (data.success) {
+          setAvailableCoupons(data.coupons || []);
+        }
+      } catch (err) {
+        // Silent fail
+      }
+      setFetchingCoupons(false);
+    };
+    fetchCoupons();
+  }, []);
+
+  const selectAndApplyCoupon = async (code) => {
+    setCoupon(code);
+    try {
+      const API_BASE = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
+      const res = await fetch(`${API_BASE}/api/coupons/validate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: code.toUpperCase(), orderTotal: sub })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setDiscount(data.discount);
+        setCouponMsg(data.message || `Coupon ${code} applied!`);
+      } else {
+        setDiscount(0);
+        setCouponMsg(data.message || "Invalid coupon code.");
+      }
+    } catch {
+      setDiscount(0);
+      setCouponMsg("Could not validate coupon. Try again.");
+    }
+  };
   const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
   const giftCharge = isGift ? totalQty * 50 : 0;
@@ -2690,6 +2749,86 @@ function CheckoutPage({ cart, onPlaceOrder }) {
                 <button type="button" className="btn-orange" onClick={applyCoupon} style={{ padding: "10px 18px", fontSize: "0.76rem", borderRadius: 8 }}>Apply</button>
               </div>
               {couponMsg && <p style={{ fontSize: "0.76rem", marginTop: 6, color: discount > 0 ? "#2d7a5a" : "#c0392b" }}>{couponMsg}</p>}
+
+              {/* Beautiful Coupons List */}
+              {availableCoupons.length > 0 && (
+                <div style={{ marginTop: "1.2rem", borderTop: `1px dashed ${T.border}`, paddingTop: "1rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.8rem" }}>
+                    <span style={{ fontSize: "0.72rem", fontWeight: 700, color: T.text, letterSpacing: "0.05em", textTransform: "uppercase" }}>🏷️ Available Offers</span>
+                    <span style={{ fontSize: "0.68rem", color: T.textMid, opacity: 0.8 }}>Click to Apply</span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10, maxHeight: 180, overflowY: "auto", paddingRight: 4 }} className="scroll-hide">
+                    {availableCoupons.map(c => {
+                      const isApplied = coupon.trim().toUpperCase() === c.code.toUpperCase() && discount > 0;
+                      return (
+                        <div
+                          key={c.code}
+                          onClick={() => selectAndApplyCoupon(c.code)}
+                          style={{
+                            background: isApplied ? "rgba(232,114,12,0.04)" : "rgba(0,0,0,0.02)",
+                            border: `1px dashed ${isApplied ? T.orange : "rgba(26,26,26,0.15)"}`,
+                            borderRadius: 12,
+                            padding: "10px 14px",
+                            cursor: "pointer",
+                            transition: "all 0.2s ease",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            position: "relative",
+                            overflow: "hidden"
+                          }}
+                          onMouseEnter={e => {
+                            e.currentTarget.style.borderColor = T.orange;
+                            e.currentTarget.style.background = "rgba(232,114,12,0.03)";
+                          }}
+                          onMouseLeave={e => {
+                            if (!isApplied) {
+                              e.currentTarget.style.borderColor = "rgba(26,26,26,0.15)";
+                              e.currentTarget.style.background = "rgba(0,0,0,0.02)";
+                            }
+                          }}
+                        >
+                          {/* Ticket notch left */}
+                          <div style={{ position: "absolute", left: -6, top: "50%", transform: "translateY(-50%)", width: 10, height: 10, borderRadius: "50%", background: "#fff", borderRight: "1px dashed rgba(26,26,26,0.15)" }} />
+                          {/* Ticket notch right */}
+                          <div style={{ position: "absolute", right: -6, top: "50%", transform: "translateY(-50%)", width: 10, height: 10, borderRadius: "50%", background: "#fff", borderLeft: "1px dashed rgba(26,26,26,0.15)" }} />
+                          
+                          <div style={{ paddingLeft: 6, paddingRight: 6 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                              <span style={{ fontSize: "0.82rem", fontWeight: 800, color: T.text, letterSpacing: "0.05em" }}>{c.code}</span>
+                              <span style={{ fontSize: "0.7rem", fontWeight: 700, color: T.orange }}>
+                                {c.discountType === "flat" ? `₹${c.discountValue} Off` : `${c.discountValue}% Off`}
+                              </span>
+                            </div>
+                            {c.description && <div style={{ fontSize: "0.68rem", color: T.textMid, marginTop: 2 }}>{c.description}</div>}
+                            {c.minOrderValue > 0 && (
+                              <div style={{ fontSize: "0.62rem", color: "rgba(26,26,26,0.45)", marginTop: 2 }}>
+                                Min. Order: ₹{c.minOrderValue}
+                              </div>
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            style={{
+                              background: isApplied ? T.orange : "transparent",
+                              border: `1.5px solid ${T.orange}`,
+                              color: isApplied ? "#fff" : T.orange,
+                              borderRadius: 8,
+                              padding: "4px 12px",
+                              fontSize: "0.7rem",
+                              fontWeight: 700,
+                              cursor: "pointer",
+                              transition: "all 0.2s"
+                            }}
+                          >
+                            {isApplied ? "Applied ✓" : "Apply"}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
             {/* ─── GIFT WRAPPING ─── */}
             <div style={{ background: "#fff", borderRadius: 16, padding: "1.5rem", border: `1px solid ${T.border}`, marginBottom: "1.2rem" }}>
@@ -2714,7 +2853,14 @@ function CheckoutPage({ cart, onPlaceOrder }) {
             </div>
             {error && <div style={{ background: "rgba(192,57,43,0.06)", border: "1px solid rgba(192,57,43,0.2)", borderRadius: 10, padding: "12px 16px", marginBottom: "1rem", display: "flex", gap: 8 }}><span>⚠️</span><p style={{ color: "#c0392b", fontSize: "0.78rem", margin: 0 }}>{error}</p></div>}
             <button type="submit" className="btn-orange" disabled={loading} style={{ width: "100%", padding: "14px", fontSize: "0.84rem", borderRadius: 9, opacity: loading ? 0.7 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
-              {loading ? <><div style={{ width: 18, height: 18, border: "2.5px solid rgba(255,255,255,0.3)", borderTop: "2.5px solid #fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />Processing Payment…</> : <><span>🔒</span> Pay ₹{total.toLocaleString()} Securely</>}
+              {loading ? (
+                <><div style={{ width: 18, height: 18, border: "2.5px solid rgba(255,255,255,0.3)", borderTop: "2.5px solid #fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />Processing Payment…</>
+              ) : (
+                <>
+                  <span>🔒</span> 
+                  Pay ₹{total.toLocaleString()} Securely {discount > 0 && `(₹${discount} Discount Applied)`}
+                </>
+              )}
             </button>
             <p style={{ textAlign: "center", fontSize: "0.65rem", color: T.textMid, marginTop: "0.6rem", opacity: 0.6 }}>🔒 Secured by Razorpay — 256-bit SSL encrypted</p>
           </form>
@@ -2742,31 +2888,31 @@ function CheckoutPage({ cart, onPlaceOrder }) {
                     <div style={{ fontSize: "0.78rem", color: T.text, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{i.name}</div>
                     <div style={{ fontSize: "0.7rem", color: T.textMid }}>x{i.qty}</div>
                   </div>
-                  <span style={{ fontSize: "0.82rem", fontWeight: 700, color: T.text, flexShrink: 0 }}>Rs.{(i.price * i.qty).toLocaleString()}</span>
+                  <span style={{ fontSize: "0.82rem", fontWeight: 700, color: T.text, flexShrink: 0 }}>₹{(i.price * i.qty).toLocaleString()}</span>
                 </div>
               );
             })}
             {ship > 0 && (
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                 <span style={{ fontSize: "0.8rem", color: T.textMid }}>Shipping</span>
-                <span style={{ fontSize: "0.8rem", fontWeight: 600, color: T.text }}>Rs.{ship}</span>
+                <span style={{ fontSize: "0.8rem", fontWeight: 600, color: T.text }}>₹{ship}</span>
               </div>
             )}
             {discount > 0 && (
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                 <span style={{ fontSize: "0.8rem", color: "#2d7a5a" }}>Coupon Discount</span>
-                <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#2d7a5a" }}>−Rs.{discount}</span>
+                <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#2d7a5a" }}>−₹{discount}</span>
               </div>
             )}
             {isGift && (
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
                 <span style={{ fontSize: "0.8rem", color: T.orange }}>🎁 Gift Wrapping</span>
-                <span style={{ fontSize: "0.8rem", fontWeight: 600, color: T.orange }}>+Rs.{giftCharge}</span>
+                <span style={{ fontSize: "0.8rem", fontWeight: 600, color: T.orange }}>+₹{giftCharge}</span>
               </div>
             )}
             <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: "0.9rem", display: "flex", justifyContent: "space-between" }}>
               <span style={{ color: T.text, fontWeight: 700 }}>Total</span>
-              <span style={{ color: T.orange, fontSize: "1.1rem", fontWeight: 800 }}>Rs.{total.toLocaleString()}</span>
+              <span style={{ color: T.orange, fontSize: "1.1rem", fontWeight: 800 }}>₹{total.toLocaleString()}</span>
             </div>
           </div>
         </div>
