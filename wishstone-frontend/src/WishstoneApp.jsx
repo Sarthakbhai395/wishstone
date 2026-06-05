@@ -2549,6 +2549,8 @@ function CheckoutPage({ cart, onPlaceOrder }) {
   const [fetchingCoupons, setFetchingCoupons] = useState(false);
   const [showCoupons, setShowCoupons] = useState(false);
   const [copiedCode, setCopiedCode] = useState("");
+  const [payMethod, setPayMethod] = useState("razorpay"); // razorpay, qr, cod
+  const [utr, setUtr] = useState("");
 
   useEffect(() => {
     const fetchCoupons = async () => {
@@ -2641,6 +2643,54 @@ function CheckoutPage({ cart, onPlaceOrder }) {
       customer: { name: form.name, email: form.email, phone: form.phone },
       shippingAddress: { address: form.address, city: form.city, state: form.state, pincode: form.pincode, country: "India" },
     };
+
+    if (payMethod === "qr") {
+      if (!utr.trim()) {
+        setError("Please enter your 12-digit UPI Transaction ID (UTR) to complete your order.");
+        setLoading(false);
+        return;
+      }
+      if (utr.trim().length !== 12 || isNaN(Number(utr.trim()))) {
+        setError("UTR number must be exactly 12 digits.");
+        setLoading(false);
+        return;
+      }
+    }
+
+    if (payMethod === "cod" || payMethod === "qr") {
+      try {
+        const ordRes = await fetch(`${API_BASE}/api/orders/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...orderPayload,
+            paymentMethod: payMethod,
+            razorpayPaymentId: payMethod === "qr" ? utr.trim() : "",
+          })
+        });
+        const ordData = await ordRes.json();
+        if (ordData.success) {
+          onPlaceOrder({
+            items: cart,
+            address: form,
+            totalAmount: ordData.order?.totalAmount || total,
+            coupon,
+            discount,
+            isGift,
+            giftNote,
+            paymentMethod: payMethod,
+            razorpayPaymentId: payMethod === "qr" ? utr.trim() : "",
+            backendOrder: ordData.order
+          });
+        } else {
+          setError(ordData.message || "Failed to place order.");
+        }
+      } catch (err) {
+        setError("Error connecting to server. Please try again.");
+      }
+      setLoading(false);
+      return;
+    }
 
     try {
       // Load Razorpay script if not loaded
@@ -2956,6 +3006,139 @@ function CheckoutPage({ cart, onPlaceOrder }) {
                 </div>
               )}
             </div>
+            {/* ─── PAYMENT METHOD ─── */}
+            <div style={{ background: "#fff", borderRadius: 16, padding: "1.5rem", border: `1px solid ${T.border}`, marginBottom: "1.2rem" }}>
+              <h3 style={{ fontFamily: "'Playfair Display',serif", color: T.text, fontSize: "1rem", fontWeight: 700, marginBottom: "1.2rem" }}>Payment Method</h3>
+              
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {/* Razorpay Online Option */}
+                <div 
+                  onClick={() => setPayMethod("razorpay")}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 12,
+                    padding: "14px 16px",
+                    border: `1.5px solid ${payMethod === "razorpay" ? T.orange : T.border}`,
+                    borderRadius: 12,
+                    cursor: "pointer",
+                    background: payMethod === "razorpay" ? "rgba(232,114,12,0.03)" : "#fff",
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${payMethod === "razorpay" ? T.orange : "rgba(26,26,26,0.3)"}`, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 2, flexShrink: 0 }}>
+                    {payMethod === "razorpay" && <div style={{ width: 10, height: 10, borderRadius: "50%", background: T.orange }} />}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 700, fontSize: "0.85rem", color: T.text }}>
+                      💳 Pay Online Securely
+                    </div>
+                    <div style={{ fontSize: "0.72rem", color: T.textMid, marginTop: 4 }}>
+                      UPI, Credit/Debit Card, Netbanking, or Wallet via Razorpay
+                    </div>
+                  </div>
+                </div>
+
+                {/* Direct QR Scan Option */}
+                <div 
+                  onClick={() => setPayMethod("qr")}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 12,
+                    padding: "14px 16px",
+                    border: `1.5px solid ${payMethod === "qr" ? T.orange : T.border}`,
+                    borderRadius: 12,
+                    cursor: "pointer",
+                    background: payMethod === "qr" ? "rgba(232,114,12,0.03)" : "#fff",
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${payMethod === "qr" ? T.orange : "rgba(26,26,26,0.3)"}`, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 2, flexShrink: 0 }}>
+                    {payMethod === "qr" && <div style={{ width: 10, height: 10, borderRadius: "50%", background: T.orange }} />}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 700, fontSize: "0.85rem", color: T.text }}>
+                      📲 Scan QR Code & Pay Direct
+                    </div>
+                    <div style={{ fontSize: "0.72rem", color: T.textMid, marginTop: 4 }}>
+                      Scan organization UPI QR. Instant & zero processing fees.
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cash on Delivery Option */}
+                <div 
+                  onClick={() => setPayMethod("cod")}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 12,
+                    padding: "14px 16px",
+                    border: `1.5px solid ${payMethod === "cod" ? T.orange : T.border}`,
+                    borderRadius: 12,
+                    cursor: "pointer",
+                    background: payMethod === "cod" ? "rgba(232,114,12,0.03)" : "#fff",
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${payMethod === "cod" ? T.orange : "rgba(26,26,26,0.3)"}`, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 2, flexShrink: 0 }}>
+                    {payMethod === "cod" && <div style={{ width: 10, height: 10, borderRadius: "50%", background: T.orange }} />}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 700, fontSize: "0.85rem", color: T.text }}>
+                      💵 Cash on Delivery (COD)
+                    </div>
+                    <div style={{ fontSize: "0.72rem", color: T.textMid, marginTop: 4 }}>
+                      Pay in cash upon delivery at your doorstep
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* QR Scan Details Container */}
+              <AnimatePresence>
+                {payMethod === "qr" && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                    animate={{ height: "auto", opacity: 1, marginTop: 20 }}
+                    exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    style={{ overflow: "hidden" }}
+                  >
+                    <div style={{ borderTop: `1px dashed ${T.border}`, paddingTop: "1.2rem", display: "flex", flexDirection: "column", alignItems: "center", gap: 15 }}>
+                      <div style={{ textAlign: "center", fontSize: "0.78rem", color: T.textMid, fontWeight: 500 }}>
+                        Scan below using GPay, PhonePe, Paytm, or any UPI app to pay <strong style={{ color: T.orange }}>₹{total.toLocaleString()}</strong>:
+                      </div>
+                      
+                      {/* Interactive Premium QR Container */}
+                      <div style={{ background: "#fff", padding: 12, borderRadius: 16, border: `1px solid ${T.border}`, boxShadow: "0 8px 32px rgba(26,26,26,0.06)", display: "flex", justifyContent: "center", alignItems: "center", width: 170, height: 170 }}>
+                        <img src="/wishstone-qr.jpg" alt="UPI QR Code" style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 8 }} />
+                      </div>
+                      
+                      <div style={{ width: "100%" }}>
+                        <label style={{ display: "block", fontSize: "0.68rem", fontWeight: 700, color: T.textMid, marginBottom: 6, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                          UPI Transaction ID (12-digit UTR) <span style={{ color: "#c0392b" }}>*</span>
+                        </label>
+                        <input 
+                          type="text" 
+                          maxLength={12}
+                          value={utr} 
+                          onChange={e => setUtr(e.target.value.replace(/\D/g, ""))} 
+                          placeholder="e.g. 345678912345"
+                          style={{ width: "100%", padding: "11px 13px", border: `1.5px solid ${T.border}`, borderRadius: 8, fontSize: "0.86rem", background: "#fff", color: T.text, outline: "none", boxSizing: "border-box" }}
+                          onFocus={e => e.target.style.borderColor = T.orange} 
+                          onBlur={e => e.target.style.borderColor = T.border} 
+                        />
+                        <p style={{ fontSize: "0.68rem", color: T.textMid, marginTop: 5, fontStyle: "italic" }}>
+                          Enter the UTR number from your payment confirmation screen.
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
             {/* ─── GIFT WRAPPING ─── */}
             <div style={{ background: "#fff", borderRadius: 16, padding: "1.5rem", border: `1px solid ${T.border}`, marginBottom: "1.2rem" }}>
               <label style={{ display: "flex", alignItems: "center", gap: "0.75rem", cursor: "pointer", userSelect: "none" }}>
@@ -2980,11 +3163,15 @@ function CheckoutPage({ cart, onPlaceOrder }) {
             {error && <div style={{ background: "rgba(192,57,43,0.06)", border: "1px solid rgba(192,57,43,0.2)", borderRadius: 10, padding: "12px 16px", marginBottom: "1rem", display: "flex", gap: 8 }}><span>⚠️</span><p style={{ color: "#c0392b", fontSize: "0.78rem", margin: 0 }}>{error}</p></div>}
             <button type="submit" className="btn-orange" disabled={loading} style={{ width: "100%", padding: "14px", fontSize: "0.84rem", borderRadius: 9, opacity: loading ? 0.7 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
               {loading ? (
-                <><div style={{ width: 18, height: 18, border: "2.5px solid rgba(255,255,255,0.3)", borderTop: "2.5px solid #fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />Processing Payment…</>
+                <>
+                  <div style={{ width: 18, height: 18, border: "2.5px solid rgba(255,255,255,0.3)", borderTop: "2.5px solid #fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                  {payMethod === "razorpay" ? "Processing Payment…" : "Placing Order…"}
+                </>
               ) : (
                 <>
                   <span>🔒</span> 
-                  Pay ₹{total.toLocaleString()} Securely {discount > 0 && `(₹${discount} Discount Applied)`}
+                  {payMethod === "razorpay" ? `Pay ₹${total.toLocaleString()} Securely` : payMethod === "qr" ? `Confirm & Place Order (UPI)` : `Confirm & Place Order (COD)`}
+                  {discount > 0 && ` (₹${discount} Discount)`}
                 </>
               )}
             </button>
@@ -4409,6 +4596,9 @@ function AppInner() {
     setCart([]);
     setOrderConfirm(newOrder);
 
+    // If backendOrder already exists, do not create duplicate order
+    if (data.backendOrder) return;
+
     // Also send to backend so admin panel can see it
     try {
       const API = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
@@ -4435,7 +4625,8 @@ function AppInner() {
           quantity: i.qty || i.quantity || 1,
           image: i.image || "",
         })),
-        paymentMethod: "cod",
+        paymentMethod: data.paymentMethod || "cod",
+        razorpayPaymentId: data.razorpayPaymentId || "",
         couponCode: data.coupon || "",
       };
       const controller = new AbortController();

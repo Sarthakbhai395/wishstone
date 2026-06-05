@@ -7,7 +7,7 @@ const { protect } = require("../middleware/auth");
 // Create order (guest or authenticated user)
 router.post("/create", async (req, res) => {
   try {
-    const { customer, shippingAddress, items, couponCode, paymentMethod } = req.body;
+    const { customer, shippingAddress, items, couponCode, paymentMethod, razorpayPaymentId } = req.body;
     
     // Validate required fields
     if (!customer || !shippingAddress || !items || items.length === 0) {
@@ -123,7 +123,8 @@ router.post("/create", async (req, res) => {
       totalAmount, 
       couponCode, 
       paymentMethod,
-      paymentStatus: paymentMethod === "cod" ? "pending" : "paid",
+      razorpayPaymentId: razorpayPaymentId || "",
+      paymentStatus: (paymentMethod === "cod" || paymentMethod === "qr") ? "pending" : "paid",
       orderStatus: "pending",
       statusHistory: [{ status: "pending", note: "Order placed successfully" }]
     };
