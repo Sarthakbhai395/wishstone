@@ -1033,105 +1033,205 @@ function Hero({ onShop, onRitual }) {
   };
   const onTouchEnd = () => setDragging(false);
 
-  return (
-    <section style={{ minHeight: "100vh", background: T.bg, display: "flex", alignItems: "center", paddingTop: 80, paddingBottom: 40, paddingLeft: "clamp(1rem,5vw,3.5rem)", paddingRight: "clamp(1rem,5vw,3.5rem)", position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", top: "18%", right: "6%", width: 8, height: 8, borderRadius: "50%", background: "#4C5A43", opacity: 0.5 }} />
-      <div style={{ position: "absolute", bottom: "28%", right: "32%", width: 6, height: 6, borderRadius: "50%", background: "#4C5A43", opacity: 0.4 }} />
+  const heroCss = `
+    /* ── HERO MOBILE LAYOUT ── */
+    @media(max-width:768px){
+      .hero-desktop-only { display:none !important; }
+      .hero-mobile-section {
+        display:flex !important;
+        flex-direction:column;
+        min-height:100svh;
+        padding:0 !important;
+        overflow:hidden;
+      }
+      .hero-mobile-top {
+        padding: 80px 1.4rem 1.4rem;
+        flex:1;
+        display:flex;
+        flex-direction:column;
+        justify-content:flex-start;
+        position:relative;
+        z-index:2;
+      }
+      .hero-mobile-stone-wrap {
+        display:flex !important;
+        position:relative;
+        width:100%;
+        min-height:52vw;
+        overflow:hidden;
+        flex-shrink:0;
+      }
+    }
+    @media(min-width:769px){
+      .hero-mobile-section-wrapper { display:none !important; }
+    }
+    @keyframes heroScrollBounce {
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(6px)}
+    }
+  `;
 
-      <div className="max-w hero-grid" style={{ width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2.5rem", alignItems: "center" }}>
-        {/* LEFT: Text — fully centered */}
-        <div className="hero-text-col" style={{ animation: "fadeUp 0.8s ease both", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(76, 90, 67, 0.08)", border: `1px solid rgba(76, 90, 67, 0.22)`, borderRadius: 20, paddingTop: 5, paddingBottom: 5, paddingLeft: 14, paddingRight: 14, marginBottom: "1.2rem" }}>
-            <span style={{ color: "#4C5A43", fontSize: 10 }}>✦</span>
-            <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#4C5A43", letterSpacing: "0.18em", textTransform: "uppercase" }}>India's Sacred Manifestation Stone</span>
+  /* ── DESKTOP HERO (unchanged) ── */
+  const desktopHero = (
+    <section className="hero-desktop-only" style={{ minHeight:"100vh", background:T.bg, display:"flex", alignItems:"center", paddingTop:80, paddingBottom:40, paddingLeft:"clamp(1rem,5vw,3.5rem)", paddingRight:"clamp(1rem,5vw,3.5rem)", position:"relative", overflow:"hidden" }}>
+      <div style={{ position:"absolute", top:"18%", right:"6%", width:8, height:8, borderRadius:"50%", background:"#4C5A43", opacity:0.5 }} />
+      <div style={{ position:"absolute", bottom:"28%", right:"32%", width:6, height:6, borderRadius:"50%", background:"#4C5A43", opacity:0.4 }} />
+      <div className="max-w hero-grid" style={{ width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2.5rem", alignItems:"center" }}>
+        {/* LEFT */}
+        <div style={{ animation:"fadeUp 0.8s ease both", display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center" }}>
+          <div style={{ display:"inline-flex", alignItems:"center", gap:7, background:"rgba(76,90,67,0.08)", border:"1px solid rgba(76,90,67,0.22)", borderRadius:20, paddingTop:5, paddingBottom:5, paddingLeft:14, paddingRight:14, marginBottom:"1.2rem" }}>
+            <span style={{ color:"#4C5A43", fontSize:10 }}>✦</span>
+            <span style={{ fontSize:"0.65rem", fontWeight:700, color:"#4C5A43", letterSpacing:"0.18em", textTransform:"uppercase" }}>India's Sacred Manifestation Stone</span>
           </div>
-
-          <h1 style={{ fontSize: "clamp(2.2rem,5.2vw,3.8rem)", fontWeight: 900, lineHeight: 1.18, letterSpacing: "-0.02em", marginBottom: "1.2rem", color: T.text }}>
+          <h1 style={{ fontSize:"clamp(2.2rem,5.2vw,3.8rem)", fontWeight:900, lineHeight:1.18, letterSpacing:"-0.02em", marginBottom:"1.2rem", color:T.text }}>
             Turn Intentions <br />
-            <span style={{ color: "#4C5A43", fontStyle: "italic" }}>into Reality</span>
+            <span style={{ color:"#4C5A43", fontStyle:"italic" }}>into Reality</span>
           </h1>
-
-          {/* Mobile divider with sparkle */}
-          <div className="hero-divider-mobile" style={{ alignItems: "center", gap: 8, margin: "0.8rem 0", width: "100%" }}>
-            <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg,#4C5A43,transparent)" }} />
-            <span style={{ color: "#4C5A43", fontSize: 10 }}>✦</span>
-          </div>
-
-          <p style={{ fontSize: "clamp(0.85rem,1.2vw,0.96rem)", color: T.textMid, lineHeight: 1.6, marginBottom: "1.6rem", maxWidth: 500 }}>
+          <p style={{ fontSize:"clamp(0.85rem,1.2vw,0.96rem)", color:T.textMid, lineHeight:1.6, marginBottom:"1.6rem", maxWidth:500 }}>
             Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
           </p>
-
-          {/* 2x2 Grid of Pillars */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 20px", maxWidth: 480, marginBottom: "2rem", textAlign: "left" }}>
-            {[
-
-            ].map((item, idx) => (
-              <div key={idx} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: "1rem" }}>{item.icon}</span>
-                <span style={{ fontSize: "0.78rem", fontWeight: 600, color: T.textMid }}>{item.text}</span>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ display: "flex", gap: "0.8rem", flexWrap: "wrap", justifyContent: "center", width: "100%" }}>
-            <button className="btn-orange" onClick={onShop} style={{ paddingTop: 13, paddingBottom: 13, paddingLeft: 26, paddingRight: 26, fontSize: "0.82rem", borderRadius: 8 }}>Begin Your Journey</button>
-            <button className="btn-outline" onClick={onRitual} style={{ paddingTop: 13, paddingBottom: 13, paddingLeft: 26, paddingRight: 26, fontSize: "0.82rem", borderRadius: 8 }}>The Ritual</button>
+          <div style={{ display:"flex", gap:"0.8rem", flexWrap:"wrap", justifyContent:"center" }}>
+            <button className="btn-orange" onClick={onShop} style={{ paddingTop:13, paddingBottom:13, paddingLeft:26, paddingRight:26, fontSize:"0.82rem", borderRadius:8 }}>Begin Your Journey</button>
+            <button className="btn-outline" onClick={onRitual} style={{ paddingTop:13, paddingBottom:13, paddingLeft:26, paddingRight:26, fontSize:"0.82rem", borderRadius:8 }}>The Ritual</button>
           </div>
         </div>
-
-        {/* RIGHT: 3D Interactive Stone */}
-        <div className="hero-right-col" style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", minHeight: "clamp(320px,45vw,520px)", perspective: "900px" }}
+        {/* RIGHT: 3D Stone */}
+        <div style={{ position:"relative", display:"flex", alignItems:"center", justifyContent:"center", minHeight:"clamp(320px,45vw,520px)", perspective:"900px" }}
           onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}>
-          <div style={{ position: "absolute", bottom: 8, left: "50%", transform: "translateX(-50%)", fontSize: "0.62rem", color: T.textMid, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 600, opacity: 0.6, whiteSpace: "nowrap", zIndex: 10 }}>↔ Drag to rotate</div>
+          <div style={{ position:"absolute", bottom:8, left:"50%", transform:"translateX(-50%)", fontSize:"0.62rem", color:T.textMid, letterSpacing:"0.1em", textTransform:"uppercase", fontWeight:600, opacity:0.6, whiteSpace:"nowrap", zIndex:10 }}>↔ Drag to rotate</div>
           <div onMouseDown={onMouseDown} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
-            style={{ position: "relative", zIndex: 2, transformStyle: "preserve-3d", transform: autoAnim ? undefined : `rotateX(${rot.x}deg) rotateY(${rot.y}deg)`, animation: autoAnim ? "stone3d 8s ease-in-out infinite" : "none", cursor: dragging ? "grabbing" : "grab", transition: dragging ? "none" : "transform 0.4s ease", userSelect: "none" }}>
-            <div style={{ width: "clamp(190px,24vw,300px)", height: "clamp(230px,30vw,360px)", borderRadius: "50% 50% 48% 52% / 55% 55% 45% 45%", background: "radial-gradient(ellipse at 32% 28%, #f5b070 0%, #38271a 40%, #120c08 65%, #181716 100%)", boxShadow: "0 40px 100px rgba(76,90,67,0.55), 0 0 0 1px rgba(76,90,67,0.12), inset 0 -25px 50px rgba(0,0,0,0.25), inset 0 12px 35px rgba(255,210,130,0.35)", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", top: "18%", left: "22%", width: "35%", height: "28%", borderRadius: "50%", background: "radial-gradient(circle, rgba(255,230,180,0.75) 0%, transparent 70%)", filter: "blur(6px)" }} />
-              <div style={{ position: "absolute", top: "10%", left: "15%", width: "20%", height: "14%", borderRadius: "50%", background: "rgba(255,245,220,0.45)", filter: "blur(4px)" }} />
-              <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "35%", background: "linear-gradient(to top, rgba(0,0,0,0.3), transparent)", borderRadius: "0 0 50% 50%" }} />
+            style={{ position:"relative", zIndex:2, transformStyle:"preserve-3d", transform:autoAnim?undefined:`rotateX(${rot.x}deg) rotateY(${rot.y}deg)`, animation:autoAnim?"stone3d 8s ease-in-out infinite":"none", cursor:dragging?"grabbing":"grab", transition:dragging?"none":"transform 0.4s ease", userSelect:"none" }}>
+            <div style={{ width:"clamp(190px,24vw,300px)", height:"clamp(230px,30vw,360px)", borderRadius:"50% 50% 48% 52% / 55% 55% 45% 45%", background:"radial-gradient(ellipse at 32% 28%, #f5b070 0%, #38271a 40%, #120c08 65%, #181716 100%)", boxShadow:"0 40px 100px rgba(76,90,67,0.55), 0 0 0 1px rgba(76,90,67,0.12), inset 0 -25px 50px rgba(0,0,0,0.25), inset 0 12px 35px rgba(255,210,130,0.35)", position:"relative", overflow:"hidden" }}>
+              <div style={{ position:"absolute", top:"18%", left:"22%", width:"35%", height:"28%", borderRadius:"50%", background:"radial-gradient(circle, rgba(255,230,180,0.75) 0%, transparent 70%)", filter:"blur(6px)" }} />
+              <div style={{ position:"absolute", top:"10%", left:"15%", width:"20%", height:"14%", borderRadius:"50%", background:"rgba(255,245,220,0.45)", filter:"blur(4px)" }} />
+              <div style={{ position:"absolute", bottom:0, left:0, right:0, height:"35%", background:"linear-gradient(to top, rgba(0,0,0,0.3), transparent)", borderRadius:"0 0 50% 50%" }} />
             </div>
-            <div style={{ position: "absolute", bottom: -18, left: "50%", transform: "translateX(-50%)", width: "70%", height: 20, borderRadius: "50%", background: "rgba(76,90,67,0.22)", filter: "blur(10px)" }} />
+            <div style={{ position:"absolute", bottom:-18, left:"50%", transform:"translateX(-50%)", width:"70%", height:20, borderRadius:"50%", background:"rgba(76,90,67,0.22)", filter:"blur(10px)" }} />
           </div>
-          <div className="hero-badge" style={{ position: "absolute", top: "14%", left: "0%", background: "rgba(255,255,255,0.75)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.4)", borderRadius: 14, paddingTop: 10, paddingBottom: 10, paddingLeft: 14, paddingRight: 14, boxShadow: "0 8px 32px rgba(0,0,0,0.08)", display: "flex", alignItems: "center", gap: 10, minWidth: 148, zIndex: 3, animation: "badgeFloat1 4s ease-in-out infinite" }}>
-            <div style={{ width: 36, height: 36, borderRadius: 9, background: "linear-gradient(135deg,#6C7E61,#4C5A43)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>🧘</div>
-            <div><div style={{ fontSize: "0.78rem", fontWeight: 700, color: T.text, whiteSpace: "nowrap" }}>Mental Peace</div><div style={{ fontSize: "0.63rem", color: T.textMid }}>Inner Clarity</div></div>
+          <div className="hero-badge" style={{ position:"absolute", top:"14%", left:"0%", background:"rgba(255,255,255,0.75)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(255,255,255,0.4)", borderRadius:14, paddingTop:10, paddingBottom:10, paddingLeft:14, paddingRight:14, boxShadow:"0 8px 32px rgba(0,0,0,0.08)", display:"flex", alignItems:"center", gap:10, minWidth:148, zIndex:3, animation:"badgeFloat1 4s ease-in-out infinite" }}>
+            <div style={{ width:36, height:36, borderRadius:9, background:"linear-gradient(135deg,#6C7E61,#4C5A43)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>🧘</div>
+            <div><div style={{ fontSize:"0.78rem", fontWeight:700, color:T.text, whiteSpace:"nowrap" }}>Mental Peace</div><div style={{ fontSize:"0.63rem", color:T.textMid }}>Inner Clarity</div></div>
           </div>
-          <div className="hero-badge" style={{ position: "absolute", top: "40%", right: "-4%", background: "rgba(255,255,255,0.75)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.4)", borderRadius: 14, paddingTop: 10, paddingBottom: 10, paddingLeft: 14, paddingRight: 14, boxShadow: "0 8px 32px rgba(0,0,0,0.08)", display: "flex", alignItems: "center", gap: 10, minWidth: 158, zIndex: 3, animation: "badgeFloat2 4.5s ease-in-out infinite" }}>
-            <div style={{ width: 36, height: 36, borderRadius: 9, background: "linear-gradient(135deg,#7E8F73,#5F6E54)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>🎯</div>
-            <div><div style={{ fontSize: "0.78rem", fontWeight: 700, color: T.text, whiteSpace: "nowrap" }}>Manifestation</div><div style={{ fontSize: "0.63rem", color: T.textMid }}>Intention Setting</div></div>
+          <div className="hero-badge" style={{ position:"absolute", top:"40%", right:"-4%", background:"rgba(255,255,255,0.75)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(255,255,255,0.4)", borderRadius:14, paddingTop:10, paddingBottom:10, paddingLeft:14, paddingRight:14, boxShadow:"0 8px 32px rgba(0,0,0,0.08)", display:"flex", alignItems:"center", gap:10, minWidth:158, zIndex:3, animation:"badgeFloat2 4.5s ease-in-out infinite" }}>
+            <div style={{ width:36, height:36, borderRadius:9, background:"linear-gradient(135deg,#7E8F73,#5F6E54)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>🎯</div>
+            <div><div style={{ fontSize:"0.78rem", fontWeight:700, color:T.text, whiteSpace:"nowrap" }}>Manifestation</div><div style={{ fontSize:"0.63rem", color:T.textMid }}>Intention Setting</div></div>
           </div>
-          <div className="hero-badge" style={{ position: "absolute", bottom: "12%", left: "4%", background: "rgba(255,255,255,0.75)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.4)", borderRadius: 14, paddingTop: 10, paddingBottom: 10, paddingLeft: 14, paddingRight: 14, boxShadow: "0 8px 32px rgba(0,0,0,0.08)", display: "flex", alignItems: "center", gap: 10, minWidth: 148, zIndex: 3, animation: "badgeFloat3 5s ease-in-out infinite" }}>
-            <div style={{ width: 36, height: 36, borderRadius: 9, background: "linear-gradient(135deg,#8D9F83,#6D7F64)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 17, flexShrink: 0 }}>✨</div>
-            <div><div style={{ fontSize: "0.78rem", fontWeight: 700, color: T.text, whiteSpace: "nowrap" }}>Positive Energy</div><div style={{ fontSize: "0.63rem", color: T.textMid }}>Mindfulness</div></div>
-          </div>
-
-          {/* Mobile badges: displayed in a clean row below the 3D stone on small devices */}
-          <div className="hero-mobile-badges" style={{ gap: "10px", marginTop: "2rem", justifyContent: "center", flexWrap: "wrap", width: "100%" }}>
-            <div style={{ background: "rgba(255, 255, 255, 0.85)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", borderRadius: 14, paddingTop: 8, paddingBottom: 8, paddingLeft: 12, paddingRight: 12, boxShadow: "0 8px 24px rgba(0,0,0,0.05)", display: "flex", alignItems: "center", gap: 10, border: "1px solid rgba(255, 255, 255, 0.4)" }}>
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,#6C7E61,#4C5A43)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}>🧘</div>
-              <div style={{ textAlign: "left" }}>
-                <div style={{ fontSize: "0.72rem", fontWeight: 700, color: T.text, whiteSpace: "nowrap" }}>Mental Peace</div>
-                <div style={{ fontSize: "0.58rem", color: T.textMid }}>Inner Clarity</div>
-              </div>
-            </div>
-            <div style={{ background: "rgba(255, 255, 255, 0.85)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", borderRadius: 14, paddingTop: 8, paddingBottom: 8, paddingLeft: 12, paddingRight: 12, boxShadow: "0 8px 24px rgba(0,0,0,0.05)", display: "flex", alignItems: "center", gap: 10, border: "1px solid rgba(255, 255, 255, 0.4)" }}>
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,#7E8F73,#5F6E54)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}>🎯</div>
-              <div style={{ textAlign: "left" }}>
-                <div style={{ fontSize: "0.72rem", fontWeight: 700, color: T.text, whiteSpace: "nowrap" }}>Manifestation</div>
-                <div style={{ fontSize: "0.58rem", color: T.textMid }}>Intention Setting</div>
-              </div>
-            </div>
-            <div style={{ background: "rgba(255, 255, 255, 0.85)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", borderRadius: 14, paddingTop: 8, paddingBottom: 8, paddingLeft: 12, paddingRight: 12, boxShadow: "0 8px 24px rgba(0,0,0,0.05)", display: "flex", alignItems: "center", gap: 10, border: "1px solid rgba(255, 255, 255, 0.4)" }}>
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,#8D9F83,#6D7F64)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}>✨</div>
-              <div style={{ textAlign: "left" }}>
-                <div style={{ fontSize: "0.72rem", fontWeight: 700, color: T.text, whiteSpace: "nowrap" }}>Positive Energy</div>
-                <div style={{ fontSize: "0.58rem", color: T.textMid }}>Mindfulness</div>
-              </div>
-            </div>
+          <div className="hero-badge" style={{ position:"absolute", bottom:"12%", left:"4%", background:"rgba(255,255,255,0.75)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(255,255,255,0.4)", borderRadius:14, paddingTop:10, paddingBottom:10, paddingLeft:14, paddingRight:14, boxShadow:"0 8px 32px rgba(0,0,0,0.08)", display:"flex", alignItems:"center", gap:10, minWidth:148, zIndex:3, animation:"badgeFloat3 5s ease-in-out infinite" }}>
+            <div style={{ width:36, height:36, borderRadius:9, background:"linear-gradient(135deg,#8D9F83,#6D7F64)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>✨</div>
+            <div><div style={{ fontSize:"0.78rem", fontWeight:700, color:T.text, whiteSpace:"nowrap" }}>Positive Energy</div><div style={{ fontSize:"0.63rem", color:T.textMid }}>Mindfulness</div></div>
           </div>
         </div>
       </div>
     </section>
+  );
+
+  /* ── MOBILE HERO ── */
+  const mobileHero = (
+    <div className="hero-mobile-section-wrapper" style={{ display:"none" }}>
+      <section className="hero-mobile-section" style={{ background:T.bg, position:"relative" }}>
+
+        {/* TOP — text content */}
+        <div className="hero-mobile-top">
+          {/* Sparkle star */}
+          <div style={{ marginBottom:"1rem" }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2 L13.5 10 L22 12 L13.5 14 L12 22 L10.5 14 L2 12 L10.5 10 Z" fill="#8D7A5B" opacity="0.85"/>
+            </svg>
+          </div>
+
+          {/* Badge label */}
+          <div style={{ marginBottom:"0.7rem" }}>
+            <span style={{ fontSize:"0.72rem", color:T.textMid, fontWeight:500 }}>India's <span style={{ color:"#8D7A5B", fontStyle:"italic", fontWeight:600 }}>Sacred</span> Manifestation Stone</span>
+          </div>
+
+          {/* Big heading */}
+          <h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.6rem,10vw,3.4rem)", fontWeight:900, lineHeight:1.1, letterSpacing:"-0.02em", color:"#1a1a1a", marginBottom:"0.6rem" }}>
+            Turn<br />Intentions<br /><span style={{ color:"#8D7A5B", fontStyle:"italic" }}>into <span style={{ color:"#8D7A5B" }}>Reality</span></span><span style={{ color:"#8D7A5B", fontSize:"0.55em", verticalAlign:"super", fontStyle:"normal" }}>✦</span>
+          </h1>
+
+          {/* Thin divider with sparkle */}
+          <div style={{ display:"flex", alignItems:"center", gap:8, margin:"0.9rem 0" }}>
+            <div style={{ flex:1, height:1, background:"linear-gradient(90deg,#8D7A5B,rgba(141,122,91,0.15))" }} />
+            <span style={{ color:"#8D7A5B", fontSize:9 }}>✦</span>
+            <div style={{ width:24, height:1, background:"rgba(141,122,91,0.15)" }} />
+          </div>
+
+          {/* Paragraph */}
+          <p style={{ fontSize:"0.88rem", color:"#4a4a4a", lineHeight:1.65, marginBottom:"1.4rem", maxWidth:340 }}>
+            Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
+          </p>
+
+          {/* CTA Button */}
+          <button
+            onClick={onRitual}
+            style={{ display:"inline-flex", alignItems:"center", gap:10, background:"#2C3320", color:"#fff", border:"none", padding:"13px 22px", borderRadius:8, fontSize:"0.88rem", fontWeight:600, cursor:"pointer", fontFamily:"'Inter',sans-serif", letterSpacing:"0.02em", transition:"all 0.25s" }}
+            onMouseEnter={e => e.currentTarget.style.background="#3a4329"}
+            onMouseLeave={e => e.currentTarget.style.background="#2C3320"}
+          >
+            Explore Rituals
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+
+        {/* BOTTOM — stone visual area (CSS stone + decorative leaf shadow bg) */}
+        <div className="hero-mobile-stone-wrap" style={{ display:"flex", position:"relative", width:"100%", minHeight:"55vw", overflow:"hidden", flexShrink:0 }}>
+          {/* Warm beige bg */}
+          <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at 60% 30%, #e8dfd0 0%, #d4c9b8 50%, #c8baa8 100%)" }} />
+
+          {/* Leaf shadow SVG overlay — top right */}
+          <div style={{ position:"absolute", top:0, right:0, width:"55%", height:"100%", opacity:0.45, pointerEvents:"none" }}>
+            <svg viewBox="0 0 200 280" width="100%" height="100%" preserveAspectRatio="xMaxYMin meet">
+              <path d="M180,0 Q120,40 100,80 Q80,120 110,160 Q140,200 120,240 Q100,270 90,280" stroke="#5a6b45" strokeWidth="1.5" fill="none" opacity="0.5"/>
+              <ellipse cx="150" cy="35" rx="28" ry="14" fill="#6b7d56" transform="rotate(-25 150 35)" opacity="0.55"/>
+              <ellipse cx="130" cy="60" rx="26" ry="12" fill="#5a6b45" transform="rotate(-35 130 60)" opacity="0.5"/>
+              <ellipse cx="155" cy="85" rx="30" ry="13" fill="#6b7d56" transform="rotate(-20 155 85)" opacity="0.52"/>
+              <ellipse cx="125" cy="110" rx="24" ry="11" fill="#5a6b45" transform="rotate(-40 125 110)" opacity="0.48"/>
+              <ellipse cx="148" cy="135" rx="28" ry="12" fill="#6b7d56" transform="rotate(-18 148 135)" opacity="0.5"/>
+              <ellipse cx="120" cy="160" rx="22" ry="10" fill="#5a6b45" transform="rotate(-38 120 160)" opacity="0.45"/>
+              <ellipse cx="145" cy="182" rx="26" ry="11" fill="#6b7d56" transform="rotate(-22 145 182)" opacity="0.48"/>
+              <ellipse cx="118" cy="208" rx="20" ry="9" fill="#5a6b45" transform="rotate(-42 118 208)" opacity="0.42"/>
+            </svg>
+          </div>
+
+          {/* Large circle / moon bg behind stone */}
+          <div style={{ position:"absolute", right:"-5%", top:"50%", transform:"translateY(-50%)", width:"75vw", height:"75vw", maxWidth:320, maxHeight:320, borderRadius:"50%", background:"rgba(210,198,178,0.55)", pointerEvents:"none" }} />
+
+          {/* CSS Stone — realistic dark stone on sand-colored slab */}
+          <div style={{ position:"absolute", bottom:0, right:"8%", width:"58%", height:"100%", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"flex-end", paddingBottom:"4%" }}>
+            {/* Slab */}
+            <div style={{ position:"relative", width:"88%", display:"flex", flexDirection:"column", alignItems:"center" }}>
+              {/* Stone */}
+              <div style={{ width:"52%", aspectRatio:"1.3/1", borderRadius:"50% 48% 52% 50% / 48% 52% 48% 52%", background:"radial-gradient(ellipse at 38% 30%, #7a7a72 0%, #4a4a44 35%, #2e2e2a 65%, #1e1e1a 100%)", boxShadow:"0 18px 48px rgba(0,0,0,0.42), inset 0 -10px 22px rgba(0,0,0,0.3), inset 0 8px 18px rgba(255,255,255,0.07)", position:"relative", marginBottom:"-2%" }}>
+                {/* White line across stone */}
+                <div style={{ position:"absolute", top:"44%", left:"18%", width:"64%", height:2, background:"rgba(255,255,255,0.32)", borderRadius:2, transform:"rotate(-3deg)" }} />
+                {/* Highlight */}
+                <div style={{ position:"absolute", top:"20%", left:"25%", width:"30%", height:"22%", borderRadius:"50%", background:"radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%)", filter:"blur(3px)" }} />
+                {/* Shadow below stone */}
+                <div style={{ position:"absolute", bottom:-8, left:"15%", width:"70%", height:10, borderRadius:"50%", background:"rgba(0,0,0,0.22)", filter:"blur(6px)" }} />
+              </div>
+              {/* Slab base */}
+              <div style={{ width:"100%", height:"clamp(28px,8vw,44px)", background:"linear-gradient(180deg, #c8b99a 0%, #b8a88a 50%, #a89878 100%)", borderRadius:"6px 6px 4px 4px", boxShadow:"0 8px 24px rgba(0,0,0,0.18), inset 0 2px 6px rgba(255,255,255,0.15)", position:"relative" }}>
+                <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:"rgba(255,255,255,0.18)", borderRadius:"6px 6px 0 0" }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Scroll indicator */}
+          <div style={{ position:"absolute", bottom:12, left:"50%", transform:"translateX(-50%)", display:"flex", flexDirection:"column", alignItems:"center", gap:5 }}>
+            <div style={{ width:1, height:18, background:"rgba(76,90,67,0.35)", borderRadius:1 }} />
+            <span style={{ fontSize:"0.55rem", fontWeight:700, color:"rgba(76,90,67,0.55)", letterSpacing:"0.2em", textTransform:"uppercase" }}>SCROLL</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+
+  return (
+    <>
+      <style>{heroCss}</style>
+      {desktopHero}
+      {mobileHero}
+    </>
   );
 }
 
