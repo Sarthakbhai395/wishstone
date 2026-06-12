@@ -339,8 +339,10 @@ const GLOBAL_CSS = `
     from{opacity:0;transform:translateX(32px) scale(0.98);}
     to{opacity:1;transform:translateX(0) scale(1);}
   }
-  .nav-link{background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#1a1a1a;padding:4px 0;transition:color 0.2s;}
+  .nav-link{background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#1a1a1a;padding:4px 0;transition:color 0.2s;position:relative;overflow:hidden;}
   .nav-link:hover,.nav-link.active{color:var(--accent-color, #4C5A43);}
+  .nav-link::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(76,90,67,0.15),transparent);transition:left 0.4s ease;pointer-events:none;}
+  .nav-link:hover::after{left:140%;}
   @keyframes navShine {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
@@ -433,6 +435,9 @@ const GLOBAL_CSS = `
     .profile-grid{grid-template-columns:1fr !important;}
     .profile-info-grid{grid-template-columns:1fr !important;}
     .prod-detail-grid{grid-template-columns:1fr !important; gap:1.5rem !important;}
+    .hero-text-col{text-align:left !important; align-items:flex-start !important;}
+    .hero-divider-mobile{display:flex !important;}
+    .hero-right-col{justify-content:center; margin-top:2rem;}
   }
   @media(max-width:600px){
     .prod-grid{grid-template-columns:1fr !important;}
@@ -541,7 +546,9 @@ const GLOBAL_CSS = `
   .sidebar-promo-glass:hover .shine-effect {
     left: 150% !important;
     transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  }`;
+  }
+  .hero-text-col { text-align: center; display: flex; flex-direction: column; align-items: center; }
+  .hero-divider-mobile { display: none; }`;
 
 // ─── HEADER ───────────────────────────────────────────────────
 function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
@@ -1033,7 +1040,7 @@ function Hero({ onShop, onRitual }) {
 
       <div className="max-w hero-grid" style={{ width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2.5rem", alignItems: "center" }}>
         {/* LEFT: Text — fully centered */}
-        <div style={{ animation: "fadeUp 0.8s ease both", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+        <div className="hero-text-col" style={{ animation: "fadeUp 0.8s ease both", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(76, 90, 67, 0.08)", border: `1px solid rgba(76, 90, 67, 0.22)`, borderRadius: 20, paddingTop: 5, paddingBottom: 5, paddingLeft: 14, paddingRight: 14, marginBottom: "1.2rem" }}>
             <span style={{ color: "#4C5A43", fontSize: 10 }}>✦</span>
             <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#4C5A43", letterSpacing: "0.18em", textTransform: "uppercase" }}>India's Sacred Manifestation Stone</span>
@@ -1043,6 +1050,12 @@ function Hero({ onShop, onRitual }) {
             Turn Intentions <br />
             <span style={{ color: "#4C5A43", fontStyle: "italic" }}>into Reality</span>
           </h1>
+
+          {/* Mobile divider with sparkle */}
+          <div className="hero-divider-mobile" style={{ alignItems: "center", gap: 8, margin: "0.8rem 0", width: "100%" }}>
+            <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg,#4C5A43,transparent)" }} />
+            <span style={{ color: "#4C5A43", fontSize: 10 }}>✦</span>
+          </div>
 
           <p style={{ fontSize: "clamp(0.85rem,1.2vw,0.96rem)", color: T.textMid, lineHeight: 1.6, marginBottom: "1.6rem", maxWidth: 500 }}>
             Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
@@ -1060,7 +1073,7 @@ function Hero({ onShop, onRitual }) {
             ))}
           </div>
 
-          <div style={{ display: "flex", gap: "0.8rem", flexWrap: "wrap", justifyContent: "center" }}>
+          <div style={{ display: "flex", gap: "0.8rem", flexWrap: "wrap", justifyContent: "center", width: "100%" }}>
             <button className="btn-orange" onClick={onShop} style={{ paddingTop: 13, paddingBottom: 13, paddingLeft: 26, paddingRight: 26, fontSize: "0.82rem", borderRadius: 8 }}>Begin Your Journey</button>
             <button className="btn-outline" onClick={onRitual} style={{ paddingTop: 13, paddingBottom: 13, paddingLeft: 26, paddingRight: 26, fontSize: "0.82rem", borderRadius: 8 }}>The Ritual</button>
           </div>
@@ -2548,7 +2561,9 @@ function BestSellersStrip({ onShop }) {
                 onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-5px)"; e.currentTarget.style.boxShadow = "0 16px 32px rgba(76,90,67,0.08)"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
                 <div style={{ position: "relative", aspectRatio: "1", overflow: "hidden" }}>
-                  <img referrerPolicy="no-referrer" src={p.image || p.images?.[0]} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <img referrerPolicy="no-referrer" src={p.image || p.images?.[0] || ""} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    onError={e => { e.currentTarget.onerror = null; e.currentTarget.style.display = "none"; if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = "flex"; }} />
+                  <div style={{ width: "100%", height: "100%", background: "#ece9e3", display: "none", alignItems: "center", justifyContent: "center", fontSize: 32, color: "#5A6651" }}>◆</div>
                   {((p.discount !== undefined && p.discount !== null) || (p.originalPrice > p.price)) && (
                     <div style={{ position: "absolute", top: 8, left: 8, background: "#4C5A43", color: "#fff", borderRadius: 4, padding: "2px 8px", fontSize: "0.6rem", fontWeight: 800 }}>
                       -{p.discount ?? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)}%
@@ -2873,10 +2888,9 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
                   <div className="ws-card-img">
                     {p.image ? (
                       <img src={p.image} alt={p.name} referrerPolicy="no-referrer"
-                        onError={e => { e.currentTarget.style.display = "none"; }} />
-                    ) : (
-                      <div style={{ width: "100%", height: "100%", background: "#ece9e3", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36, color: G }}>◆</div>
-                    )}
+                        onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = ""; e.currentTarget.style.display = "none"; if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = "flex"; }} />
+                    ) : null}
+                    <div style={{ width: "100%", height: "100%", background: "#ece9e3", display: p.image ? "none" : "flex", alignItems: "center", justifyContent: "center", fontSize: 36, color: G }}>◆</div>
                     {p.discount > 0 && (
                       <div style={{ position: "absolute", top: 10, left: 10, background: G, color: "#fff", borderRadius: 6, padding: "3px 9px", fontSize: "0.68rem", fontWeight: 700, zIndex: 2 }}>
                         -{p.discount}%
@@ -2890,7 +2904,7 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
                     </button>
                   </div>
 
-                  {/* RIGHT — Details */}
+                  {/* RIGHT — Details (Minimal) */}
                   <div className="ws-card-body">
                     {p.isBestSeller && (
                       <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: "0.35rem" }}>
@@ -2900,21 +2914,19 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
                     )}
                     <h3 style={{ fontSize: "clamp(0.92rem,1.4vw,1.05rem)", fontWeight: 600, color: "#2c2c2c", marginBottom: "0.28rem", lineHeight: 1.25 }}>{p.name}</h3>
                     <div style={{ width: 22, height: 2, background: G, borderRadius: 2, marginBottom: "0.4rem", opacity: 0.55 }} />
-                    {p.shortDesc && (
-                      <p style={{ fontSize: "0.68rem", color: "#8a8a7a", lineHeight: 1.6, marginBottom: "0.5rem" }}>
-                        {p.shortDesc.slice(0, 75)}{p.shortDesc.length > 75 ? "…" : ""}
-                      </p>
-                    )}
-                    {p.benefits && p.benefits.length > 0 && (
-                      <div style={{ display: "flex", alignItems: "stretch", justifyContent: "space-around", gap: "4px", margin: "8px 0", padding: "6px 0", borderTop: "1px dashed rgba(90,102,81,0.15)", borderBottom: "1px dashed rgba(90,102,81,0.15)" }}>
-                        {p.benefits.slice(0, 3).map((b, i) => (
-                          <div key={i} style={{ display: "flex", flex: 1, flexDirection: "column", alignItems: "center", gap: 3, padding: "0 2px", borderRight: i < Math.min(p.benefits.length, 3) - 1 ? "1px solid rgba(90,102,81,0.15)" : "none" }}>
-                            <BenefitIcon idx={i} />
-                            <span style={{ fontSize: "0.58rem", color: "#5A6651", textAlign: "center", lineHeight: 1.2, fontWeight: 600, wordBreak: "break-word" }}>{b}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    <p style={{ fontSize: "0.72rem", color: G, fontWeight: 700, letterSpacing: "0.06em", marginBottom: "0.6rem", fontStyle: "italic" }}>
+                      {(() => {
+                        const n = (p.name || "").toLowerCase();
+                        if (n.includes("wishstone")) return "Deep Calm";
+                        if (n.includes("cosmic")) return "Pure Focus";
+                        if (n.includes("diffuser") || n.includes("reed")) return "Vital Energy";
+                        if (n.includes("camphor") || n.includes("kapoor")) return "Sacred Purity";
+                        if (n.includes("habit")) return "Inner Growth";
+                        if (n.includes("candle")) return "Warm Glow";
+                        if (n.includes("incense")) return "Soul Cleanse";
+                        return "Sacred Energy";
+                      })()}
+                    </p>
                     <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginBottom: "0.55rem" }}>
                       <span style={{ fontSize: "clamp(1rem,1.6vw,1.2rem)", fontWeight: 700, color: "#2c2c2c" }}>₹{p.price.toLocaleString("en-IN")}</span>
                       {p.originalPrice > p.price && <span style={{ fontSize: "0.75rem", color: "#b0a89a", textDecoration: "line-through" }}>₹{p.originalPrice.toLocaleString("en-IN")}</span>}
@@ -3475,17 +3487,16 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                 </div>
               </div>
 
-              {/* Thumbnail Strip - Nike Style */}
+              {/* Thumbnail Strip — Square Boxes, Max 4, Fill Width */}
               <div style={{
                 display: "flex",
-                gap: "0.9rem",
-                overflowX: "auto",
-                padding: "8px 4px",
-                justifyContent: imgs.length >= 3 ? "space-between" : "flex-start",
+                gap: "0.5rem",
+                padding: "8px 0",
+                justifyContent: "stretch",
                 alignItems: "center",
                 width: "100%"
               }} className="scroll-hide ep-thumb-strip">
-                {imgs.map((img, i) => (
+                {imgs.slice(0, 4).map((img, i) => (
                   <motion.div
                     key={i}
                     role="button"
@@ -3493,24 +3504,20 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                       isProgrammaticScroll.current = true;
                       setActiveImg(i);
                     }}
-                    variants={thumbnailVariants}
-                    initial="idle"
-                    whileHover="hover"
-                    whileTap="tap"
-                    animate={activeImg === i ? { scale: 1.02, y: -2 } : { scale: 1, y: 0 }}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
                     transition={{ duration: 0.2 }}
                     className={`ep-thumb-btn ${activeImg === i ? "active" : ""}`}
                     style={{
-                      flex: imgs.length >= 3 ? "1 1 0px" : "0 0 120px",
-                      maxWidth: imgs.length >= 3 ? "none" : "120px",
+                      flex: "1 1 0px",
                       aspectRatio: "1 / 1",
-                      borderRadius: 14,
+                      borderRadius: 8,
                       overflow: "hidden",
-                      padding: 4,
+                      padding: 3,
                       background: activeImg === i ? "#ffffff" : "transparent",
                       cursor: "pointer",
-                      boxShadow: activeImg === i ? "0 8px 24px rgba(90,102,81,0.15)" : "0 2px 8px rgba(0,0,0,0.04)",
-                      position: "relative"
+                      boxShadow: activeImg === i ? "0 4px 16px rgba(90,102,81,0.18)" : "0 1px 4px rgba(0,0,0,0.04)",
+                      border: activeImg === i ? "2px solid #5A6651" : "2px solid transparent"
                     }}
                   >
                     <img
@@ -3521,25 +3528,9 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                         width: "100%",
                         height: "100%",
                         objectFit: "cover",
-                        borderRadius: 10,
-                        opacity: 1
+                        borderRadius: 5
                       }}
                     />
-                    {activeImg === i && (
-                      <motion.div
-                        layoutId="activeIndicator"
-                        style={{
-                          position: "absolute",
-                          bottom: -8,
-                          left: "50%",
-                          transform: "translateX(-50%)",
-                          width: 6,
-                          height: 6,
-                          borderRadius: "50%",
-                          background: "#5A6651"
-                        }}
-                      />
-                    )}
                   </motion.div>
                 ))}
               </div>
@@ -4319,9 +4310,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
             overflow-wrap: break-word !important;
           }
           .you-may-like-left-col {
-            margin-top: 0.8rem !important;
-            border-top: 1px solid #D9DDD5 !important;
-            padding-top: 0.8rem !important;
+            display: none !important;
           }
           .recommendation-icons-wrapper {
             flex-direction: row !important;
@@ -4355,71 +4344,146 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
 }
 // ─── RITUALS PAGE ─────────────────────────────────────────────
 function RitualsPage() {
+  const navigate = useNavigate();
+  const [visible, setVisible] = useState({});
+  const refs = useRef([]);
+
+  useEffect(() => {
+    const observers = refs.current.map((el, i) => {
+      if (!el) return null;
+      const obs = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) setVisible(v => ({ ...v, [i]: true }));
+      }, { threshold: 0.15 });
+      obs.observe(el);
+      return obs;
+    });
+    return () => observers.forEach(o => o && o.disconnect());
+  }, []);
+
   const rituals = [
     {
-      icon: "🌙",
+      label: "01 — New Moon",
       title: "New Moon Ritual",
-      time: "15 - 20 Minutes",
+      time: "15–20 min",
       desc: "Manifest New Beginnings & Inner Clarity",
       steps: [
-        "Hold your WishStone and take a few mindful breaths",
-        "Write down three intentions for the month ahead",
-        "Visualize your goals with clarity and confidence",
-        "Place the stone beside your intentions overnight",
-        "End with gratitude and trust in new beginnings"
+        { step: "Settle", text: "Hold your WishStone and take a few mindful breaths to arrive fully in the present." },
+        { step: "Intend", text: "Write down three clear intentions you wish to call into your life this month." },
+        { step: "Visualise", text: "Close your eyes. See your goals unfolding with vivid clarity and quiet confidence." },
+        { step: "Anchor", text: "Place the stone beside your written intentions and let it rest there overnight." },
+        { step: "Release", text: "End with a moment of genuine gratitude and surrender to what is on its way." },
       ]
     },
     {
-      icon: "☀️",
+      label: "02 — Morning",
       title: "Morning Activation",
-      time: "5 - 10 Minutes",
+      time: "5–10 min",
       desc: "Begin Your Day with Peace & Purpose",
       steps: [
-        "Hold WishStone and breathe deeply",
-        "Set one positive intention for the day",
-        "Repeat a calming affirmation",
-        "Carry the stone or keep it nearby",
-        "Return to your intention whenever you need focus"
+        { step: "Breathe", text: "Hold your WishStone in both palms. Inhale slowly for four counts, exhale for six." },
+        { step: "Set", text: "Choose one meaningful intention to carry with you through the day ahead." },
+        { step: "Affirm", text: "Speak a calm, positive affirmation aloud — let your own voice make it real." },
+        { step: "Carry", text: "Keep the stone close in your pocket or on your desk as a gentle daily anchor." },
+        { step: "Return", text: "Whenever focus drifts, hold the stone and return quietly to your morning intention." },
       ]
     },
     {
-      icon: "🌿",
+      label: "03 — Cleansing",
       title: "Cleansing Ritual",
-      time: "10 - 15 Minutes",
+      time: "10–15 min",
       desc: "Release Stress & Restore Balance",
       steps: [
-        "Reflect on stress or emotions you wish to release",
-        "Cleanse your WishStone with water or sunlight",
-        "Visualize renewed balance and positivity",
-        "Set a fresh intention for your well-being",
-        "Store the stone mindfully until your next ritual"
+        { step: "Acknowledge", text: "Sit quietly and name the stress, emotion or energy you are ready to release today." },
+        { step: "Cleanse", text: "Rinse your WishStone gently under cool water or hold it briefly in morning sunlight." },
+        { step: "Breathe Out", text: "With each exhale, consciously let go of the weight you acknowledged. Repeat three times." },
+        { step: "Renew", text: "Set a simple, grounded intention for how you wish to feel for the rest of your day." },
+        { step: "Store", text: "Place the stone mindfully in a clean, quiet spot until your next ritual session." },
       ]
     }
   ];
+
+  const css = `
+    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+    .rituals-page { font-family: 'Open Sans', sans-serif; }
+    .rituals-page * { font-family: 'Open Sans', sans-serif; }
+    .ritual-card-enter { opacity: 0; transform: translateY(40px); }
+    .ritual-card-visible { opacity: 1; transform: translateY(0); transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+    .ritual-step-row { display: flex; gap: 1.5rem; align-items: flex-start; padding: 1.2rem 0; border-bottom: 1px solid rgba(76,90,67,0.08); }
+    .ritual-step-row:last-child { border-bottom: none; }
+    @keyframes ritualGlow { 0%,100%{opacity:0.4} 50%{opacity:0.9} }
+  `;
+
   return (
-    <div style={{ paddingTop: 90, background: T.bg, minHeight: "100vh" }}>
-      <div className="max-w" style={{ padding: "clamp(1.5rem,4vw,3rem)" }}>
-        <h1 style={{ fontFamily: "'Playfair Display',serif", color: T.text, fontSize: "clamp(1.6rem,4vw,2.2rem)", fontWeight: 900, marginBottom: "0.4rem" }}>Sacred Rituals</h1>
-        <div style={{ width: 60, height: 3, background: `linear-gradient(90deg,${T.orange},transparent)`, marginBottom: "0.8rem" }} />
-        <p style={{ color: T.textMid, fontSize: "0.88rem", marginBottom: "2.5rem", maxWidth: 580 }}>Ancient practices adapted for modern life.</p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.5rem" }} className="prod-grid">
-          {rituals.map(r => (
-            <div key={r.title} style={{ background: "#fff", borderRadius: 16, padding: "1.8rem", border: `1px solid ${T.border}` }}>
-              <div style={{ fontSize: 38, marginBottom: "1rem" }}>{r.icon}</div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "0.8rem" }}>
-                <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.05rem", fontWeight: 700, color: T.text }}>{r.title}</h3>
-                <span style={{ background: "rgba(232,114,12,0.08)", color: T.orange, borderRadius: 20, padding: "2px 10px", fontSize: "0.65rem", fontWeight: 700 }}>{r.time}</span>
-              </div>
-              <p style={{ fontSize: "0.8rem", color: T.orange, fontWeight: 700, marginBottom: "1.2rem", fontStyle: "italic" }}>{r.desc}</p>
-              {r.steps.map((s, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 8 }}>
-                  <span style={{ width: 20, height: 20, borderRadius: "50%", background: `linear-gradient(135deg,${T.orangeD},${T.orange})`, color: "#fff", fontSize: "0.6rem", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>{i + 1}</span>
-                  <span style={{ fontSize: "0.78rem", color: T.textMid, lineHeight: 1.5 }}>{s}</span>
+    <div className="rituals-page" style={{ paddingTop: 80, background: "#F9F7F3", minHeight: "100vh" }}>
+      <style>{css}</style>
+
+      {/* Hero header */}
+      <div style={{ background: "linear-gradient(180deg, #2C3320 0%, #3a4329 100%)", padding: "5rem clamp(1.5rem,6vw,5rem) 4rem", textAlign: "center", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 100%, rgba(141,122,91,0.18) 0%, transparent 60%)", pointerEvents: "none" }} />
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: "1.5rem", opacity: 0.7 }}>
+          <div style={{ height: 1, width: 40, background: "#8D7A5B" }} />
+          <span style={{ fontSize: "0.62rem", fontWeight: 700, color: "#8D7A5B", letterSpacing: "0.28em", textTransform: "uppercase" }}>SACRED RITUALS</span>
+          <div style={{ height: 1, width: 40, background: "#8D7A5B" }} />
+        </div>
+        <h1 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(2rem,5vw,3.2rem)", fontWeight: 700, color: "#F9F7F3", lineHeight: 1.15, marginBottom: "1rem", letterSpacing: "-0.01em" }}>
+          Ancient Practices,<br /><span style={{ color: "#C8B89A", fontStyle: "italic" }}>Modern Life.</span>
+        </h1>
+        <p style={{ fontSize: "clamp(0.85rem,1.2vw,0.96rem)", color: "rgba(255,255,255,0.55)", lineHeight: 1.7, maxWidth: 520, margin: "0 auto" }}>
+          Three rituals. Five steps each. A complete daily practice for clarity, intention, and inner renewal.
+        </p>
+      </div>
+
+      {/* Ritual cards */}
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "4rem clamp(1.5rem,5vw,3rem) 5rem" }}>
+        {rituals.map((r, idx) => (
+          <div
+            key={r.title}
+            ref={el => refs.current[idx] = el}
+            className={visible[idx] ? "ritual-card-visible" : "ritual-card-enter"}
+            style={{ marginBottom: idx < rituals.length - 1 ? "5rem" : 0, transitionDelay: `${idx * 0.1}s` }}
+          >
+            {/* Card label */}
+            <div style={{ display: "flex", alignItems: "center", gap: "1.2rem", marginBottom: "1rem" }}>
+              <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#8D7A5B", letterSpacing: "0.22em", textTransform: "uppercase", whiteSpace: "nowrap" }}>{r.label}</span>
+              <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, #8D7A5B44, transparent)" }} />
+              <span style={{ fontSize: "0.65rem", color: "#4C5A43", fontWeight: 600, letterSpacing: "0.1em", background: "rgba(76,90,67,0.08)", padding: "3px 10px", borderRadius: 20, whiteSpace: "nowrap" }}>{r.time}</span>
+            </div>
+
+            {/* Title */}
+            <h2 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(1.5rem,3vw,2rem)", fontWeight: 700, color: "#2C3320", marginBottom: "0.4rem", letterSpacing: "-0.01em" }}>{r.title}</h2>
+            <p style={{ fontSize: "0.85rem", color: "#8D7A5B", fontStyle: "italic", marginBottom: "2rem", fontWeight: 500 }}>{r.desc}</p>
+
+            {/* Steps */}
+            <div>
+              {r.steps.map((s, si) => (
+                <div key={si} className="ritual-step-row">
+                  <div style={{ minWidth: 80, paddingTop: "0.15rem" }}>
+                    <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#4C5A43", letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.7 }}>{s.step}</span>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: "0.9rem", color: "#3a3a2e", lineHeight: 1.75, margin: 0 }}>{s.text}</p>
+                  </div>
                 </div>
               ))}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Bottom CTA */}
+      <div style={{ background: "#2C3320", padding: "3.5rem clamp(1.5rem,5vw,3rem)", textAlign: "center" }}>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.75rem", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: "0.8rem" }}>Ready to begin?</p>
+        <h3 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(1.3rem,3vw,1.8rem)", fontWeight: 700, color: "#F9F7F3", marginBottom: "1.5rem" }}>
+          Your first ritual starts with a single breath.
+        </h3>
+        <button
+          onClick={() => navigate("/shop")}
+          style={{ background: "#C8B89A", color: "#2C3320", border: "none", padding: "13px 32px", borderRadius: 30, fontSize: "0.82rem", fontWeight: 700, cursor: "pointer", letterSpacing: "0.06em", transition: "all 0.3s" }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#d4c4a6"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "#C8B89A"; e.currentTarget.style.transform = "translateY(0)"; }}
+        >
+          Find Your WishStone →
+        </button>
       </div>
     </div>
   );
@@ -4453,12 +4517,22 @@ function BenefitsPage() {
           Manifestation begins with intention. In a world filled with distractions, WishStone helps you pause, gain clarity, and focus your energy on what truly matters. Through mindful daily rituals, it encourages positive thinking, purposeful action, and alignment with the life you wish to create.
         </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.5rem", marginTop: "2rem" }} className="prod-grid">
-          {benefits.map(b => (
-            <div key={b.title} className="power-card">
-              <div style={{ fontSize: 34, marginBottom: "1rem" }}>{b.icon}</div>
-              <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1rem", fontWeight: 700, color: T.text, marginBottom: "0.5rem" }}>{b.title}</h3>
-              <p style={{ fontSize: "0.8rem", color: T.textMid, lineHeight: 1.65 }}>{b.desc}</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.8rem", marginTop: "2rem" }} className="prod-grid">
+          {benefits.map((b, i) => (
+            <div key={b.title} style={{
+              padding: "1.8rem 1.6rem",
+              background: "#fff",
+              borderRadius: 16,
+              borderLeft: "3px solid #4C5A43",
+              boxShadow: "0 2px 16px rgba(76,90,67,0.06)",
+              transition: "all 0.3s ease"
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(76,90,67,0.12)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 2px 16px rgba(76,90,67,0.06)"; }}
+            >
+              <div style={{ fontSize: "1.6rem", marginBottom: "0.9rem", lineHeight: 1 }}>{b.icon}</div>
+              <h3 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "0.95rem", fontWeight: 700, color: "#2C3320", marginBottom: "0.7rem", letterSpacing: "-0.005em" }}>{b.title}</h3>
+              <p style={{ fontSize: "0.8rem", color: "#5C6654", lineHeight: 1.75, margin: 0 }}>{b.desc}</p>
             </div>
           ))}
         </div>
@@ -4551,55 +4625,195 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick }) {
   const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const ship = sub >= 999 ? 0 : 99;
   const total = sub + ship;
+
+  const cartCss = `
+    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap');
+    .cart-page { font-family: 'Open Sans', sans-serif; }
+    .cart-item-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 1.1rem;
+      margin-bottom: 0.85rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      border: 1px solid rgba(76,90,67,0.1);
+      box-shadow: 0 2px 12px rgba(76,90,67,0.04);
+      transition: box-shadow 0.2s;
+    }
+    .cart-item-card:hover { box-shadow: 0 6px 24px rgba(76,90,67,0.09); }
+    .cart-qty-btn {
+      width: 32px; height: 32px;
+      border: 1.5px solid rgba(76,90,67,0.25);
+      background: #fff; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1.1rem; color: #4C5A43; font-weight: 700;
+      transition: all 0.15s;
+    }
+    .cart-qty-btn:hover { background: #4C5A43; color: #fff; border-color: #4C5A43; }
+    .cart-summary-card {
+      background: linear-gradient(160deg, #2C3320 0%, #3a4329 100%);
+      border-radius: 20px;
+      padding: 1.8rem 1.5rem;
+      color: #fff;
+    }
+    .cart-checkout-btn {
+      width: 100%; padding: 15px;
+      background: #4C5A43; color: #fff;
+      border: none; border-radius: 14px;
+      font-size: 0.9rem; font-weight: 700;
+      cursor: pointer; font-family: 'Open Sans', sans-serif;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      letter-spacing: 0.02em; transition: all 0.25s;
+      margin-top: 1.2rem;
+    }
+    .cart-checkout-btn:hover { background: #384332; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(76,90,67,0.25); }
+    .cart-trust-row {
+      display: flex; justify-content: center; gap: 1.5rem;
+      flex-wrap: wrap; margin-top: 1rem;
+    }
+    .cart-trust-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    @media(max-width:768px) {
+      .cart-page-grid { grid-template-columns: 1fr !important; }
+      .cart-summary-sticky { position: static !important; }
+    }
+  `;
+
   if (cart.length === 0) return (
-    <div style={{ paddingTop: 130, paddingBottom: 40, paddingLeft: "2rem", paddingRight: "2rem", background: T.bg, minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14, textAlign: "center" }}>
-      <div style={{ fontSize: 56 }}>🛒</div>
-      <h2 style={{ fontFamily: "'Playfair Display',serif", color: T.text, fontSize: "1.8rem", fontWeight: 900 }}>Your Cart is Empty</h2>
+    <div className="cart-page" style={{ paddingTop: 130, paddingBottom: 40, background: "#F9F7F3", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, textAlign: "center" }}>
+      <style>{cartCss}</style>
+      <div style={{ fontSize: 52, marginBottom: 8 }}>🛒</div>
+      <h2 style={{ fontFamily: "'Open Sans', sans-serif", color: "#2C3320", fontSize: "1.6rem", fontWeight: 700 }}>Your Cart is Empty</h2>
+      <p style={{ color: "#5C6654", fontSize: "0.88rem" }}>Add some sacred products to get started.</p>
     </div>
   );
+
   return (
-    <div style={{ paddingTop: 90, background: T.bg, minHeight: "100vh" }}>
-      <div className="max-w" style={{ padding: "clamp(1.5rem,4vw,3rem)" }}>
-        <h1 style={{ fontFamily: "'Playfair Display',serif", color: T.text, fontSize: "clamp(1.5rem,4vw,2rem)", fontWeight: 900, marginBottom: "0.4rem" }}>Your Cart</h1>
-        <div style={{ width: 60, height: 3, background: `linear-gradient(90deg,${T.orange},transparent)`, marginBottom: "1.5rem" }} />
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "2rem", alignItems: "start" }} className="checkout-grid">
+    <div className="cart-page" style={{ paddingTop: 90, background: "#F9F7F3", minHeight: "100vh" }}>
+      <style>{cartCss}</style>
+      <div className="max-w" style={{ padding: "clamp(1.2rem,4vw,2.5rem)" }}>
+
+        {/* Page header */}
+        <div style={{ marginBottom: "1.8rem" }}>
+          <p style={{ fontSize: "0.65rem", fontWeight: 700, color: "#4C5A43", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 4 }}>SHOPPING CART</p>
+          <h1 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(1.6rem,4vw,2.2rem)", fontWeight: 700, color: "#2C3320", lineHeight: 1.1 }}>Your Cart</h1>
+          <div style={{ width: 48, height: 3, background: "#C8B89A", borderRadius: 2, marginTop: 8 }} />
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "1.8rem", alignItems: "start" }} className="cart-page-grid checkout-grid">
+
+          {/* Items */}
           <div>
             {cart.map(item => (
-              <div key={item.id} style={{ background: "#fff", borderRadius: 12, padding: "1.2rem", marginBottom: "1rem", display: "flex", gap: "1rem", alignItems: "center", border: `1px solid ${T.border}` }}>
-                <img referrerPolicy="no-referrer" src={item.image} alt={item.name} onClick={() => onProductClick && onProductClick(item)} style={{ width: 76, height: 76, objectFit: "cover", borderRadius: 8, flexShrink: 0, cursor: onProductClick ? "pointer" : "default", transition: "opacity 0.2s" }}
-                  onMouseEnter={e => { if (onProductClick) e.currentTarget.style.opacity = "0.8"; }}
-                  onMouseLeave={e => e.currentTarget.style.opacity = "1"} />
-                <div style={{ flex: 1 }}>
-                  <h4 onClick={() => onProductClick && onProductClick(item)} style={{ fontSize: "0.88rem", fontWeight: 700, color: T.text, marginBottom: 4, cursor: onProductClick ? "pointer" : "default" }}
-                    onMouseEnter={e => { if (onProductClick) e.currentTarget.style.color = T.orange; }}
-                    onMouseLeave={e => e.currentTarget.style.color = T.text}>{item.name}</h4>
-                  <p style={{ fontSize: "0.78rem", color: T.textMid, marginBottom: 8 }}>Rs.{item.price.toLocaleString()} each</p>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <div style={{ display: "flex", alignItems: "center", border: `1.5px solid ${T.border}`, borderRadius: 6, overflow: "hidden" }}>
-                      <button onClick={() => onQty(item.id, -1)} style={{ width: 30, height: 30, background: "none", border: "none", cursor: "pointer", fontSize: 16, color: T.text }}>-</button>
-                      <span style={{ width: 30, textAlign: "center", fontSize: "0.85rem", fontWeight: 700, color: T.text }}>{item.qty}</span>
-                      <button onClick={() => onQty(item.id, 1)} style={{ width: 30, height: 30, background: "none", border: "none", cursor: "pointer", fontSize: 16, color: T.text }}>+</button>
+              <div key={item.id} className="cart-item-card">
+                {/* Image */}
+                <div style={{ width: 88, height: 88, borderRadius: 12, overflow: "hidden", flexShrink: 0, background: "#ece9e3", cursor: onProductClick ? "pointer" : "default" }}
+                  onClick={() => onProductClick && onProductClick(item)}>
+                  {item.image ? (
+                    <img referrerPolicy="no-referrer" src={item.image} alt={item.name}
+                      style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s" }}
+                      onMouseEnter={e => e.currentTarget.style.transform = "scale(1.06)"}
+                      onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"} />
+                  ) : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, color: "#4C5A43" }}>◆</div>}
+                </div>
+
+                {/* Info */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h4 onClick={() => onProductClick && onProductClick(item)}
+                    style={{ fontSize: "0.9rem", fontWeight: 700, color: "#2C3320", marginBottom: 3, cursor: onProductClick ? "pointer" : "default", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+                    onMouseEnter={e => { if (onProductClick) e.currentTarget.style.color = "#4C5A43"; }}
+                    onMouseLeave={e => e.currentTarget.style.color = "#2C3320"}
+                  >{item.name}</h4>
+                  <p style={{ fontSize: "0.75rem", color: "#8D9A84", marginBottom: 10 }}>Sacred Stone Accessory</p>
+
+                  {/* Qty + Remove */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <button className="cart-qty-btn" onClick={() => onQty(item.id, -1)}>−</button>
+                      <span style={{ minWidth: 24, textAlign: "center", fontSize: "0.9rem", fontWeight: 700, color: "#2C3320" }}>{item.qty}</span>
+                      <button className="cart-qty-btn" onClick={() => onQty(item.id, 1)}>+</button>
                     </div>
-                    <button onClick={() => onRemove(item.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "#c0392b", fontSize: "0.72rem", fontWeight: 600 }}>Remove</button>
+                    <button onClick={() => onRemove(item.id)}
+                      style={{ background: "none", border: "none", cursor: "pointer", color: "#c0392b", fontSize: "0.72rem", fontWeight: 600, display: "flex", alignItems: "center", gap: 4, padding: "4px 0" }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                      Remove
+                    </button>
                   </div>
                 </div>
-                <div style={{ fontWeight: 800, color: T.orange, fontSize: "0.95rem", flexShrink: 0 }}>Rs.{(item.price * item.qty).toLocaleString()}</div>
+
+                {/* Price + Badge */}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10, flexShrink: 0 }}>
+                  <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "#2C3320" }}>Rs.{(item.price * item.qty).toLocaleString()}</span>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "rgba(76,90,67,0.07)", borderRadius: 10, padding: "6px 8px" }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><polyline points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                    <span style={{ fontSize: "0.52rem", fontWeight: 700, color: "#4C5A43", marginTop: 3, textAlign: "center", lineHeight: 1.2 }}>Handcrafted<br/>Quality</span>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
-          <div style={{ background: "#fff", borderRadius: 16, padding: "1.5rem", border: `1px solid ${T.border}`, position: "sticky", top: 90 }}>
-            <h3 style={{ fontFamily: "'Playfair Display',serif", color: T.text, fontSize: "1.05rem", fontWeight: 700, marginBottom: "1.2rem" }}>Order Summary</h3>
-            {[["Subtotal", "Rs." + sub.toLocaleString()], ["Shipping", ship === 0 ? "FREE" : "Rs." + ship]].map(([l, v]) => (
-              <div key={l} style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
-                <span style={{ color: T.textMid, fontSize: "0.82rem" }}>{l}</span>
-                <span style={{ color: T.text, fontSize: "0.82rem", fontWeight: 600 }}>{v}</span>
+
+          {/* Order Summary */}
+          <div className="cart-summary-sticky" style={{ position: "sticky", top: 90 }}>
+            <div className="cart-summary-card">
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "1.2rem", paddingBottom: "1rem", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+                <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8B89A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                </div>
+                <span style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "1rem", fontWeight: 700, color: "#fff" }}>Order Summary</span>
+                <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4 }}>
+                  <div style={{ width: 80, height: 1, background: "rgba(200,184,154,0.3)" }} />
+                  <span style={{ color: "#C8B89A", fontSize: 10 }}>✦</span>
+                </div>
               </div>
-            ))}
-            <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: "0.9rem", display: "flex", justifyContent: "space-between", marginBottom: "1.2rem" }}>
-              <span style={{ color: T.text, fontWeight: 700 }}>Total</span>
-              <span style={{ color: T.orange, fontSize: "1.1rem", fontWeight: 800 }}>Rs.{total.toLocaleString()}</span>
+
+              {[["Subtotal", `Rs.${sub.toLocaleString()}`], ["Shipping", ship === 0 ? "FREE ✓" : `Rs.${ship}`]].map(([l, v]) => (
+                <div key={l} style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+                  <span style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.84rem" }}>{l}</span>
+                  <span style={{ color: ship === 0 && l === "Shipping" ? "#C8B89A" : "#fff", fontSize: "0.84rem", fontWeight: 600 }}>{v}</span>
+                </div>
+              ))}
+
+              <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)", paddingTop: "0.9rem", display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 }}>
+                <div>
+                  <span style={{ color: "#fff", fontWeight: 700, fontSize: "0.9rem" }}>Total</span>
+                  <span style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.65rem", marginLeft: 6 }}>(Inclusive of all taxes)</span>
+                </div>
+                <span style={{ color: "#C8B89A", fontSize: "1.2rem", fontWeight: 800 }}>Rs.{total.toLocaleString()}</span>
+              </div>
+
+              <button className="cart-checkout-btn" onClick={onCheckout}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  Proceed to Checkout
+                </div>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+              </button>
             </div>
-            <button className="btn-orange" onClick={onCheckout} style={{ width: "100%", padding: "13px", fontSize: "0.8rem", borderRadius: 8 }}>Proceed to Checkout</button>
+
+            {/* Trust badges */}
+            <div style={{ background: "#fff", borderRadius: 14, padding: "1rem", marginTop: "0.85rem", border: "1px solid rgba(76,90,67,0.1)" }}>
+              <div className="cart-trust-row">
+                {[
+                  { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>, label: "Secure", sub: "Checkout" },
+                  { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>, label: "Fast & Safe", sub: "Delivery" },
+                  { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>, label: "Premium", sub: "Quality" },
+                ].map((t, i) => (
+                  <div key={i} className="cart-trust-item">
+                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(76,90,67,0.07)", display: "flex", alignItems: "center", justifyContent: "center" }}>{t.icon}</div>
+                    <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#2C3320" }}>{t.label}</span>
+                    <span style={{ fontSize: "0.6rem", color: "#8D9A84" }}>{t.sub}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <p style={{ textAlign: "center", fontSize: "0.65rem", color: "#8D9A84", marginTop: "0.7rem", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              100% Secure Payments
+            </p>
           </div>
         </div>
       </div>
@@ -5232,36 +5446,34 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
   );
 
   if (!items.length) return (
-    <div style={{ paddingTop: 120, paddingBottom: 60, paddingLeft: "1.5rem", paddingRight: "1.5rem", background: T.bg, minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+    <div style={{ paddingTop: 64, height: "100vh", background: T.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", overflow: "hidden", boxSizing: "border-box" }}>
 
       {/* Dynamic Animated Entrance Container */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", maxWidth: 650, textAlign: "center" }}
+        style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", maxWidth: 420, textAlign: "center", padding: "0 1.5rem" }}
       >
         {/* Heart Badge with Sparkles */}
-        <div style={{ position: "relative", width: 140, height: 140, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1.5rem" }}>
-          {/* Main Circle background */}
-          <div style={{ width: 110, height: 110, borderRadius: "50%", background: "rgba(76, 90, 67, 0.05)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(76, 90, 67, 0.08)" }}>
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{ color: "#4C5A43" }}>
+        <div style={{ position: "relative", width: 110, height: 110, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1rem" }}>
+          <div style={{ width: 90, height: 90, borderRadius: "50%", background: "rgba(76, 90, 67, 0.05)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(76, 90, 67, 0.08)" }}>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
           </div>
-          {/* Sparkles absolute positioned */}
-          <div style={{ position: "absolute", top: 12, left: 16, fontSize: "18px", opacity: 0.8, animation: "badgeFloat1 3s ease-in-out infinite" }}>✨</div>
-          <div style={{ position: "absolute", bottom: 20, right: 12, fontSize: "14px", opacity: 0.6, animation: "badgeFloat3 4s ease-in-out infinite" }}>✦</div>
-          <div style={{ position: "absolute", top: 28, right: 16, fontSize: "12px", opacity: 0.7, animation: "badgeFloat2 3.5s ease-in-out infinite" }}>✦</div>
+          <div style={{ position: "absolute", top: 8, left: 12, fontSize: "14px", opacity: 0.8, animation: "badgeFloat1 3s ease-in-out infinite" }}>✨</div>
+          <div style={{ position: "absolute", bottom: 16, right: 8, fontSize: "11px", opacity: 0.6, animation: "badgeFloat3 4s ease-in-out infinite" }}>✦</div>
+          <div style={{ position: "absolute", top: 22, right: 12, fontSize: "10px", opacity: 0.7, animation: "badgeFloat2 3.5s ease-in-out infinite" }}>✦</div>
         </div>
 
         {/* Title */}
-        <h2 style={{ fontFamily: "'Playfair Display', serif", color: "#2C3320", fontSize: "clamp(1.8rem, 4vw, 2.4rem)", fontWeight: 900, marginBottom: "0.8rem", letterSpacing: "-0.01em" }}>
-          Your Wishlist is Empty
+        <h2 style={{ fontFamily: "'Playfair Display', serif", color: "#2C3320", fontSize: "clamp(1.5rem, 4vw, 2rem)", fontWeight: 900, marginBottom: "0.5rem", letterSpacing: "-0.01em" }}>
+          Your Wishlist is<br /><span style={{ color: "#4C5A43" }}>Empty</span>
         </h2>
 
         {/* Description */}
-        <p style={{ color: "#5C6654", fontSize: "clamp(0.85rem, 1.2vw, 0.94rem)", lineHeight: 1.6, marginBottom: "1.8rem", maxWidth: 460 }}>
+        <p style={{ color: "#5C6654", fontSize: "clamp(0.8rem, 1.1vw, 0.88rem)", lineHeight: 1.5, marginBottom: "1.2rem", maxWidth: 340 }}>
           Looks like you haven't saved anything yet. Explore our collections and add your favorites to your wishlist.
         </p>
 
@@ -5270,95 +5482,45 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
           onClick={() => navigate("/shop")}
           className="btn-orange"
           style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "10px",
-            padding: "14px 28px",
-            fontSize: "0.85rem",
-            borderRadius: 30,
-            background: "#4C5A43",
-            color: "#fff",
-            border: "none",
-            fontWeight: 700,
-            cursor: "pointer",
-            letterSpacing: "0.05em",
-            boxShadow: "0 8px 20px rgba(76, 90, 67, 0.18)",
-            transition: "all 0.3s ease"
+            display: "inline-flex", alignItems: "center", gap: "8px",
+            padding: "12px 24px", fontSize: "0.82rem", borderRadius: 30,
+            background: "#4C5A43", color: "#fff", border: "none", fontWeight: 700,
+            cursor: "pointer", letterSpacing: "0.05em",
+            boxShadow: "0 8px 20px rgba(76, 90, 67, 0.18)", transition: "all 0.3s ease"
           }}
           onMouseEnter={e => { e.currentTarget.style.background = "#384332"; e.currentTarget.style.transform = "translateY(-1px)"; }}
           onMouseLeave={e => { e.currentTarget.style.background = "#4C5A43"; e.currentTarget.style.transform = "translateY(0)"; }}
         >
-          {/* Compass Icon */}
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
             <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
           </svg>
           Explore Products
         </button>
 
-        {/* Features Card container */}
-        <div style={{
-          width: "100%",
-          background: "#F4F6F2",
-          borderRadius: 20,
-          border: "1px solid rgba(76, 90, 67, 0.08)",
-          padding: "24px",
-          marginTop: "3rem",
-          boxShadow: "0 10px 30px rgba(44,51,32,0.04)"
-        }}>
-          {/* Grid layout (1 col on mobile, 3 col on desktop) */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "24px", alignItems: "center" }} className="wishlist-features-grid">
-            {/* Save with Ease */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "10px" }}>
-              <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(76, 90, 67, 0.08)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                </svg>
-              </div>
-              <h4 style={{ color: "#2C3320", fontSize: "0.92rem", fontWeight: 700, marginBottom: 6 }}>Save with Ease</h4>
-              <p style={{ color: "#5C6654", fontSize: "0.74rem", lineHeight: 1.5 }}>Add items you love and keep them all in one place.</p>
+        {/* Compact Features Row */}
+        <div style={{ display: "flex", justifyContent: "center", gap: "24px", marginTop: "2rem", flexWrap: "wrap" }}>
+          {[
+            { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>, label: "Save with Ease", sub: "Add items you love and keep them all in one place." },
+            { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>, label: "Stay Notified", sub: "Get alerts when your saved items go on sale." },
+            { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>, label: "Secure & Private", sub: "Your wishlist is safe and visible only to you." }
+          ].map((f, i) => (
+            <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", maxWidth: 110 }}>
+              <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(76, 90, 67, 0.06)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 6 }}>{f.icon}</div>
+              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#2C3320", marginBottom: 2 }}>{f.label}</div>
+              <div style={{ fontSize: "0.65rem", color: "#5C6654", lineHeight: 1.4, textAlign: "center" }}>{f.sub}</div>
             </div>
-
-            {/* divider on desktop */}
-            <div className="wishlist-divider" style={{ width: "1px", height: "40px", background: "rgba(76, 90, 67, 0.12)", justifySelf: "center" }} />
-
-            {/* Stay Notified */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "10px" }}>
-              <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(76, 90, 67, 0.08)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                </svg>
-              </div>
-              <h4 style={{ color: "#2C3320", fontSize: "0.92rem", fontWeight: 700, marginBottom: 6 }}>Stay Notified</h4>
-              <p style={{ color: "#5C6654", fontSize: "0.74rem", lineHeight: 1.5 }}>Get alerts when your saved items go on sale.</p>
-            </div>
-
-            {/* divider on desktop */}
-            <div className="wishlist-divider" style={{ width: "1px", height: "40px", background: "rgba(76, 90, 67, 0.12)", justifySelf: "center" }} />
-
-            {/* Secure & Private */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "10px" }}>
-              <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(76, 90, 67, 0.08)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
-              </div>
-              <h4 style={{ color: "#2C3320", fontSize: "0.92rem", fontWeight: 700, marginBottom: 6 }}>Secure & Private</h4>
-              <p style={{ color: "#5C6654", fontSize: "0.74rem", lineHeight: 1.5 }}>Your wishlist is safe and visible only to you.</p>
-            </div>
-          </div>
+          ))}
         </div>
 
-        {/* Find what you love branding footer */}
-        <div style={{ marginTop: "3rem", display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, color: "#8D7A5B" }}>
-            <span style={{ fontSize: 14 }}>🌿</span>
-            <span style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic", fontSize: "1.25rem", color: "#2C3320" }}>Find what you love</span>
-            <span style={{ fontSize: 14 }}>🌿</span>
+        {/* Find what you love branding */}
+        <div style={{ marginTop: "1.5rem", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, color: "#8D7A5B" }}>
+            <span style={{ fontSize: 12 }}>🌿</span>
+            <span style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic", fontSize: "1rem", color: "#2C3320" }}>Find what you love</span>
+            <span style={{ fontSize: 12 }}>🌿</span>
           </div>
-          <p style={{ color: "#5C6654", fontSize: "0.78rem" }}>Discover something special, just for you.</p>
+          <p style={{ color: "#5C6654", fontSize: "0.72rem" }}>Discover something special, just for you.</p>
         </div>
 
       </motion.div>
@@ -7539,12 +7701,16 @@ function PromoModal({ onClose, onShop, userEmail }) {
         )}
 
         {/* Realistic Stone Image Container */}
-        <div style={{ position: "relative", width: "100%", height: "170px", borderRadius: "18px", overflow: "hidden", marginTop: "1.4rem", border: "1px solid rgba(76, 90, 67, 0.08)" }}>
+        <div style={{ position: "relative", width: "100%", height: "200px", borderRadius: "18px", overflow: "hidden", marginTop: "1.4rem", border: "1px solid rgba(76, 90, 67, 0.08)" }}>
           <img
             src={`${process.env.PUBLIC_URL || ""}/wishstone-product-login.png`}
             alt="Sacred stone"
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            onError={e => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "block"; }}
           />
+          <div style={{ display: "none", position: "absolute", inset: 0, margin: "auto", width: "60%", height: "80%", background: "radial-gradient(ellipse at 60% 40%, #d4c5a9 0%, #c4a882 40%, #8d7355 100%)", borderRadius: "50% 45% 55% 48%" }} />
+          {/* Leaf shadow overlay */}
+          <div style={{ position: "absolute", top: 0, left: 0, width: "50%", height: "100%", background: "linear-gradient(135deg, rgba(76,90,67,0.08) 0%, transparent 60%)", pointerEvents: "none" }} />
           {/* Concentric gold rings overlay */}
           <div style={{ position: "absolute", border: "1px solid rgba(141,122,91,0.22)", borderRadius: "50%", width: "180px", height: "180px", top: "-30px", right: "-30px", pointerEvents: "none" }} />
           <div style={{ position: "absolute", border: "1px solid rgba(141,122,91,0.14)", borderRadius: "50%", width: "240px", height: "240px", top: "-60px", right: "-60px", pointerEvents: "none" }} />
