@@ -1011,10 +1011,18 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
 
 // ─── HERO — TEXT CENTERED ─────────────────────────────────────
 function Hero({ onShop, onRitual }) {
+  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth <= 768 : false);
   const [rot, setRot] = useState({ x: 6, y: -18 });
   const [dragging, setDragging] = useState(false);
   const [last, setLast] = useState({ x: 0, y: 0 });
   const [autoAnim, setAutoAnim] = useState(true);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   const onMouseDown = e => { setDragging(true); setAutoAnim(false); setLast({ x: e.clientX, y: e.clientY }); };
   const onMouseMove = e => {
@@ -1033,47 +1041,102 @@ function Hero({ onShop, onRitual }) {
   };
   const onTouchEnd = () => setDragging(false);
 
-  const heroCss = `
-    /* ── HERO MOBILE LAYOUT ── */
-    @media(max-width:768px){
-      .hero-desktop-only { display:none !important; }
-      .hero-mobile-section {
-        display:flex !important;
-        flex-direction:column;
-        min-height:100svh;
-        padding:0 !important;
-        overflow:hidden;
-      }
-      .hero-mobile-top {
-        padding: 80px 1.4rem 1.4rem;
-        flex:1;
-        display:flex;
-        flex-direction:column;
-        justify-content:flex-start;
-        position:relative;
-        z-index:2;
-      }
-      .hero-mobile-stone-wrap {
-        display:flex !important;
-        position:relative;
-        width:100%;
-        min-height:52vw;
-        overflow:hidden;
-        flex-shrink:0;
-      }
-    }
-    @media(min-width:769px){
-      .hero-mobile-section-wrapper { display:none !important; }
-    }
-    @keyframes heroScrollBounce {
-      0%,100%{transform:translateY(0)}
-      50%{transform:translateY(6px)}
-    }
-  `;
+  /* ── MOBILE HERO ── */
+  if (isMobile) return (
+    <section style={{ background:T.bg, display:"flex", flexDirection:"column", minHeight:"100svh", position:"relative", overflow:"hidden" }}>
+
+      {/* TOP — text */}
+      <div style={{ padding:"80px 1.4rem 1.6rem", flex:1, display:"flex", flexDirection:"column", justifyContent:"flex-start", position:"relative", zIndex:2 }}>
+
+        {/* 4-pointed star */}
+        <div style={{ marginBottom:"1rem" }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5Z" fill="#8D7A5B" opacity="0.9"/>
+          </svg>
+        </div>
+
+        {/* Sub-label */}
+        <p style={{ fontSize:"0.8rem", color:"#5a5a4a", fontWeight:400, marginBottom:"0.6rem", lineHeight:1.4 }}>
+          India's <span style={{ color:"#8D7A5B", fontStyle:"italic", fontWeight:600 }}>Sacred</span> Manifestation Stone
+        </p>
+
+        {/* Big heading */}
+        <h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.8rem,11vw,3.6rem)", fontWeight:900, lineHeight:1.08, letterSpacing:"-0.025em", color:"#1a1a1a", margin:"0 0 0.7rem" }}>
+          Turn<br />Intentions<br /><span style={{ color:"#8D7A5B", fontStyle:"italic" }}>into{" "}
+          <span style={{ color:"#8D7A5B" }}>Reality</span></span><sup style={{ color:"#8D7A5B", fontSize:"0.38em", fontStyle:"normal", verticalAlign:"super", marginLeft:2 }}>✦</sup>
+        </h1>
+
+        {/* Gold divider */}
+        <div style={{ display:"flex", alignItems:"center", gap:8, margin:"0.85rem 0 1rem" }}>
+          <div style={{ width:60, height:1, background:"linear-gradient(90deg,#8D7A5B,rgba(141,122,91,0.1))" }} />
+          <span style={{ color:"#8D7A5B", fontSize:9, lineHeight:1 }}>✦</span>
+        </div>
+
+        {/* Paragraph */}
+        <p style={{ fontSize:"0.9rem", color:"#4a4a3a", lineHeight:1.7, marginBottom:"1.6rem", maxWidth:340 }}>
+          Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
+        </p>
+
+        {/* CTA */}
+        <button
+          onClick={onRitual}
+          style={{ display:"inline-flex", alignItems:"center", gap:10, background:"#1e2618", color:"#fff", border:"none", padding:"14px 22px", borderRadius:8, fontSize:"0.88rem", fontWeight:600, cursor:"pointer", letterSpacing:"0.02em", alignSelf:"flex-start" }}
+        >
+          Explore Rituals
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      {/* BOTTOM — stone scene */}
+      <div style={{ position:"relative", width:"100%", height:"58vw", minHeight:220, overflow:"hidden", flexShrink:0 }}>
+
+        {/* Sandy warm bg */}
+        <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at 65% 40%, #e2d5c0 0%, #cfc0a8 45%, #bfae98 100%)" }} />
+
+        {/* Large soft circle behind stone */}
+        <div style={{ position:"absolute", right:"-8%", top:"50%", transform:"translateY(-50%)", width:"72vw", height:"72vw", maxWidth:300, maxHeight:300, borderRadius:"50%", background:"rgba(200,185,162,0.45)", pointerEvents:"none" }} />
+
+        {/* Leaf branch — right side */}
+        <div style={{ position:"absolute", top:"-4%", right:"-2%", width:"48%", height:"110%", opacity:0.5, pointerEvents:"none", overflow:"hidden" }}>
+          <svg viewBox="0 0 160 260" width="100%" height="100%" preserveAspectRatio="xMaxYMin meet">
+            <path d="M140,0 Q95,45 85,95 Q75,145 100,185 Q115,210 100,240 Q88,258 80,260" stroke="#4a5e38" strokeWidth="1.8" fill="none" opacity="0.6"/>
+            <ellipse cx="122" cy="30" rx="25" ry="12" fill="#5a7048" transform="rotate(-28 122 30)" opacity="0.62"/>
+            <ellipse cx="105" cy="55" rx="23" ry="11" fill="#4a5e38" transform="rotate(-38 105 55)" opacity="0.58"/>
+            <ellipse cx="128" cy="78" rx="27" ry="12" fill="#5a7048" transform="rotate(-22 128 78)" opacity="0.6"/>
+            <ellipse cx="100" cy="102" rx="22" ry="10" fill="#4a5e38" transform="rotate(-42 100 102)" opacity="0.55"/>
+            <ellipse cx="122" cy="124" rx="25" ry="11" fill="#5a7048" transform="rotate(-20 122 124)" opacity="0.58"/>
+            <ellipse cx="96" cy="148" rx="20" ry="9" fill="#4a5e38" transform="rotate(-40 96 148)" opacity="0.5"/>
+            <ellipse cx="118" cy="168" rx="23" ry="10" fill="#5a7048" transform="rotate(-25 118 168)" opacity="0.52"/>
+          </svg>
+        </div>
+
+        {/* CSS Wishstone on slab */}
+        <div style={{ position:"absolute", bottom:0, right:"10%", display:"flex", flexDirection:"column", alignItems:"center", width:"50%", paddingBottom:"2%" }}>
+          {/* Stone */}
+          <div style={{ width:"62%", aspectRatio:"1.25/1", borderRadius:"48% 52% 50% 50% / 50% 50% 52% 48%", background:"radial-gradient(ellipse at 35% 28%, #6e6e66 0%, #3c3c38 38%, #252522 68%, #18181520 100%)", boxShadow:"0 16px 44px rgba(0,0,0,0.48), inset 0 -8px 18px rgba(0,0,0,0.32), inset 0 6px 14px rgba(255,255,255,0.06)", position:"relative", marginBottom:"-3%" }}>
+            {/* White stripe line */}
+            <div style={{ position:"absolute", top:"46%", left:"16%", width:"68%", height:"1.5px", background:"rgba(255,255,255,0.28)", borderRadius:2, transform:"rotate(-4deg)" }} />
+            {/* Subtle top highlight */}
+            <div style={{ position:"absolute", top:"18%", left:"22%", width:"28%", height:"20%", borderRadius:"50%", background:"radial-gradient(circle, rgba(255,255,255,0.14) 0%, transparent 70%)", filter:"blur(3px)" }} />
+            {/* Drop shadow */}
+            <div style={{ position:"absolute", bottom:-6, left:"12%", width:"76%", height:8, borderRadius:"50%", background:"rgba(0,0,0,0.2)", filter:"blur(5px)" }} />
+          </div>
+          {/* Slab */}
+          <div style={{ width:"100%", height:"clamp(24px,7vw,38px)", background:"linear-gradient(180deg,#c2b090 0%,#ae9b7c 55%,#9e8b6c 100%)", borderRadius:"5px 5px 3px 3px", boxShadow:"0 6px 20px rgba(0,0,0,0.2), inset 0 1px 4px rgba(255,255,255,0.14)" }} />
+        </div>
+
+        {/* SCROLL indicator */}
+        <div style={{ position:"absolute", bottom:10, left:"50%", transform:"translateX(-50%)", display:"flex", flexDirection:"column", alignItems:"center", gap:4, pointerEvents:"none" }}>
+          <div style={{ width:1, height:16, background:"rgba(76,90,67,0.4)", borderRadius:1 }} />
+          <span style={{ fontSize:"0.5rem", fontWeight:700, color:"rgba(76,90,67,0.6)", letterSpacing:"0.22em", textTransform:"uppercase" }}>SCROLL</span>
+        </div>
+      </div>
+    </section>
+  );
 
   /* ── DESKTOP HERO (unchanged) ── */
-  const desktopHero = (
-    <section className="hero-desktop-only" style={{ minHeight:"100vh", background:T.bg, display:"flex", alignItems:"center", paddingTop:80, paddingBottom:40, paddingLeft:"clamp(1rem,5vw,3.5rem)", paddingRight:"clamp(1rem,5vw,3.5rem)", position:"relative", overflow:"hidden" }}>
+  return (
+    <section style={{ minHeight:"100vh", background:T.bg, display:"flex", alignItems:"center", paddingTop:80, paddingBottom:40, paddingLeft:"clamp(1rem,5vw,3.5rem)", paddingRight:"clamp(1rem,5vw,3.5rem)", position:"relative", overflow:"hidden" }}>
       <div style={{ position:"absolute", top:"18%", right:"6%", width:8, height:8, borderRadius:"50%", background:"#4C5A43", opacity:0.5 }} />
       <div style={{ position:"absolute", bottom:"28%", right:"32%", width:6, height:6, borderRadius:"50%", background:"#4C5A43", opacity:0.4 }} />
       <div className="max-w hero-grid" style={{ width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2.5rem", alignItems:"center" }}>
@@ -1123,115 +1186,6 @@ function Hero({ onShop, onRitual }) {
         </div>
       </div>
     </section>
-  );
-
-  /* ── MOBILE HERO ── */
-  const mobileHero = (
-    <div className="hero-mobile-section-wrapper" style={{ display:"none" }}>
-      <section className="hero-mobile-section" style={{ background:T.bg, position:"relative" }}>
-
-        {/* TOP — text content */}
-        <div className="hero-mobile-top">
-          {/* Sparkle star */}
-          <div style={{ marginBottom:"1rem" }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2 L13.5 10 L22 12 L13.5 14 L12 22 L10.5 14 L2 12 L10.5 10 Z" fill="#8D7A5B" opacity="0.85"/>
-            </svg>
-          </div>
-
-          {/* Badge label */}
-          <div style={{ marginBottom:"0.7rem" }}>
-            <span style={{ fontSize:"0.72rem", color:T.textMid, fontWeight:500 }}>India's <span style={{ color:"#8D7A5B", fontStyle:"italic", fontWeight:600 }}>Sacred</span> Manifestation Stone</span>
-          </div>
-
-          {/* Big heading */}
-          <h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.6rem,10vw,3.4rem)", fontWeight:900, lineHeight:1.1, letterSpacing:"-0.02em", color:"#1a1a1a", marginBottom:"0.6rem" }}>
-            Turn<br />Intentions<br /><span style={{ color:"#8D7A5B", fontStyle:"italic" }}>into <span style={{ color:"#8D7A5B" }}>Reality</span></span><span style={{ color:"#8D7A5B", fontSize:"0.55em", verticalAlign:"super", fontStyle:"normal" }}>✦</span>
-          </h1>
-
-          {/* Thin divider with sparkle */}
-          <div style={{ display:"flex", alignItems:"center", gap:8, margin:"0.9rem 0" }}>
-            <div style={{ flex:1, height:1, background:"linear-gradient(90deg,#8D7A5B,rgba(141,122,91,0.15))" }} />
-            <span style={{ color:"#8D7A5B", fontSize:9 }}>✦</span>
-            <div style={{ width:24, height:1, background:"rgba(141,122,91,0.15)" }} />
-          </div>
-
-          {/* Paragraph */}
-          <p style={{ fontSize:"0.88rem", color:"#4a4a4a", lineHeight:1.65, marginBottom:"1.4rem", maxWidth:340 }}>
-            Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
-          </p>
-
-          {/* CTA Button */}
-          <button
-            onClick={onRitual}
-            style={{ display:"inline-flex", alignItems:"center", gap:10, background:"#2C3320", color:"#fff", border:"none", padding:"13px 22px", borderRadius:8, fontSize:"0.88rem", fontWeight:600, cursor:"pointer", fontFamily:"'Inter',sans-serif", letterSpacing:"0.02em", transition:"all 0.25s" }}
-            onMouseEnter={e => e.currentTarget.style.background="#3a4329"}
-            onMouseLeave={e => e.currentTarget.style.background="#2C3320"}
-          >
-            Explore Rituals
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
-          </button>
-        </div>
-
-        {/* BOTTOM — stone visual area (CSS stone + decorative leaf shadow bg) */}
-        <div className="hero-mobile-stone-wrap" style={{ display:"flex", position:"relative", width:"100%", minHeight:"55vw", overflow:"hidden", flexShrink:0 }}>
-          {/* Warm beige bg */}
-          <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at 60% 30%, #e8dfd0 0%, #d4c9b8 50%, #c8baa8 100%)" }} />
-
-          {/* Leaf shadow SVG overlay — top right */}
-          <div style={{ position:"absolute", top:0, right:0, width:"55%", height:"100%", opacity:0.45, pointerEvents:"none" }}>
-            <svg viewBox="0 0 200 280" width="100%" height="100%" preserveAspectRatio="xMaxYMin meet">
-              <path d="M180,0 Q120,40 100,80 Q80,120 110,160 Q140,200 120,240 Q100,270 90,280" stroke="#5a6b45" strokeWidth="1.5" fill="none" opacity="0.5"/>
-              <ellipse cx="150" cy="35" rx="28" ry="14" fill="#6b7d56" transform="rotate(-25 150 35)" opacity="0.55"/>
-              <ellipse cx="130" cy="60" rx="26" ry="12" fill="#5a6b45" transform="rotate(-35 130 60)" opacity="0.5"/>
-              <ellipse cx="155" cy="85" rx="30" ry="13" fill="#6b7d56" transform="rotate(-20 155 85)" opacity="0.52"/>
-              <ellipse cx="125" cy="110" rx="24" ry="11" fill="#5a6b45" transform="rotate(-40 125 110)" opacity="0.48"/>
-              <ellipse cx="148" cy="135" rx="28" ry="12" fill="#6b7d56" transform="rotate(-18 148 135)" opacity="0.5"/>
-              <ellipse cx="120" cy="160" rx="22" ry="10" fill="#5a6b45" transform="rotate(-38 120 160)" opacity="0.45"/>
-              <ellipse cx="145" cy="182" rx="26" ry="11" fill="#6b7d56" transform="rotate(-22 145 182)" opacity="0.48"/>
-              <ellipse cx="118" cy="208" rx="20" ry="9" fill="#5a6b45" transform="rotate(-42 118 208)" opacity="0.42"/>
-            </svg>
-          </div>
-
-          {/* Large circle / moon bg behind stone */}
-          <div style={{ position:"absolute", right:"-5%", top:"50%", transform:"translateY(-50%)", width:"75vw", height:"75vw", maxWidth:320, maxHeight:320, borderRadius:"50%", background:"rgba(210,198,178,0.55)", pointerEvents:"none" }} />
-
-          {/* CSS Stone — realistic dark stone on sand-colored slab */}
-          <div style={{ position:"absolute", bottom:0, right:"8%", width:"58%", height:"100%", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"flex-end", paddingBottom:"4%" }}>
-            {/* Slab */}
-            <div style={{ position:"relative", width:"88%", display:"flex", flexDirection:"column", alignItems:"center" }}>
-              {/* Stone */}
-              <div style={{ width:"52%", aspectRatio:"1.3/1", borderRadius:"50% 48% 52% 50% / 48% 52% 48% 52%", background:"radial-gradient(ellipse at 38% 30%, #7a7a72 0%, #4a4a44 35%, #2e2e2a 65%, #1e1e1a 100%)", boxShadow:"0 18px 48px rgba(0,0,0,0.42), inset 0 -10px 22px rgba(0,0,0,0.3), inset 0 8px 18px rgba(255,255,255,0.07)", position:"relative", marginBottom:"-2%" }}>
-                {/* White line across stone */}
-                <div style={{ position:"absolute", top:"44%", left:"18%", width:"64%", height:2, background:"rgba(255,255,255,0.32)", borderRadius:2, transform:"rotate(-3deg)" }} />
-                {/* Highlight */}
-                <div style={{ position:"absolute", top:"20%", left:"25%", width:"30%", height:"22%", borderRadius:"50%", background:"radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%)", filter:"blur(3px)" }} />
-                {/* Shadow below stone */}
-                <div style={{ position:"absolute", bottom:-8, left:"15%", width:"70%", height:10, borderRadius:"50%", background:"rgba(0,0,0,0.22)", filter:"blur(6px)" }} />
-              </div>
-              {/* Slab base */}
-              <div style={{ width:"100%", height:"clamp(28px,8vw,44px)", background:"linear-gradient(180deg, #c8b99a 0%, #b8a88a 50%, #a89878 100%)", borderRadius:"6px 6px 4px 4px", boxShadow:"0 8px 24px rgba(0,0,0,0.18), inset 0 2px 6px rgba(255,255,255,0.15)", position:"relative" }}>
-                <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:"rgba(255,255,255,0.18)", borderRadius:"6px 6px 0 0" }} />
-              </div>
-            </div>
-          </div>
-
-          {/* Scroll indicator */}
-          <div style={{ position:"absolute", bottom:12, left:"50%", transform:"translateX(-50%)", display:"flex", flexDirection:"column", alignItems:"center", gap:5 }}>
-            <div style={{ width:1, height:18, background:"rgba(76,90,67,0.35)", borderRadius:1 }} />
-            <span style={{ fontSize:"0.55rem", fontWeight:700, color:"rgba(76,90,67,0.55)", letterSpacing:"0.2em", textTransform:"uppercase" }}>SCROLL</span>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-
-  return (
-    <>
-      <style>{heroCss}</style>
-      {desktopHero}
-      {mobileHero}
-    </>
   );
 }
 
