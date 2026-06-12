@@ -548,7 +548,26 @@ const GLOBAL_CSS = `
     transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
   .hero-text-col { text-align: center; display: flex; flex-direction: column; align-items: center; }
-  .hero-divider-mobile { display: none; }`;
+  .hero-divider-mobile { display: none; }
+  .hero-serif-title, .hero-serif-title * {
+    font-family: 'Playfair Display', serif !important;
+  }
+  .hero-serif-italic {
+    font-family: 'Playfair Display', serif !important;
+    font-style: italic !important;
+  }
+  .hero-sans-subtitle {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 700 !important;
+  }
+  .desktop-only-banner {
+    display: block !important;
+  }
+  @media(max-width:768px) {
+    .desktop-only-banner {
+      display: none !important;
+    }
+  }`;
 
 // ─── HEADER ───────────────────────────────────────────────────
 function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
@@ -623,9 +642,27 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
       borderBottom: scrolled ? `1px solid ${T.border}` : "1px solid transparent",
       transition: "all 0.3s",
     }}>
+      {currentPage === "home" && (
+        <div className="desktop-only-banner" style={{
+          background: "#4C5A43",
+          color: "#ffffff",
+          textAlign: "center",
+          fontSize: "0.68rem",
+          fontWeight: 700,
+          letterSpacing: "0.18em",
+          padding: "10px 0",
+          textTransform: "uppercase",
+          fontFamily: "'Inter', sans-serif"
+        }}>
+          ✦ India's Sacred Manifestation Stone ✦
+        </div>
+      )}
       <div className="max-w" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 64, padding: "0 clamp(1rem,4vw,2.5rem)" }}>
-        <button onClick={() => navTo("home")} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", flexShrink: 0 }}>
-          <img src={`${process.env.PUBLIC_URL || ""}/wishstone svg.svg`} alt="WishStone" style={{ height: 28, width: "auto", display: "block" }} />
+        <button onClick={() => navTo("home")} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <img src={`${process.env.PUBLIC_URL || ""}/wishstone svg.svg`} alt="WishStone" style={{ height: 20, width: "auto", display: "block" }} />
+          <div style={{ fontSize: "0.52rem", letterSpacing: "0.18em", color: "#8D7A5B", marginTop: 2, fontWeight: 700, textTransform: "uppercase", fontFamily: "'Inter', sans-serif" }}>
+            SACRED STORE
+          </div>
         </button>
 
         <nav className="header-nav" style={{ display: "flex", gap: "2.2rem", alignItems: "center" }}>
@@ -1009,13 +1046,8 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
   );
 }
 
-// ─── HERO — TEXT CENTERED ─────────────────────────────────────
 function Hero({ onShop, onRitual }) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth <= 768 : false);
-  const [rot, setRot] = useState({ x: 6, y: -18 });
-  const [dragging, setDragging] = useState(false);
-  const [last, setLast] = useState({ x: 0, y: 0 });
-  const [autoAnim, setAutoAnim] = useState(true);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth <= 768);
@@ -1024,164 +1056,333 @@ function Hero({ onShop, onRitual }) {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  const onMouseDown = e => { setDragging(true); setAutoAnim(false); setLast({ x: e.clientX, y: e.clientY }); };
-  const onMouseMove = e => {
-    if (!dragging) return;
-    const dx = e.clientX - last.x; const dy = e.clientY - last.y;
-    setRot(r => ({ x: Math.max(-40, Math.min(40, r.x - dy * 0.4)), y: r.y + dx * 0.5 }));
-    setLast({ x: e.clientX, y: e.clientY });
-  };
-  const onMouseUp = () => setDragging(false);
-  const onTouchStart = e => { setDragging(true); setAutoAnim(false); setLast({ x: e.touches[0].clientX, y: e.touches[0].clientY }); };
-  const onTouchMove = e => {
-    if (!dragging) return;
-    const dx = e.touches[0].clientX - last.x; const dy = e.touches[0].clientY - last.y;
-    setRot(r => ({ x: Math.max(-40, Math.min(40, r.x - dy * 0.4)), y: r.y + dx * 0.5 }));
-    setLast({ x: e.touches[0].clientX, y: e.touches[0].clientY });
-  };
-  const onTouchEnd = () => setDragging(false);
-
-  /* ── MOBILE HERO ── */
+  /* ────────────────────────────────────────────────────────────
+     MOBILE HERO
+  ──────────────────────────────────────────────────────────── */
   if (isMobile) return (
-    <section style={{ background:T.bg, display:"flex", flexDirection:"column", minHeight:"100svh", position:"relative", overflow:"hidden" }}>
+    <section style={{
+      position: "relative",
+      width: "100%",
+      minHeight: "100vh",
+      background: `url(${process.env.PUBLIC_URL || ""}/hero_mobile_bg.png) no-repeat center center / cover`,
+      paddingTop: "90px",
+      paddingBottom: "40px",
+      paddingLeft: "1.25rem",
+      paddingRight: "1.25rem",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      overflow: "hidden"
+    }}>
 
-      {/* TOP — text */}
-      <div style={{ padding:"80px 1.4rem 1.6rem", flex:1, display:"flex", flexDirection:"column", justifyContent:"flex-start", position:"relative", zIndex:2 }}>
-
-        {/* 4-pointed star */}
-        <div style={{ marginBottom:"1rem" }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2L13.5 10.5L22 12L13.5 13.5L12 22L10.5 13.5L2 12L10.5 10.5Z" fill="#8D7A5B" opacity="0.9"/>
+      {/* Content Wrapper */}
+      <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
+        {/* 8-pointed star */}
+        <div style={{ marginBottom: "0.8rem" }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L13.5 9.5L21 11L13.5 12.5L12 20L10.5 12.5L3 11L10.5 9.5Z" fill="#A68D60" />
+            <path d="M12 6L13 10L17 11L13 12L12 16L11 12L7 11L11 10Z" fill="#A68D60" opacity="0.6" transform="rotate(45 12 11)" />
           </svg>
         </div>
 
-        {/* Sub-label */}
-        <p style={{ fontSize:"0.8rem", color:"#5a5a4a", fontWeight:400, marginBottom:"0.6rem", lineHeight:1.4 }}>
-          India's <span style={{ color:"#8D7A5B", fontStyle:"italic", fontWeight:600 }}>Sacred</span> Manifestation Stone
-        </p>
-
-        {/* Big heading */}
-        <h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(2.8rem,11vw,3.6rem)", fontWeight:900, lineHeight:1.08, letterSpacing:"-0.025em", color:"#1a1a1a", margin:"0 0 0.7rem" }}>
-          Turn<br />Intentions<br /><span style={{ color:"#8D7A5B", fontStyle:"italic" }}>into{" "}
-          <span style={{ color:"#8D7A5B" }}>Reality</span></span><sup style={{ color:"#8D7A5B", fontSize:"0.38em", fontStyle:"normal", verticalAlign:"super", marginLeft:2 }}>✦</sup>
-        </h1>
-
-        {/* Gold divider */}
-        <div style={{ display:"flex", alignItems:"center", gap:8, margin:"0.85rem 0 1rem" }}>
-          <div style={{ width:60, height:1, background:"linear-gradient(90deg,#8D7A5B,rgba(141,122,91,0.1))" }} />
-          <span style={{ color:"#8D7A5B", fontSize:9, lineHeight:1 }}>✦</span>
+        {/* Subheader label */}
+        <div className="hero-sans-subtitle" style={{
+          fontSize: "0.78rem",
+          color: "#5C6654",
+          letterSpacing: "0.05em",
+          marginBottom: "0.6rem"
+        }}>
+          India's <span style={{ color: "#A68D60" }}>Sacred</span> Manifestation Stone
         </div>
 
-        {/* Paragraph */}
-        <p style={{ fontSize:"0.9rem", color:"#4a4a3a", lineHeight:1.7, marginBottom:"1.6rem", maxWidth:340 }}>
+        {/* Title */}
+        <h1 className="hero-serif-title" style={{
+          fontSize: "clamp(2.5rem, 10vw, 3.2rem)",
+          fontWeight: 400,
+          color: "#000000",
+          lineHeight: 1.1,
+          margin: "0 0 0.8rem 0"
+        }}>
+          Turn<br />
+          Intentions<br />
+          <span className="hero-serif-italic" style={{ color: "#4C5A43", marginRight: "8px" }}>into</span>
+          <span style={{ color: "#A68D60", position: "relative" }}>
+            Reality
+            <span style={{ fontSize: "0.45em", position: "absolute", top: "-0.2em", right: "-0.45em", color: "#A68D60", fontStyle: "normal" }}>✦</span>
+          </span>
+        </h1>
+
+        {/* Divider */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", width: "100%", maxWidth: "160px", margin: "1rem 0" }}>
+          <div style={{ height: "1px", flex: 1, background: "linear-gradient(95deg, #A68D60, transparent)" }} />
+          <span style={{ color: "#A68D60", fontSize: "8px" }}>✦</span>
+          <div style={{ height: "1px", flex: 1, background: "linear-gradient(275deg, #A68D60, transparent)" }} />
+        </div>
+
+        {/* Description */}
+        <p style={{
+          fontSize: "0.85rem",
+          color: "#5C6654",
+          lineHeight: 1.65,
+          marginBottom: "1.6rem",
+          maxWidth: "320px"
+        }}>
           Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
         </p>
 
-        {/* CTA */}
-        <button
-          onClick={onRitual}
-          style={{ display:"inline-flex", alignItems:"center", gap:10, background:"#1e2618", color:"#fff", border:"none", padding:"14px 22px", borderRadius:8, fontSize:"0.88rem", fontWeight:600, cursor:"pointer", letterSpacing:"0.02em", alignSelf:"flex-start" }}
-        >
+        {/* Button */}
+        <button onClick={onRitual} style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "10px",
+          background: "#1e2618",
+          color: "#ffffff",
+          border: "none",
+          padding: "12px 24px",
+          borderRadius: "6px",
+          fontSize: "0.8rem",
+          fontWeight: 600,
+          cursor: "pointer",
+          letterSpacing: "0.02em",
+          marginBottom: "2rem"
+        }}>
           Explore Rituals
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "4px" }}>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
         </button>
       </div>
 
-      {/* BOTTOM — stone scene */}
-      <div style={{ position:"relative", width:"100%", height:"58vw", minHeight:220, overflow:"hidden", flexShrink:0 }}>
+      {/* Mobile Visual Image Container */}
+      <div style={{
+        width: "100vw",
+        marginLeft: "-1.25rem",
+        marginRight: "-1.25rem",
+        marginBottom: "-40px",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "flex-end",
+        zIndex: 1
+      }}>
+        <img src={`${process.env.PUBLIC_URL || ""}/hero_mobile_stone.png`} alt="Wishstone Ritual Collection" style={{
+          width: "100%",
+          height: "auto",
+          display: "block",
+          border: "none",
+          borderRadius: 0,
+          boxShadow: "none"
+        }} />
+      </div>
 
-        {/* Sandy warm bg */}
-        <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at 65% 40%, #e2d5c0 0%, #cfc0a8 45%, #bfae98 100%)" }} />
-
-        {/* Large soft circle behind stone */}
-        <div style={{ position:"absolute", right:"-8%", top:"50%", transform:"translateY(-50%)", width:"72vw", height:"72vw", maxWidth:300, maxHeight:300, borderRadius:"50%", background:"rgba(200,185,162,0.45)", pointerEvents:"none" }} />
-
-        {/* Leaf branch — right side */}
-        <div style={{ position:"absolute", top:"-4%", right:"-2%", width:"48%", height:"110%", opacity:0.5, pointerEvents:"none", overflow:"hidden" }}>
-          <svg viewBox="0 0 160 260" width="100%" height="100%" preserveAspectRatio="xMaxYMin meet">
-            <path d="M140,0 Q95,45 85,95 Q75,145 100,185 Q115,210 100,240 Q88,258 80,260" stroke="#4a5e38" strokeWidth="1.8" fill="none" opacity="0.6"/>
-            <ellipse cx="122" cy="30" rx="25" ry="12" fill="#5a7048" transform="rotate(-28 122 30)" opacity="0.62"/>
-            <ellipse cx="105" cy="55" rx="23" ry="11" fill="#4a5e38" transform="rotate(-38 105 55)" opacity="0.58"/>
-            <ellipse cx="128" cy="78" rx="27" ry="12" fill="#5a7048" transform="rotate(-22 128 78)" opacity="0.6"/>
-            <ellipse cx="100" cy="102" rx="22" ry="10" fill="#4a5e38" transform="rotate(-42 100 102)" opacity="0.55"/>
-            <ellipse cx="122" cy="124" rx="25" ry="11" fill="#5a7048" transform="rotate(-20 122 124)" opacity="0.58"/>
-            <ellipse cx="96" cy="148" rx="20" ry="9" fill="#4a5e38" transform="rotate(-40 96 148)" opacity="0.5"/>
-            <ellipse cx="118" cy="168" rx="23" ry="10" fill="#5a7048" transform="rotate(-25 118 168)" opacity="0.52"/>
-          </svg>
+      {/* Scroll indicator centered absolutely at bottom of content */}
+      <div style={{
+        position: "absolute",
+        bottom: "12px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "8px",
+        zIndex: 3,
+        pointerEvents: "none"
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", width: "100%", justifyContent: "center" }}>
+          <div style={{ width: "32px", height: "1px", background: "linear-gradient(90deg, transparent, #A68D60)" }} />
+          <span style={{ color: "#A68D60", fontSize: "10px", lineHeight: 1 }}>✦</span>
+          <div style={{ width: "32px", height: "1px", background: "linear-gradient(270deg, transparent, #A68D60)" }} />
         </div>
-
-        {/* CSS Wishstone on slab */}
-        <div style={{ position:"absolute", bottom:0, right:"10%", display:"flex", flexDirection:"column", alignItems:"center", width:"50%", paddingBottom:"2%" }}>
-          {/* Stone */}
-          <div style={{ width:"62%", aspectRatio:"1.25/1", borderRadius:"48% 52% 50% 50% / 50% 50% 52% 48%", background:"radial-gradient(ellipse at 35% 28%, #6e6e66 0%, #3c3c38 38%, #252522 68%, #18181520 100%)", boxShadow:"0 16px 44px rgba(0,0,0,0.48), inset 0 -8px 18px rgba(0,0,0,0.32), inset 0 6px 14px rgba(255,255,255,0.06)", position:"relative", marginBottom:"-3%" }}>
-            {/* White stripe line */}
-            <div style={{ position:"absolute", top:"46%", left:"16%", width:"68%", height:"1.5px", background:"rgba(255,255,255,0.28)", borderRadius:2, transform:"rotate(-4deg)" }} />
-            {/* Subtle top highlight */}
-            <div style={{ position:"absolute", top:"18%", left:"22%", width:"28%", height:"20%", borderRadius:"50%", background:"radial-gradient(circle, rgba(255,255,255,0.14) 0%, transparent 70%)", filter:"blur(3px)" }} />
-            {/* Drop shadow */}
-            <div style={{ position:"absolute", bottom:-6, left:"12%", width:"76%", height:8, borderRadius:"50%", background:"rgba(0,0,0,0.2)", filter:"blur(5px)" }} />
-          </div>
-          {/* Slab */}
-          <div style={{ width:"100%", height:"clamp(24px,7vw,38px)", background:"linear-gradient(180deg,#c2b090 0%,#ae9b7c 55%,#9e8b6c 100%)", borderRadius:"5px 5px 3px 3px", boxShadow:"0 6px 20px rgba(0,0,0,0.2), inset 0 1px 4px rgba(255,255,255,0.14)" }} />
-        </div>
-
-        {/* SCROLL indicator */}
-        <div style={{ position:"absolute", bottom:10, left:"50%", transform:"translateX(-50%)", display:"flex", flexDirection:"column", alignItems:"center", gap:4, pointerEvents:"none" }}>
-          <div style={{ width:1, height:16, background:"rgba(76,90,67,0.4)", borderRadius:1 }} />
-          <span style={{ fontSize:"0.5rem", fontWeight:700, color:"rgba(76,90,67,0.6)", letterSpacing:"0.22em", textTransform:"uppercase" }}>SCROLL</span>
-        </div>
+        <span style={{
+          fontSize: "0.58rem",
+          fontWeight: 700,
+          color: "#A68D60",
+          letterSpacing: "0.22em",
+          textTransform: "uppercase"
+        }}>
+          SCROLL
+        </span>
       </div>
     </section>
   );
 
-  /* ── DESKTOP HERO (unchanged) ── */
+  /* ────────────────────────────────────────────────────────────
+     DESKTOP HERO
+  ──────────────────────────────────────────────────────────── */
   return (
-    <section style={{ minHeight:"100vh", background:T.bg, display:"flex", alignItems:"center", paddingTop:80, paddingBottom:40, paddingLeft:"clamp(1rem,5vw,3.5rem)", paddingRight:"clamp(1rem,5vw,3.5rem)", position:"relative", overflow:"hidden" }}>
-      <div style={{ position:"absolute", top:"18%", right:"6%", width:8, height:8, borderRadius:"50%", background:"#4C5A43", opacity:0.5 }} />
-      <div style={{ position:"absolute", bottom:"28%", right:"32%", width:6, height:6, borderRadius:"50%", background:"#4C5A43", opacity:0.4 }} />
-      <div className="max-w hero-grid" style={{ width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2.5rem", alignItems:"center" }}>
-        {/* LEFT */}
-        <div style={{ animation:"fadeUp 0.8s ease both", display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center" }}>
-          <div style={{ display:"inline-flex", alignItems:"center", gap:7, background:"rgba(76,90,67,0.08)", border:"1px solid rgba(76,90,67,0.22)", borderRadius:20, paddingTop:5, paddingBottom:5, paddingLeft:14, paddingRight:14, marginBottom:"1.2rem" }}>
-            <span style={{ color:"#4C5A43", fontSize:10 }}>✦</span>
-            <span style={{ fontSize:"0.65rem", fontWeight:700, color:"#4C5A43", letterSpacing:"0.18em", textTransform:"uppercase" }}>India's Sacred Manifestation Stone</span>
+    <section style={{
+      minHeight: "100vh",
+      background: "#F5F0E8",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      paddingTop: "120px",
+      paddingBottom: "80px",
+      paddingLeft: "clamp(1.5rem, 5vw, 3.5rem)",
+      paddingRight: "clamp(1.5rem, 5vw, 3.5rem)",
+      position: "relative",
+      overflow: "hidden"
+    }}>
+      {/* Background Soft Shadows */}
+      <div style={{
+        position: "absolute",
+        top: 0,
+        right: 0,
+        width: "50%",
+        height: "60%",
+        opacity: 0.08,
+        pointerEvents: "none",
+        zIndex: 0
+      }}>
+        <svg viewBox="0 0 100 100" width="100%" height="100%" fill="#4C5A43" filter="blur(2px)">
+          <path d="M100,0 Q60,40 0,70" stroke="#4C5A43" strokeWidth="1.5" fill="none" />
+          <ellipse cx="85" cy="20" rx="20" ry="8" transform="rotate(-30 85 20)" />
+          <ellipse cx="65" cy="35" rx="18" ry="7" transform="rotate(-40 65 35)" />
+          <ellipse cx="80" cy="50" rx="19" ry="8" transform="rotate(-20 80 50)" />
+        </svg>
+      </div>
+
+      <div className="max-w" style={{ width: "100%", display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: "3rem", alignItems: "center", position: "relative", zIndex: 1 }}>
+        {/* Left Column: Text & CTA */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+          {/* 8-pointed star */}
+          <div style={{ marginBottom: "1.5rem" }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L13.5 9.5L21 11L13.5 12.5L12 20L10.5 12.5L3 11L10.5 9.5Z" fill="#A68D60" />
+              <path d="M12 6L13 10L17 11L13 12L12 16L11 12L7 11L11 10Z" fill="#A68D60" opacity="0.6" transform="rotate(45 12 11)" />
+            </svg>
           </div>
-          <h1 style={{ fontSize:"clamp(2.2rem,5.2vw,3.8rem)", fontWeight:900, lineHeight:1.18, letterSpacing:"-0.02em", marginBottom:"1.2rem", color:T.text }}>
-            Turn Intentions <br />
-            <span style={{ color:"#4C5A43", fontStyle:"italic" }}>into Reality</span>
+
+          {/* Main Title */}
+          <h1 className="hero-serif-title" style={{
+            fontSize: "clamp(2.8rem, 5vw, 4.4rem)",
+            fontWeight: 400,
+            color: "#000000",
+            lineHeight: 1.1,
+            margin: "0 0 1.2rem 0",
+            textAlign: "left"
+          }}>
+            Turn<br />
+            Intentions<br />
+            <span className="hero-serif-italic" style={{ color: "#4C5A43", marginRight: "12px" }}>into</span>
+            <span style={{ color: "#A68D60", position: "relative" }}>
+              Reality
+              <span style={{ fontSize: "0.45em", position: "absolute", top: "-0.2em", right: "-0.45em", color: "#A68D60", fontStyle: "normal" }}>✦</span>
+            </span>
           </h1>
-          <p style={{ fontSize:"clamp(0.85rem,1.2vw,0.96rem)", color:T.textMid, lineHeight:1.6, marginBottom:"1.6rem", maxWidth:500 }}>
+
+          {/* Divider Line */}
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", width: "100%", maxWidth: "220px", margin: "1.6rem 0" }}>
+            <div style={{ height: "1px", flex: 1, background: "linear-gradient(90deg, #A68D60, transparent)" }} />
+            <span style={{ color: "#A68D60", fontSize: "9px" }}>✦</span>
+            <div style={{ height: "1px", flex: 1, background: "linear-gradient(270deg, #A68D60, transparent)" }} />
+          </div>
+
+          {/* Description */}
+          <p style={{
+            fontSize: "clamp(0.88rem, 1.1vw, 1.02rem)",
+            color: "#5C6654",
+            lineHeight: 1.75,
+            marginBottom: "2rem",
+            maxWidth: "420px",
+            textAlign: "left"
+          }}>
             Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
           </p>
-          <div style={{ display:"flex", gap:"0.8rem", flexWrap:"wrap", justifyContent:"center" }}>
-            <button className="btn-orange" onClick={onShop} style={{ paddingTop:13, paddingBottom:13, paddingLeft:26, paddingRight:26, fontSize:"0.82rem", borderRadius:8 }}>Begin Your Journey</button>
-            <button className="btn-outline" onClick={onRitual} style={{ paddingTop:13, paddingBottom:13, paddingLeft:26, paddingRight:26, fontSize:"0.82rem", borderRadius:8 }}>The Ritual</button>
-          </div>
+
+          {/* Button */}
+          <button onClick={onRitual} style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "12px",
+            background: "#4C5A43",
+            color: "#ffffff",
+            border: "none",
+            padding: "14px 28px",
+            borderRadius: "6px",
+            fontSize: "0.85rem",
+            fontWeight: 600,
+            cursor: "pointer",
+            letterSpacing: "0.02em",
+            transition: "all 0.25s ease-in-out"
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#3D4B35"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "#4C5A43"; e.currentTarget.style.transform = "translateY(0)"; }}
+          >
+            Explore Rituals
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "4px" }}>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
         </div>
-        {/* RIGHT: 3D Stone */}
-        <div style={{ position:"relative", display:"flex", alignItems:"center", justifyContent:"center", minHeight:"clamp(320px,45vw,520px)", perspective:"900px" }}
-          onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}>
-          <div style={{ position:"absolute", bottom:8, left:"50%", transform:"translateX(-50%)", fontSize:"0.62rem", color:T.textMid, letterSpacing:"0.1em", textTransform:"uppercase", fontWeight:600, opacity:0.6, whiteSpace:"nowrap", zIndex:10 }}>↔ Drag to rotate</div>
-          <div onMouseDown={onMouseDown} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
-            style={{ position:"relative", zIndex:2, transformStyle:"preserve-3d", transform:autoAnim?undefined:`rotateX(${rot.x}deg) rotateY(${rot.y}deg)`, animation:autoAnim?"stone3d 8s ease-in-out infinite":"none", cursor:dragging?"grabbing":"grab", transition:dragging?"none":"transform 0.4s ease", userSelect:"none" }}>
-            <div style={{ width:"clamp(190px,24vw,300px)", height:"clamp(230px,30vw,360px)", borderRadius:"50% 50% 48% 52% / 55% 55% 45% 45%", background:"radial-gradient(ellipse at 32% 28%, #f5b070 0%, #38271a 40%, #120c08 65%, #181716 100%)", boxShadow:"0 40px 100px rgba(76,90,67,0.55), 0 0 0 1px rgba(76,90,67,0.12), inset 0 -25px 50px rgba(0,0,0,0.25), inset 0 12px 35px rgba(255,210,130,0.35)", position:"relative", overflow:"hidden" }}>
-              <div style={{ position:"absolute", top:"18%", left:"22%", width:"35%", height:"28%", borderRadius:"50%", background:"radial-gradient(circle, rgba(255,230,180,0.75) 0%, transparent 70%)", filter:"blur(6px)" }} />
-              <div style={{ position:"absolute", top:"10%", left:"15%", width:"20%", height:"14%", borderRadius:"50%", background:"rgba(255,245,220,0.45)", filter:"blur(4px)" }} />
-              <div style={{ position:"absolute", bottom:0, left:0, right:0, height:"35%", background:"linear-gradient(to top, rgba(0,0,0,0.3), transparent)", borderRadius:"0 0 50% 50%" }} />
+
+        {/* Right Column: Premium Visual Scene */}
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%" }}>
+          <img src={`${process.env.PUBLIC_URL || ""}/hero_desktop_stone.png`} alt="Sacred Manifestation Stone" style={{
+            width: "100%",
+            maxWidth: "520px",
+            height: "auto",
+            borderRadius: "24px",
+            boxShadow: "0 20px 48px rgba(76,90,67,0.12)",
+            objectFit: "cover"
+          }} />
+        </div>
+      </div>
+
+      {/* 4 Key Benefits container at the bottom */}
+      <div style={{
+        marginTop: "5rem",
+        background: "rgba(255, 255, 255, 0.4)",
+        backdropFilter: "blur(8px)",
+        border: "1.2px solid rgba(76, 90, 67, 0.08)",
+        borderRadius: "16px",
+        padding: "24px 32px",
+        width: "100%",
+        maxWidth: "1100px",
+        boxShadow: "0 10px 30px rgba(76, 90, 67, 0.02)",
+        position: "relative",
+        zIndex: 1
+      }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "24px", alignItems: "center" }}>
+          {/* Card 1 */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "0 10px" }}>
+            <div style={{ width: "42px", height: "42px", borderRadius: "50%", background: "#F5F0E8", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "12px" }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.5">
+                <path d="M12 2L19 7L19 17L12 22L5 17L5 7Z M12 2L12 22 M5 7L12 12L19 7 M5 17L12 12L19 17" />
+              </svg>
             </div>
-            <div style={{ position:"absolute", bottom:-18, left:"50%", transform:"translateX(-50%)", width:"70%", height:20, borderRadius:"50%", background:"rgba(76,90,67,0.22)", filter:"blur(10px)" }} />
+            <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#2C3320" }}>Authentic WishStone</span>
           </div>
-          <div className="hero-badge" style={{ position:"absolute", top:"14%", left:"0%", background:"rgba(255,255,255,0.75)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(255,255,255,0.4)", borderRadius:14, paddingTop:10, paddingBottom:10, paddingLeft:14, paddingRight:14, boxShadow:"0 8px 32px rgba(0,0,0,0.08)", display:"flex", alignItems:"center", gap:10, minWidth:148, zIndex:3, animation:"badgeFloat1 4s ease-in-out infinite" }}>
-            <div style={{ width:36, height:36, borderRadius:9, background:"linear-gradient(135deg,#6C7E61,#4C5A43)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>🧘</div>
-            <div><div style={{ fontSize:"0.78rem", fontWeight:700, color:T.text, whiteSpace:"nowrap" }}>Mental Peace</div><div style={{ fontSize:"0.63rem", color:T.textMid }}>Inner Clarity</div></div>
+
+          {/* Card 2 */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "0 10px", borderLeft: "1px solid rgba(76, 90, 67, 0.08)" }}>
+            <div style={{ width: "42px", height: "42px", borderRadius: "50%", background: "#F5F0E8", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "12px" }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.5">
+                <path d="M12 22V10 M12 10C12 10 16 8 16 5C16 2 12 2 12 5 M12 14C12 14 8 12 8 9C8 6 12 6 12 9 M12 18C12 18 16 16 16 13C16 10 12 10 12 13" />
+              </svg>
+            </div>
+            <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#2C3320" }}>Ancient Wisdom Meets Modern Life</span>
           </div>
-          <div className="hero-badge" style={{ position:"absolute", top:"40%", right:"-4%", background:"rgba(255,255,255,0.75)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(255,255,255,0.4)", borderRadius:14, paddingTop:10, paddingBottom:10, paddingLeft:14, paddingRight:14, boxShadow:"0 8px 32px rgba(0,0,0,0.08)", display:"flex", alignItems:"center", gap:10, minWidth:158, zIndex:3, animation:"badgeFloat2 4.5s ease-in-out infinite" }}>
-            <div style={{ width:36, height:36, borderRadius:9, background:"linear-gradient(135deg,#7E8F73,#5F6E54)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>🎯</div>
-            <div><div style={{ fontSize:"0.78rem", fontWeight:700, color:T.text, whiteSpace:"nowrap" }}>Manifestation</div><div style={{ fontSize:"0.63rem", color:T.textMid }}>Intention Setting</div></div>
+
+          {/* Card 3 */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "0 10px", borderLeft: "1px solid rgba(76, 90, 67, 0.08)" }}>
+            <div style={{ width: "42px", height: "42px", borderRadius: "50%", background: "#F5F0E8", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "12px" }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.5">
+                <path d="M12 21C12 21 8 16 8 13C8 10 12 7 12 7C12 7 16 10 16 13C16 16 12 21 12 21Z M12 21C12 21 5 18 5 14C5 10 10 9 10 9 C10 9 14 10 14 14C14 18 12 21 12 21Z M12 21C12 21 19 18 19 14C19 10 14 9 14 9" />
+              </svg>
+            </div>
+            <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#2C3320" }}>Energy You Can Feel</span>
           </div>
-          <div className="hero-badge" style={{ position:"absolute", bottom:"12%", left:"4%", background:"rgba(255,255,255,0.75)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", border:"1px solid rgba(255,255,255,0.4)", borderRadius:14, paddingTop:10, paddingBottom:10, paddingLeft:14, paddingRight:14, boxShadow:"0 8px 32px rgba(0,0,0,0.08)", display:"flex", alignItems:"center", gap:10, minWidth:148, zIndex:3, animation:"badgeFloat3 5s ease-in-out infinite" }}>
-            <div style={{ width:36, height:36, borderRadius:9, background:"linear-gradient(135deg,#8D9F83,#6D7F64)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>✨</div>
-            <div><div style={{ fontSize:"0.78rem", fontWeight:700, color:T.text, whiteSpace:"nowrap" }}>Positive Energy</div><div style={{ fontSize:"0.63rem", color:T.textMid }}>Mindfulness</div></div>
+
+          {/* Card 4 */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "0 10px", borderLeft: "1px solid rgba(76, 90, 67, 0.08)" }}>
+            <div style={{ width: "42px", height: "42px", borderRadius: "50%", background: "#F5F0E8", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "12px" }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.5">
+                <path d="M12 12C12 12 15 9 15 7C15 5 13 4 12 5C11 4 9 5 9 7C9 9 12 12 12 12Z M3 14C3 14 5 16 8 16C11 16 12 14 12 14 M21 14C21 14 19 16 16 16C13 16 12 14 12 14 M12 14V22" />
+              </svg>
+            </div>
+            <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#2C3320" }}>Made With Intention</span>
           </div>
         </div>
       </div>
