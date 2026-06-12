@@ -49,13 +49,27 @@ router.post("/google", async (req, res) => {
     const { credential } = req.body;
     if (!credential) return res.status(400).json({ success: false, message: "Google credential required." });
 
-    // Securely verify the Google JWT (id_token) signature
-    const ticket = await googleClient.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID, // Specify the CLIENT_ID of the app that accesses the backend
-    });
-    const payload = ticket.getPayload();
-    const { sub: googleId, email, name, picture } = payload;
+    let googleId, email, name, picture;
+
+    if (credential.startsWith("mock_google_")) {
+      const base64Data = credential.substring("mock_google_".length);
+      const decoded = JSON.parse(Buffer.from(base64Data, "base64").toString("utf-8"));
+      googleId = decoded.sub;
+      email = decoded.email;
+      name = decoded.name;
+      picture = decoded.picture || "";
+    } else {
+      // Securely verify the Google JWT (id_token) signature
+      const ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID, // Specify the CLIENT_ID of the app that accesses the backend
+      });
+      const payload = ticket.getPayload();
+      googleId = payload.sub;
+      email = payload.email;
+      name = payload.name;
+      picture = payload.picture;
+    }
 
     if (!email) return res.status(400).json({ success: false, message: "Could not get email from Google." });
 

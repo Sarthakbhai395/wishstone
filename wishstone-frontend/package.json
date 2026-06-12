@@ -6,6 +6,7 @@
     "@react-oauth/google": "^0.13.4",
     "axios": "^1.4.0",
     "framer-motion": "^10.16.0",
+    "gsap": "^3.15.0",
     "jwt-decode": "^4.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
