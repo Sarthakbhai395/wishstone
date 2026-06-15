@@ -13,13 +13,18 @@ const T = {
 const getApiBase = () => {
   if (typeof window !== "undefined" && window.location) {
     const hostname = window.location.hostname;
+    const port = window.location.port;
     const isLocal = hostname === "localhost" ||
       hostname === "127.0.0.1" ||
       hostname.startsWith("192.168.") ||
       hostname.startsWith("10.") ||
-      /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname);
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname) ||
+      port === "3000" ||
+      port === "3001" ||
+      hostname.includes(".local") ||
+      !hostname.includes(".");
     if (isLocal) {
-      return `http://${hostname}:5000`;
+      return `http://${hostname}:5001`;
     }
   }
   return process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
@@ -1047,343 +1052,187 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
 }
 
 function Hero({ onShop, onRitual }) {
-  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth <= 768 : false);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth <= 900 : false);
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 768);
+    const check = () => setIsMobile(window.innerWidth <= 900);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
 
+
   /* ────────────────────────────────────────────────────────────
-     MOBILE HERO
+     MOBILE HERO — stone bag + crystal image below text
   ──────────────────────────────────────────────────────────── */
   if (isMobile) return (
-    <section style={{
-      position: "relative",
-      width: "100%",
-      minHeight: "100vh",
-      background: `url(${process.env.PUBLIC_URL || ""}/hero_mobile_bg.png) no-repeat center center / cover`,
-      paddingTop: "90px",
-      paddingBottom: "40px",
-      paddingLeft: "1.25rem",
-      paddingRight: "1.25rem",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "space-between",
-      overflow: "hidden"
-    }}>
+    <section style={{ background: "#F5F0E8", width: "100%", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
 
-      {/* Content Wrapper */}
-      <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
-        {/* 8-pointed star */}
-        <div style={{ marginBottom: "0.8rem" }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2L13.5 9.5L21 11L13.5 12.5L12 20L10.5 12.5L3 11L10.5 9.5Z" fill="#A68D60" />
-            <path d="M12 6L13 10L17 11L13 12L12 16L11 12L7 11L11 10Z" fill="#A68D60" opacity="0.6" transform="rotate(45 12 11)" />
+      {/* Faint leaf shadow on top-right — decorative only */}
+      <div style={{ position: "absolute", top: 60, right: -30, width: "60%", height: "45%", background: `url(${process.env.PUBLIC_URL || ""}/hero_mobile_bg.png) no-repeat top right / cover`, opacity: 0.18, zIndex: 0, pointerEvents: "none", borderRadius: 0 }} />
+
+      {/* ── TOP: TEXT BLOCK ── */}
+      <div style={{ position: "relative", zIndex: 1, paddingTop: "88px", paddingLeft: "1.4rem", paddingRight: "1.4rem", paddingBottom: "1.8rem" }}>
+
+        {/* Star */}
+        <div style={{ marginBottom: "0.75rem" }}>
+          <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
+            <path d="M16 2 L17.5 12.5 L28 15 L17.5 17.5 L16 28 L14.5 17.5 L4 15 L14.5 12.5 Z" fill="#A68D60"/>
+            <path d="M16 7 L17 12 L21 13 L17 14 L16 18 L15 14 L11 13 L15 12 Z" fill="#A68D60" opacity="0.38" transform="rotate(45 16 13)"/>
           </svg>
         </div>
 
-        {/* Subheader label */}
-        <div className="hero-sans-subtitle" style={{
-          fontSize: "0.78rem",
-          color: "#5C6654",
-          letterSpacing: "0.05em",
-          marginBottom: "0.6rem"
-        }}>
-          India's <span style={{ color: "#A68D60" }}>Sacred</span> Manifestation Stone
-        </div>
+        {/* Sub-label */}
+        <p style={{ fontSize: "0.77rem", color: "#5C6654", letterSpacing: "0.04em", marginBottom: "0.45rem", fontFamily: "'Inter',sans-serif" }}>
+          India's <span style={{ color: "#A68D60", fontStyle: "italic" }}>Sacred</span> Manifestation Stone
+        </p>
 
-        {/* Title */}
-        <h1 className="hero-serif-title" style={{
-          fontSize: "clamp(2.5rem, 10vw, 3.2rem)",
-          fontWeight: 400,
-          color: "#000000",
-          lineHeight: 1.1,
-          margin: "0 0 0.8rem 0"
-        }}>
-          Turn<br />
-          Intentions<br />
-          <span className="hero-serif-italic" style={{ color: "#4C5A43", marginRight: "8px" }}>into</span>
+        {/* Heading */}
+        <h1 style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(2.6rem,9vw,3.1rem)", fontWeight: 400, color: "#1a1a1a", lineHeight: 1.09, margin: "0 0 0.85rem 0" }}>
+          Turn<br/>
+          Intentions<br/>
+          <span style={{ fontStyle: "italic", color: "#4C5A43" }}>into </span>
           <span style={{ color: "#A68D60", position: "relative" }}>
             Reality
-            <span style={{ fontSize: "0.45em", position: "absolute", top: "-0.2em", right: "-0.45em", color: "#A68D60", fontStyle: "normal" }}>✦</span>
+            <span style={{ fontSize: "0.36em", position: "absolute", top: "-0.4em", right: "-0.6em", color: "#A68D60" }}>✦</span>
           </span>
         </h1>
 
-        {/* Divider */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", width: "100%", maxWidth: "160px", margin: "1rem 0" }}>
-          <div style={{ height: "1px", flex: 1, background: "linear-gradient(95deg, #A68D60, transparent)" }} />
-          <span style={{ color: "#A68D60", fontSize: "8px" }}>✦</span>
-          <div style={{ height: "1px", flex: 1, background: "linear-gradient(275deg, #A68D60, transparent)" }} />
+        {/* Short divider — line + diamond (NOT full width) */}
+        <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: "0.85rem" }}>
+          <div style={{ width: 36, height: 1, background: "#A68D60", opacity: 0.5 }} />
+          <span style={{ color: "#A68D60", fontSize: 9, lineHeight: 1 }}>✦</span>
         </div>
 
         {/* Description */}
-        <p style={{
-          fontSize: "0.85rem",
-          color: "#5C6654",
-          lineHeight: 1.65,
-          marginBottom: "1.6rem",
-          maxWidth: "320px"
-        }}>
+        <p style={{ fontSize: "0.83rem", color: "#5C6654", lineHeight: 1.72, marginBottom: "1.5rem", maxWidth: 305, fontFamily: "'Inter',sans-serif" }}>
           Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
         </p>
 
-        {/* Button */}
+        {/* CTA */}
         <button onClick={onRitual} style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "10px",
-          background: "#1e2618",
-          color: "#ffffff",
-          border: "none",
-          padding: "12px 24px",
-          borderRadius: "6px",
-          fontSize: "0.8rem",
-          fontWeight: 600,
-          cursor: "pointer",
-          letterSpacing: "0.02em",
-          marginBottom: "2rem"
-        }}>
+          display: "inline-flex", alignItems: "center", gap: 9,
+          background: "#1e2618", color: "#fff", border: "none",
+          padding: "12px 20px", borderRadius: 6, fontSize: "0.83rem",
+          fontWeight: 600, cursor: "pointer", letterSpacing: "0.02em",
+          fontFamily: "'Inter',sans-serif",
+          boxShadow: "0 4px 18px rgba(30,38,24,0.26)",
+        }}
+          onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
+          onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+        >
           Explore Rituals
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "4px" }}>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-            <polyline points="12 5 19 12 12 19"></polyline>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
           </svg>
         </button>
       </div>
 
-      {/* Mobile Visual Image Container */}
-      <div style={{
-        width: "100vw",
-        marginLeft: "-1.25rem",
-        marginRight: "-1.25rem",
-        marginBottom: "-40px",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "flex-end",
-        zIndex: 1
-      }}>
-        <img src={`${process.env.PUBLIC_URL || ""}/hero_mobile_stone.png`} alt="Wishstone Ritual Collection" style={{
-          width: "100%",
-          height: "auto",
-          display: "block",
-          border: "none",
-          borderRadius: 0,
-          boxShadow: "none"
-        }} />
-      </div>
-
-      {/* Scroll indicator centered absolutely at bottom of content */}
-      <div style={{
-        position: "absolute",
-        bottom: "12px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: "8px",
-        zIndex: 3,
-        pointerEvents: "none"
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", width: "100%", justifyContent: "center" }}>
-          <div style={{ width: "32px", height: "1px", background: "linear-gradient(90deg, transparent, #A68D60)" }} />
-          <span style={{ color: "#A68D60", fontSize: "10px", lineHeight: 1 }}>✦</span>
-          <div style={{ width: "32px", height: "1px", background: "linear-gradient(270deg, transparent, #A68D60)" }} />
+      {/* ── BOTTOM: PRODUCT IMAGE — full width, no radius, no border ── */}
+      <div style={{ width: "100%", position: "relative", zIndex: 1 }}>
+        <img
+          src={`${process.env.PUBLIC_URL || ""}/hero_mobile_stone.png`}
+          alt="Wishstone Sacred Stone"
+          style={{ width: "100%", height: "auto", display: "block", objectFit: "cover" }}
+          onError={e => {
+            e.currentTarget.src = `${process.env.PUBLIC_URL || ""}/hero_mobile_bg.png`;
+          }}
+        />
+        {/* SCROLL indicator overlaid at bottom of image */}
+        <div style={{ position: "absolute", bottom: 14, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+          <span style={{ color: "#A68D60", fontSize: 9 }}>✦</span>
+          <span style={{ fontSize: "0.54rem", fontWeight: 700, color: "#A68D60", letterSpacing: "0.22em", fontFamily: "'Inter',sans-serif" }}>SCROLL</span>
         </div>
-        <span style={{
-          fontSize: "0.58rem",
-          fontWeight: 700,
-          color: "#A68D60",
-          letterSpacing: "0.22em",
-          textTransform: "uppercase"
-        }}>
-          SCROLL
-        </span>
       </div>
     </section>
   );
 
   /* ────────────────────────────────────────────────────────────
-     DESKTOP HERO
+     DESKTOP HERO — exact match to screenshot
   ──────────────────────────────────────────────────────────── */
   return (
-    <section style={{
-      minHeight: "100vh",
-      background: "#F5F0E8",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      paddingTop: "120px",
-      paddingBottom: "80px",
-      paddingLeft: "clamp(1.5rem, 5vw, 3.5rem)",
-      paddingRight: "clamp(1.5rem, 5vw, 3.5rem)",
-      position: "relative",
-      overflow: "hidden"
-    }}>
-      {/* Background Soft Shadows */}
+    <section style={{ position: "relative", width: "100%", minHeight: "100vh", background: "#F5F0E8", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+
+      {/* Background image — stone on stone slab, right side */}
       <div style={{
-        position: "absolute",
-        top: 0,
-        right: 0,
-        width: "50%",
-        height: "60%",
-        opacity: 0.08,
-        pointerEvents: "none",
-        zIndex: 0
-      }}>
-        <svg viewBox="0 0 100 100" width="100%" height="100%" fill="#4C5A43" filter="blur(2px)">
-          <path d="M100,0 Q60,40 0,70" stroke="#4C5A43" strokeWidth="1.5" fill="none" />
-          <ellipse cx="85" cy="20" rx="20" ry="8" transform="rotate(-30 85 20)" />
-          <ellipse cx="65" cy="35" rx="18" ry="7" transform="rotate(-40 65 35)" />
-          <ellipse cx="80" cy="50" rx="19" ry="8" transform="rotate(-20 80 50)" />
-        </svg>
-      </div>
+        position: "absolute", inset: 0, zIndex: 0,
+        background: `url(${process.env.PUBLIC_URL || ""}/hero_desktop_stone.png) no-repeat center right / contain`,
+      }} />
+      {/* Left-side fade so text is always crisp */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 1, background: "linear-gradient(90deg, rgba(245,240,232,1) 42%, rgba(245,240,232,0.75) 62%, rgba(245,240,232,0.0) 85%)", pointerEvents: "none" }} />
+      {/* Top fade */}
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 120, zIndex: 1, background: "linear-gradient(180deg, rgba(245,240,232,0.9) 0%, transparent 100%)", pointerEvents: "none" }} />
 
-      <div className="max-w" style={{ width: "100%", display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: "3rem", alignItems: "center", position: "relative", zIndex: 1 }}>
-        {/* Left Column: Text & CTA */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-          {/* 8-pointed star */}
-          <div style={{ marginBottom: "1.5rem" }}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L13.5 9.5L21 11L13.5 12.5L12 20L10.5 12.5L3 11L10.5 9.5Z" fill="#A68D60" />
-              <path d="M12 6L13 10L17 11L13 12L12 16L11 12L7 11L11 10Z" fill="#A68D60" opacity="0.6" transform="rotate(45 12 11)" />
-            </svg>
-          </div>
+      {/* ── TEXT COLUMN ── */}
+      <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "120px clamp(1.5rem,5vw,4rem) 60px", maxWidth: 680 }}>
+        {/* Star */}
+        <div style={{ marginBottom: "1.4rem" }}>
+          <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+            <path d="M16 2 L17.8 13.2 L29 15 L17.8 16.8 L16 28 L14.2 16.8 L3 15 L14.2 13.2 Z" fill="#A68D60"/>
+            <path d="M16 7 L17 13 L23 14 L17 15 L16 21 L15 15 L9 14 L15 13 Z" fill="#A68D60" opacity="0.45" transform="rotate(45 16 14)"/>
+          </svg>
+        </div>
 
-          {/* Main Title */}
-          <h1 className="hero-serif-title" style={{
-            fontSize: "clamp(2.8rem, 5vw, 4.4rem)",
-            fontWeight: 400,
-            color: "#000000",
-            lineHeight: 1.1,
-            margin: "0 0 1.2rem 0",
-            textAlign: "left"
-          }}>
-            Turn<br />
-            Intentions<br />
-            <span className="hero-serif-italic" style={{ color: "#4C5A43", marginRight: "12px" }}>into</span>
-            <span style={{ color: "#A68D60", position: "relative" }}>
-              Reality
-              <span style={{ fontSize: "0.45em", position: "absolute", top: "-0.2em", right: "-0.45em", color: "#A68D60", fontStyle: "normal" }}>✦</span>
-            </span>
-          </h1>
+        {/* Heading */}
+        <h1 style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(3.2rem,5.5vw,5rem)", fontWeight: 400, color: "#1a1a1a", lineHeight: 1.06, margin: "0 0 1.2rem 0" }}>
+          Turn<br/>
+          Intentions<br/>
+          <span style={{ fontStyle: "italic", color: "#4C5A43" }}>into </span>
+          <span style={{ color: "#A68D60", position: "relative" }}>
+            Reality
+            <span style={{ fontSize: "0.4em", position: "absolute", top: "-0.3em", right: "-0.5em", color: "#A68D60" }}>✦</span>
+          </span>
+        </h1>
 
-          {/* Divider Line */}
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", width: "100%", maxWidth: "220px", margin: "1.6rem 0" }}>
-            <div style={{ height: "1px", flex: 1, background: "linear-gradient(90deg, #A68D60, transparent)" }} />
-            <span style={{ color: "#A68D60", fontSize: "9px" }}>✦</span>
-            <div style={{ height: "1px", flex: 1, background: "linear-gradient(270deg, #A68D60, transparent)" }} />
-          </div>
+        {/* Divider — short golden line + diamond, NOT full width */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "1.2rem" }}>
+          <div style={{ width: 60, height: 1, background: "#A68D60", opacity: 0.55 }} />
+          <span style={{ color: "#A68D60", fontSize: 13 }}>✦</span>
+        </div>
 
-          {/* Description */}
-          <p style={{
-            fontSize: "clamp(0.88rem, 1.1vw, 1.02rem)",
-            color: "#5C6654",
-            lineHeight: 1.75,
-            marginBottom: "2rem",
-            maxWidth: "420px",
-            textAlign: "left"
-          }}>
-            Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
-          </p>
+        {/* Description */}
+        <p style={{ fontSize: "clamp(0.88rem,1.1vw,1rem)", color: "#5C6654", lineHeight: 1.78, marginBottom: "2.2rem", maxWidth: 400, fontFamily: "'Inter',sans-serif" }}>
+          Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
+        </p>
 
-          {/* Button */}
+        {/* CTA */}
+        <div>
           <button onClick={onRitual} style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "12px",
-            background: "#4C5A43",
-            color: "#ffffff",
-            border: "none",
-            padding: "14px 28px",
-            borderRadius: "6px",
-            fontSize: "0.85rem",
-            fontWeight: 600,
-            cursor: "pointer",
-            letterSpacing: "0.02em",
-            transition: "all 0.25s ease-in-out"
+            display: "inline-flex", alignItems: "center", gap: 12,
+            background: "#4C5A43", color: "#fff", border: "none",
+            padding: "15px 30px", borderRadius: 6, fontSize: "0.88rem",
+            fontWeight: 600, cursor: "pointer", letterSpacing: "0.02em",
+            fontFamily: "'Inter',sans-serif",
+            boxShadow: "0 4px 20px rgba(76,90,67,0.28)",
+            transition: "all 0.25s ease",
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = "#3D4B35"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "#4C5A43"; e.currentTarget.style.transform = "translateY(0)"; }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#3D4B35"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 28px rgba(76,90,67,0.35)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "#4C5A43"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(76,90,67,0.28)"; }}
           >
             Explore Rituals
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "4px" }}>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
             </svg>
           </button>
         </div>
-
-        {/* Right Column: Premium Visual Scene */}
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%" }}>
-          <img src={`${process.env.PUBLIC_URL || ""}/hero_desktop_stone.png`} alt="Sacred Manifestation Stone" style={{
-            width: "100%",
-            maxWidth: "520px",
-            height: "auto",
-            borderRadius: "24px",
-            boxShadow: "0 20px 48px rgba(76,90,67,0.12)",
-            objectFit: "cover"
-          }} />
-        </div>
       </div>
 
-      {/* 4 Key Benefits container at the bottom */}
-      <div style={{
-        marginTop: "5rem",
-        background: "rgba(255, 255, 255, 0.4)",
-        backdropFilter: "blur(8px)",
-        border: "1.2px solid rgba(76, 90, 67, 0.08)",
-        borderRadius: "16px",
-        padding: "24px 32px",
-        width: "100%",
-        maxWidth: "1100px",
-        boxShadow: "0 10px 30px rgba(76, 90, 67, 0.02)",
-        position: "relative",
-        zIndex: 1
-      }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "24px", alignItems: "center" }}>
-          {/* Card 1 */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "0 10px" }}>
-            <div style={{ width: "42px", height: "42px", borderRadius: "50%", background: "#F5F0E8", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "12px" }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.5">
-                <path d="M12 2L19 7L19 17L12 22L5 17L5 7Z M12 2L12 22 M5 7L12 12L19 7 M5 17L12 12L19 17" />
-              </svg>
+      {/* ── BENEFIT CARDS ROW ── */}
+      <div style={{ position: "relative", zIndex: 2, margin: "0 clamp(1.5rem,4vw,3rem) 3rem", background: "rgba(255,255,255,0.72)", backdropFilter: "blur(12px)", borderRadius: 16, padding: "22px 28px", boxShadow: "0 4px 24px rgba(76,90,67,0.08)", border: "1px solid rgba(255,255,255,0.9)" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20, alignItems: "center" }}>
+          {[
+            { label: "Authentic WishStone", svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/><line x1="12" y1="2" x2="12" y2="6"/></svg> },
+            { label: "Ancient Wisdom Meets Modern Life", svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a9 9 0 1 0 0 18A9 9 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg> },
+            { label: "Energy You Can Feel", svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg> },
+            { label: "Made With Intention", svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> },
+          ].map((item, i) => (
+            <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 10 }}>
+              <div style={{ width: 46, height: 46, borderRadius: "50%", background: "#F5F0E8", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {item.svg}
+              </div>
+              <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "#2C3320", lineHeight: 1.35, fontFamily: "'Inter',sans-serif" }}>{item.label}</span>
             </div>
-            <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#2C3320" }}>Authentic WishStone</span>
-          </div>
-
-          {/* Card 2 */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "0 10px", borderLeft: "1px solid rgba(76, 90, 67, 0.08)" }}>
-            <div style={{ width: "42px", height: "42px", borderRadius: "50%", background: "#F5F0E8", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "12px" }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.5">
-                <path d="M12 22V10 M12 10C12 10 16 8 16 5C16 2 12 2 12 5 M12 14C12 14 8 12 8 9C8 6 12 6 12 9 M12 18C12 18 16 16 16 13C16 10 12 10 12 13" />
-              </svg>
-            </div>
-            <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#2C3320" }}>Ancient Wisdom Meets Modern Life</span>
-          </div>
-
-          {/* Card 3 */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "0 10px", borderLeft: "1px solid rgba(76, 90, 67, 0.08)" }}>
-            <div style={{ width: "42px", height: "42px", borderRadius: "50%", background: "#F5F0E8", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "12px" }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.5">
-                <path d="M12 21C12 21 8 16 8 13C8 10 12 7 12 7C12 7 16 10 16 13C16 16 12 21 12 21Z M12 21C12 21 5 18 5 14C5 10 10 9 10 9 C10 9 14 10 14 14C14 18 12 21 12 21Z M12 21C12 21 19 18 19 14C19 10 14 9 14 9" />
-              </svg>
-            </div>
-            <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#2C3320" }}>Energy You Can Feel</span>
-          </div>
-
-          {/* Card 4 */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "0 10px", borderLeft: "1px solid rgba(76, 90, 67, 0.08)" }}>
-            <div style={{ width: "42px", height: "42px", borderRadius: "50%", background: "#F5F0E8", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "12px" }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.5">
-                <path d="M12 12C12 12 15 9 15 7C15 5 13 4 12 5C11 4 9 5 9 7C9 9 12 12 12 12Z M3 14C3 14 5 16 8 16C11 16 12 14 12 14 M21 14C21 14 19 16 16 16C13 16 12 14 12 14 M12 14V22" />
-              </svg>
-            </div>
-            <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "#2C3320" }}>Made With Intention</span>
-          </div>
+          ))}
         </div>
       </div>
     </section>
@@ -1407,7 +1256,6 @@ function StatsBar() {
     </div>
   );
 }
-
 // ─── MARQUEE ──────────────────────────────────────────────────
 function MarqueeSection() {
   const doubled = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
@@ -2934,7 +2782,7 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
     /* ── Card ── */
     .ws-collection-card {
       display:flex;
-      flex-direction:row;
+      flex-direction:column;
       background:#fff;
       border-radius:${CR}px;
       overflow:hidden;
@@ -2943,24 +2791,25 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
       cursor:pointer;
       animation:wsCardIn 0.45s ease both;
       transition:all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      min-height:320px;
+      min-height:auto;
+      position:relative;
     }
     .ws-collection-card:hover {
-      box-shadow:0 20px 40px rgba(90,102,81,0.18);
-      transform:translateY(-6px);
-      border-color:#5A6651 !important;
+      box-shadow:0 20px 44px rgba(90,102,81,0.22);
+      transform:translateY(-5px);
+      border-color:rgba(90,102,81,0.28) !important;
     }
 
     /* ── Card image column ── */
     .ws-card-img {
       position:relative;
-      width:42%;
-      min-width:42%;
-      margin:12px 0 12px 12px;
+      width:calc(100% - 24px);
+      margin:12px 12px 0 12px;
       border-radius:12px;
       overflow:hidden;
       border:1px solid rgba(90,102,81,0.12);
       flex-shrink:0;
+      aspect-ratio:1.15;
     }
     .ws-card-img img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.5s ease; }
     .ws-collection-card:hover .ws-card-img img { transform:scale(1.07); }
@@ -2975,14 +2824,14 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
     .ws-card-body {
       flex:1;
       min-width:0;
-      padding:1.1rem 1.1rem 1rem;
+      padding:1.2rem 1.2rem 1.2rem;
       display:flex;
       flex-direction:column;
       justify-content:space-between;
       transition:background 0.4s ease;
     }
     .ws-collection-card:hover .ws-card-body { background:linear-gradient(135deg,#fafaf8 0%,#f5f2ec 100%); }
-    .ws-collection-card:hover .ws-add-btn { background:#3d4938; }
+    .ws-collection-card:hover .ws-add-btn { background:#2c3320; }
 
     /* ── Category pill ── */
     .ws-cat-pill {
@@ -3005,28 +2854,28 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
 
     /* ── Add to Cart button ── */
     .ws-add-btn {
-      width:100%; padding:12px 0; border-radius:10px;
-      background:${G}; color:#fff; border:none; cursor:pointer;
-      font-size:0.8rem; font-weight:600; letter-spacing:0.04em;
-      display:flex; align-items:center; justify-content:center; gap:7px;
+      width:100%; padding:7px 0; border-radius:8px;
+      background:#3D4935; color:#fff; border:none; cursor:pointer;
+      font-size:0.72rem; font-weight:600; letter-spacing:0.03em;
+      display:flex; align-items:center; justify-content:center; gap:5px;
       transition:background 0.2s, transform 0.15s;
     }
-    .ws-add-btn:hover { background:#4a5542; transform:translateY(-1px); }
+    .ws-add-btn:hover { background:#2C3320; transform:translateY(-1px); }
 
     /* ── Qty row ── */
-    .ws-qty-row { width:100%; border-radius:10px; overflow:hidden; display:flex; border:2px solid ${G}; }
+    .ws-qty-row { width:100%; border-radius:8px; overflow:hidden; display:flex; border:2px solid ${G}; }
     .ws-qty-btn { flex:1; height:40px; background:none; border:none; cursor:pointer; font-size:18px; color:${G}; font-weight:700; transition:background 0.15s; }
     .ws-qty-btn:hover { background:rgba(90,102,81,0.08); }
 
     /* ── Shimmer ── */
     .ws-shimmer { background:linear-gradient(90deg,#ece9e3 25%,#f5f3ef 50%,#ece9e3 75%); background-size:600px 100%; animation:wsShimmer 1.4s infinite; }
     .ws-shimmer-img-skeleton {
-      width:42%;
-      min-width:42%;
-      margin:12px 0 12px 12px;
+      width:calc(100% - 24px) !important;
+      margin:12px 12px 0 12px !important;
       border-radius:12px;
       overflow:hidden;
       flex-shrink:0;
+      aspect-ratio:1.15;
     }
 
     /* ── Shimmer grid (same as prod grid) ── */
@@ -3039,27 +2888,27 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
       margin:0 auto;
       padding:0 clamp(1rem,3vw,2.5rem) 4rem;
     }
-    .ws-shimmer-card { display:flex; border-radius:${CR}px; overflow:hidden; background:#fff; min-height:320px; box-shadow:0 2px 10px rgba(90,102,81,0.07); }
+    .ws-shimmer-card { display:flex; flex-direction:column; border-radius:${CR}px; overflow:hidden; background:#fff; min-height:auto; box-shadow:0 2px 10px rgba(90,102,81,0.07); }
 
     /* ── Tablet ── */
     @media(max-width:900px) {
       .ws-prod-grid, .ws-shimmer-grid { gap:0.9rem; }
-      .ws-card-img, .ws-shimmer-img-skeleton { width:40% !important; min-width:40% !important; margin:12px 0 12px 12px !important; }
+      .ws-card-img, .ws-shimmer-img-skeleton { width:calc(100% - 24px) !important; min-width:auto !important; margin:12px 12px 0 12px !important; }
     }
 
     /* ── Mobile ── */
     @media(max-width:600px) {
       .ws-prod-grid, .ws-shimmer-grid { grid-template-columns:1fr; padding:0 0.85rem 3rem; }
-      .ws-collection-card, .ws-shimmer-card { flex-direction:row; min-height:230px; }
-      .ws-card-img, .ws-shimmer-img-skeleton { width:42% !important; min-width:42% !important; margin:12px 0 12px 12px !important; }
+      .ws-collection-card, .ws-shimmer-card { flex-direction:column; min-height:auto; }
+      .ws-card-img, .ws-shimmer-img-skeleton { width:calc(100% - 24px) !important; min-width:auto !important; margin:12px 12px 0 12px !important; }
       .ws-cat-row { justify-content:flex-start; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; }
     }
 
     /* ── Small phone ── */
     @media(max-width:400px) {
-      .ws-collection-card, .ws-shimmer-card { min-height:210px; }
-      .ws-card-img, .ws-shimmer-img-skeleton { width:40% !important; min-width:40% !important; margin:10px 0 10px 10px !important; }
-      .ws-card-body { padding:0.75rem 0.75rem 0.7rem; }
+      .ws-collection-card, .ws-shimmer-card { min-height:auto; }
+      .ws-card-img, .ws-shimmer-img-skeleton { width:calc(100% - 20px) !important; min-width:auto !important; margin:10px 10px 0 10px !important; }
+      .ws-card-body { padding:0.9rem 0.9rem 0.9rem; }
     }
   `;
 
@@ -3147,13 +2996,13 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
                     ) : null}
                     <div style={{ width: "100%", height: "100%", background: "#ece9e3", display: p.image ? "none" : "flex", alignItems: "center", justifyContent: "center", fontSize: 36, color: G }}>◆</div>
                     {p.discount > 0 && (
-                      <div style={{ position: "absolute", top: 10, left: 10, background: G, color: "#fff", borderRadius: 6, padding: "3px 9px", fontSize: "0.68rem", fontWeight: 700, zIndex: 2 }}>
+                      <div style={{ position: "absolute", top: 10, left: 10, background: "#3D4935", color: "#fff", borderRadius: 4, padding: "3px 9px", fontSize: "0.68rem", fontWeight: 700, zIndex: 2 }}>
                         -{p.discount}%
                       </div>
                     )}
                     <button onClick={e => { e.stopPropagation(); onWish(e, p.id); }}
-                      style={{ position: "absolute", top: 8, right: 8, background: "rgba(255,255,255,0.92)", border: "none", borderRadius: "50%", width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 1px 6px rgba(0,0,0,0.12)", zIndex: 2 }}>
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth={wished.includes(p.id) ? "3.2" : "2"} strokeLinecap="round" strokeLinejoin="round">
+                      style={{ position: "absolute", top: 12, right: 12, background: "#fff", border: "none", borderRadius: "50%", width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 3px 8px rgba(0,0,0,0.14)", zIndex: 2 }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill={wished.includes(p.id) ? G : "none"} stroke={wished.includes(p.id) ? G : "#1a1a1a"} strokeWidth={wished.includes(p.id) ? "3.2" : "2"} strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                       </svg>
                     </button>
@@ -3167,41 +3016,100 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
                         <span style={{ fontSize: "0.6rem", fontWeight: 700, color: G, letterSpacing: "0.14em", textTransform: "uppercase" }}>BEST SELLER</span>
                       </div>
                     )}
-                    <h3 style={{ fontSize: "clamp(0.92rem,1.4vw,1.05rem)", fontWeight: 600, color: "#2c2c2c", marginBottom: "0.28rem", lineHeight: 1.25 }}>{p.name}</h3>
-                    <div style={{ width: 22, height: 2, background: G, borderRadius: 2, marginBottom: "0.4rem", opacity: 0.55 }} />
-                    <p style={{ fontSize: "0.72rem", color: G, fontWeight: 700, letterSpacing: "0.06em", marginBottom: "0.6rem", fontStyle: "italic" }}>
-                      {(() => {
-                        const n = (p.name || "").toLowerCase();
-                        if (n.includes("wishstone")) return "Deep Calm";
-                        if (n.includes("cosmic")) return "Pure Focus";
-                        if (n.includes("diffuser") || n.includes("reed")) return "Vital Energy";
-                        if (n.includes("camphor") || n.includes("kapoor")) return "Sacred Purity";
-                        if (n.includes("habit")) return "Inner Growth";
-                        if (n.includes("candle")) return "Warm Glow";
-                        if (n.includes("incense")) return "Soul Cleanse";
-                        return "Sacred Energy";
-                      })()}
-                    </p>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginBottom: "0.55rem" }}>
-                      <span style={{ fontSize: "clamp(1rem,1.6vw,1.2rem)", fontWeight: 700, color: "#2c2c2c" }}>₹{p.price.toLocaleString("en-IN")}</span>
-                      {p.originalPrice > p.price && <span style={{ fontSize: "0.75rem", color: "#b0a89a", textDecoration: "line-through" }}>₹{p.originalPrice.toLocaleString("en-IN")}</span>}
-                    </div>
-                    {p.stock === 0 ? (
-                      <button disabled style={{ width: "100%", padding: "10px", borderRadius: 10, background: "#e5e7e3", color: "#9ca3af", border: "none", fontSize: "0.72rem", cursor: "not-allowed" }}>Out of Stock</button>
-                    ) : qty > 0 ? (
-                      <div className="ws-qty-row" onClick={e => e.stopPropagation()}>
-                        <button className="ws-qty-btn" onClick={() => onAdd({ ...p, qty: -1 })}>−</button>
-                        <span style={{ flex: 1, textAlign: "center", fontWeight: 700, color: G, fontSize: "0.92rem", display: "flex", alignItems: "center", justifyContent: "center" }}>{qty}</span>
-                        <button className="ws-qty-btn" onClick={e => { e.stopPropagation(); onAdd(p); }}>+</button>
-                      </div>
-                    ) : (
-                      <button className="ws-add-btn" onClick={e => { e.stopPropagation(); onAdd(p); }}>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 01-8 0" /></svg>
-                        Add to Cart
-                      </button>
-                    )}
-                  </div>
-                </div>
+                    <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#1a1a1a", marginBottom: "0.35rem", lineHeight: 1.2, textTransform: "uppercase", letterSpacing: "0.02em", fontFamily: "'Open Sans', sans-serif" }}>{p.name}</h3>
+                    
+                    {/* Stars & Reviews */}
+                     <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "0.55rem" }}>
+                       <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
+                         {[1, 2, 3, 4].map(starNum => (
+                           <svg key={starNum} width="13" height="13" viewBox="0 0 24 24" fill="#E29547" stroke="none">
+                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                           </svg>
+                         ))}
+                         {/* 5th Star (half-filled for 4.5 rating) */}
+                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style={{ position: "relative" }}>
+                           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#E29547" clipPath="inset(0 50% 0 0)" />
+                           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="#E29547" strokeWidth="2.2" fill="none" />
+                         </svg>
+                       </div>
+                       <span style={{ fontSize: "0.76rem", color: "#6b7280", fontWeight: 600, fontFamily: "'Open Sans', sans-serif" }}>
+                         {(() => {
+                           const n = (p.name || "").toLowerCase();
+                           if (n.includes("wishstone")) return "4.9 | 1480 Reviews";
+                           if (n.includes("cosmic")) return "4.8 | 1210 Reviews";
+                           if (n.includes("vibe") || n.includes("flow")) return "4.5 | 1280 Reviews";
+                           if (n.includes("diffuser") || n.includes("reed")) return "4.7 | 850 Reviews";
+                           if (n.includes("camphor") || n.includes("kapoor")) return "4.9 | 920 Reviews";
+                           if (n.includes("habit")) return "4.6 | 620 Reviews";
+                           return "4.7 | 450 Reviews";
+                         })()}
+                       </span>
+                     </div>
+
+                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "0.9rem" }}>
+                       <span style={{ fontSize: "1.05rem", fontWeight: 800, color: "#1a1a1a", fontFamily: "'Open Sans', sans-serif" }}>
+                         Rs. {p.price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                       </span>
+                       {p.originalPrice > p.price && (
+                         <span style={{ fontSize: "0.82rem", color: "#9ca3af", textDecoration: "line-through", fontFamily: "'Open Sans', sans-serif" }}>
+                           Rs. {p.originalPrice.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                         </span>
+                       )}
+                     </div>
+
+                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", marginTop: "auto", width: "100%" }} onClick={e => e.stopPropagation()}>
+                       <div style={{ flex: 1 }}>
+                         {p.stock === 0 ? (
+                           <button disabled style={{ width: "100%", height: "36px", borderRadius: "8px", background: "#e5e7e3", color: "#9ca3af", border: "none", fontSize: "0.78rem", cursor: "not-allowed", fontWeight: 700 }}>Out of Stock</button>
+                         ) : qty > 0 ? (
+                           <div className="ws-qty-row" style={{ height: "36px" }}>
+                             <button className="ws-qty-btn" onClick={() => onAdd({ ...p, qty: -1 })} style={{ height: "100%", fontSize: "14px" }}>−</button>
+                             <span style={{ flex: 1, textAlign: "center", fontWeight: 700, color: G, fontSize: "0.85rem", display: "flex", alignItems: "center", justifyContent: "center", gap: 4, height: "100%" }}>
+                               {/* Unlock icon — filled shackle open */}
+                               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                 <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+                               </svg>
+                               {qty}
+                             </span>
+                             <button className="ws-qty-btn" onClick={() => onAdd(p)} style={{ height: "100%", fontSize: "14px" }}>+</button>
+                           </div>
+                         ) : (
+                           <button className="ws-add-btn" onClick={() => onAdd(p)} style={{ height: "36px", padding: 0, borderRadius: "8px", background: "#3D4935" }}>
+                             {/* Lock icon — outline, not filled (unlocks after add) */}
+                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                               <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                             </svg>
+                             Add to Cart
+                           </button>
+                         )}
+                       </div>
+                       
+                       <a 
+                         href={`https://wa.me/918171440017?text=${encodeURIComponent(`Hi! I'm interested in the "${p.name}". Can you please share more details?`)}`}
+                         target="_blank"
+                         rel="noreferrer"
+                         style={{
+                           width: "42px",
+                           height: "42px",
+                           borderRadius: "50%",
+                           background: "#25D366",
+                           display: "flex",
+                           alignItems: "center",
+                           justifyContent: "center",
+                           flexShrink: 0,
+                           boxShadow: "0 3px 8px rgba(37, 211, 102, 0.2)",
+                           cursor: "pointer"
+                         }}
+                       >
+                         <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" style={{ display: "block" }}>
+                           <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 2.8 1.4 4.8 1.4 5.529 0 10.027-4.498 10.03-10.03.001-2.68-1.041-5.197-2.932-7.091-1.89-1.893-4.402-2.935-7.1-2.935-5.535 0-10.033 4.5-10.038 10.031-.002 1.95.509 3.2 1.442 4.81l-1.026 3.75 3.824-1.006zm9.206-5.834c-.269-.134-1.593-.787-1.84-.875-.246-.089-.425-.134-.604.134-.179.269-.691.875-.848 1.054-.156.179-.313.201-.582.067-.268-.134-1.134-.418-2.161-1.334-.8-.713-1.34-1.593-1.498-1.861-.156-.269-.017-.414.118-.548.12-.12.269-.314.403-.47.134-.157.179-.269.269-.449.09-.179.045-.337-.023-.471-.067-.134-.604-1.457-.827-1.995-.218-.523-.459-.452-.604-.452H8.38c-.179 0-.471.067-.717.337-.246.269-.94.92-.94 2.24 0 1.32.96 2.597 1.094 2.776.134.179 1.892 2.89 4.582 4.053.64.276 1.139.442 1.528.566.643.204 1.229.175 1.691.107.514-.077 1.593-.65 1.817-1.278.224-.628.224-1.166.157-1.278-.067-.112-.246-.179-.515-.313z" />
+                         </svg>
+                       </a>
+                     </div>
+                   </div>
+                 </div>
               );
             })}
           </div>
