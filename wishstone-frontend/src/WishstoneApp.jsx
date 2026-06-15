@@ -27,15 +27,27 @@ const getApiBase = () => {
       return `http://${hostname}:5001`;
     }
   }
-  return process.env.REACT_APP_API_URL || "https://wishstone.onrender.com";
+  const envUrl = process.env.REACT_APP_API_URL;
+  if (envUrl && !envUrl.includes("localhost") && !envUrl.includes("127.0.0.1")) {
+    return envUrl;
+  }
+  return "https://wishstone.onrender.com";
 };
 
 const getImageUrl = (img) => {
   if (!img) return "";
-  if (img.startsWith("http://") || img.startsWith("https://") || img.startsWith("data:")) {
+  const base = getApiBase();
+  if (img.startsWith("http://") || img.startsWith("https://")) {
+    if (!base.includes("localhost") && !base.includes("127.0.0.1")) {
+      if (img.includes("localhost:") || img.includes("127.0.0.1:")) {
+        return img.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/, base);
+      }
+    }
     return img;
   }
-  const base = getApiBase();
+  if (img.startsWith("data:")) {
+    return img;
+  }
   const cleanImg = img.startsWith("/") ? img : `/${img}`;
   return `${base}${cleanImg}`;
 };
@@ -7578,24 +7590,33 @@ function OrderConfirmModal({ order, onClose }) {
 
 // ─── PROMO MODAL ──────────────────────────────────────────────
 function PromoModal({ onClose, onShop, userEmail }) {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(userEmail || "");
+  const [emailError, setEmailError] = useState("");
   const [claimed, setClaimed] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [emailError, setEmailError] = useState("");
-  const COUPON = "WOW300";
+
+  const COUPON = "SACRED300";
 
   const handleClaim = () => {
-    if (!email.trim()) { setEmailError("Please enter your email."); return; }
-    if (userEmail && email.trim().toLowerCase() !== userEmail.toLowerCase()) {
-      setEmailError("Invalid email. Please use your registered email address.");
+    if (!email || !email.includes("@")) {
+      setEmailError("Please enter a valid email address.");
       return;
     }
     setEmailError("");
-    const claimKey = userEmail
-      ? `ws_coupon_claimed_${userEmail}`
-      : `ws_coupon_claimed_guest`;
-    localStorage.setItem(claimKey, "1");
-    setClaimed(true);
+    const API_BASE = getApiBase();
+    fetch(`${API_BASE}/api/auth/register-promo`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    })
+      .then(r => r.json())
+      .then(data => {
+        setClaimed(true);
+      })
+      .catch(() => {
+        // Fallback claim in case database register fails
+        setClaimed(true);
+      });
   };
 
   const handleCopy = () => {
@@ -7609,7 +7630,7 @@ function PromoModal({ onClose, onShop, userEmail }) {
       {/* Backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: 0.5 }}
+        animate={{ opacity: 0.55 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
         style={{
@@ -7622,23 +7643,23 @@ function PromoModal({ onClose, onShop, userEmail }) {
 
       {/* Modal Card */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.92, y: 20 }}
+        initial={{ opacity: 0, scale: 0.94, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 15 }}
+        exit={{ opacity: 0, scale: 0.96, y: 15 }}
         transition={{ type: "spring", damping: 28, stiffness: 240 }}
         onClick={e => e.stopPropagation()}
         style={{
-          background: "linear-gradient(180deg, #F9F6F0 0%, #EDE6DB 100%)",
-          borderRadius: 28,
+          background: "#FDFBF7",
+          borderRadius: 24,
           maxWidth: 440,
           width: "100%",
-          padding: "2.8rem 2.2rem 1.8rem",
-          boxShadow: "0 30px 70px rgba(44,51,32,0.22)",
+          padding: "2.5rem 0 0 0",
+          boxShadow: "0 20px 50px rgba(0,0,0,0.15)",
           position: "relative",
           zIndex: 2,
           textAlign: "center",
           fontFamily: "'Open Sans', sans-serif",
-          border: "1px solid rgba(76, 90, 67, 0.12)",
+          border: "1px solid rgba(141,122,91,0.14)",
           overflow: "hidden",
         }}
       >
@@ -7647,267 +7668,322 @@ function PromoModal({ onClose, onShop, userEmail }) {
           onClick={onClose}
           style={{
             position: "absolute",
-            top: 18,
-            right: 18,
+            top: 20,
+            right: 20,
             background: "none",
             border: "none",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: "#2C3320",
+            color: "#000000",
             opacity: 0.6,
             transition: "opacity 0.2s",
+            zIndex: 10,
           }}
-          onMouseEnter={e => e.currentTarget.style.opacity = 1}
-          onMouseLeave={e => e.currentTarget.style.opacity = 0.6}
+          onMouseEnter={e => { e.currentTarget.style.opacity = 1; }}
+          onMouseLeave={e => { e.currentTarget.style.opacity = 0.6; }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
         </button>
 
-        {/* Logo & Header */}
-        <div style={{ marginBottom: "1.2rem" }}>
-          <img
-            src={`${process.env.PUBLIC_URL || ""}/wishstone svg.svg`}
-            alt="WishStone"
-            style={{ height: 26, width: "auto", margin: "0 auto", display: "block" }}
-          />
-          <div style={{ fontSize: "0.65rem", letterSpacing: "0.25rem", color: "#8D7A5B", marginTop: 6, fontWeight: 800 }}>
-            SACRED STORE
-          </div>
-        </div>
-
-        {!claimed ? (
-          <>
-            {/* Title */}
-            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.4rem, 4vw, 1.8rem)", color: "#2C3320", fontWeight: 400, lineHeight: 1.3, marginBottom: "0.6rem" }}>
-              Begin your <span style={{ fontStyle: "italic", color: "#8D7A5B", fontFamily: "'Playfair Display', serif" }}>sacred</span> journey with us
-            </h3>
-
-            {/* Sparkle Divider */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", width: "100%", margin: "0.6rem 0 0.8rem 0" }}>
-              <div style={{ height: "1px", flex: 1, background: "linear-gradient(90deg, transparent, rgba(141,122,91,0.22))" }} />
-              <span style={{ color: "#8D7A5B", fontSize: "12px" }}>✦</span>
-              <div style={{ height: "1px", flex: 1, background: "linear-gradient(270deg, transparent, rgba(141,122,91,0.22))" }} />
+        {/* Content Wrapper (with padding) */}
+        <div style={{ padding: "0 2.2rem" }}>
+          {/* Logo & Header */}
+          <div style={{ marginBottom: "1.4rem" }}>
+            <img
+              src={`${process.env.PUBLIC_URL || ""}/wishstone svg.svg`}
+              alt="WishStone"
+              style={{ height: 24, width: "auto", margin: "0 auto", display: "block" }}
+            />
+            <div style={{ fontSize: "0.6rem", letterSpacing: "0.22em", color: "#A68D60", marginTop: 6, fontWeight: 700, fontFamily: "'Inter', sans-serif" }}>
+              SACRED STORE
             </div>
+          </div>
 
-            {/* Subheader */}
-            <p style={{ fontSize: "0.85rem", color: "#5C6654", lineHeight: 1.5, marginBottom: "1.4rem", padding: "0 10px" }}>
-              Unlock <span style={{ color: "#8D7A5B", fontWeight: 700 }}>₹300 OFF</span> on your first order and step into something meaningful.
-            </p>
+          {!claimed ? (
+            <>
+              {/* Title */}
+              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.85rem", color: "#1a1a1a", fontWeight: 400, lineHeight: 1.25, marginBottom: "0.6rem" }}>
+                Begin your <span style={{ fontStyle: "italic", color: "#A68D60", fontFamily: "'Playfair Display', serif" }}>sacred</span> journey with us
+              </h3>
 
-            {/* Input field wrapper */}
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              background: "rgba(255,255,255,0.45)",
-              border: `1px solid ${emailError ? "#c0392b" : "rgba(76, 90, 67, 0.18)"}`,
-              borderRadius: 12,
-              padding: "0 14px",
-              height: "46px",
-              marginBottom: emailError ? "0.3rem" : "1rem",
-              transition: "border-color 0.2s",
-              width: "100%",
-            }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8D7A5B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.8 }}>
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                <polyline points="22,6 12,13 2,6" />
-              </svg>
-              <input
-                type="email"
-                value={email}
-                onChange={e => { setEmail(e.target.value); setEmailError(""); }}
-                placeholder="Email address"
+              {/* Sparkle Divider */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", width: "100%", margin: "0.8rem 0 1rem 0" }}>
+                <div style={{ height: "1px", flex: 1, background: "rgba(166,141,96,0.25)" }} />
+                <span style={{ color: "#A68D60", fontSize: "10px" }}>✦</span>
+                <div style={{ height: "1px", flex: 1, background: "rgba(166,141,96,0.25)" }} />
+              </div>
+
+              {/* Subheader */}
+              <p style={{ fontSize: "0.82rem", color: "#5C6654", lineHeight: 1.5, marginBottom: "1.4rem", padding: "0 8px", fontFamily: "'Inter', sans-serif" }}>
+                Unlock <span style={{ color: "#A68D60", fontWeight: 700 }}>₹300 OFF</span> on your first order<br/>and step into something meaningful.
+              </p>
+
+              {/* Input field wrapper */}
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                background: "#F5F0E8",
+                border: `1px solid ${emailError ? "#c0392b" : "rgba(76, 90, 67, 0.08)"}`,
+                borderRadius: 12,
+                padding: "0 14px",
+                height: "46px",
+                marginBottom: emailError ? "0.3rem" : "1rem",
+                transition: "border-color 0.2s",
+                width: "100%",
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A68D60" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.85 }}>
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => { setEmail(e.target.value); setEmailError(""); }}
+                  placeholder="Email address"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    background: "none",
+                    border: "none",
+                    outline: "none",
+                    fontSize: "0.84rem",
+                    color: "#1a1a1a",
+                    fontFamily: "'Inter', sans-serif"
+                  }}
+                  onKeyDown={e => e.key === "Enter" && handleClaim()}
+                />
+              </div>
+              {emailError && <p style={{ fontSize: "0.72rem", color: "#c0392b", marginBottom: "0.8rem", textAlign: "left", paddingLeft: 4 }}>{emailError}</p>}
+
+              {/* Submit Button */}
+              <button
+                onClick={handleClaim}
                 style={{
                   width: "100%",
-                  height: "100%",
-                  background: "none",
+                  height: "46px",
+                  background: "#3D4935",
+                  color: "#fff",
                   border: "none",
-                  outline: "none",
-                  fontSize: "0.88rem",
-                  color: "#2C3320",
-                  fontFamily: "'Open Sans', sans-serif"
-                }}
-                onKeyDown={e => e.key === "Enter" && handleClaim()}
-              />
-            </div>
-            {emailError && <p style={{ fontSize: "0.72rem", color: "#c0392b", marginBottom: "0.8rem", textAlign: "left", paddingLeft: 4 }}>{emailError}</p>}
-
-            {/* Submit Button */}
-            <button
-              onClick={handleClaim}
-              style={{
-                width: "100%",
-                height: "46px",
-                background: "#4C5A43",
-                color: "#fff",
-                border: "none",
-                borderRadius: 12,
-                fontSize: "0.88rem",
-                fontWeight: 700,
-                cursor: "pointer",
-                fontFamily: "'Open Sans', sans-serif",
-                letterSpacing: "0.02em",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
-                transition: "all 0.3s ease",
-                boxShadow: "0 8px 20px rgba(76, 90, 67, 0.15)"
-              }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#384332"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#4C5A43"; e.currentTarget.style.transform = "translateY(0)"; }}
-            >
-              Unlock My Offer ✦
-            </button>
-
-            {/* Reject Link */}
-            <div style={{ marginTop: "0.8rem" }}>
-              <button
-                onClick={onClose}
-                style={{
-                  background: "none",
-                  border: "none",
+                  borderRadius: 12,
+                  fontSize: "0.86rem",
+                  fontWeight: 700,
                   cursor: "pointer",
-                  fontSize: "0.72rem",
-                  color: "#7C8675",
-                  fontFamily: "'Open Sans', sans-serif",
-                  textDecoration: "underline",
-                  transition: "color 0.2s"
+                  fontFamily: "'Inter', sans-serif",
+                  letterSpacing: "0.02em",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "6px",
+                  transition: "all 0.25s ease",
+                  boxShadow: "0 4px 14px rgba(61,73,53,0.18)"
                 }}
-                onMouseEnter={e => e.currentTarget.style.color = "#4C5A43"}
-                onMouseLeave={e => e.currentTarget.style.color = "#7C8675"}
+                onMouseEnter={e => { e.currentTarget.style.background = "#2C3320"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "#3D4935"; e.currentTarget.style.transform = "translateY(0)"; }}
               >
-                No thanks, I'll pay full price
+                Unlock My Offer ✦
               </button>
-            </div>
-          </>
-        ) : (
-          <>
-            {/* Coupon State */}
-            <div style={{ fontSize: 40, marginBottom: "0.6rem" }}>🎉</div>
-            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", color: "#2C3320", marginBottom: "0.4rem", fontWeight: 700 }}>
-              Your coupon is ready!
-            </h3>
-            <p style={{ fontSize: "0.8rem", color: "#7C8675", marginBottom: "1.4rem" }}>
-              Copy the code below and use it at checkout
-            </p>
-            <div
-              onClick={handleCopy}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                background: "rgba(76, 90, 67, 0.05)",
-                border: `2px dashed #4C5A43`,
-                borderRadius: 14,
-                padding: "12px 18px",
-                cursor: "pointer",
-                marginBottom: "1.4rem",
-                transition: "all 0.2s"
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(76, 90, 67, 0.1)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(76, 90, 67, 0.05)"}
-            >
-              <span style={{ fontSize: "1.5rem", fontWeight: 800, color: "#4C5A43", letterSpacing: "0.1em" }}>
-                {COUPON}
-              </span>
-              <span style={{ background: copied ? "#2d7a5a" : "#4C5A43", color: "#fff", borderRadius: 8, padding: "6px 12px", fontSize: "0.7rem", fontWeight: 700, transition: "background 0.2s" }}>
-                {copied ? "✓ Copied!" : "COPY"}
-              </span>
-            </div>
-            <button
-              onClick={() => { onClose(); onShop(); }}
-              style={{
-                width: "100%",
-                height: "46px",
-                fontSize: "0.85rem",
-                borderRadius: 12,
-                background: "#4C5A43",
-                color: "#fff",
-                border: "none",
-                fontWeight: 700,
-                cursor: "pointer",
-                transition: "background 0.2s",
-                boxShadow: "0 8px 20px rgba(76, 90, 67, 0.15)"
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = "#384332"}
-              onMouseLeave={e => e.currentTarget.style.background = "#4C5A43"}
-            >
-              Shop Now & Save
-            </button>
-          </>
-        )}
 
-        {/* Realistic Stone Image Container */}
-        <div style={{ position: "relative", width: "100%", height: "200px", borderRadius: "18px", overflow: "hidden", marginTop: "1.4rem", border: "1px solid rgba(76, 90, 67, 0.08)" }}>
+              {/* Reject Link */}
+              <div style={{ marginTop: "0.8rem", marginBottom: "0.4rem" }}>
+                <button
+                  onClick={onClose}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: "0.72rem",
+                    color: "#7C8675",
+                    fontFamily: "'Inter', sans-serif",
+                    textDecoration: "underline",
+                    transition: "color 0.2s"
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.color = "#3D4935"; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = "#7C8675"; }}
+                >
+                  No thanks, I'll pay full price
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Coupon State */}
+              <div style={{ fontSize: 40, marginBottom: "0.6rem" }}>🎉</div>
+              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", color: "#2C3320", marginBottom: "0.4rem", fontWeight: 700 }}>
+                Your coupon is ready!
+              </h3>
+              <p style={{ fontSize: "0.8rem", color: "#7C8675", marginBottom: "1.4rem" }}>
+                Copy the code below and use it at checkout
+              </p>
+              <div
+                onClick={handleCopy}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  background: "rgba(76, 90, 67, 0.05)",
+                  border: `2px dashed #4C5A43`,
+                  borderRadius: 14,
+                  padding: "12px 18px",
+                  cursor: "pointer",
+                  marginBottom: "1.4rem",
+                  transition: "all 0.2s"
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(76, 90, 67, 0.1)"}
+                onMouseLeave={e => e.currentTarget.style.background = "rgba(76, 90, 67, 0.05)"}
+              >
+                <span style={{ fontSize: "1.5rem", fontWeight: 800, color: "#4C5A43", letterSpacing: "0.1em" }}>
+                  {COUPON}
+                </span>
+                <span style={{ background: copied ? "#2d7a5a" : "#4C5A43", color: "#fff", borderRadius: 8, padding: "6px 12px", fontSize: "0.7rem", fontWeight: 700, transition: "background 0.2s" }}>
+                  {copied ? "✓ Copied!" : "COPY"}
+                </span>
+              </div>
+              <button
+                onClick={() => { onClose(); onShop(); }}
+                style={{
+                  width: "100%",
+                  height: "46px",
+                  fontSize: "0.85rem",
+                  borderRadius: 12,
+                  background: "#4C5A43",
+                  color: "#fff",
+                  border: "none",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  transition: "background 0.2s",
+                  boxShadow: "0 8px 20px rgba(76, 90, 67, 0.15)",
+                  marginBottom: "1.2rem",
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = "#384332"}
+                onMouseLeave={e => e.currentTarget.style.background = "#4C5A43"}
+              >
+                Shop Now & Save
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Bottom Stone Image + Overlapping Capsule Container */}
+        <div style={{
+          position: "relative",
+          width: "100%",
+          height: "230px",
+          marginTop: "1.2rem",
+          background: "linear-gradient(to bottom, #F5F0E8, #DFD9CE)",
+          overflow: "hidden"
+        }}>
+          {/* Main Stone Image */}
           <img
             src={`${process.env.PUBLIC_URL || ""}/wishstone-product-login.png`}
             alt="Sacred stone"
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
             onError={e => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "block"; }}
           />
+          {/* Fallback stylized gold stone if image fails */}
           <div style={{ display: "none", position: "absolute", inset: 0, margin: "auto", width: "60%", height: "80%", background: "radial-gradient(ellipse at 60% 40%, #d4c5a9 0%, #c4a882 40%, #8d7355 100%)", borderRadius: "50% 45% 55% 48%" }} />
+          
           {/* Leaf shadow overlay */}
-          <div style={{ position: "absolute", top: 0, left: 0, width: "50%", height: "100%", background: "linear-gradient(135deg, rgba(76,90,67,0.08) 0%, transparent 60%)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "linear-gradient(135deg, rgba(76,90,67,0.08) 0%, transparent 60%)", pointerEvents: "none" }} />
+          
           {/* Concentric gold rings overlay */}
-          <div style={{ position: "absolute", border: "1px solid rgba(141,122,91,0.22)", borderRadius: "50%", width: "180px", height: "180px", top: "-30px", right: "-30px", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", border: "1px solid rgba(141,122,91,0.14)", borderRadius: "50%", width: "240px", height: "240px", top: "-60px", right: "-60px", pointerEvents: "none" }} />
-        </div>
+          <div style={{
+            position: "absolute",
+            border: "1px solid rgba(166,141,96,0.18)",
+            borderRadius: "50%",
+            width: "260px",
+            height: "260px",
+            bottom: "-80px",
+            right: "-40px",
+            pointerEvents: "none"
+          }} />
+          <div style={{
+            position: "absolute",
+            border: "1px solid rgba(166,141,96,0.11)",
+            borderRadius: "50%",
+            width: "340px",
+            height: "340px",
+            bottom: "-120px",
+            right: "-80px",
+            pointerEvents: "none"
+          }} />
+          
+          {/* Star sparkle on the ring */}
+          <span style={{
+            position: "absolute",
+            color: "rgba(166,141,96,0.45)",
+            fontSize: "12px",
+            bottom: "105px",
+            right: "135px",
+            pointerEvents: "none"
+          }}>✦</span>
 
-        {/* Features Row Pill at the very bottom */}
-        <div style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          background: "rgba(255, 255, 255, 0.78)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          borderRadius: "14px",
-          border: "1px solid rgba(255, 255, 255, 0.55)",
-          padding: "8px 12px",
-          width: "100%",
-          marginTop: "1.2rem",
-          boxShadow: "0 8px 24px rgba(44, 51, 32, 0.06)"
-        }}>
-          {/* Item 1 */}
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", flex: 1, textAlign: "left" }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8D7A5B" strokeWidth="2">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-            </svg>
-            <div style={{ fontSize: "0.58rem", fontWeight: 700, color: "#2C3320", lineHeight: 1.25 }}>
-              Handpicked<br />with Intention
+          {/* Overlapping White Capsule */}
+          <div style={{
+            position: "absolute",
+            bottom: "16px",
+            left: "16px",
+            right: "16px",
+            background: "rgba(253, 251, 247, 0.94)",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+            borderRadius: "14px",
+            border: "1px solid rgba(166, 141, 96, 0.22)",
+            padding: "10px 14px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.06)"
+          }}>
+            {/* Item 1 */}
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", flex: 1, textAlign: "left" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A68D60" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 3L17 8L15 16L12 21L9 16L7 8L12 3Z" />
+                <path d="M12 3V21" />
+                <path d="M7 8L12 11L17 8" />
+                <path d="M9 16L12 13L15 16" />
+                <path d="M4 8h2 M5 7v2" strokeWidth="1" />
+                <path d="M19 15h2 M20 14v2" strokeWidth="1" />
+              </svg>
+              <div style={{ fontSize: "0.58rem", fontWeight: 700, color: "#2c3320", lineHeight: 1.25, fontFamily: "'Inter', sans-serif" }}>
+                Handpicked<br />with Intention
+              </div>
             </div>
-          </div>
-          {/* Divider */}
-          <div style={{ width: "1px", height: "22px", background: "rgba(76, 90, 67, 0.12)", margin: "0 4px" }} />
-          {/* Item 2 */}
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", flex: 1.2, textAlign: "left" }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8D7A5B" strokeWidth="2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg>
-            <div style={{ fontSize: "0.58rem", fontWeight: 700, color: "#2C3320", lineHeight: 1.25 }}>
-              Made to Elevate<br />Your Energy
+            {/* Divider */}
+            <div style={{ width: "1px", height: "22px", background: "rgba(166, 141, 96, 0.18)", margin: "0 6px" }} />
+            {/* Item 2 */}
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", flex: 1.1, textAlign: "left" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A68D60" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 18h4c1 0 2-1 2.5-2s1.5-3 3.5-3h4c1.5 0 3 .5 4 1.5l2 2" />
+                <path d="M5 15c1-2 2-3.5 4-3.5" />
+                <path d="M13 5l2.5 3L13 11l-2.5-3z" />
+                <path d="M13 5v6" />
+                <path d="M17 4h2M18 3v2" strokeWidth="1" />
+              </svg>
+              <div style={{ fontSize: "0.58rem", fontWeight: 700, color: "#2c3320", lineHeight: 1.25, fontFamily: "'Inter', sans-serif" }}>
+                Made to Elevate<br />Your Energy
+              </div>
             </div>
-          </div>
-          {/* Divider */}
-          <div style={{ width: "1px", height: "22px", background: "rgba(76, 90, 67, 0.12)", margin: "0 4px" }} />
-          {/* Item 3 */}
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", flex: 1.2, textAlign: "left" }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8D7A5B" strokeWidth="2">
-              <circle cx="12" cy="12" r="10" />
-              <circle cx="12" cy="12" r="4" />
-            </svg>
-            <div style={{ fontSize: "0.58rem", fontWeight: 700, color: "#2C3320", lineHeight: 1.25 }}>
-              For Your Journey<br />of Manifestation
+            {/* Divider */}
+            <div style={{ width: "1px", height: "22px", background: "rgba(166, 141, 96, 0.18)", margin: "0 6px" }} />
+            {/* Item 3 */}
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", flex: 1.1, textAlign: "left" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A68D60" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 21a9 9 0 1 1 5.3-16.2" />
+                <path d="M12 8l1.5 2.5L15 12l-1.5 1.5L12 16l-1.5-1.5L9 12l1.5-2.5z" />
+                <circle cx="12" cy="12" r="1.5" fill="#A68D60" />
+              </svg>
+              <div style={{ fontSize: "0.58rem", fontWeight: 700, color: "#2c3320", lineHeight: 1.25, fontFamily: "'Inter', sans-serif" }}>
+                For Your Journey<br />of Manifestation
+              </div>
             </div>
           </div>
         </div>
-
       </motion.div>
     </div>
   );
@@ -7933,8 +8009,8 @@ function ProductPageWrapper({ onAdd, onAddAnim, onWish, wished, cart, onShop }) 
           setProduct({
             ...p,
             id: p._id,
-            image: p.images?.[0] || "",
-            images: p.images || [],
+            image: getImageUrl(p.images?.[0] || p.image || ""),
+            images: (p.images || [p.image]).filter(Boolean).map(getImageUrl),
             category: p.category?.slug || p.category || "",
             categoryName: p.category?.name || "",
             discount: p.discount || (p.originalPrice ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) : 0),
