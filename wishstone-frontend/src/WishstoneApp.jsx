@@ -7567,19 +7567,29 @@ function PromoModal({ onClose, onShop, userEmail }) {
         onClick={e => e.stopPropagation()}
         style={{
           background: "#FDFBF7",
-          borderRadius: 24,
-          maxWidth: 440,
-          width: "100%",
-          padding: "2.5rem 0 0 0",
-          boxShadow: "0 20px 50px rgba(0,0,0,0.15)",
+          borderRadius: 20,
+          maxWidth: 380,
+          width: "90%",
+          padding: "2.2rem 0 0 0",
+          boxShadow: "0 20px 50px rgba(44, 51, 32, 0.12)",
           position: "relative",
           zIndex: 2,
           textAlign: "center",
           fontFamily: "'Open Sans', sans-serif",
-          border: "1px solid rgba(141,122,91,0.14)",
+          border: "1px solid #DFD9CE",
           overflow: "hidden",
         }}
       >
+        {/* Inset luxury double border */}
+        <div style={{
+          position: "absolute",
+          inset: "8px",
+          border: "1px solid rgba(166, 141, 96, 0.22)",
+          borderRadius: 14,
+          pointerEvents: "none",
+          zIndex: 1,
+        }} />
+
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -7608,7 +7618,7 @@ function PromoModal({ onClose, onShop, userEmail }) {
         </button>
 
         {/* Content Wrapper (with padding) */}
-        <div style={{ padding: "0 2.2rem" }}>
+        <div style={{ padding: "0 1.8rem", position: "relative", zIndex: 2 }}>
           {/* Logo & Header */}
           <div style={{ marginBottom: "1.4rem" }}>
             <img
@@ -7624,7 +7634,7 @@ function PromoModal({ onClose, onShop, userEmail }) {
           {!claimed ? (
             <>
               {/* Title */}
-              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.85rem", color: "#1a1a1a", fontWeight: 400, lineHeight: 1.25, marginBottom: "0.6rem" }}>
+              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", color: "#1a1a1a", fontWeight: 400, lineHeight: 1.25, marginBottom: "0.6rem" }}>
                 Begin your <span style={{ fontStyle: "italic", color: "#A68D60", fontFamily: "'Playfair Display', serif" }}>sacred</span> journey with us
               </h3>
 
@@ -7636,7 +7646,7 @@ function PromoModal({ onClose, onShop, userEmail }) {
               </div>
 
               {/* Subheader */}
-              <p style={{ fontSize: "0.82rem", color: "#5C6654", lineHeight: 1.5, marginBottom: "1.4rem", padding: "0 8px", fontFamily: "'Inter', sans-serif" }}>
+              <p style={{ fontSize: "0.78rem", color: "#5C6654", lineHeight: 1.5, marginBottom: "1.2rem", padding: "0 8px", fontFamily: "'Inter', sans-serif" }}>
                 Unlock <span style={{ color: "#A68D60", fontWeight: 700 }}>₹300 OFF</span> on your first order<br/>and step into something meaningful.
               </p>
 
@@ -7646,10 +7656,10 @@ function PromoModal({ onClose, onShop, userEmail }) {
                 alignItems: "center",
                 gap: "10px",
                 background: "#F5F0E8",
-                border: `1px solid ${emailError ? "#c0392b" : "rgba(76, 90, 67, 0.08)"}`,
-                borderRadius: 12,
+                border: `1px solid ${emailError ? "#c0392b" : "rgba(166, 141, 96, 0.22)"}`,
+                borderRadius: 8,
                 padding: "0 14px",
-                height: "46px",
+                height: "44px",
                 marginBottom: emailError ? "0.3rem" : "1rem",
                 transition: "border-color 0.2s",
                 width: "100%",
@@ -7669,7 +7679,7 @@ function PromoModal({ onClose, onShop, userEmail }) {
                     background: "none",
                     border: "none",
                     outline: "none",
-                    fontSize: "0.84rem",
+                    fontSize: "0.8rem",
                     color: "#1a1a1a",
                     fontFamily: "'Inter', sans-serif"
                   }}
@@ -7683,12 +7693,12 @@ function PromoModal({ onClose, onShop, userEmail }) {
                 onClick={handleClaim}
                 style={{
                   width: "100%",
-                  height: "46px",
+                  height: "44px",
                   background: "#3D4935",
                   color: "#fff",
                   border: "none",
-                  borderRadius: 12,
-                  fontSize: "0.86rem",
+                  borderRadius: 8,
+                  fontSize: "0.82rem",
                   fontWeight: 700,
                   cursor: "pointer",
                   fontFamily: "'Inter', sans-serif",
@@ -7707,14 +7717,14 @@ function PromoModal({ onClose, onShop, userEmail }) {
               </button>
 
               {/* Reject Link */}
-              <div style={{ marginTop: "0.8rem", marginBottom: "0.4rem" }}>
+              <div style={{ marginTop: "0.6rem", marginBottom: "0.8rem" }}>
                 <button
                   onClick={onClose}
                   style={{
                     background: "none",
                     border: "none",
                     cursor: "pointer",
-                    fontSize: "0.72rem",
+                    fontSize: "0.7rem",
                     color: "#7C8675",
                     fontFamily: "'Inter', sans-serif",
                     textDecoration: "underline",
@@ -7730,11 +7740,11 @@ function PromoModal({ onClose, onShop, userEmail }) {
           ) : (
             <>
               {/* Coupon State */}
-              <div style={{ fontSize: 40, marginBottom: "0.6rem" }}>🎉</div>
-              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.4rem", color: "#2C3320", marginBottom: "0.4rem", fontWeight: 700 }}>
+              <div style={{ fontSize: 32, marginBottom: "0.6rem" }}>🎉</div>
+              <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.3rem", color: "#2C3320", marginBottom: "0.4rem", fontWeight: 700 }}>
                 Your coupon is ready!
               </h3>
-              <p style={{ fontSize: "0.8rem", color: "#7C8675", marginBottom: "1.4rem" }}>
+              <p style={{ fontSize: "0.76rem", color: "#7C8675", marginBottom: "1.2rem" }}>
                 Copy the code below and use it at checkout
               </p>
               <div
@@ -7745,19 +7755,19 @@ function PromoModal({ onClose, onShop, userEmail }) {
                   justifyContent: "space-between",
                   background: "rgba(76, 90, 67, 0.05)",
                   border: `2px dashed #4C5A43`,
-                  borderRadius: 14,
-                  padding: "12px 18px",
+                  borderRadius: 8,
+                  padding: "8px 14px",
                   cursor: "pointer",
-                  marginBottom: "1.4rem",
+                  marginBottom: "1.2rem",
                   transition: "all 0.2s"
                 }}
                 onMouseEnter={e => e.currentTarget.style.background = "rgba(76, 90, 67, 0.1)"}
                 onMouseLeave={e => e.currentTarget.style.background = "rgba(76, 90, 67, 0.05)"}
               >
-                <span style={{ fontSize: "1.5rem", fontWeight: 800, color: "#4C5A43", letterSpacing: "0.1em" }}>
+                <span style={{ fontSize: "1.3rem", fontWeight: 800, color: "#4C5A43", letterSpacing: "0.1em" }}>
                   {COUPON}
                 </span>
-                <span style={{ background: copied ? "#2d7a5a" : "#4C5A43", color: "#fff", borderRadius: 8, padding: "6px 12px", fontSize: "0.7rem", fontWeight: 700, transition: "background 0.2s" }}>
+                <span style={{ background: copied ? "#2d7a5a" : "#4C5A43", color: "#fff", borderRadius: 6, padding: "4px 10px", fontSize: "0.65rem", fontWeight: 700, transition: "background 0.2s" }}>
                   {copied ? "✓ Copied!" : "COPY"}
                 </span>
               </div>
@@ -7765,9 +7775,9 @@ function PromoModal({ onClose, onShop, userEmail }) {
                 onClick={() => { onClose(); onShop(); }}
                 style={{
                   width: "100%",
-                  height: "46px",
-                  fontSize: "0.85rem",
-                  borderRadius: 12,
+                  height: "44px",
+                  fontSize: "0.82rem",
+                  borderRadius: 8,
                   background: "#4C5A43",
                   color: "#fff",
                   border: "none",
@@ -7775,7 +7785,7 @@ function PromoModal({ onClose, onShop, userEmail }) {
                   cursor: "pointer",
                   transition: "background 0.2s",
                   boxShadow: "0 8px 20px rgba(76, 90, 67, 0.15)",
-                  marginBottom: "1.2rem",
+                  marginBottom: "1rem",
                 }}
                 onMouseEnter={e => e.currentTarget.style.background = "#384332"}
                 onMouseLeave={e => e.currentTarget.style.background = "#4C5A43"}
@@ -7786,118 +7796,59 @@ function PromoModal({ onClose, onShop, userEmail }) {
           )}
         </div>
 
-        {/* Bottom Stone Image + Overlapping Capsule Container */}
+        {/* Features Footer Section */}
         <div style={{
-          position: "relative",
-          width: "100%",
-          height: "230px",
           marginTop: "1.2rem",
-          background: "linear-gradient(to bottom, #F5F0E8, #DFD9CE)",
-          overflow: "hidden"
+          background: "linear-gradient(to bottom, #FAF8F5, #F4EFE6)",
+          borderTop: "1px solid rgba(166, 141, 96, 0.15)",
+          padding: "12px 18px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          width: "100%",
+          position: "relative",
+          zIndex: 2,
         }}>
-          {/* Main Stone Image */}
-          <img
-            src={`${process.env.PUBLIC_URL || ""}/wishstone-product-login.png`}
-            alt="Sacred stone"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            onError={e => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "block"; }}
-          />
-          {/* Fallback stylized gold stone if image fails */}
-          <div style={{ display: "none", position: "absolute", inset: 0, margin: "auto", width: "60%", height: "80%", background: "radial-gradient(ellipse at 60% 40%, #d4c5a9 0%, #c4a882 40%, #8d7355 100%)", borderRadius: "50% 45% 55% 48%" }} />
-          
-          {/* Leaf shadow overlay */}
-          <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "linear-gradient(135deg, rgba(76,90,67,0.08) 0%, transparent 60%)", pointerEvents: "none" }} />
-          
-          {/* Concentric gold rings overlay */}
-          <div style={{
-            position: "absolute",
-            border: "1px solid rgba(166,141,96,0.18)",
-            borderRadius: "50%",
-            width: "260px",
-            height: "260px",
-            bottom: "-80px",
-            right: "-40px",
-            pointerEvents: "none"
-          }} />
-          <div style={{
-            position: "absolute",
-            border: "1px solid rgba(166,141,96,0.11)",
-            borderRadius: "50%",
-            width: "340px",
-            height: "340px",
-            bottom: "-120px",
-            right: "-80px",
-            pointerEvents: "none"
-          }} />
-          
-          {/* Star sparkle on the ring */}
-          <span style={{
-            position: "absolute",
-            color: "rgba(166,141,96,0.45)",
-            fontSize: "12px",
-            bottom: "105px",
-            right: "135px",
-            pointerEvents: "none"
-          }}>✦</span>
-
-          {/* Overlapping White Capsule */}
-          <div style={{
-            position: "absolute",
-            bottom: "16px",
-            left: "16px",
-            right: "16px",
-            background: "rgba(253, 251, 247, 0.94)",
-            backdropFilter: "blur(10px)",
-            WebkitBackdropFilter: "blur(10px)",
-            borderRadius: "14px",
-            border: "1px solid rgba(166, 141, 96, 0.22)",
-            padding: "10px 14px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            boxShadow: "0 8px 24px rgba(0,0,0,0.06)"
-          }}>
-            {/* Item 1 */}
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", flex: 1, textAlign: "left" }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A68D60" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 3L17 8L15 16L12 21L9 16L7 8L12 3Z" />
-                <path d="M12 3V21" />
-                <path d="M7 8L12 11L17 8" />
-                <path d="M9 16L12 13L15 16" />
-                <path d="M4 8h2 M5 7v2" strokeWidth="1" />
-                <path d="M19 15h2 M20 14v2" strokeWidth="1" />
-              </svg>
-              <div style={{ fontSize: "0.58rem", fontWeight: 700, color: "#2c3320", lineHeight: 1.25, fontFamily: "'Inter', sans-serif" }}>
-                Handpicked<br />with Intention
-              </div>
+          {/* Item 1 */}
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", flex: 1, textAlign: "left" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A68D60" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 3L17 8L15 16L12 21L9 16L7 8L12 3Z" />
+              <path d="M12 3V21" />
+              <path d="M7 8L12 11L17 8" />
+              <path d="M9 16L12 13L15 16" />
+              <path d="M4 8h2 M5 7v2" strokeWidth="1" />
+              <path d="M19 15h2 M20 14v2" strokeWidth="1" />
+            </svg>
+            <div style={{ fontSize: "0.52rem", fontWeight: 700, color: "#2c3320", lineHeight: 1.2, fontFamily: "'Inter', sans-serif" }}>
+              Handpicked<br />with Intention
             </div>
-            {/* Divider */}
-            <div style={{ width: "1px", height: "22px", background: "rgba(166, 141, 96, 0.18)", margin: "0 6px" }} />
-            {/* Item 2 */}
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", flex: 1.1, textAlign: "left" }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A68D60" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M2 18h4c1 0 2-1 2.5-2s1.5-3 3.5-3h4c1.5 0 3 .5 4 1.5l2 2" />
-                <path d="M5 15c1-2 2-3.5 4-3.5" />
-                <path d="M13 5l2.5 3L13 11l-2.5-3z" />
-                <path d="M13 5v6" />
-                <path d="M17 4h2M18 3v2" strokeWidth="1" />
-              </svg>
-              <div style={{ fontSize: "0.58rem", fontWeight: 700, color: "#2c3320", lineHeight: 1.25, fontFamily: "'Inter', sans-serif" }}>
-                Made to Elevate<br />Your Energy
-              </div>
+          </div>
+          {/* Divider */}
+          <div style={{ width: "1px", height: "18px", background: "rgba(166, 141, 96, 0.15)", margin: "0 4px" }} />
+          {/* Item 2 */}
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", flex: 1.1, textAlign: "left" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A68D60" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 18h4c1 0 2-1 2.5-2s1.5-3 3.5-3h4c1.5 0 3 .5 4 1.5l2 2" />
+              <path d="M5 15c1-2 2-3.5 4-3.5" />
+              <path d="M13 5l2.5 3L13 11l-2.5-3z" />
+              <path d="M13 5v6" />
+              <path d="M17 4h2M18 3v2" strokeWidth="1" />
+            </svg>
+            <div style={{ fontSize: "0.52rem", fontWeight: 700, color: "#2c3320", lineHeight: 1.2, fontFamily: "'Inter', sans-serif" }}>
+              Made to Elevate<br />Your Energy
             </div>
-            {/* Divider */}
-            <div style={{ width: "1px", height: "22px", background: "rgba(166, 141, 96, 0.18)", margin: "0 6px" }} />
-            {/* Item 3 */}
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", flex: 1.1, textAlign: "left" }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A68D60" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 21a9 9 0 1 1 5.3-16.2" />
-                <path d="M12 8l1.5 2.5L15 12l-1.5 1.5L12 16l-1.5-1.5L9 12l1.5-2.5z" />
-                <circle cx="12" cy="12" r="1.5" fill="#A68D60" />
-              </svg>
-              <div style={{ fontSize: "0.58rem", fontWeight: 700, color: "#2c3320", lineHeight: 1.25, fontFamily: "'Inter', sans-serif" }}>
-                For Your Journey<br />of Manifestation
-              </div>
+          </div>
+          {/* Divider */}
+          <div style={{ width: "1px", height: "18px", background: "rgba(166, 141, 96, 0.15)", margin: "0 4px" }} />
+          {/* Item 3 */}
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", flex: 1.1, textAlign: "left" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A68D60" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 21a9 9 0 1 1 5.3-16.2" />
+              <path d="M12 8l1.5 2.5L15 12l-1.5 1.5L12 16l-1.5-1.5L9 12l1.5-2.5z" />
+              <circle cx="12" cy="12" r="1.5" fill="#A68D60" />
+            </svg>
+            <div style={{ fontSize: "0.52rem", fontWeight: 700, color: "#2c3320", lineHeight: 1.2, fontFamily: "'Inter', sans-serif" }}>
+              For Your Journey<br />of Manifestation
             </div>
           </div>
         </div>
