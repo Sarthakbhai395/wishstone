@@ -22,33 +22,67 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
   process.env.ADMIN_URL_2,
+  process.env.RENDER_EXTERNAL_URL,
   "http://localhost:3000",
   "http://localhost:3001",
   "http://localhost:4000",
 ].filter(Boolean);
 
-const corsOptions = {
-  origin: (origin, cb) => {
-    // Allow requests with no origin (mobile apps, curl, Postman)
-    if (!origin) return cb(null, true);
-    // Always allow localhost
-    if (origin.startsWith("http://localhost") || origin.startsWith("http://127.0.0.1")) return cb(null, true);
-    // Allow ALL Vercel deployments for this project (any subdomain of vercel.app)
-    if (origin.endsWith(".vercel.app")) return cb(null, true);
-    // Allow explicitly listed origins
-    if (allowedOrigins.includes(origin)) return cb(null, true);
-    // In development, allow everything
-    if (!isProd) return cb(null, true);
+const corsOptionsDelegate = (req, cb) => {
+  const origin = req.header("Origin");
+  const host = req.header("Host");
+
+  // Allow requests with no origin (mobile apps, curl, Postman)
+  if (!origin) {
+    return cb(null, {
+      origin: true,
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"]
+    });
+  }
+
+  // Parse origin to get hostname
+  let originHostname = "";
+  try {
+    originHostname = new URL(origin).hostname;
+  } catch (e) {}
+
+  // Parse host header to get hostname
+  const hostHostname = host ? host.split(":")[0] : "";
+
+  // Check if same domain / host
+  const isSameDomain = originHostname && hostHostname && (originHostname === hostHostname);
+
+  // Check if local network origin
+  const isLocal = originHostname === "localhost" ||
+    originHostname === "127.0.0.1" ||
+    originHostname.startsWith("192.168.") ||
+    originHostname.startsWith("10.") ||
+    /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(originHostname);
+
+  const isAllowed = isSameDomain ||
+    isLocal ||
+    origin.endsWith(".vercel.app") ||
+    origin.endsWith(".netlify.app") ||
+    allowedOrigins.includes(origin) ||
+    !isProd;
+
+  if (isAllowed) {
+    cb(null, {
+      origin: true,
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"]
+    });
+  } else {
     cb(new Error(`CORS: origin ${origin} not allowed`));
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  }
 };
 
 // Handle preflight OPTIONS requests for all routes
-app.options("*", cors(corsOptions));
-app.use(cors(corsOptions));
+app.options("*", cors(corsOptionsDelegate));
+app.use(cors(corsOptionsDelegate));
 
 // ─── COMPRESSION ─────────────────────────────────────────────
 app.use(compression());
@@ -174,7 +208,7 @@ const connectDB = async () => {
 };
 
 // ─── START SERVER ────────────────────────────────────────────
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 const startServer = async () => {
   await connectDB();

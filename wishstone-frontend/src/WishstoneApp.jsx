@@ -2771,7 +2771,7 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
     /* ── Grid container ── */
     .ws-prod-grid {
       display:grid;
-      grid-template-columns:repeat(2,1fr);
+      grid-template-columns:repeat(3,1fr);
       gap:1.1rem;
       width:100%;
       max-width:1280px;
@@ -2840,6 +2840,7 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
       border:1.5px solid rgba(90,102,81,0.28);
       background:#fff; color:${G};
       flex-shrink:0;
+      white-space:nowrap;
     }
     .ws-cat-pill.active { background:${G}; color:#fff; border-color:${G}; }
 
@@ -2850,6 +2851,12 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
       padding:0 1.5rem 1.5rem;
       justify-content:center;
       flex-wrap:wrap;
+      overflow-x:auto;
+      scrollbar-width:none;
+      -ms-overflow-style:none;
+    }
+    .ws-cat-row::-webkit-scrollbar {
+      display:none;
     }
 
     /* ── Add to Cart button ── */
@@ -2881,7 +2888,7 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
     /* ── Shimmer grid (same as prod grid) ── */
     .ws-shimmer-grid {
       display:grid;
-      grid-template-columns:repeat(2,1fr);
+      grid-template-columns:repeat(3,1fr);
       gap:1.1rem;
       width:100%;
       max-width:1280px;
@@ -2891,17 +2898,17 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
     .ws-shimmer-card { display:flex; flex-direction:column; border-radius:${CR}px; overflow:hidden; background:#fff; min-height:auto; box-shadow:0 2px 10px rgba(90,102,81,0.07); }
 
     /* ── Tablet ── */
-    @media(max-width:900px) {
-      .ws-prod-grid, .ws-shimmer-grid { gap:0.9rem; }
+    @media(max-width:1024px) {
+      .ws-prod-grid, .ws-shimmer-grid { grid-template-columns:repeat(2,1fr) !important; gap:0.9rem; }
       .ws-card-img, .ws-shimmer-img-skeleton { width:calc(100% - 24px) !important; min-width:auto !important; margin:12px 12px 0 12px !important; }
     }
 
     /* ── Mobile ── */
-    @media(max-width:600px) {
-      .ws-prod-grid, .ws-shimmer-grid { grid-template-columns:1fr; padding:0 0.85rem 3rem; }
+    @media(max-width:768px) {
+      .ws-prod-grid, .ws-shimmer-grid { grid-template-columns:1fr !important; padding:0 0.85rem 3rem; }
       .ws-collection-card, .ws-shimmer-card { flex-direction:column; min-height:auto; }
       .ws-card-img, .ws-shimmer-img-skeleton { width:calc(100% - 24px) !important; min-width:auto !important; margin:12px 12px 0 12px !important; }
-      .ws-cat-row { justify-content:flex-start; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+      .ws-cat-row { justify-content:flex-start !important; flex-wrap:nowrap !important; overflow-x:auto !important; -webkit-overflow-scrolling:touch !important; }
     }
 
     /* ── Small phone ── */
@@ -3057,57 +3064,35 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
                        )}
                      </div>
 
-                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", marginTop: "auto", width: "100%" }} onClick={e => e.stopPropagation()}>
-                       <div style={{ flex: 1 }}>
-                         {p.stock === 0 ? (
-                           <button disabled style={{ width: "100%", height: "36px", borderRadius: "8px", background: "#e5e7e3", color: "#9ca3af", border: "none", fontSize: "0.78rem", cursor: "not-allowed", fontWeight: 700 }}>Out of Stock</button>
-                         ) : qty > 0 ? (
-                           <div className="ws-qty-row" style={{ height: "36px" }}>
-                             <button className="ws-qty-btn" onClick={() => onAdd({ ...p, qty: -1 })} style={{ height: "100%", fontSize: "14px" }}>−</button>
-                             <span style={{ flex: 1, textAlign: "center", fontWeight: 700, color: G, fontSize: "0.85rem", display: "flex", alignItems: "center", justifyContent: "center", gap: 4, height: "100%" }}>
-                               {/* Unlock icon — filled shackle open */}
-                               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                 <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
-                               </svg>
-                               {qty}
-                             </span>
-                             <button className="ws-qty-btn" onClick={() => onAdd(p)} style={{ height: "100%", fontSize: "14px" }}>+</button>
-                           </div>
-                         ) : (
-                           <button className="ws-add-btn" onClick={() => onAdd(p)} style={{ height: "36px", padding: 0, borderRadius: "8px", background: "#3D4935" }}>
-                             {/* Lock icon — outline, not filled (unlocks after add) */}
-                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                               <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                             </svg>
-                             Add to Cart
-                           </button>
-                         )}
-                       </div>
-                       
-                       <a 
-                         href={`https://wa.me/918171440017?text=${encodeURIComponent(`Hi! I'm interested in the "${p.name}". Can you please share more details?`)}`}
-                         target="_blank"
-                         rel="noreferrer"
-                         style={{
-                           width: "42px",
-                           height: "42px",
-                           borderRadius: "50%",
-                           background: "#25D366",
-                           display: "flex",
-                           alignItems: "center",
-                           justifyContent: "center",
-                           flexShrink: 0,
-                           boxShadow: "0 3px 8px rgba(37, 211, 102, 0.2)",
-                           cursor: "pointer"
-                         }}
-                       >
-                         <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" style={{ display: "block" }}>
-                           <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 2.8 1.4 4.8 1.4 5.529 0 10.027-4.498 10.03-10.03.001-2.68-1.041-5.197-2.932-7.091-1.89-1.893-4.402-2.935-7.1-2.935-5.535 0-10.033 4.5-10.038 10.031-.002 1.95.509 3.2 1.442 4.81l-1.026 3.75 3.824-1.006zm9.206-5.834c-.269-.134-1.593-.787-1.84-.875-.246-.089-.425-.134-.604.134-.179.269-.691.875-.848 1.054-.156.179-.313.201-.582.067-.268-.134-1.134-.418-2.161-1.334-.8-.713-1.34-1.593-1.498-1.861-.156-.269-.017-.414.118-.548.12-.12.269-.314.403-.47.134-.157.179-.269.269-.449.09-.179.045-.337-.023-.471-.067-.134-.604-1.457-.827-1.995-.218-.523-.459-.452-.604-.452H8.38c-.179 0-.471.067-.717.337-.246.269-.94.92-.94 2.24 0 1.32.96 2.597 1.094 2.776.134.179 1.892 2.89 4.582 4.053.64.276 1.139.442 1.528.566.643.204 1.229.175 1.691.107.514-.077 1.593-.65 1.817-1.278.224-.628.224-1.166.157-1.278-.067-.112-.246-.179-.515-.313z" />
-                         </svg>
-                       </a>
-                     </div>
+                                           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginTop: "auto", width: "100%" }} onClick={e => e.stopPropagation()}>
+                        <div style={{ width: "100%", maxWidth: "160px" }}>
+                          {p.stock === 0 ? (
+                            <button disabled style={{ width: "100%", height: "36px", borderRadius: "8px", background: "#e5e7e3", color: "#9ca3af", border: "none", fontSize: "0.78rem", cursor: "not-allowed", fontWeight: 700 }}>Out of Stock</button>
+                          ) : qty > 0 ? (
+                            <div className="ws-qty-row" style={{ height: "36px", width: "100%" }}>
+                              <button className="ws-qty-btn" onClick={() => onAdd({ ...p, qty: -1 })} style={{ height: "100%", fontSize: "14px" }}>−</button>
+                              <span style={{ flex: 1, textAlign: "center", fontWeight: 700, color: G, fontSize: "0.85rem", display: "flex", alignItems: "center", justifyContent: "center", gap: 4, height: "100%" }}>
+                                {/* Unlock icon — filled shackle open */}
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                  <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+                                </svg>
+                                {qty}
+                              </span>
+                              <button className="ws-qty-btn" onClick={() => onAdd(p)} style={{ height: "100%", fontSize: "14px" }}>+</button>
+                            </div>
+                          ) : (
+                            <button className="ws-add-btn" onClick={() => onAdd(p)} style={{ height: "36px", padding: 0, borderRadius: "8px", background: "#3D4935", width: "100%" }}>
+                              {/* Lock icon — outline, not filled (unlocks after add) */}
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                              </svg>
+                              Add to Cart
+                            </button>
+                          )}
+                        </div>
+                      </div>
                    </div>
                  </div>
               );
@@ -3628,10 +3613,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                       referrerPolicy="no-referrer"
                       src={img}
                       alt={p.name}
-                      animate={{
-                        filter: activeImg === i ? "blur(0px)" : "blur(12px)"
-                      }}
-                      transition={{ duration: 0.35, ease: "easeOut" }}
+                      // Removed blur animation for smooth transitions
                       style={{
                         width: "100%",
                         height: "100%",
@@ -3732,11 +3714,11 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                 <div
                   className="tabs-sidebar-card"
                   style={{
-                    background: "#F0F2EE",
-                    borderRadius: "16px",
-                    border: "1px solid #D9DDD5",
-                    padding: "1.6rem",
-                    boxShadow: "0 10px 30px rgba(90,102,81,0.02)",
+                    background: "transparent",
+                    borderRadius: "0px",
+                    border: "none",
+                    padding: "0px",
+                    boxShadow: "none",
                     height: "fit-content",
                     display: "flex",
                     flexDirection: "column",
@@ -3779,49 +3761,45 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                         )
                       }
                     ].map(t => (
-                      <motion.button
+                                            <motion.button
                         key={t.id}
                         onClick={() => setTab(t.id)}
-                        whileHover={{ x: 6 }}
                         whileTap={{ scale: 0.98 }}
                         className={`ep-tab-btn-vertical ${tab === t.id ? "active" : ""}`}
                         style={{
                           display: "flex",
                           alignItems: "center",
-                          gap: "12px",
-                          padding: "14px 18px",
-                          borderRadius: "12px",
+                          justifyContent: "center",
+                          gap: "8px",
+                          padding: "12px 14px",
                           fontSize: "0.8rem",
                           fontWeight: "700",
                           cursor: "pointer",
-                          border: "1px solid #D9DDD5",
-                          background: "#FFFFFF",
-                          color: tab === t.id ? "#FFFFFF" : "#000000",
-                          textAlign: "left",
+                          border: "none",
+                          background: "transparent",
+                          color: tab === t.id ? "#5A6651" : "#8c9685",
+                          textAlign: "center",
                           position: "relative",
-                          transition: "color 0.25s, border-color 0.25s, box-shadow 0.25s",
-                          boxShadow: tab === t.id ? "0 4px 14px rgba(90,102,81,0.12)" : "none"
+                          transition: "color 0.2s ease"
                         }}
                       >
                         {tab === t.id && (
                           <motion.div
-                            layoutId="activeVerticalTabBg"
+                            layoutId="activeVerticalTabLine"
                             style={{
                               position: "absolute",
-                              top: -1,
-                              left: -1,
-                              right: -1,
-                              bottom: -1,
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              height: "2.5px",
                               background: "#5A6651",
-                              borderRadius: "12px",
-                              zIndex: 1,
-                              border: "1px solid #5A6651"
+                              zIndex: 1
                             }}
                             transition={{ type: "spring", stiffness: 380, damping: 30 }}
                           />
                         )}
                         <span style={{ flexShrink: 0, position: "relative", zIndex: 2 }}>{t.icon}</span>
-                        <span style={{ position: "relative", zIndex: 2 }}>{t.label}</span>
+                        <span style={{ position: "relative", zIndex: 2, whiteSpace: "nowrap" }}>{t.label}</span>
                       </motion.button>
                     ))}
                   </div>
@@ -3895,11 +3873,11 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                   layout
                   className="tabs-content-card"
                   style={{
-                    background: "#F0F2EE",
-                    borderRadius: "16px",
-                    border: "1px solid #D9DDD5",
-                    padding: "1.6rem",
-                    boxShadow: "0 10px 30px rgba(90,102,81,0.02)",
+                    background: "transparent",
+                    borderRadius: "0px",
+                    border: "none",
+                    padding: "0px",
+                    boxShadow: "none",
                     height: "fit-content",
                     minHeight: "180px",
                     minWidth: 0,
@@ -4319,22 +4297,21 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
           box-shadow: 0 8px 24px rgba(90,102,81,0.15) !important;
         }
         .ep-tab-btn-vertical {
-          border: 1px solid #D9DDD5 !important;
+          border: none !important;
+          background: transparent !important;
           transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
         .ep-tab-btn-vertical:hover {
-          background: #F0F2EE !important;
-          border-color: #5A6651 !important;
+          background: transparent !important;
           color: #5A6651 !important;
         }
         .ep-tab-btn-vertical.active {
-          background: #5A6651 !important;
-          color: #ffffff !important;
-          border-color: #5A6651 !important;
-          box-shadow: 0 4px 14px rgba(90, 102, 81, 0.2) !important;
+          background: transparent !important;
+          color: #5A6651 !important;
+          box-shadow: none !important;
         }
         .ep-tab-btn-vertical.active svg {
-          stroke: #ffffff !important;
+          stroke: #5A6651 !important;
         }
         .ep-primary-btn {
           background: linear-gradient(135deg, #5A6651, #454F3F) !important;
@@ -4426,20 +4403,23 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
             gap: 16px !important;
           }
           .tabs-sidebar-card, .tabs-content-card {
-            padding: 1rem !important;
-            border-radius: 12px !important;
+            padding: 0px !important;
+            border-radius: 0px !important;
           }
           .vertical-tabs-col {
             flex-direction: row !important;
-            overflow-x: auto !important;
-            padding-bottom: 4px !important;
+            display: flex !important;
+            width: 100% !important;
             gap: 8px !important;
+            border-bottom: 1px solid #D9DDD5 !important;
+            padding-bottom: 0px !important;
           }
-          .ep-tab-btn-vertical {
-            padding: 8px 12px !important;
+          .vertical-tabs-col .ep-tab-btn-vertical {
+            flex: 1 !important;
+            padding: 10px 8px !important;
             white-space: nowrap !important;
             font-size: 0.72rem !important;
-            border-radius: 8px !important;
+            border-radius: 0px !important;
           }
           .tab-content-col {
             min-height: 140px !important;

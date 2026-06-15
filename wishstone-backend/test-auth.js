@@ -1,13 +1,13 @@
 const http = require('http');
 
-const API_URL = 'http://localhost:5000';
+const API_URL = 'http://localhost:5001';
 
 function makeRequest(method, path, data) {
   return new Promise((resolve, reject) => {
     const postData = JSON.stringify(data);
     const options = {
       hostname: 'localhost',
-      port: 5000,
+      port: 5001,
       path: path,
       method: method,
       headers: {
@@ -72,7 +72,7 @@ async function testAuthentication() {
       
       const tokenOptions = {
         hostname: 'localhost',
-        port: 5000,
+        port: 5001,
         path: '/api/auth/me',
         method: 'GET',
         headers: {

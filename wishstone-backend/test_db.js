@@ -1,7 +1,7 @@
 const http = require('http');
 
 console.log("Requesting /api/products...");
-const req = http.get("http://localhost:5000/api/products", (res) => {
+const req = http.get("http://localhost:5001/api/products", (res) => {
   console.log(`Status Code: ${res.statusCode}`);
   let data = '';
   res.on('data', chunk => { data += chunk; });
