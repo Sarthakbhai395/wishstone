@@ -696,11 +696,12 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
             onMouseEnter={e => e.currentTarget.style.background = "rgba(0,0,0,0.05)"}
             onMouseLeave={e => e.currentTarget.style.background = "none"}>
             <svg id="cart-nav-desktop" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block", animation: cartAnim ? "cartIconAnim 0.7s cubic-bezier(0.36,0.07,0.19,0.97)" : "none" }}>
-              <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
             </svg>
             Cart
-            {cartCount > 0 && <span style={{ background: "#1a1a1a", color: "#fff", borderRadius: "50%", width: 16, height: 16, fontSize: "0.58rem", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, position: "absolute", top: -4, right: -6 }}>{cartCount}</span>}
+            {cartCount > 0 && <span style={{ background: "#C39D5F", color: "#fff", borderRadius: "50%", width: 16, height: 16, fontSize: "0.58rem", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, position: "absolute", top: -4, right: -6 }}>{cartCount}</span>}
           </button>
         </nav>
 
@@ -712,18 +713,19 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth={wishCount > 0 ? "3" : "2"} strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all 0.25s ease", display: "block", animation: wishAnim ? "wishJump 0.6s cubic-bezier(0.36,0.07,0.19,0.97)" : "none" }}>
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
-            {wishCount > 0 && <span style={{ position: "absolute", top: 0, right: 0, background: "#1a1a1a", color: "#fff", borderRadius: "50%", width: 15, height: 15, fontSize: "0.52rem", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700 }}>{wishCount}</span>}
+            {wishCount > 0 && <span style={{ position: "absolute", top: 0, right: 0, background: "#1a1a1a", color: "#fff", width: 15, height: 15, fontSize: "0.52rem", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700 }}>{wishCount}</span>}
           </button>
 
-          {/* Cart icon mobile — black */}
+          {/* Cart icon mobile — shopping bag matching screenshot */}
           <button id="cart-nav-btn" onClick={() => navTo("cart")} className="show-mobile-flex" style={{ display: "none", background: "none", border: "none", cursor: "pointer", position: "relative", padding: "6px", alignItems: "center", justifyContent: "center", borderRadius: 8, transition: "background 0.2s" }}
             onMouseEnter={e => e.currentTarget.style.background = "rgba(0,0,0,0.06)"}
             onMouseLeave={e => e.currentTarget.style.background = "none"}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block", animation: cartAnim ? "cartIconAnim 0.7s cubic-bezier(0.36,0.07,0.19,0.97)" : "none" }}>
-              <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block", animation: cartAnim ? "cartIconAnim 0.7s cubic-bezier(0.36,0.07,0.19,0.97)" : "none" }}>
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
             </svg>
-            {cartCount > 0 && <span style={{ position: "absolute", top: 0, right: 0, background: "#1a1a1a", color: "#fff", borderRadius: "50%", width: 15, height: 15, fontSize: "0.52rem", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700 }}>{cartCount}</span>}
+            {cartCount > 0 && <span style={{ position: "absolute", top: -2, right: -2, background: "#C39D5F", color: "#fff", borderRadius: "50%", width: 16, height: 16, fontSize: "0.58rem", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700 }}>{cartCount}</span>}
           </button>
           {user ? (
             <>
@@ -1073,163 +1075,78 @@ function Hero({ onShop, onRitual }) {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-
   /* ────────────────────────────────────────────────────────────
-     MOBILE HERO — stone bag + crystal image below text
+     MOBILE HERO
   ──────────────────────────────────────────────────────────── */
   if (isMobile) return (
-    <section style={{ background: "#F5F0E8", width: "100%", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
-
-      {/* Faint leaf shadow on top-right — decorative only */}
+    <section style={{ background: "#FDFBF7", width: "100%", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", top: 60, right: -30, width: "60%", height: "45%", background: `url(${process.env.PUBLIC_URL || ""}/hero_mobile_bg.png) no-repeat top right / cover`, opacity: 0.18, zIndex: 0, pointerEvents: "none", borderRadius: 0 }} />
-
-      {/* ── TOP: TEXT BLOCK ── */}
       <div style={{ position: "relative", zIndex: 1, paddingTop: "88px", paddingLeft: "1.4rem", paddingRight: "1.4rem", paddingBottom: "1.8rem" }}>
-
-        {/* Star */}
         <div style={{ marginBottom: "0.75rem" }}>
-          <svg width="18" height="18" viewBox="0 0 32 32" fill="none">
-            <path d="M16 2 L17.5 12.5 L28 15 L17.5 17.5 L16 28 L14.5 17.5 L4 15 L14.5 12.5 Z" fill="#A68D60"/>
-            <path d="M16 7 L17 12 L21 13 L17 14 L16 18 L15 14 L11 13 L15 12 Z" fill="#A68D60" opacity="0.38" transform="rotate(45 16 13)"/>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#A68D60" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="2" x2="12" y2="22" /><line x1="2" y1="12" x2="22" y2="12" /><line x1="5" y1="5" x2="19" y2="19" /><line x1="19" y1="5" x2="5" y2="19" />
+            <path d="M12 7l1.5 3.5L17 12l-3.5 1.5L12 17l-1.5-3.5L7 12l3.5-1.5z" fill="#A68D60" />
           </svg>
         </div>
-
-        {/* Sub-label */}
         <p style={{ fontSize: "0.77rem", color: "#5C6654", letterSpacing: "0.04em", marginBottom: "0.45rem", fontFamily: "'Inter',sans-serif" }}>
-          India's <span style={{ color: "#A68D60", fontStyle: "italic" }}>Sacred</span> Manifestation Stone
+          India's <span style={{ color: "#A68D60", fontWeight: 600 }}>Sacred</span> Manifestation Stone
         </p>
-
-        {/* Heading */}
-        <h1 style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(2.6rem,9vw,3.1rem)", fontWeight: 400, color: "#1a1a1a", lineHeight: 1.09, margin: "0 0 0.85rem 0" }}>
-          Turn<br/>
-          Intentions<br/>
-          <span style={{ fontStyle: "italic", color: "#4C5A43" }}>into </span>
-          <span style={{ color: "#A68D60", position: "relative" }}>
-            Reality
-            <span style={{ fontSize: "0.36em", position: "absolute", top: "-0.4em", right: "-0.6em", color: "#A68D60" }}>✦</span>
-          </span>
+        <h1 style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(2.8rem,9.5vw,3.5rem)", fontWeight: 900, color: "#1a1a1a", lineHeight: 1.08, margin: "0 0 1rem 0" }}>
+          Turn<br/>Intentions<br/>into <span style={{ color: "#A68D60", position: "relative", whiteSpace: "nowrap" }}>Reality<span style={{ fontSize: "0.45em", position: "absolute", top: "-0.2em", right: "-0.5em", color: "#A68D60" }}>✦</span></span>
         </h1>
-
-        {/* Short divider — line + diamond (NOT full width) */}
-        <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: "0.85rem" }}>
-          <div style={{ width: 36, height: 1, background: "#A68D60", opacity: 0.5 }} />
-          <span style={{ color: "#A68D60", fontSize: 9, lineHeight: 1 }}>✦</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", width: "100%", maxWidth: "160px", margin: "1rem 0" }}>
+          <div style={{ height: "1px", flex: 1, background: "rgba(166,141,96,0.35)" }} /><span style={{ color: "#A68D60", fontSize: "10px" }}>✦</span><div style={{ height: "1px", flex: 1, background: "rgba(166,141,96,0.35)" }} />
         </div>
-
-        {/* Description */}
         <p style={{ fontSize: "0.83rem", color: "#5C6654", lineHeight: 1.72, marginBottom: "1.5rem", maxWidth: 305, fontFamily: "'Inter',sans-serif" }}>
           Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
         </p>
-
-        {/* CTA */}
-        <button onClick={onRitual} style={{
-          display: "inline-flex", alignItems: "center", gap: 9,
-          background: "#1e2618", color: "#fff", border: "none",
-          padding: "12px 20px", borderRadius: 6, fontSize: "0.83rem",
-          fontWeight: 600, cursor: "pointer", letterSpacing: "0.02em",
-          fontFamily: "'Inter',sans-serif",
-          boxShadow: "0 4px 18px rgba(30,38,24,0.26)",
-        }}
-          onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
-          onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
-        >
-          Explore Rituals
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-          </svg>
+        <button onClick={onRitual} style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "#1E1E1E", color: "#fff", border: "none", padding: "13px 26px", borderRadius: 4, fontSize: "0.85rem", fontWeight: 600, cursor: "pointer", letterSpacing: "0.02em", fontFamily: "'Inter',sans-serif", boxShadow: "0 4px 14px rgba(0,0,0,0.15)" }}>
+          Explore Rituals<span style={{ color: "#A68D60", fontSize: "1.1rem", fontWeight: 700 }}>→</span>
         </button>
       </div>
-
-      {/* ── BOTTOM: PRODUCT IMAGE — full width, no radius, no border ── */}
       <div style={{ width: "100%", position: "relative", zIndex: 1 }}>
-        <img
-          src={`${process.env.PUBLIC_URL || ""}/hero_mobile_stone.png`}
-          alt="Wishstone Sacred Stone"
-          style={{ width: "100%", height: "auto", display: "block", objectFit: "cover" }}
-          onError={e => {
-            e.currentTarget.src = `${process.env.PUBLIC_URL || ""}/hero_mobile_bg.png`;
-          }}
-        />
-        {/* SCROLL indicator overlaid at bottom of image */}
+        <img src={`${process.env.PUBLIC_URL || ""}/hero_mobile_stone.png`} alt="Wishstone Sacred Stone" style={{ width: "100%", height: "auto", display: "block", objectFit: "cover" }} onError={e => { e.currentTarget.src = `${process.env.PUBLIC_URL || ""}/hero_mobile_bg.png`; }} />
         <div style={{ position: "absolute", bottom: 14, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-          <span style={{ color: "#A68D60", fontSize: 9 }}>✦</span>
-          <span style={{ fontSize: "0.54rem", fontWeight: 700, color: "#A68D60", letterSpacing: "0.22em", fontFamily: "'Inter',sans-serif" }}>SCROLL</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", width: "80px" }}><div style={{ height: "1px", flex: 1, background: "rgba(166,141,96,0.35)" }} /><span style={{ color: "#A68D60", fontSize: 9 }}>✦</span><div style={{ height: "1px", flex: 1, background: "rgba(166,141,96,0.35)" }} /></div>
+          <span style={{ fontSize: "0.58rem", fontWeight: 700, color: "#A68D60", letterSpacing: "0.22em", fontFamily: "'Inter',sans-serif", textTransform: "uppercase" }}>SCROLL</span>
         </div>
       </div>
     </section>
   );
 
   /* ────────────────────────────────────────────────────────────
-     DESKTOP HERO — exact match to screenshot
+     DESKTOP HERO
   ──────────────────────────────────────────────────────────── */
   return (
-    <section style={{ position: "relative", width: "100%", minHeight: "100vh", background: "#F5F0E8", overflow: "hidden", display: "flex", flexDirection: "column" }}>
-
-      {/* Background image — stone on stone slab, right side */}
-      <div style={{
-        position: "absolute", inset: 0, zIndex: 0,
-        background: `url(${process.env.PUBLIC_URL || ""}/hero_desktop_stone.png) no-repeat center right / contain`,
-      }} />
-      {/* Left-side fade so text is always crisp */}
-      <div style={{ position: "absolute", inset: 0, zIndex: 1, background: "linear-gradient(90deg, rgba(245,240,232,1) 42%, rgba(245,240,232,0.75) 62%, rgba(245,240,232,0.0) 85%)", pointerEvents: "none" }} />
-      {/* Top fade */}
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 120, zIndex: 1, background: "linear-gradient(180deg, rgba(245,240,232,0.9) 0%, transparent 100%)", pointerEvents: "none" }} />
-
-      {/* ── TEXT COLUMN ── */}
+    <section style={{ position: "relative", width: "100%", minHeight: "100vh", background: "#FDFBF7", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+      <div style={{ position: "absolute", inset: 0, zIndex: 0, background: `url(${process.env.PUBLIC_URL || ""}/hero_desktop_stone.png) no-repeat center right / contain` }} />
+      <div style={{ position: "absolute", inset: 0, zIndex: 1, background: "linear-gradient(90deg, rgba(253,251,247,1) 42%, rgba(253,251,247,0.75) 62%, rgba(253,251,247,0) 85%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 120, zIndex: 1, background: "linear-gradient(180deg, rgba(253,251,247,0.9) 0%, transparent 100%)", pointerEvents: "none" }} />
       <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "120px clamp(1.5rem,5vw,4rem) 60px", maxWidth: 680 }}>
-        {/* Star */}
         <div style={{ marginBottom: "1.4rem" }}>
-          <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-            <path d="M16 2 L17.8 13.2 L29 15 L17.8 16.8 L16 28 L14.2 16.8 L3 15 L14.2 13.2 Z" fill="#A68D60"/>
-            <path d="M16 7 L17 13 L23 14 L17 15 L16 21 L15 15 L9 14 L15 13 Z" fill="#A68D60" opacity="0.45" transform="rotate(45 16 14)"/>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#A68D60" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="2" x2="12" y2="22" /><line x1="2" y1="12" x2="22" y2="12" /><line x1="5" y1="5" x2="19" y2="19" /><line x1="19" y1="5" x2="5" y2="19" />
+            <path d="M12 7l1.5 3.5L17 12l-3.5 1.5L12 17l-1.5-3.5L7 12l3.5-1.5z" fill="#A68D60" />
           </svg>
         </div>
-
-        {/* Heading */}
-        <h1 style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(3.2rem,5.5vw,5rem)", fontWeight: 400, color: "#1a1a1a", lineHeight: 1.06, margin: "0 0 1.2rem 0" }}>
-          Turn<br/>
-          Intentions<br/>
-          <span style={{ fontStyle: "italic", color: "#4C5A43" }}>into </span>
-          <span style={{ color: "#A68D60", position: "relative" }}>
-            Reality
-            <span style={{ fontSize: "0.4em", position: "absolute", top: "-0.3em", right: "-0.5em", color: "#A68D60" }}>✦</span>
-          </span>
+        <p style={{ fontSize: "0.85rem", color: "#5C6654", letterSpacing: "0.04em", marginBottom: "0.6rem", fontFamily: "'Inter',sans-serif" }}>
+          India's <span style={{ color: "#A68D60", fontWeight: 600 }}>Sacred</span> Manifestation Stone
+        </p>
+        <h1 style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(3.5rem,5.5vw,5rem)", fontWeight: 900, color: "#1a1a1a", lineHeight: 1.06, margin: "0 0 1.2rem 0" }}>
+          Turn<br/>Intentions<br/>into <span style={{ color: "#A68D60", position: "relative", whiteSpace: "nowrap" }}>Reality<span style={{ fontSize: "0.4em", position: "absolute", top: "-0.25em", right: "-0.5em", color: "#A68D60" }}>✦</span></span>
         </h1>
-
-        {/* Divider — short golden line + diamond, NOT full width */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "1.2rem" }}>
-          <div style={{ width: 60, height: 1, background: "#A68D60", opacity: 0.55 }} />
-          <span style={{ color: "#A68D60", fontSize: 13 }}>✦</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", width: "100%", maxWidth: "180px", margin: "1.2rem 0" }}>
+          <div style={{ height: "1px", flex: 1, background: "rgba(166,141,96,0.35)" }} /><span style={{ color: "#A68D60", fontSize: "12px" }}>✦</span><div style={{ height: "1px", flex: 1, background: "rgba(166,141,96,0.35)" }} />
         </div>
-
-        {/* Description */}
         <p style={{ fontSize: "clamp(0.88rem,1.1vw,1rem)", color: "#5C6654", lineHeight: 1.78, marginBottom: "2.2rem", maxWidth: 400, fontFamily: "'Inter',sans-serif" }}>
           Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
         </p>
-
-        {/* CTA */}
         <div>
-          <button onClick={onRitual} style={{
-            display: "inline-flex", alignItems: "center", gap: 12,
-            background: "#4C5A43", color: "#fff", border: "none",
-            padding: "15px 30px", borderRadius: 6, fontSize: "0.88rem",
-            fontWeight: 600, cursor: "pointer", letterSpacing: "0.02em",
-            fontFamily: "'Inter',sans-serif",
-            boxShadow: "0 4px 20px rgba(76,90,67,0.28)",
-            transition: "all 0.25s ease",
-          }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#3D4B35"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 28px rgba(76,90,67,0.35)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "#4C5A43"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(76,90,67,0.28)"; }}
-          >
-            Explore Rituals
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-            </svg>
+          <button onClick={onRitual} style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "#4C5A43", color: "#fff", border: "none", padding: "15px 32px", borderRadius: 4, fontSize: "0.9rem", fontWeight: 600, cursor: "pointer", letterSpacing: "0.02em", fontFamily: "'Inter',sans-serif", boxShadow: "0 4px 20px rgba(76,90,67,0.28)", transition: "all 0.25s ease" }} onMouseEnter={e => { e.currentTarget.style.background = "#3D4B35"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 28px rgba(76,90,67,0.35)"; }} onMouseLeave={e => { e.currentTarget.style.background = "#4C5A43"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(76,90,67,0.28)"; }}>
+            Explore Rituals<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
         </div>
       </div>
-
-      {/* ── BENEFIT CARDS ROW ── */}
       <div style={{ position: "relative", zIndex: 2, margin: "0 clamp(1.5rem,4vw,3rem) 3rem", background: "rgba(255,255,255,0.72)", backdropFilter: "blur(12px)", borderRadius: 16, padding: "22px 28px", boxShadow: "0 4px 24px rgba(76,90,67,0.08)", border: "1px solid rgba(255,255,255,0.9)" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20, alignItems: "center" }}>
           {[
@@ -8203,25 +8120,12 @@ function AppInner() {
   }, [orders, user]);
 
   useEffect(() => {
-    // Use a stable key — for logged-in users use email, for guests use a device key
-    const claimKey = user?.email
-      ? `ws_coupon_claimed_${user.email}`
-      : `ws_coupon_claimed_guest`;
-
-    const shownKey = user?.email
-      ? `ws_coupon_shown_${user.email}`
-      : `ws_coupon_shown_guest`;
-
-    // Never show if already claimed or already shown
-    if (localStorage.getItem(claimKey) || localStorage.getItem(shownKey)) return;
-
-    // Show 5 sec after page load/refresh
+    // Show 5 sec after page load/refresh every single time
     const t = setTimeout(() => {
       setShowModal(true);
-      localStorage.setItem(shownKey, "true");
     }, 5000);
     return () => clearTimeout(t);
-  }, [user?.email]);
+  }, []);
 
   const addToCart = p => {
     const MAX_TOTAL = 10; // Max 10 items total across all products
