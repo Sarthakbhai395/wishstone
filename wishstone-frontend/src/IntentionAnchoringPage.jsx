@@ -2,10 +2,10 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 const T = {
-  bg: "#F5F0E8", bgDark: "#2C3320",
-  text: "#1a1a1a", textMid: "#4a4a4a",
-  orange: "#E8720C", orangeD: "#C45E00",
-  white: "#ffffff", border: "rgba(26,26,26,0.12)",
+  bg: "#ffffff", bgDark: "#5A6651",
+  text: "#000000", textMid: "#000000",
+  orange: "#5A6651", orangeD: "#5A6651",
+  white: "#ffffff", border: "rgba(90, 102, 81, 0.2)",
 };
 
 export default function IntentionAnchoringPage() {
@@ -154,7 +154,7 @@ export default function IntentionAnchoringPage() {
           >
             WishStone: Staying Connected to Your Intention
           </h2>
-          <div style={{ background: "linear-gradient(135deg, #fff0e8, #fff)", padding: "2rem", borderRadius: 12, border: `1px solid ${T.border}` }}>
+          <div style={{ background: "rgba(90, 102, 81, 0.08)", padding: "2rem", borderRadius: 12, border: `1px solid ${T.border}` }}>
             <p style={{ fontSize: "1rem", color: T.textMid, lineHeight: 1.8, marginBottom: "1rem" }}>
               Staying focused on one goal for a time is not easy. The mind shifts, and distractions come in. And slowly, your intention fades.
             </p>
@@ -203,18 +203,18 @@ export default function IntentionAnchoringPage() {
           <button
             onClick={() => navigate("/shop")}
             style={{
-              background: `linear-gradient(135deg, #C45E00, #E8720C)`,
+              background: "#ffffff",
               border: "none",
-              color: "#fff",
+              color: "#000000",
               padding: "14px 32px",
               borderRadius: 8,
               fontSize: "1rem",
               fontWeight: 700,
               cursor: "pointer",
               transition: "all 0.3s",
-              fontFamily: "'Inter', sans-serif",
+              fontFamily: "'Open Sans', sans-serif",
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)", e.currentTarget.style.boxShadow = "0 8px 28px rgba(232,114,12,0.4)")}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)", e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,0,0,0.15)")}
             onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)", e.currentTarget.style.boxShadow = "none")}
           >
             Shop WishStone →

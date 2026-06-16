@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams, Navigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import IntentionAnchoringPage from "./IntentionAnchoringPage";
 
 const T = {
-  bg: "#F5F0E8", bgDark: "#2C3320",
-  text: "#1a1a1a", textMid: "#4a4a4a",
-  orange: "#4C5A43", orangeD: "#2C3320", orangeL: "#5C6B53",
-  white: "#ffffff", border: "rgba(26,26,26,0.12)",
+  bg: "#ffffff", bgDark: "#5A6651",
+  text: "#000000", textMid: "#5A6651",
+  orange: "#5A6651", orangeD: "#000000", orangeL: "#5A6651",
+  white: "#ffffff", border: "rgba(90, 102, 81, 0.2)",
 };
 
 const getApiBase = () => {
@@ -133,10 +134,10 @@ const COMMUNITY_VIDEOS = [
 ];
 
 const GLOBAL_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,900&family=Noto+Serif+Devanagari:wght@700;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
   html{scroll-behavior:smooth;}
-  body{background:#F5F0E8;color:#1a1a1a;font-family:'Open Sans',sans-serif;overflow-x:hidden;}
+  body{background:#ffffff;color:#000000;font-family:'Open Sans',sans-serif;overflow-x:hidden;}
   body, body *, html, html * {
     font-family: 'Open Sans', sans-serif !important;
   }
@@ -153,8 +154,8 @@ const GLOBAL_CSS = `
     }
   }
   ::-webkit-scrollbar{width:5px;}
-  ::-webkit-scrollbar-track{background:#F5F0E8;}
-  ::-webkit-scrollbar-thumb{background:var(--accent-color, #4C5A43);border-radius:3px;}
+  ::-webkit-scrollbar-track{background:#ffffff;}
+  ::-webkit-scrollbar-thumb{background:#5A6651;border-radius:3px;}
   @keyframes autoScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
   .scroll-hide::-webkit-scrollbar{display:none;}
   .scroll-hide{-ms-overflow-style:none;scrollbar-width:none;}
@@ -164,9 +165,9 @@ const GLOBAL_CSS = `
     margin: 0.5rem -1.5rem 1rem -1.5rem;
     padding: 0.6rem 0;
     overflow: hidden;
-    background: rgba(0,0,0,0.02);
-    border-top: 1px solid rgba(0,0,0,0.05);
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    background: rgba(90, 102, 81, 0.04);
+    border-top: 1px solid rgba(90, 102, 81, 0.1);
+    border-bottom: 1px solid rgba(90, 102, 81, 0.1);
     position: relative;
   }
   .nav-marquee-track {
@@ -185,10 +186,10 @@ const GLOBAL_CSS = `
     padding: 16px 4px !important;
     font-size: 0.9rem !important;
     font-weight: 700 !important;
-    color: #1a1a1a !important;
+    color: #000000 !important;
     background: transparent !important;
     border: none !important;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-bottom: 1px solid rgba(90, 102, 81, 0.12) !important;
     border-radius: 0px !important;
     cursor: pointer !important;
     text-align: left !important;
@@ -200,27 +201,27 @@ const GLOBAL_CSS = `
     box-sizing: border-box !important;
   }
   .sidebar-link:hover {
-    color: #4C5A43 !important;
+    color: #5A6651 !important;
     padding-left: 10px !important;
   }
   .sidebar-link.active {
-    color: #4C5A43 !important;
+    color: #5A6651 !important;
     font-weight: 800 !important;
     padding-left: 10px !important;
   }
   .sidebar-link .chevron-icon {
     font-size: 1rem;
-    color: rgba(0, 0, 0, 0.25);
+    color: rgba(90, 102, 81, 0.3);
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
   }
   .sidebar-link:hover .chevron-icon {
-    color: #4C5A43;
+    color: #5A6651;
     transform: translateX(4px);
   }
   .sidebar-link.active .chevron-icon {
-    color: #4C5A43;
+    color: #5A6651;
   }
   .sidebar-showcase-row {
     display: flex;
@@ -356,9 +357,9 @@ const GLOBAL_CSS = `
     from{opacity:0;transform:translateX(32px) scale(0.98);}
     to{opacity:1;transform:translateX(0) scale(1);}
   }
-  .nav-link{background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#1a1a1a;padding:4px 0;transition:color 0.2s;position:relative;overflow:hidden;}
-  .nav-link:hover,.nav-link.active{color:var(--accent-color, #4C5A43);}
-  .nav-link::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(76,90,67,0.15),transparent);transition:left 0.4s ease;pointer-events:none;}
+  .nav-link{background:none;border:none;cursor:pointer;font-family:'Open Sans',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#000000;padding:4px 0;transition:color 0.2s;position:relative;overflow:hidden;}
+  .nav-link:hover,.nav-link.active{color:#5A6651;}
+  .nav-link::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(90,102,81,0.15),transparent);transition:left 0.4s ease;pointer-events:none;}
   .nav-link:hover::after{left:140%;}
   @keyframes navShine {
     0% { background-position: -200% 0; }
@@ -366,7 +367,7 @@ const GLOBAL_CSS = `
   }
   .nav-link-shine {
     position: relative;
-    background: linear-gradient(120deg, #1a1a1a 30%, #5A6651 45%, #ffffff 50%, #5A6651 55%, #1a1a1a 70%) !important;
+    background: linear-gradient(120deg, #000000 30%, #5A6651 45%, #ffffff 50%, #5A6651 55%, #000000 70%) !important;
     background-size: 200% auto !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
@@ -374,19 +375,19 @@ const GLOBAL_CSS = `
     animation: navShine 3s linear infinite !important;
   }
   .nav-link-shine:hover, .nav-link-shine.active {
-    background: linear-gradient(120deg, #4C5A43 30%, #5A6651 45%, #ffffff 50%, #5A6651 55%, #4C5A43 70%) !important;
+    background: linear-gradient(120deg, #5A6651 30%, #5A6651 45%, #ffffff 50%, #5A6651 55%, #5A6651 70%) !important;
     background-size: 200% auto !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     color: transparent !important;
   }
-  .prod-card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,0.03);transition:transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);cursor:pointer;}
-  .prod-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 24px 60px rgba(0,0,0,0.08);}
-  .btn-orange{background:linear-gradient(135deg,#4C5A43,#5C6B53);border:none;color:#fff;cursor:pointer;font-family:'Inter',sans-serif;font-weight:700;letter-spacing:0.06em;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);box-shadow:0 4px 14px rgba(76,90,67,0.2);}
-  .btn-orange:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 12px 30px rgba(76,90,67,0.45);background:linear-gradient(135deg,#5C6B53,#4C5A43);filter:brightness(1.05);}
-  .btn-orange:active{transform:translateY(-1px) scale(0.98);box-shadow:0 6px 18px rgba(76,90,67,0.3);}
-  .btn-outline{background:transparent;border:1.5px solid #1a1a1a;color:#1a1a1a;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:0.06em;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);}
-  .btn-outline:hover{background:#1a1a1a;color:#F5F0E8;border-color:#1a1a1a;transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,0.08);}
+  .prod-card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 12px 32px rgba(90,102,81,0.03);transition:transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);cursor:pointer;}
+  .prod-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 24px 60px rgba(90,102,81,0.08);}
+  .btn-orange{background:#5A6651;border:none;color:#fff;cursor:pointer;font-family:'Open Sans',sans-serif;font-weight:700;letter-spacing:0.06em;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);box-shadow:0 4px 14px rgba(90,102,81,0.2);}
+  .btn-orange:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 12px 30px rgba(90,102,81,0.45);background:#5A6651;filter:brightness(0.9);}
+  .btn-orange:active{transform:translateY(-1px) scale(0.98);box-shadow:0 6px 18px rgba(90,102,81,0.3);}
+  .btn-outline{background:transparent;border:1.5px solid #000000;color:#000000;cursor:pointer;font-family:'Open Sans',sans-serif;font-weight:600;letter-spacing:0.06em;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);}
+  .btn-outline:hover{background:#000000;color:#ffffff;border-color:#000000;transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,0.08);}
   .btn-outline:active{transform:translateY(-1px);}
   .max-w{max-width:1200px;margin:0 auto;width:100%;}
   .power-card{background:#fff;border-radius:16px;padding:1.8rem 1.6rem;box-shadow:0 12px 32px rgba(0,0,0,0.03);transition:transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);}
@@ -1079,36 +1080,36 @@ function Hero({ onShop, onRitual }) {
      MOBILE HERO
   ──────────────────────────────────────────────────────────── */
   if (isMobile) return (
-    <section style={{ background: "#FDFBF7", width: "100%", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
+    <section style={{ background: "#ffffff", width: "100%", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", top: 60, right: -30, width: "60%", height: "45%", background: `url(${process.env.PUBLIC_URL || ""}/hero_mobile_bg.png) no-repeat top right / cover`, opacity: 0.18, zIndex: 0, pointerEvents: "none", borderRadius: 0 }} />
       <div style={{ position: "relative", zIndex: 1, paddingTop: "88px", paddingLeft: "1.4rem", paddingRight: "1.4rem", paddingBottom: "1.8rem" }}>
         <div style={{ marginBottom: "0.75rem" }}>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#A68D60" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="2" x2="12" y2="22" /><line x1="2" y1="12" x2="22" y2="12" /><line x1="5" y1="5" x2="19" y2="19" /><line x1="19" y1="5" x2="5" y2="19" />
-            <path d="M12 7l1.5 3.5L17 12l-3.5 1.5L12 17l-1.5-3.5L7 12l3.5-1.5z" fill="#A68D60" />
+            <path d="M12 7l1.5 3.5L17 12l-3.5 1.5L12 17l-1.5-3.5L7 12l3.5-1.5z" fill="#5A6651" />
           </svg>
         </div>
-        <p style={{ fontSize: "0.77rem", color: "#5C6654", letterSpacing: "0.04em", marginBottom: "0.45rem", fontFamily: "'Inter',sans-serif" }}>
-          India's <span style={{ color: "#A68D60", fontWeight: 600 }}>Sacred</span> Manifestation Stone
+        <p style={{ fontSize: "0.77rem", color: "#5A6651", letterSpacing: "0.04em", marginBottom: "0.45rem", fontFamily: "'Open Sans',sans-serif" }}>
+          India's <span style={{ color: "#5A6651", fontWeight: 600 }}>Sacred</span> Manifestation Stone
         </p>
-        <h1 style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(2.8rem,9.5vw,3.5rem)", fontWeight: 900, color: "#1a1a1a", lineHeight: 1.08, margin: "0 0 1rem 0" }}>
-          Turn<br/>Intentions<br/>into <span style={{ color: "#A68D60", position: "relative", whiteSpace: "nowrap" }}>Reality<span style={{ fontSize: "0.45em", position: "absolute", top: "-0.2em", right: "-0.5em", color: "#A68D60" }}>✦</span></span>
+        <h1 style={{ fontFamily: "'Open Sans',sans-serif", fontSize: "clamp(2.8rem,9.5vw,3.5rem)", fontWeight: 900, color: "#000000", lineHeight: 1.08, margin: "0 0 1rem 0" }}>
+          Turn<br/>Intentions<br/>into <span style={{ color: "#5A6651", position: "relative", whiteSpace: "nowrap" }}>Reality<span style={{ fontSize: "0.45em", position: "absolute", top: "-0.2em", right: "-0.5em", color: "#5A6651" }}>✦</span></span>
         </h1>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", width: "100%", maxWidth: "160px", margin: "1rem 0" }}>
-          <div style={{ height: "1px", flex: 1, background: "rgba(166,141,96,0.35)" }} /><span style={{ color: "#A68D60", fontSize: "10px" }}>✦</span><div style={{ height: "1px", flex: 1, background: "rgba(166,141,96,0.35)" }} />
+          <div style={{ height: "1px", flex: 1, background: "rgba(90,102,81,0.35)" }} /><span style={{ color: "#5A6651", fontSize: "10px" }}>✦</span><div style={{ height: "1px", flex: 1, background: "rgba(90,102,81,0.35)" }} />
         </div>
-        <p style={{ fontSize: "0.83rem", color: "#5C6654", lineHeight: 1.72, marginBottom: "1.5rem", maxWidth: 305, fontFamily: "'Inter',sans-serif" }}>
+        <p style={{ fontSize: "0.83rem", color: "#5A6651", lineHeight: 1.72, marginBottom: "1.5rem", maxWidth: 305, fontFamily: "'Open Sans',sans-serif" }}>
           Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
         </p>
-        <button onClick={onRitual} style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "#1E1E1E", color: "#fff", border: "none", padding: "13px 26px", borderRadius: 4, fontSize: "0.85rem", fontWeight: 600, cursor: "pointer", letterSpacing: "0.02em", fontFamily: "'Inter',sans-serif", boxShadow: "0 4px 14px rgba(0,0,0,0.15)" }}>
-          Explore Rituals<span style={{ color: "#A68D60", fontSize: "1.1rem", fontWeight: 700 }}>→</span>
+        <button onClick={onRitual} style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "#000000", color: "#fff", border: "none", padding: "13px 26px", borderRadius: 4, fontSize: "0.85rem", fontWeight: 600, cursor: "pointer", letterSpacing: "0.02em", fontFamily: "'Open Sans',sans-serif", boxShadow: "0 4px 14px rgba(0,0,0,0.15)" }}>
+          Explore Rituals<span style={{ color: "#5A6651", fontSize: "1.1rem", fontWeight: 700 }}>→</span>
         </button>
       </div>
       <div style={{ width: "100%", position: "relative", zIndex: 1 }}>
         <img src={`${process.env.PUBLIC_URL || ""}/hero_mobile_stone.png`} alt="Wishstone Sacred Stone" style={{ width: "100%", height: "auto", display: "block", objectFit: "cover" }} onError={e => { e.currentTarget.src = `${process.env.PUBLIC_URL || ""}/hero_mobile_bg.png`; }} />
         <div style={{ position: "absolute", bottom: 14, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", width: "80px" }}><div style={{ height: "1px", flex: 1, background: "rgba(166,141,96,0.35)" }} /><span style={{ color: "#A68D60", fontSize: 9 }}>✦</span><div style={{ height: "1px", flex: 1, background: "rgba(166,141,96,0.35)" }} /></div>
-          <span style={{ fontSize: "0.58rem", fontWeight: 700, color: "#A68D60", letterSpacing: "0.22em", fontFamily: "'Inter',sans-serif", textTransform: "uppercase" }}>SCROLL</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", width: "80px" }}><div style={{ height: "1px", flex: 1, background: "rgba(90,102,81,0.35)" }} /><span style={{ color: "#5A6651", fontSize: 9 }}>✦</span><div style={{ height: "1px", flex: 1, background: "rgba(90,102,81,0.35)" }} /></div>
+          <span style={{ fontSize: "0.58rem", fontWeight: 700, color: "#5A6651", letterSpacing: "0.22em", fontFamily: "'Open Sans',sans-serif", textTransform: "uppercase" }}>SCROLL</span>
         </div>
       </div>
     </section>
@@ -1118,48 +1119,48 @@ function Hero({ onShop, onRitual }) {
      DESKTOP HERO
   ──────────────────────────────────────────────────────────── */
   return (
-    <section style={{ position: "relative", width: "100%", minHeight: "100vh", background: "#FDFBF7", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+    <section style={{ position: "relative", width: "100%", minHeight: "100vh", background: "#ffffff", overflow: "hidden", display: "flex", flexDirection: "column" }}>
       <div style={{ position: "absolute", inset: 0, zIndex: 0, background: `url(${process.env.PUBLIC_URL || ""}/hero_desktop_stone.png) no-repeat center right / contain` }} />
-      <div style={{ position: "absolute", inset: 0, zIndex: 1, background: "linear-gradient(90deg, rgba(253,251,247,1) 42%, rgba(253,251,247,0.75) 62%, rgba(253,251,247,0) 85%)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 120, zIndex: 1, background: "linear-gradient(180deg, rgba(253,251,247,0.9) 0%, transparent 100%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", inset: 0, zIndex: 1, background: "linear-gradient(90deg, #ffffff 35%, rgba(255,255,255,0.4) 52%, rgba(255,255,255,0) 65%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 120, zIndex: 1, background: "linear-gradient(180deg, rgba(255,255,255,0.9) 0%, transparent 100%)", pointerEvents: "none" }} />
       <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "120px clamp(1.5rem,5vw,4rem) 60px", maxWidth: 680 }}>
         <div style={{ marginBottom: "1.4rem" }}>
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#A68D60" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="2" x2="12" y2="22" /><line x1="2" y1="12" x2="22" y2="12" /><line x1="5" y1="5" x2="19" y2="19" /><line x1="19" y1="5" x2="5" y2="19" />
-            <path d="M12 7l1.5 3.5L17 12l-3.5 1.5L12 17l-1.5-3.5L7 12l3.5-1.5z" fill="#A68D60" />
+            <path d="M12 7l1.5 3.5L17 12l-3.5 1.5L12 17l-1.5-3.5L7 12l3.5-1.5z" fill="#5A6651" />
           </svg>
         </div>
-        <p style={{ fontSize: "0.85rem", color: "#5C6654", letterSpacing: "0.04em", marginBottom: "0.6rem", fontFamily: "'Inter',sans-serif" }}>
-          India's <span style={{ color: "#A68D60", fontWeight: 600 }}>Sacred</span> Manifestation Stone
+        <p style={{ fontSize: "0.85rem", color: "#5A6651", letterSpacing: "0.04em", marginBottom: "0.6rem", fontFamily: "'Open Sans',sans-serif" }}>
+          India's <span style={{ color: "#5A6651", fontWeight: 600 }}>Sacred</span> Manifestation Stone
         </p>
-        <h1 style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(3.5rem,5.5vw,5rem)", fontWeight: 900, color: "#1a1a1a", lineHeight: 1.06, margin: "0 0 1.2rem 0" }}>
-          Turn<br/>Intentions<br/>into <span style={{ color: "#A68D60", position: "relative", whiteSpace: "nowrap" }}>Reality<span style={{ fontSize: "0.4em", position: "absolute", top: "-0.25em", right: "-0.5em", color: "#A68D60" }}>✦</span></span>
+        <h1 style={{ fontFamily: "'Open Sans',serif", fontSize: "clamp(3.5rem,5.5vw,5rem)", fontWeight: 900, color: "#000000", lineHeight: 1.06, margin: "0 0 1.2rem 0" }}>
+          Turn<br/>Intentions<br/>into <span style={{ color: "#5A6651", position: "relative", whiteSpace: "nowrap" }}>Reality<span style={{ fontSize: "0.4em", position: "absolute", top: "-0.25em", right: "-0.5em", color: "#5A6651" }}>✦</span></span>
         </h1>
         <div style={{ display: "flex", alignItems: "center", gap: "12px", width: "100%", maxWidth: "180px", margin: "1.2rem 0" }}>
-          <div style={{ height: "1px", flex: 1, background: "rgba(166,141,96,0.35)" }} /><span style={{ color: "#A68D60", fontSize: "12px" }}>✦</span><div style={{ height: "1px", flex: 1, background: "rgba(166,141,96,0.35)" }} />
+          <div style={{ height: "1px", flex: 1, background: "rgba(90,102,81,0.35)" }} /><span style={{ color: "#5A6651", fontSize: "12px" }}>✦</span><div style={{ height: "1px", flex: 1, background: "rgba(90,102,81,0.35)" }} />
         </div>
-        <p style={{ fontSize: "clamp(0.88rem,1.1vw,1rem)", color: "#5C6654", lineHeight: 1.78, marginBottom: "2.2rem", maxWidth: 400, fontFamily: "'Inter',sans-serif" }}>
+        <p style={{ fontSize: "clamp(0.88rem,1.1vw,1rem)", color: "#5A6651", lineHeight: 1.78, marginBottom: "2.2rem", maxWidth: 400, fontFamily: "'Open Sans',sans-serif" }}>
           Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
         </p>
         <div>
-          <button onClick={onRitual} style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "#4C5A43", color: "#fff", border: "none", padding: "15px 32px", borderRadius: 4, fontSize: "0.9rem", fontWeight: 600, cursor: "pointer", letterSpacing: "0.02em", fontFamily: "'Inter',sans-serif", boxShadow: "0 4px 20px rgba(76,90,67,0.28)", transition: "all 0.25s ease" }} onMouseEnter={e => { e.currentTarget.style.background = "#3D4B35"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 28px rgba(76,90,67,0.35)"; }} onMouseLeave={e => { e.currentTarget.style.background = "#4C5A43"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(76,90,67,0.28)"; }}>
+          <button onClick={onRitual} style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "#5A6651", color: "#fff", border: "none", padding: "15px 32px", borderRadius: 4, fontSize: "0.9rem", fontWeight: 600, cursor: "pointer", letterSpacing: "0.02em", fontFamily: "'Open Sans',sans-serif", boxShadow: "0 4px 20px rgba(90,102,81,0.28)", transition: "all 0.25s ease" }} onMouseEnter={e => { e.currentTarget.style.background = "#5A6651"; e.currentTarget.style.filter = "brightness(0.9)"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 28px rgba(90,102,81,0.35)"; }} onMouseLeave={e => { e.currentTarget.style.background = "#5A6651"; e.currentTarget.style.filter = "none"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(90,102,81,0.28)"; }}>
             Explore Rituals<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
         </div>
       </div>
-      <div style={{ position: "relative", zIndex: 2, margin: "0 clamp(1.5rem,4vw,3rem) 3rem", background: "rgba(255,255,255,0.72)", backdropFilter: "blur(12px)", borderRadius: 16, padding: "22px 28px", boxShadow: "0 4px 24px rgba(76,90,67,0.08)", border: "1px solid rgba(255,255,255,0.9)" }}>
+      <div style={{ position: "relative", zIndex: 2, margin: "0 clamp(1.5rem,4vw,3rem) 3rem", background: "rgba(255,255,255,0.72)", backdropFilter: "blur(12px)", borderRadius: 16, padding: "22px 28px", boxShadow: "0 4px 24px rgba(90,102,81,0.08)", border: "1px solid rgba(255,255,255,0.9)" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20, alignItems: "center" }}>
           {[
-            { label: "Authentic WishStone", svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/><line x1="12" y1="2" x2="12" y2="6"/></svg> },
-            { label: "Ancient Wisdom Meets Modern Life", svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a9 9 0 1 0 0 18A9 9 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg> },
-            { label: "Energy You Can Feel", svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg> },
-            { label: "Made With Intention", svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> },
+            { label: "Authentic WishStone", svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/><line x1="12" y1="2" x2="12" y2="6"/></svg> },
+            { label: "Ancient Wisdom Meets Modern Life", svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a9 9 0 1 0 0 18A9 9 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg> },
+            { label: "Energy You Can Feel", svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg> },
+            { label: "Made With Intention", svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> },
           ].map((item, i) => (
             <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 10 }}>
-              <div style={{ width: 46, height: 46, borderRadius: "50%", background: "#F5F0E8", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ width: 46, height: 46, borderRadius: "50%", background: "rgba(90, 102, 81, 0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {item.svg}
               </div>
-              <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "#2C3320", lineHeight: 1.35, fontFamily: "'Inter',sans-serif" }}>{item.label}</span>
+              <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "#000000", lineHeight: 1.35, fontFamily: "'Open Sans',sans-serif" }}>{item.label}</span>
             </div>
           ))}
         </div>
@@ -1170,20 +1171,7 @@ function Hero({ onShop, onRitual }) {
 
 // ─── STATS BAR ────────────────────────────────────────────────
 function StatsBar() {
-  return (
-    <div className="premium-fade-up" style={{ background: T.bg, borderTop: `1px solid ${T.border}`, borderBottom: `1px solid ${T.border}`, padding: "28px clamp(1.5rem,5vw,3.5rem)" }}>
-      <div className="max-w">
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "clamp(2rem,5vw,5rem)", flexWrap: "wrap" }}>
-          {[["12K+", "DREAMERS"], ["4.9★", "RATING"], ["100%", "NATURAL"], ["21", "DAY SHIFT"]].map(([n, l]) => (
-            <div key={l} style={{ textAlign: "center" }}>
-              <div style={{ fontFamily: "'Inter',sans-serif", fontSize: "clamp(1.3rem,2.5vw,1.8rem)", fontWeight: 800, color: T.text, lineHeight: 1 }}>{n}</div>
-              <div style={{ fontSize: "0.62rem", fontWeight: 700, color: T.textMid, letterSpacing: "0.14em", marginTop: 4, fontFamily: "'Inter',sans-serif" }}>{l}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  return null;
 }
 // ─── MARQUEE ──────────────────────────────────────────────────
 function MarqueeSection() {
@@ -1383,33 +1371,32 @@ function QuoteSection() {
   }, []);
   const q = QUOTES[idx];
   return (
-    <section style={{ background: "radial-gradient(circle at center, #2e3b24 0%, #171d11 100%)", padding: "64px clamp(1.5rem,5vw,3.5rem)", textAlign: "center", position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at center, rgba(232,114,12,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
+    <section style={{ background: "rgba(90, 102, 81, 0.08)", padding: "64px clamp(1.5rem,5vw,3.5rem)", textAlign: "center", position: "relative", overflow: "hidden" }}>
       <div className="max-w" style={{ maxWidth: 760, position: "relative" }}>
-        <div style={{ fontSize: "0.68rem", fontWeight: 800, color: "#F48B29", letterSpacing: "0.22em", textTransform: "uppercase", marginBottom: "1.2rem", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-          <span style={{ color: "#F48B29" }}>✦</span> Daily Manifestation Oracle <span style={{ color: "#F48B29" }}>✦</span>
+        <div style={{ fontSize: "0.68rem", fontWeight: 800, color: "#5A6651", letterSpacing: "0.22em", textTransform: "uppercase", marginBottom: "1.2rem", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+          <span style={{ color: "#5A6651" }}>✦</span> Daily Manifestation Oracle <span style={{ color: "#5A6651" }}>✦</span>
         </div>
-        <blockquote key={key} style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(1.2rem,2.8vw,1.75rem)", fontWeight: 700, color: "#F5F0E8", lineHeight: 1.6, marginBottom: "1.2rem", fontStyle: "italic", animation: "quoteIn 0.5s ease both" }}>
+        <blockquote key={key} style={{ fontFamily: "'Open Sans',sans-serif", fontSize: "clamp(1.2rem,2.8vw,1.75rem)", fontWeight: 800, color: "#000000", lineHeight: 1.6, marginBottom: "1.2rem", fontStyle: "italic", animation: "quoteIn 0.5s ease both" }}>
           "{q.text}"
         </blockquote>
-        <cite style={{ fontSize: "0.8rem", fontWeight: 700, color: "#F48B29", letterSpacing: "0.2em", textTransform: "uppercase", fontStyle: "normal", display: "block", marginBottom: "1.8rem" }}>— {q.author}</cite>
+        <cite style={{ fontSize: "0.8rem", fontWeight: 700, color: "#5A6651", letterSpacing: "0.2em", textTransform: "uppercase", fontStyle: "normal", display: "block", marginBottom: "1.8rem" }}>— {q.author}</cite>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1.2rem" }}>
           <button onClick={() => { setIdx(i => (i - 1 + QUOTES.length) % QUOTES.length); setKey(k => k + 1); }}
-            style={{ width: 34, height: 34, borderRadius: "50%", border: `1px solid rgba(244,139,41,0.4)`, background: "none", color: "#F48B29", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#F48B29"; e.currentTarget.style.color = "#fff"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#F48B29"; }}>‹</button>
-          <div style={{ width: 180, height: 3, background: "rgba(255,255,255,0.1)", borderRadius: 1.5, position: "relative" }}>
-            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", background: "#F48B29", borderRadius: 1.5, width: `${((idx + 1) / QUOTES.length) * 100}%`, transition: "width 0.4s ease" }} />
+            style={{ width: 34, height: 34, borderRadius: "50%", border: `1px solid rgba(90, 102, 81, 0.4)`, background: "none", color: "#5A6651", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#5A6651"; e.currentTarget.style.color = "#fff"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#5A6651"; }}>‹</button>
+          <div style={{ width: 180, height: 3, background: "rgba(90, 102, 81, 0.1)", borderRadius: 1.5, position: "relative" }}>
+            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", background: "#5A6651", borderRadius: 1.5, width: `${((idx + 1) / QUOTES.length) * 100}%`, transition: "width 0.4s ease" }} />
           </div>
           <div style={{ display: "flex", gap: 6 }}>
             {QUOTES.map((_, i) => (
-              <button key={i} onClick={() => { setIdx(i); setKey(k => k + 1); }} style={{ width: i === idx ? 20 : 8, height: 8, borderRadius: 4, background: i === idx ? "#F48B29" : "rgba(255,255,255,0.3)", border: "none", cursor: "pointer", transition: "all 0.3s", padding: 0 }} />
+              <button key={i} onClick={() => { setIdx(i); setKey(k => k + 1); }} style={{ width: i === idx ? 20 : 8, height: 8, borderRadius: 4, background: i === idx ? "#5A6651" : "rgba(90, 102, 81, 0.3)", border: "none", cursor: "pointer", transition: "all 0.3s", padding: 0 }} />
             ))}
           </div>
           <button onClick={() => { setIdx(i => (i + 1) % QUOTES.length); setKey(k => k + 1); }}
-            style={{ width: 34, height: 34, borderRadius: "50%", border: `1px solid rgba(244,139,41,0.4)`, background: "none", color: "#F48B29", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#F48B29"; e.currentTarget.style.color = "#fff"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#F48B29"; }}>›</button>
+            style={{ width: 34, height: 34, borderRadius: "50%", border: `1px solid rgba(90, 102, 81, 0.4)`, background: "none", color: "#5A6651", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#5A6651"; e.currentTarget.style.color = "#fff"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#5A6651"; }}>›</button>
         </div>
       </div>
     </section>
@@ -2475,7 +2462,6 @@ function HomePage({ onShop, onRitual, onNav }) {
   return (
     <div className="homepage-font-override">
       <Hero onShop={onShop} onRitual={onRitual} />
-      <StatsBar />
       <MarqueeSection />
       <CommunityVideoSection />
       {/* Auto-Scrolling Products Strip */}
@@ -2625,6 +2611,41 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
   const location = useLocation();
   const API_BASE = getApiBase();
   const [filter, setFilter] = useState("all");
+  const [toastMsg, setToastMsg] = useState("");
+
+  useEffect(() => {
+    if (toastMsg) {
+      const timer = setTimeout(() => setToastMsg(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMsg]);
+
+  const handleShare = async (e, product) => {
+    e.stopPropagation();
+    const prodId = product._id || product.id;
+    const liveUrl = (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+      ? `https://wishstone.in/product/${prodId}`
+      : `${window.location.origin}/product/${prodId}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: product.name,
+          text: `Check out ${product.name} on WishStone!`,
+          url: liveUrl,
+        });
+      } catch (err) {
+        console.log("Error sharing:", err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(liveUrl);
+        setToastMsg("Product link copied to clipboard!");
+      } catch (err) {
+        console.error("Could not copy text:", err);
+      }
+    }
+  };
 
   useEffect(() => {
     if (location.state && location.state.category) setFilter(location.state.category);
@@ -2789,14 +2810,37 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
     }
 
     /* ── Add to Cart button ── */
+    @keyframes wsShineEffect {
+      0% { left: -100%; }
+      50%, 100% { left: 120%; }
+    }
     .ws-add-btn {
       width:100%; padding:7px 0; border-radius:8px;
-      background:#3D4935; color:#fff; border:none; cursor:pointer;
+      background:${G}; color:#fff; border:none; cursor:pointer;
       font-size:0.72rem; font-weight:600; letter-spacing:0.03em;
       display:flex; align-items:center; justify-content:center; gap:5px;
-      transition:background 0.2s, transform 0.15s;
+      transition:all 0.2s ease, transform 0.15s;
+      position: relative;
+      overflow: hidden;
     }
-    .ws-add-btn:hover { background:#2C3320; transform:translateY(-1px); }
+    .ws-add-btn:hover { background:#000000; transform:translateY(-1px); }
+    .ws-add-btn-shining::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+      );
+      transform: skewX(-20deg);
+      animation: wsShineEffect 3s infinite ease-in-out;
+      pointer-events: none;
+    }
 
     /* ── Qty row ── */
     .ws-qty-row { width:100%; border-radius:8px; overflow:hidden; display:flex; border:2px solid ${G}; }
@@ -2952,56 +2996,62 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
                         <span style={{ fontSize: "0.6rem", fontWeight: 700, color: G, letterSpacing: "0.14em", textTransform: "uppercase" }}>BEST SELLER</span>
                       </div>
                     )}
-                    <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#1a1a1a", marginBottom: "0.35rem", lineHeight: 1.2, textTransform: "uppercase", letterSpacing: "0.02em", fontFamily: "'Open Sans', sans-serif" }}>{p.name}</h3>
-                    
-                    {/* Stars & Reviews */}
-                     <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "0.55rem" }}>
-                       <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
-                         {[1, 2, 3, 4].map(starNum => (
-                           <svg key={starNum} width="13" height="13" viewBox="0 0 24 24" fill="#E29547" stroke="none">
-                             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                           </svg>
-                         ))}
-                         {/* 5th Star (half-filled for 4.5 rating) */}
-                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style={{ position: "relative" }}>
-                           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="#E29547" clipPath="inset(0 50% 0 0)" />
-                           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="#E29547" strokeWidth="2.2" fill="none" />
-                         </svg>
-                       </div>
-                       <span style={{ fontSize: "0.76rem", color: "#6b7280", fontWeight: 600, fontFamily: "'Open Sans', sans-serif" }}>
-                         {(() => {
-                           const n = (p.name || "").toLowerCase();
-                           if (n.includes("wishstone")) return "4.9 | 1480 Reviews";
-                           if (n.includes("cosmic")) return "4.8 | 1210 Reviews";
-                           if (n.includes("vibe") || n.includes("flow")) return "4.5 | 1280 Reviews";
-                           if (n.includes("diffuser") || n.includes("reed")) return "4.7 | 850 Reviews";
-                           if (n.includes("camphor") || n.includes("kapoor")) return "4.9 | 920 Reviews";
-                           if (n.includes("habit")) return "4.6 | 620 Reviews";
-                           return "4.7 | 450 Reviews";
-                         })()}
-                       </span>
-                     </div>
+                    <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#000000", marginBottom: "0.35rem", lineHeight: 1.2, textTransform: "uppercase", letterSpacing: "0.02em", fontFamily: "'Open Sans', sans-serif" }}>{p.name}</h3>
 
-                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "0.9rem" }}>
-                       <span style={{ fontSize: "1.05rem", fontWeight: 800, color: "#1a1a1a", fontFamily: "'Open Sans', sans-serif" }}>
-                         Rs. {p.price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                       </span>
-                       {p.originalPrice > p.price && (
-                         <span style={{ fontSize: "0.82rem", color: "#9ca3af", textDecoration: "line-through", fontFamily: "'Open Sans', sans-serif" }}>
-                           Rs. {p.originalPrice.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                         </span>
-                       )}
-                     </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "0.9rem" }}>
+                        <span style={{ fontSize: "1.05rem", fontWeight: 800, color: "#000000", fontFamily: "'Open Sans', sans-serif" }}>
+                          Rs. {p.price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                        {p.originalPrice > p.price && (
+                          <span style={{ fontSize: "0.82rem", color: "rgba(0, 0, 0, 0.4)", textDecoration: "line-through", fontFamily: "'Open Sans', sans-serif" }}>
+                            Rs. {p.originalPrice.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
+                        )}
+                      </div>
 
-                                           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginTop: "auto", width: "100%" }} onClick={e => e.stopPropagation()}>
-                        <div style={{ width: "100%", maxWidth: "160px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", width: "100%", marginTop: "auto", justifyContent: "space-between" }} onClick={e => e.stopPropagation()}>
+                        {/* Share Button */}
+                        <button
+                          onClick={(e) => handleShare(e, p)}
+                          style={{
+                            width: "36px",
+                            height: "36px",
+                            borderRadius: "8px",
+                            border: "1px solid rgba(90, 102, 81, 0.28)",
+                            background: "#ffffff",
+                            color: "#5A6651",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            transition: "all 0.2s ease",
+                            flexShrink: 0
+                          }}
+                          onMouseEnter={e => {
+                            e.currentTarget.style.background = "rgba(90, 102, 81, 0.05)";
+                          }}
+                          onMouseLeave={e => {
+                            e.currentTarget.style.background = "#ffffff";
+                          }}
+                          title="Share Product"
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="18" cy="5" r="3" />
+                            <circle cx="6" cy="12" r="3" />
+                            <circle cx="18" cy="19" r="3" />
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                          </svg>
+                        </button>
+
+                        {/* Add to Cart Container */}
+                        <div style={{ flex: 1, display: "flex", justifyContent: "flex-end", maxWidth: "160px" }}>
                           {p.stock === 0 ? (
-                            <button disabled style={{ width: "100%", height: "36px", borderRadius: "8px", background: "#e5e7e3", color: "#9ca3af", border: "none", fontSize: "0.78rem", cursor: "not-allowed", fontWeight: 700 }}>Out of Stock</button>
+                            <button disabled style={{ width: "100%", height: "36px", borderRadius: "8px", background: "rgba(0, 0, 0, 0.08)", color: "rgba(0, 0, 0, 0.3)", border: "none", fontSize: "0.78rem", cursor: "not-allowed", fontWeight: 700 }}>Out of Stock</button>
                           ) : qty > 0 ? (
                             <div className="ws-qty-row" style={{ height: "36px", width: "100%" }}>
                               <button className="ws-qty-btn" onClick={() => onAdd({ ...p, qty: -1 })} style={{ height: "100%", fontSize: "14px" }}>−</button>
                               <span style={{ flex: 1, textAlign: "center", fontWeight: 700, color: G, fontSize: "0.85rem", display: "flex", alignItems: "center", justifyContent: "center", gap: 4, height: "100%" }}>
-                                {/* Unlock icon — filled shackle open */}
                                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                                   <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
@@ -3011,13 +3061,12 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
                               <button className="ws-qty-btn" onClick={() => onAdd(p)} style={{ height: "100%", fontSize: "14px" }}>+</button>
                             </div>
                           ) : (
-                            <button className="ws-add-btn" onClick={() => onAdd(p)} style={{ height: "36px", padding: 0, borderRadius: "8px", background: "#3D4935", width: "100%" }}>
-                              {/* Lock icon — outline, not filled (unlocks after add) */}
+                            <button className="ws-add-btn ws-add-btn-shining" onClick={() => onAdd(p)} style={{ height: "36px", padding: 0, borderRadius: "8px", background: G, width: "100%" }}>
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                               </svg>
-                              Add to Cart
+                              Add
                             </button>
                           )}
                         </div>
@@ -3040,6 +3089,26 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
           </div>
         )}
       </div>
+      {/* Share Toast */}
+      {toastMsg && (
+        <div style={{
+          position: "fixed",
+          bottom: "24px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          background: "#000000",
+          color: "#ffffff",
+          padding: "12px 24px",
+          borderRadius: "8px",
+          fontSize: "0.85rem",
+          fontWeight: 600,
+          zIndex: 99999,
+          boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+          animation: "wsFadeIn 0.3s ease"
+        }}>
+          {toastMsg}
+        </div>
+      )}
     </div>
   );
 }
@@ -4693,7 +4762,36 @@ function StoriesPage() {
 }
 
 // ─── CART PAGE ────────────────────────────────────────────────
-function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick }) {
+function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, onWish, wished = [] }) {
+  const API_BASE = getApiBase();
+  const navigate = useNavigate();
+  const [recommended, setRecommended] = useState([]);
+  const [recLoading, setRecLoading] = useState(false);
+
+  useEffect(() => {
+    if (cart.length === 0) {
+      setRecLoading(true);
+      fetch(`${API_BASE}/api/products?limit=3`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.success && d.products) {
+            setRecommended(d.products.map(p => ({
+              ...p,
+              id: p._id,
+              image: p.images?.[0] || "",
+              discount: p.discount || (p.originalPrice ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) : 0),
+              isBestSeller: p.isBestSeller || false
+            })));
+          }
+          setRecLoading(false);
+        })
+        .catch(err => {
+          console.error(err);
+          setRecLoading(false);
+        });
+    }
+  }, [cart.length, API_BASE]);
+
   const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const ship = sub >= 999 ? 0 : 99;
   const total = sub + ship;
@@ -4709,29 +4807,29 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick }) {
       display: flex;
       gap: 1rem;
       align-items: flex-start;
-      border: 1px solid rgba(76,90,67,0.1);
-      box-shadow: 0 2px 12px rgba(76,90,67,0.04);
+      border: 1px solid rgba(90,102,81,0.1);
+      box-shadow: 0 2px 12px rgba(90,102,81,0.04);
       transition: box-shadow 0.2s;
     }
-    .cart-item-card:hover { box-shadow: 0 6px 24px rgba(76,90,67,0.09); }
+    .cart-item-card:hover { box-shadow: 0 6px 24px rgba(90,102,81,0.09); }
     .cart-qty-btn {
       width: 32px; height: 32px;
-      border: 1.5px solid rgba(76,90,67,0.25);
+      border: 1.5px solid rgba(90,102,81,0.25);
       background: #fff; border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 1.1rem; color: #4C5A43; font-weight: 700;
+      cursor: pointer; font-size: 1.1rem; color: #5A6651; font-weight: 700;
       transition: all 0.15s;
     }
-    .cart-qty-btn:hover { background: #4C5A43; color: #fff; border-color: #4C5A43; }
+    .cart-qty-btn:hover { background: #5A6651; color: #fff; border-color: #5A6651; }
     .cart-summary-card {
-      background: linear-gradient(160deg, #2C3320 0%, #3a4329 100%);
+      background: linear-gradient(160deg, #5A6651 0%, #000000 100%);
       border-radius: 20px;
       padding: 1.8rem 1.5rem;
       color: #fff;
     }
     .cart-checkout-btn {
       width: 100%; padding: 15px;
-      background: #4C5A43; color: #fff;
+      background: #5A6651; color: #fff;
       border: none; border-radius: 14px;
       font-size: 0.9rem; font-weight: 700;
       cursor: pointer; font-family: 'Open Sans', sans-serif;
@@ -4739,7 +4837,7 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick }) {
       letter-spacing: 0.02em; transition: all 0.25s;
       margin-top: 1.2rem;
     }
-    .cart-checkout-btn:hover { background: #384332; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(76,90,67,0.25); }
+    .cart-checkout-btn:hover { background: #000000; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(90,102,81,0.25); }
     .cart-trust-row {
       display: flex; justify-content: center; gap: 1.5rem;
       flex-wrap: wrap; margin-top: 1rem;
@@ -4754,24 +4852,154 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick }) {
   `;
 
   if (cart.length === 0) return (
-    <div className="cart-page" style={{ paddingTop: 130, paddingBottom: 40, background: "#F9F7F3", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, textAlign: "center" }}>
+    <div className="cart-page" style={{ paddingTop: 90, background: "#ffffff", minHeight: "100vh", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
       <style>{cartCss}</style>
-      <div style={{ fontSize: 52, marginBottom: 8 }}>🛒</div>
-      <h2 style={{ fontFamily: "'Open Sans', sans-serif", color: "#2C3320", fontSize: "1.6rem", fontWeight: 700 }}>Your Cart is Empty</h2>
-      <p style={{ color: "#5C6654", fontSize: "0.88rem" }}>Add some sacred products to get started.</p>
+      <div className="max-w" style={{ padding: "3rem clamp(1.5rem,5vw,3.5rem) 6rem", flex: 1, display: "flex", flexDirection: "column", gap: "3rem" }}>
+        
+        {/* Main Grid: Left empty message, Right features/branding */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2.5rem", alignItems: "center" }}>
+          
+          {/* Left Side: Empty State Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            style={{
+              background: "rgba(90, 102, 81, 0.04)",
+              border: "1px solid rgba(90, 102, 81, 0.12)",
+              borderRadius: 20,
+              padding: "3rem 2rem",
+              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 8px 32px rgba(90, 102, 81, 0.03)"
+            }}
+          >
+            <div style={{ position: "relative", width: 90, height: 90, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1.5rem" }}>
+              <div style={{ width: 80, height: 80, borderRadius: "50%", background: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(90, 102, 81, 0.15)", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.2">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <path d="M16 10a4 4 0 0 1-8 0" />
+                </svg>
+              </div>
+              <div style={{ position: "absolute", top: 4, left: 6, fontSize: "12px", animation: "badgeFloat1 3s ease-in-out infinite" }}>✨</div>
+              <div style={{ position: "absolute", bottom: 10, right: 4, fontSize: "10px", animation: "badgeFloat3 4s ease-in-out infinite" }}>✦</div>
+            </div>
+
+            <h2 style={{ fontFamily: "'Open Sans', sans-serif", color: "#000000", fontSize: "clamp(1.5rem, 3.5vw, 1.85rem)", fontWeight: 800, marginBottom: "0.6rem", lineHeight: 1.25 }}>
+              Your Cart is <span style={{ color: "#5A6651" }}>Empty</span>
+            </h2>
+            <p style={{ color: "#5A6651", fontSize: "0.85rem", lineHeight: 1.6, marginBottom: "1.8rem", maxWidth: 300, fontFamily: "'Open Sans', sans-serif" }}>
+              Your cart is waiting for sacred intentions. Explore our collection of manifestation tools to start your journey.
+            </p>
+
+            <button
+              onClick={() => navigate("/shop")}
+              className="btn-orange"
+              style={{
+                display: "inline-flex", alignItems: "center", gap: "8px",
+                padding: "12px 28px", fontSize: "0.8rem", borderRadius: 30,
+                background: "#5A6651", color: "#ffffff", border: "none", fontWeight: 700,
+                cursor: "pointer", letterSpacing: "0.05em",
+                boxShadow: "0 6px 18px rgba(90, 102, 81, 0.25)", transition: "all 0.3s ease"
+              }}
+              onMouseEnter={e => { e.currentTarget.style.filter = "brightness(0.9)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.filter = "none"; e.currentTarget.style.transform = "translateY(0)"; }}
+            >
+              Explore Collection
+            </button>
+          </motion.div>
+
+          {/* Right Side: Features and Branding */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.8rem", padding: "1rem" }}>
+            {[
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>, label: "Safe & Secure Checkout", sub: "Fully encrypted and certified gateway for seamless online payments." },
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.8"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M2 12h20"/></svg>, label: "Free Shipping Over ₹999", sub: "Dispatched within 24-48 hours with reliable courier tracking." },
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>, label: "100% Authentic Crystals", sub: "Ethically sourced, natural gemstones cleansed under direct moonlight." }
+            ].map((f, i) => (
+              <div key={i} style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
+                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(90, 102, 81, 0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  {f.icon}
+                </div>
+                <div>
+                  <h4 style={{ fontSize: "0.9rem", fontWeight: 700, color: "#000000", marginBottom: 3, fontFamily: "'Open Sans', sans-serif" }}>{f.label}</h4>
+                  <p style={{ fontSize: "0.78rem", color: "#5A6651", lineHeight: 1.5, fontFamily: "'Open Sans', sans-serif" }}>{f.sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+
+        {/* Curated Recommendations Section */}
+        {recommended.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            style={{ marginTop: "2rem" }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: "1.5rem" }}>
+              <div style={{ height: 1, flex: 1, background: "rgba(90, 102, 81, 0.15)" }} />
+              <h3 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "1rem", fontWeight: 700, color: "#5A6651", letterSpacing: "0.05em", textTransform: "uppercase", margin: 0 }}>Recommended for You</h3>
+              <div style={{ height: 1, flex: 1, background: "rgba(90, 102, 81, 0.15)" }} />
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1.5rem" }}>
+              {recommended.map(p => (
+                <div key={p._id} className="prod-card" style={{ display: "flex", flexDirection: "column", border: "1px solid rgba(90, 102, 81, 0.12)", borderRadius: 16, overflow: "hidden" }} onClick={() => onProductClick(p)}>
+                  <div style={{ position: "relative", aspectRatio: "4/3", overflow: "hidden", background: "#fcfcfa" }}>
+                    {p.image ? (
+                      <img referrerPolicy="no-referrer" src={getImageUrl(p.image)} alt={p.name}
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        onError={e => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }} />
+                    ) : null}
+                    <div style={{ width: "100%", height: "100%", background: "rgba(90, 102, 81, 0.08)", display: p.image ? "none" : "flex", alignItems: "center", justifyContent: "center", fontSize: 36, color: "#5A6651" }}>◆</div>
+                    
+                    {/* Wishlist toggle button */}
+                    {onWish && (
+                      <button onClick={e => { e.stopPropagation(); onWish(e, p._id); }}
+                        style={{ position: "absolute", top: 10, right: 10, background: "#ffffff", border: "none", borderRadius: "50%", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 3px 8px rgba(0,0,0,0.12)", zIndex: 2 }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill={wished.includes(p._id) ? G : "none"} stroke="#5A6651" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                  <div style={{ padding: "1.2rem", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                    <div>
+                      <h4 style={{ fontSize: "0.92rem", fontWeight: 700, color: "#000000", marginBottom: "0.4rem", fontFamily: "'Open Sans', sans-serif" }}>{p.name}</h4>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "1rem" }}>
+                        <span style={{ fontSize: "0.95rem", color: "#5A6651", fontWeight: 700 }}>₹{p.price.toLocaleString()}</span>
+                        {p.originalPrice > p.price && <span style={{ color: "rgba(0,0,0,0.4)", fontSize: "0.75rem", textDecoration: "line-through" }}>₹{p.originalPrice.toLocaleString()}</span>}
+                      </div>
+                    </div>
+                    {onAdd && (
+                      <button className="btn-orange" onClick={e => { e.stopPropagation(); onAdd(p); }} style={{ width: "100%", padding: "10px", fontSize: "0.72rem", borderRadius: 8, background: "#5A6651", color: "#ffffff", border: "none", fontWeight: 700, cursor: "pointer" }}>Add to Cart</button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 
   return (
-    <div className="cart-page" style={{ paddingTop: 90, background: "#F9F7F3", minHeight: "100vh" }}>
+    <div className="cart-page" style={{ paddingTop: 90, background: "#ffffff", minHeight: "100vh" }}>
       <style>{cartCss}</style>
       <div className="max-w" style={{ padding: "clamp(1.2rem,4vw,2.5rem)" }}>
 
         {/* Page header */}
         <div style={{ marginBottom: "1.8rem" }}>
-          <p style={{ fontSize: "0.65rem", fontWeight: 700, color: "#4C5A43", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 4 }}>SHOPPING CART</p>
-          <h1 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(1.6rem,4vw,2.2rem)", fontWeight: 700, color: "#2C3320", lineHeight: 1.1 }}>Your Cart</h1>
-          <div style={{ width: 48, height: 3, background: "#C8B89A", borderRadius: 2, marginTop: 8 }} />
+          <p style={{ fontSize: "0.65rem", fontWeight: 700, color: "#5A6651", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 4 }}>SHOPPING CART</p>
+          <h1 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(1.6rem,4vw,2.2rem)", fontWeight: 700, color: "#000000", lineHeight: 1.1 }}>Your Cart</h1>
+          <div style={{ width: 48, height: 3, background: "#5A6651", borderRadius: 2, marginTop: 8 }} />
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "1.8rem", alignItems: "start" }} className="cart-page-grid checkout-grid">
@@ -5471,9 +5699,37 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
   const API_BASE = getApiBase();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [recommended, setRecommended] = useState([]);
+  const [recLoading, setRecLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!ids || ids.length === 0) { setItems([]); setLoading(false); return; }
+    if (!ids || ids.length === 0) {
+      setItems([]);
+      setLoading(false);
+      
+      // Fetch recommendations
+      setRecLoading(true);
+      fetch(`${API_BASE}/api/products?limit=3`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.success && d.products) {
+            setRecommended(d.products.map(p => ({
+              ...p,
+              id: p._id,
+              image: p.images?.[0] || "",
+              discount: p.discount || (p.originalPrice ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) : 0),
+              isBestSeller: p.isBestSeller || false
+            })));
+          }
+          setRecLoading(false);
+        })
+        .catch(err => {
+          console.error(err);
+          setRecLoading(false);
+        });
+      return;
+    }
 
     // Fetch all wishlisted products from backend
     const fetchWishlistItems = async () => {
@@ -5509,105 +5765,155 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
   }, [ids, API_BASE]);
 
   if (loading) return (
-    <div style={{ paddingTop: 130, background: T.bg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <div style={{ paddingTop: 130, background: "#ffffff", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ textAlign: "center" }}>
-        <div style={{ width: 40, height: 40, border: "3px solid rgba(232,114,12,0.2)", borderTop: `3px solid ${T.orange}`, borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
-        <p style={{ color: T.textLight, fontSize: "0.88rem" }}>Loading wishlist…</p>
+        <div style={{ width: 40, height: 40, border: "3px solid rgba(90, 102, 81, 0.2)", borderTop: `3px solid #5A6651`, borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
+        <p style={{ color: "#5A6651", fontSize: "0.88rem" }}>Loading wishlist…</p>
       </div>
     </div>
   );
 
   if (!items.length) return (
-    <div style={{ paddingTop: 64, height: "100vh", background: T.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", overflow: "hidden", boxSizing: "border-box" }}>
-
-      {/* Dynamic Animated Entrance Container */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", maxWidth: 420, textAlign: "center", padding: "0 1.5rem" }}
-      >
-        {/* Heart Badge with Sparkles */}
-        <div style={{ position: "relative", width: 110, height: 110, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1rem" }}>
-          <div style={{ width: 90, height: 90, borderRadius: "50%", background: "rgba(76, 90, 67, 0.05)", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(76, 90, 67, 0.08)" }}>
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-            </svg>
-          </div>
-          <div style={{ position: "absolute", top: 8, left: 12, fontSize: "14px", opacity: 0.8, animation: "badgeFloat1 3s ease-in-out infinite" }}>✨</div>
-          <div style={{ position: "absolute", bottom: 16, right: 8, fontSize: "11px", opacity: 0.6, animation: "badgeFloat3 4s ease-in-out infinite" }}>✦</div>
-          <div style={{ position: "absolute", top: 22, right: 12, fontSize: "10px", opacity: 0.7, animation: "badgeFloat2 3.5s ease-in-out infinite" }}>✦</div>
-        </div>
-
-        {/* Title */}
-        <h2 style={{ fontFamily: "'Playfair Display', serif", color: "#2C3320", fontSize: "clamp(1.5rem, 4vw, 2rem)", fontWeight: 900, marginBottom: "0.5rem", letterSpacing: "-0.01em" }}>
-          Your Wishlist is<br /><span style={{ color: "#4C5A43" }}>Empty</span>
-        </h2>
-
-        {/* Description */}
-        <p style={{ color: "#5C6654", fontSize: "clamp(0.8rem, 1.1vw, 0.88rem)", lineHeight: 1.5, marginBottom: "1.2rem", maxWidth: 340 }}>
-          Looks like you haven't saved anything yet. Explore our collections and add your favorites to your wishlist.
-        </p>
-
-        {/* Explore Button */}
-        <button
-          onClick={() => navigate("/shop")}
-          className="btn-orange"
-          style={{
-            display: "inline-flex", alignItems: "center", gap: "8px",
-            padding: "12px 24px", fontSize: "0.82rem", borderRadius: 30,
-            background: "#4C5A43", color: "#fff", border: "none", fontWeight: 700,
-            cursor: "pointer", letterSpacing: "0.05em",
-            boxShadow: "0 8px 20px rgba(76, 90, 67, 0.18)", transition: "all 0.3s ease"
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = "#384332"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "#4C5A43"; e.currentTarget.style.transform = "translateY(0)"; }}
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
-          </svg>
-          Explore Products
-        </button>
-
-        {/* Compact Features Row */}
-        <div style={{ display: "flex", justifyContent: "center", gap: "24px", marginTop: "2rem", flexWrap: "wrap" }}>
-          {[
-            { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>, label: "Save with Ease", sub: "Add items you love and keep them all in one place." },
-            { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>, label: "Stay Notified", sub: "Get alerts when your saved items go on sale." },
-            { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>, label: "Secure & Private", sub: "Your wishlist is safe and visible only to you." }
-          ].map((f, i) => (
-            <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", maxWidth: 110 }}>
-              <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(76, 90, 67, 0.06)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 6 }}>{f.icon}</div>
-              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#2C3320", marginBottom: 2 }}>{f.label}</div>
-              <div style={{ fontSize: "0.65rem", color: "#5C6654", lineHeight: 1.4, textAlign: "center" }}>{f.sub}</div>
+    <div style={{ paddingTop: 90, background: "#ffffff", minHeight: "100vh", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
+      <div className="max-w" style={{ padding: "3rem clamp(1.5rem,5vw,3.5rem) 6rem", flex: 1, display: "flex", flexDirection: "column", gap: "3rem" }}>
+        
+        {/* Main Grid: Left empty message, Right features/branding */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2.5rem", alignItems: "center" }}>
+          
+          {/* Left Side: Empty State Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            style={{
+              background: "rgba(90, 102, 81, 0.04)",
+              border: "1px solid rgba(90, 102, 81, 0.12)",
+              borderRadius: 20,
+              padding: "3rem 2rem",
+              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 8px 32px rgba(90, 102, 81, 0.03)"
+            }}
+          >
+            <div style={{ position: "relative", width: 90, height: 90, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1.5rem" }}>
+              <div style={{ width: 80, height: 80, borderRadius: "50%", background: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(90, 102, 81, 0.15)", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+              </div>
+              <div style={{ position: "absolute", top: 4, left: 6, fontSize: "12px", animation: "badgeFloat1 3s ease-in-out infinite" }}>✨</div>
+              <div style={{ position: "absolute", bottom: 10, right: 4, fontSize: "10px", animation: "badgeFloat3 4s ease-in-out infinite" }}>✦</div>
             </div>
-          ))}
-        </div>
 
-        {/* Find what you love branding */}
-        <div style={{ marginTop: "1.5rem", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, color: "#8D7A5B" }}>
-            <span style={{ fontSize: 12 }}>🌿</span>
-            <span style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic", fontSize: "1rem", color: "#2C3320" }}>Find what you love</span>
-            <span style={{ fontSize: 12 }}>🌿</span>
+            <h2 style={{ fontFamily: "'Open Sans', sans-serif", color: "#000000", fontSize: "clamp(1.5rem, 3.5vw, 1.85rem)", fontWeight: 800, marginBottom: "0.6rem", lineHeight: 1.25 }}>
+              Your Wishlist is <span style={{ color: "#5A6651" }}>Empty</span>
+            </h2>
+            <p style={{ color: "#5A6651", fontSize: "0.85rem", lineHeight: 1.6, marginBottom: "1.8rem", maxWidth: 300, fontFamily: "'Open Sans', sans-serif" }}>
+              Anchor your dreams. Explore our sacred collection of manifestation tools and save your favorites here.
+            </p>
+
+            <button
+              onClick={() => navigate("/shop")}
+              className="btn-orange"
+              style={{
+                display: "inline-flex", alignItems: "center", gap: "8px",
+                padding: "12px 28px", fontSize: "0.8rem", borderRadius: 30,
+                background: "#5A6651", color: "#ffffff", border: "none", fontWeight: 700,
+                cursor: "pointer", letterSpacing: "0.05em",
+                boxShadow: "0 6px 18px rgba(90, 102, 81, 0.25)", transition: "all 0.3s ease"
+              }}
+              onMouseEnter={e => { e.currentTarget.style.filter = "brightness(0.9)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.filter = "none"; e.currentTarget.style.transform = "translateY(0)"; }}
+            >
+              Explore Collection
+            </button>
+          </motion.div>
+
+          {/* Right Side: Features and Branding */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.8rem", padding: "1rem" }}>
+            {[
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>, label: "Intentional Anchoring", sub: "Save tools that resonate with your current manifestation goals to keep focus." },
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.8"><path d="M12 2a9 9 0 1 0 0 18A9 9 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>, label: "Clean, Ethical Energy", sub: "100% authentic, natural stones sourced responsibly and cleansed under moonlight." },
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>, label: "Secure & Private", sub: "Your intentions and wishlist are personal and stored securely for you." }
+            ].map((f, i) => (
+              <div key={i} style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
+                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(90, 102, 81, 0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  {f.icon}
+                </div>
+                <div>
+                  <h4 style={{ fontSize: "0.9rem", fontWeight: 700, color: "#000000", marginBottom: 3, fontFamily: "'Open Sans', sans-serif" }}>{f.label}</h4>
+                  <p style={{ fontSize: "0.78rem", color: "#5A6651", lineHeight: 1.5, fontFamily: "'Open Sans', sans-serif" }}>{f.sub}</p>
+                </div>
+              </div>
+            ))}
           </div>
-          <p style={{ color: "#5C6654", fontSize: "0.72rem" }}>Discover something special, just for you.</p>
+
         </div>
 
-      </motion.div>
+        {/* Curated Recommendations Section */}
+        {recommended.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            style={{ marginTop: "2rem" }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: "1.5rem" }}>
+              <div style={{ height: 1, flex: 1, background: "rgba(90, 102, 81, 0.15)" }} />
+              <h3 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "1rem", fontWeight: 700, color: "#5A6651", letterSpacing: "0.05em", textTransform: "uppercase", margin: 0 }}>Recommended for You</h3>
+              <div style={{ height: 1, flex: 1, background: "rgba(90, 102, 81, 0.15)" }} />
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1.5rem" }}>
+              {recommended.map(p => (
+                <div key={p._id} className="prod-card" style={{ display: "flex", flexDirection: "column", border: "1px solid rgba(90, 102, 81, 0.12)", borderRadius: 16, overflow: "hidden" }} onClick={() => onClick(p)}>
+                  <div style={{ position: "relative", aspectRatio: "4/3", overflow: "hidden", background: "#fcfcfa" }}>
+                    {p.image ? (
+                      <img referrerPolicy="no-referrer" src={getImageUrl(p.image)} alt={p.name}
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        onError={e => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }} />
+                    ) : null}
+                    <div style={{ width: "100%", height: "100%", background: "rgba(90, 102, 81, 0.08)", display: p.image ? "none" : "flex", alignItems: "center", justifyContent: "center", fontSize: 36, color: "#5A6651" }}>◆</div>
+                    
+                    {/* Add/Wishlist button overlay */}
+                    <button onClick={e => { e.stopPropagation(); onWish(p._id); }}
+                      style={{ position: "absolute", top: 10, right: 10, background: "#ffffff", border: "none", borderRadius: "50%", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 3px 8px rgba(0,0,0,0.12)", zIndex: 2 }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill={ids.includes(p._id) ? "#5A6651" : "none"} stroke="#5A6651" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div style={{ padding: "1.2rem", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                    <div>
+                      <h4 style={{ fontSize: "0.92rem", fontWeight: 700, color: "#000000", marginBottom: "0.4rem", fontFamily: "'Open Sans', sans-serif" }}>{p.name}</h4>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "1rem" }}>
+                        <span style={{ fontSize: "0.95rem", color: "#5A6651", fontWeight: 700 }}>₹{p.price.toLocaleString()}</span>
+                        {p.originalPrice > p.price && <span style={{ color: "rgba(0,0,0,0.4)", fontSize: "0.75rem", textDecoration: "line-through" }}>₹{p.originalPrice.toLocaleString()}</span>}
+                      </div>
+                    </div>
+                    <button className="btn-orange" onClick={e => { e.stopPropagation(); onAdd(p); }} style={{ width: "100%", padding: "10px", fontSize: "0.72rem", borderRadius: 8, background: "#5A6651", color: "#ffffff", border: "none", fontWeight: 700, cursor: "pointer" }}>Add to Cart</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 
   return (
-    <div style={{ paddingTop: 90, background: T.bg, minHeight: "100vh" }}>
+    <div style={{ paddingTop: 90, background: "#ffffff", minHeight: "100vh" }}>
       <div className="max-w" style={{ padding: "clamp(1.5rem,4vw,3rem)" }}>
-        <h1 style={{ fontFamily: "'Playfair Display',serif", color: T.text, fontSize: "clamp(1.5rem,4vw,2rem)", fontWeight: 900, marginBottom: "0.4rem" }}>Your Wishlist</h1>
-        <div style={{ width: 60, height: 3, background: `linear-gradient(90deg,${T.orange},transparent)`, marginBottom: "0.5rem" }} />
-        <p style={{ color: T.textMid, fontSize: "0.85rem", marginBottom: "1.5rem" }}>{items.length} saved item{items.length !== 1 ? "s" : ""}</p>
+        <h1 style={{ fontFamily: "'Open Sans',sans-serif", color: "#000000", fontSize: "clamp(1.5rem,4vw,2rem)", fontWeight: 900, marginBottom: "0.4rem" }}>Your Wishlist</h1>
+        <div style={{ width: 60, height: 3, background: "#5A6651", marginBottom: "0.5rem" }} />
+        <p style={{ color: "#5A6651", fontSize: "0.85rem", marginBottom: "1.5rem" }}>{items.length} saved item{items.length !== 1 ? "s" : ""}</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.5rem" }} className="prod-grid">
           {items.map(p => (
-            <div key={p._id} className="prod-card" onClick={() => onClick(p)}>
+            <div key={p._id} className="prod-card" onClick={() => onClick(p)} style={{ border: "1px solid rgba(90, 102, 81, 0.12)" }}>
               <div style={{ position: "relative", aspectRatio: "4/3", overflow: "hidden" }}>
                 {p.image ? (
                   <img referrerPolicy="no-referrer" src={p.image} alt={p.name}
@@ -5616,138 +5922,29 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
                     onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
                     onError={e => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }} />
                 ) : null}
-                <div style={{ width: "100%", height: "100%", background: `linear-gradient(135deg,${T.bg},#ede8df)`, display: p.image ? "none" : "flex", alignItems: "center", justifyContent: "center", fontSize: 48 }}>◆</div>
-                {p.discount > 0 && <div style={{ position: "absolute", top: 10, left: 10, background: T.orange, color: "#fff", borderRadius: 4, padding: "3px 10px", fontSize: "0.65rem", fontWeight: 800 }}>-{p.discount}%</div>}
+                <div style={{ width: "100%", height: "100%", background: "rgba(90, 102, 81, 0.08)", display: p.image ? "none" : "flex", alignItems: "center", justifyContent: "center", fontSize: 48, color: "#5A6651" }}>◆</div>
+                {p.discount > 0 && <div style={{ position: "absolute", top: 10, left: 10, background: "#5A6651", color: "#fff", borderRadius: 4, padding: "3px 10px", fontSize: "0.65rem", fontWeight: 800 }}>-{p.discount}%</div>}
                 <button onClick={e => { e.stopPropagation(); onWish(p._id); }}
                   style={{ position: "absolute", top: 8, right: 8, background: "rgba(255,255,255,0.9)", border: "none", borderRadius: "50%", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "transform 0.2s" }}
                   onMouseEnter={e => e.currentTarget.style.transform = "scale(1.15)"}
                   onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all 0.2s ease" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#5A6651" stroke="#5A6651" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all 0.2s ease" }}>
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                   </svg>
                 </button>
-                {p.isBestSeller && <div style={{ position: "absolute", bottom: 8, left: 8, background: T.bgDark, color: T.orange, borderRadius: 4, padding: "2px 8px", fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.08em" }}>BEST SELLER</div>}
+                {p.isBestSeller && <div style={{ position: "absolute", bottom: 8, left: 8, background: "#5A6651", color: "#ffffff", borderRadius: 4, padding: "2px 8px", fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.08em" }}>BEST SELLER</div>}
               </div>
               <div style={{ padding: "1.2rem" }}>
-                <h4 style={{ fontSize: "0.92rem", fontWeight: 700, color: T.text, marginBottom: "0.4rem" }}>{p.name}</h4>
-                {p.shortDesc && <p style={{ fontSize: "0.76rem", color: T.textMid, marginBottom: "0.7rem", lineHeight: 1.5 }}>{p.shortDesc.slice(0, 65)}{p.shortDesc.length > 65 ? "..." : ""}</p>}
+                <h4 style={{ fontSize: "0.92rem", fontWeight: 700, color: "#000000", marginBottom: "0.4rem", fontFamily: "'Open Sans', sans-serif" }}>{p.name}</h4>
+                {p.shortDesc && <p style={{ fontSize: "0.76rem", color: "#5A6651", marginBottom: "0.7rem", lineHeight: 1.5 }}>{p.shortDesc.slice(0, 65)}{p.shortDesc.length > 65 ? "..." : ""}</p>}
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "0.8rem" }}>
-                  <span style={{ fontSize: "1rem", color: T.orange, fontWeight: 700 }}>₹{p.price.toLocaleString()}</span>
-                  {p.originalPrice > p.price && <span style={{ color: T.textMid, fontSize: "0.75rem", textDecoration: "line-through" }}>₹{p.originalPrice.toLocaleString()}</span>}
+                  <span style={{ fontSize: "1rem", color: "#5A6651", fontWeight: 700 }}>₹{p.price.toLocaleString()}</span>
+                  {p.originalPrice > p.price && <span style={{ color: "rgba(0, 0, 0, 0.4)", fontSize: "0.75rem", textDecoration: "line-through" }}>₹{p.originalPrice.toLocaleString()}</span>}
                 </div>
-                <button className="btn-orange" onClick={e => { e.stopPropagation(); onAdd(p); }} style={{ width: "100%", padding: "10px", fontSize: "0.72rem", borderRadius: 7 }}>Add to Cart</button>
+                <button className="btn-orange" onClick={e => { e.stopPropagation(); onAdd(p); }} style={{ width: "100%", padding: "10px", fontSize: "0.72rem", borderRadius: 8, background: "#5A6651", color: "#ffffff", border: "none", fontWeight: 700, cursor: "pointer" }}>Add to Cart</button>
               </div>
             </div>
           ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── GOOGLE ACCOUNT CHOOSER MODAL ─────────────────────────────
-function GoogleChooserModal({ open, onClose, onSelect, mode }) {
-  const [customEmail, setCustomEmail] = useState("");
-  const [customName, setCustomName] = useState("");
-  const [showCustom, setShowCustom] = useState(false);
-
-  if (!open) return null;
-
-  const accounts = [
-    { email: "sb1258954@gmail.com", name: "Sandeep Singh", avatar: "S", color: "#4285F4" },
-    { email: "testuser@gmail.com", name: "Test User", avatar: "T", color: "#34A853" },
-  ];
-
-  const handleSelect = (account) => {
-    const payload = { sub: account.email.replace(/[^a-z0-9]/gi, ""), email: account.email, name: account.name, picture: "" };
-    const credential = "mock_google_" + btoa(JSON.stringify(payload));
-    onSelect(credential);
-    onClose();
-  };
-
-  const handleCustom = () => {
-    if (!customEmail) return;
-    const nm = customName || customEmail.split("@")[0];
-    const payload = { sub: customEmail.replace(/[^a-z0-9]/gi, ""), email: customEmail, name: nm, picture: "" };
-    const credential = "mock_google_" + btoa(JSON.stringify(payload));
-    onSelect(credential);
-    onClose();
-  };
-
-  return (
-    <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 99999, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, animation: "fadeIn 0.2s ease" }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, width: "100%", maxWidth: 400, overflow: "hidden", boxShadow: "0 24px 80px rgba(0,0,0,0.25)", animation: "cardIn 0.35s ease both" }}>
-        {/* Header */}
-        <div style={{ padding: "28px 28px 0", textAlign: "center" }}>
-          <svg width="30" height="30" viewBox="0 0 48 48" style={{ marginBottom: 10 }}>
-            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
-            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
-            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
-            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
-          </svg>
-          <h3 style={{ fontFamily: "'Open Sans',sans-serif", fontSize: "1.15rem", fontWeight: 600, color: "#202124", margin: "0 0 4px" }}>
-            {mode === "signup" ? "Sign up with Google" : "Sign in with Google"}
-          </h3>
-          <p style={{ fontFamily: "'Open Sans',sans-serif", fontSize: "0.82rem", color: "#5f6368", margin: "0 0 18px" }}>Choose an account to continue to WishStone</p>
-        </div>
-
-        {/* Account List */}
-        <div style={{ padding: "0 12px" }}>
-          {accounts.map(acc => (
-            <button key={acc.email} onClick={() => handleSelect(acc)}
-              style={{ display: "flex", alignItems: "center", gap: 14, width: "100%", padding: "12px 16px", border: "none", borderRadius: 12, background: "transparent", cursor: "pointer", transition: "background 0.15s", textAlign: "left", fontFamily: "'Open Sans',sans-serif" }}
-              onMouseEnter={e => e.currentTarget.style.background = "#f1f3f4"}
-              onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-              <div style={{ width: 40, height: 40, borderRadius: "50%", background: acc.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "1rem", fontWeight: 700, flexShrink: 0 }}>{acc.avatar}</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: "0.88rem", fontWeight: 600, color: "#202124", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{acc.name}</div>
-                <div style={{ fontSize: "0.78rem", color: "#5f6368", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{acc.email}</div>
-              </div>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5f6368" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
-            </button>
-          ))}
-        </div>
-
-        {/* Divider */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 28px" }}>
-          <div style={{ flex: 1, height: 1, background: "#e0e0e0" }} />
-          <span style={{ fontSize: "0.72rem", color: "#9aa0a6", fontWeight: 600, letterSpacing: "0.05em" }}>OR</span>
-          <div style={{ flex: 1, height: 1, background: "#e0e0e0" }} />
-        </div>
-
-        {/* Custom email */}
-        {!showCustom ? (
-          <div style={{ padding: "0 12px 8px" }}>
-            <button onClick={() => setShowCustom(true)}
-              style={{ display: "flex", alignItems: "center", gap: 14, width: "100%", padding: "12px 16px", border: "none", borderRadius: 12, background: "transparent", cursor: "pointer", transition: "background 0.15s", textAlign: "left", fontFamily: "'Open Sans',sans-serif" }}
-              onMouseEnter={e => e.currentTarget.style.background = "#f1f3f4"}
-              onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-              <div style={{ width: 40, height: 40, borderRadius: "50%", background: "#e8eaed", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5f6368" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
-              </div>
-              <div style={{ fontSize: "0.88rem", fontWeight: 500, color: "#1a73e8" }}>Use another account</div>
-            </button>
-          </div>
-        ) : (
-          <div style={{ padding: "0 28px 8px" }}>
-            <input type="email" placeholder="Email address" value={customEmail} onChange={e => setCustomEmail(e.target.value)}
-              style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #dadce0", borderRadius: 8, fontSize: "0.88rem", marginBottom: 8, outline: "none", boxSizing: "border-box", fontFamily: "'Open Sans',sans-serif" }}
-              onFocus={e => e.target.style.borderColor = "#1a73e8"} onBlur={e => e.target.style.borderColor = "#dadce0"} />
-            <input type="text" placeholder="Full name (optional)" value={customName} onChange={e => setCustomName(e.target.value)}
-              style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #dadce0", borderRadius: 8, fontSize: "0.88rem", marginBottom: 10, outline: "none", boxSizing: "border-box", fontFamily: "'Open Sans',sans-serif" }}
-              onFocus={e => e.target.style.borderColor = "#1a73e8"} onBlur={e => e.target.style.borderColor = "#dadce0"} />
-            <button onClick={handleCustom}
-              style={{ width: "100%", padding: "10px", background: "#1a73e8", color: "#fff", border: "none", borderRadius: 8, fontSize: "0.85rem", fontWeight: 600, cursor: "pointer", fontFamily: "'Open Sans',sans-serif", transition: "background 0.15s" }}
-              onMouseEnter={e => e.currentTarget.style.background = "#1557b0"}
-              onMouseLeave={e => e.currentTarget.style.background = "#1a73e8"}>Continue</button>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div style={{ padding: "14px 28px 20px", borderTop: "1px solid #e0e0e0", marginTop: 8 }}>
-          <p style={{ fontFamily: "'Open Sans',sans-serif", fontSize: "0.72rem", color: "#9aa0a6", margin: 0, lineHeight: 1.5, textAlign: "center" }}>
-            To continue, Google will share your name, email, and profile picture with WishStone.
-          </p>
         </div>
       </div>
     </div>
@@ -5759,7 +5956,6 @@ function SignupPage({ onSignup, onSwitch }) {
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
-  const [showGoogleChooser, setShowGoogleChooser] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const API_BASE = getApiBase();
 
@@ -5784,32 +5980,6 @@ function SignupPage({ onSignup, onSwitch }) {
 
   return (
     <div style={{ minHeight: "100vh", background: "#5A6651", display: "flex", alignItems: "center", justifyContent: "center", padding: "clamp(1rem, 3vw, 2.5rem)", boxSizing: "border-box", paddingTop: 90, position: "relative", overflow: "hidden" }}>
-      <GoogleChooserModal
-        open={showGoogleChooser}
-        onClose={() => setShowGoogleChooser(false)}
-        mode="signup"
-        onSelect={async (credential) => {
-          setGoogleLoading(true); setError("");
-          try {
-            const res = await fetch(`${API_BASE}/api/auth/google`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ credential })
-            });
-            const data = await res.json();
-            if (data.success && data.token) {
-              localStorage.setItem("ws_token", data.token);
-              localStorage.setItem("ws_user", JSON.stringify(data.user));
-              onSignup({ ...data.user, joinedAt: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) });
-            } else {
-              setError(data.message || "Google sign-up failed.");
-            }
-          } catch {
-            setError("Google sign-up failed. Please try again.");
-          }
-          setGoogleLoading(false);
-        }}
-      />
       {/* Background glass blur glows for mobile */}
       <div className="login-bg-glow-1" style={{ position: "absolute", top: "15%", left: "5%", width: "clamp(240px, 50vw, 400px)", height: "clamp(240px, 50vw, 400px)", borderRadius: "50%", background: "radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%)", filter: "blur(50px)", pointerEvents: "none", zIndex: 0 }} />
       <div className="login-bg-glow-2" style={{ position: "absolute", bottom: "10%", right: "-10%", width: "clamp(280px, 60vw, 480px)", height: "clamp(280px, 60vw, 480px)", borderRadius: "50%", background: "radial-gradient(circle, rgba(245, 176, 112, 0.15) 0%, transparent 70%)", filter: "blur(60px)", pointerEvents: "none", zIndex: 0 }} />
@@ -6089,19 +6259,37 @@ function SignupPage({ onSignup, onSwitch }) {
           <p className="login-sub-title">Please enter your details</p>
 
           <div style={{ display: "flex", justifyContent: "center", width: "100%", marginBottom: "1.4rem" }}>
-            <button
-              type="button"
-              onClick={() => setShowGoogleChooser(true)}
-              className="google-login-custom-btn"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: "block" }}>
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" />
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-              </svg>
-              {googleLoading ? "Loading..." : "Sign up with Google"}
-            </button>
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                const credential = credentialResponse.credential;
+                setGoogleLoading(true); setError("");
+                try {
+                  const res = await fetch(`${API_BASE}/api/auth/google`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ credential })
+                  });
+                  const data = await res.json();
+                  if (data.success && data.token) {
+                    localStorage.setItem("ws_token", data.token);
+                    localStorage.setItem("ws_user", JSON.stringify(data.user));
+                    onSignup({ ...data.user, joinedAt: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) });
+                  } else {
+                    setError(data.message || "Google sign-up failed.");
+                  }
+                } catch {
+                  setError("Google sign-up failed. Please try again.");
+                }
+                setGoogleLoading(false);
+              }}
+              onError={() => {
+                setError("Google sign-up failed. Please try again.");
+              }}
+              theme="outline"
+              size="large"
+              text="signup_with"
+              width="320px"
+            />
           </div>
 
           <div className="login-or-divider">
@@ -6168,7 +6356,6 @@ function LoginPage({ onLogin, onSwitch }) {
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
-  const [showGoogleChooser, setShowGoogleChooser] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const API_BASE = getApiBase();
   const GOOGLE_CLIENT_ID = "342285664182-b68b0t0tmj66jgu9eg14hg7212a57h2r.apps.googleusercontent.com";
@@ -6190,32 +6377,6 @@ function LoginPage({ onLogin, onSwitch }) {
 
   return (
     <div style={{ minHeight: "100vh", background: "#5A6651", display: "flex", alignItems: "center", justifyContent: "center", padding: "clamp(1rem, 3vw, 2.5rem)", boxSizing: "border-box", paddingTop: 90, position: "relative", overflow: "hidden" }}>
-      <GoogleChooserModal
-        open={showGoogleChooser}
-        onClose={() => setShowGoogleChooser(false)}
-        mode="login"
-        onSelect={async (credential) => {
-          setGoogleLoading(true); setError("");
-          try {
-            const res = await fetch(`${API_BASE}/api/auth/google`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ credential })
-            });
-            const data = await res.json();
-            if (data.success && data.token) {
-              localStorage.setItem("ws_token", data.token);
-              localStorage.setItem("ws_user", JSON.stringify(data.user));
-              onLogin({ ...data.user, joinedAt: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) });
-            } else {
-              setError(data.message || "Google sign-in failed.");
-            }
-          } catch {
-            setError("Google sign-in failed. Please try again.");
-          }
-          setGoogleLoading(false);
-        }}
-      />
       {/* Background glass blur glows for mobile */}
       <div className="login-bg-glow-1" style={{ position: "absolute", top: "15%", left: "5%", width: "clamp(240px, 50vw, 400px)", height: "clamp(240px, 50vw, 400px)", borderRadius: "50%", background: "radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%)", filter: "blur(50px)", pointerEvents: "none", zIndex: 0 }} />
       <div className="login-bg-glow-2" style={{ position: "absolute", bottom: "10%", right: "-10%", width: "clamp(280px, 60vw, 480px)", height: "clamp(280px, 60vw, 480px)", borderRadius: "50%", background: "radial-gradient(circle, rgba(245, 176, 112, 0.15) 0%, transparent 70%)", filter: "blur(60px)", pointerEvents: "none", zIndex: 0 }} />
@@ -6540,19 +6701,37 @@ function LoginPage({ onLogin, onSwitch }) {
           <p className="login-sub-title">Please enter your details</p>
 
           <div style={{ display: "flex", justifyContent: "center", width: "100%", marginBottom: "1.4rem" }}>
-            <button
-              type="button"
-              onClick={() => setShowGoogleChooser(true)}
-              className="google-login-custom-btn"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: "block" }}>
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" />
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-              </svg>
-              {googleLoading ? "Loading..." : "Continue with Google"}
-            </button>
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                const credential = credentialResponse.credential;
+                setGoogleLoading(true); setError("");
+                try {
+                  const res = await fetch(`${API_BASE}/api/auth/google`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ credential })
+                  });
+                  const data = await res.json();
+                  if (data.success && data.token) {
+                    localStorage.setItem("ws_token", data.token);
+                    localStorage.setItem("ws_user", JSON.stringify(data.user));
+                    onLogin({ ...data.user, joinedAt: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) });
+                  } else {
+                    setError(data.message || "Google sign-in failed.");
+                  }
+                } catch {
+                  setError("Google sign-in failed. Please try again.");
+                }
+                setGoogleLoading(false);
+              }}
+              onError={() => {
+                setError("Google sign-in failed. Please try again.");
+              }}
+              theme="outline"
+              size="large"
+              text="signin_with"
+              width="320px"
+            />
           </div>
 
           <div className="login-or-divider">
@@ -8270,7 +8449,7 @@ function AppInner() {
         <Route path="/rituals" element={<RitualsPage />} />
         <Route path="/benefits" element={<BenefitsPage />} />
         <Route path="/stories" element={<StoriesPage />} />
-        <Route path="/cart" element={<CartPage cart={cart} onQty={updateQty} onRemove={removeFromCart} onCheckout={() => nav("checkout")} onProductClick={p => navigate("/product/" + p.id)} />} />
+        <Route path="/cart" element={<CartPage cart={cart} onQty={updateQty} onRemove={removeFromCart} onCheckout={() => nav("checkout")} onProductClick={p => navigate("/product/" + p.id)} onAdd={addToCart} onWish={toggleWish} wished={wished} />} />
         <Route path="/checkout" element={<CheckoutPage cart={cart} onPlaceOrder={handlePlaceOrder} />} />
         <Route path="/wishlist" element={<WishlistPage ids={wished} onAdd={addToCart} onWish={toggleWish} onClick={goToProduct} />} />
         <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage onLogin={handleLogin} onSwitch={() => navigate("/signup")} />} />
@@ -8309,8 +8488,10 @@ function AppInner() {
 // ─── MAIN APP ─────────────────────────────────────────────────
 export default function WishstoneApp() {
   return (
-    <BrowserRouter>
-      <AppInner />
-    </BrowserRouter>
+    <GoogleOAuthProvider clientId="342285664182-b68b0t0tmj66jgu9eg14hg7212a57h2r.apps.googleusercontent.com">
+      <BrowserRouter>
+        <AppInner />
+      </BrowserRouter>
+    </GoogleOAuthProvider>
   );
 }
