@@ -4486,21 +4486,6 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
 // ─── RITUALS PAGE ─────────────────────────────────────────────
 function RitualsPage() {
   const navigate = useNavigate();
-  const [visible, setVisible] = useState({});
-  const refs = useRef([]);
-
-  useEffect(() => {
-    const observers = refs.current.map((el, i) => {
-      if (!el) return null;
-      const obs = new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting) setVisible(v => ({ ...v, [i]: true }));
-      }, { threshold: 0.15 });
-      obs.observe(el);
-      return obs;
-    });
-    return () => observers.forEach(o => o && o.disconnect());
-  }, []);
-
   const rituals = [
     {
       label: "01 — New Moon",
@@ -4547,27 +4532,56 @@ function RitualsPage() {
     @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
     .rituals-page { font-family: 'Open Sans', sans-serif; }
     .rituals-page * { font-family: 'Open Sans', sans-serif; }
-    .ritual-card-enter { opacity: 0; transform: translateY(40px); }
-    .ritual-card-visible { opacity: 1; transform: translateY(0); transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16,1,0.3,1); }
-    .ritual-step-row { display: flex; gap: 1.5rem; align-items: flex-start; padding: 1.2rem 0; border-bottom: 1px solid rgba(76,90,67,0.08); }
-    .ritual-step-row:last-child { border-bottom: none; }
-    @keyframes ritualGlow { 0%,100%{opacity:0.4} 50%{opacity:0.9} }
+    .ritual-arch-card {
+      background: #ffffff;
+      border: 1px solid rgba(90, 102, 81, 0.15);
+      border-radius: 120px 120px 24px 24px;
+      padding: 4.5rem 2.5rem 3.5rem;
+      box-shadow: 0 16px 48px rgba(90, 102, 81, 0.03);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 5rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .ritual-arch-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 24px 64px rgba(90, 102, 81, 0.08);
+      border-color: rgba(90, 102, 81, 0.3);
+    }
+    .ritual-step-item {
+      width: 100%;
+      padding: 1.2rem 0;
+      border-bottom: 1px solid rgba(90, 102, 81, 0.08);
+    }
+    .ritual-step-item:last-child {
+      border-bottom: none;
+    }
+    @media(max-width: 768px) {
+      .ritual-arch-card {
+        border-radius: 80px 80px 20px 20px;
+        padding: 3rem 1.5rem 2.5rem;
+      }
+    }
   `;
 
   return (
-    <div className="rituals-page" style={{ paddingTop: 80, background: "#F9F7F3", minHeight: "100vh" }}>
+    <div className="rituals-page" style={{ paddingTop: 80, background: "#ffffff", minHeight: "100vh" }}>
       <style>{css}</style>
 
       {/* Hero header */}
-      <div style={{ background: "linear-gradient(180deg, #2C3320 0%, #3a4329 100%)", padding: "5rem clamp(1.5rem,6vw,5rem) 4rem", textAlign: "center", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 100%, rgba(141,122,91,0.18) 0%, transparent 60%)", pointerEvents: "none" }} />
+      <div style={{ background: "linear-gradient(180deg, #5A6651 0%, #000000 100%)", padding: "5rem clamp(1.5rem,6vw,5rem) 4rem", textAlign: "center", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 100%, rgba(90,102,81,0.18) 0%, transparent 60%)", pointerEvents: "none" }} />
         <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: "1.5rem", opacity: 0.7 }}>
-          <div style={{ height: 1, width: 40, background: "#8D7A5B" }} />
-          <span style={{ fontSize: "0.62rem", fontWeight: 700, color: "#8D7A5B", letterSpacing: "0.28em", textTransform: "uppercase" }}>SACRED RITUALS</span>
-          <div style={{ height: 1, width: 40, background: "#8D7A5B" }} />
+          <div style={{ height: 1, width: 40, background: "#5A6651" }} />
+          <span style={{ fontSize: "0.62rem", fontWeight: 700, color: "#5A6651", letterSpacing: "0.28em", textTransform: "uppercase" }}>SACRED RITUALS</span>
+          <div style={{ height: 1, width: 40, background: "#5A6651" }} />
         </div>
-        <h1 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(2rem,5vw,3.2rem)", fontWeight: 700, color: "#F9F7F3", lineHeight: 1.15, marginBottom: "1rem", letterSpacing: "-0.01em" }}>
-          Ancient Practices,<br /><span style={{ color: "#C8B89A", fontStyle: "italic" }}>Modern Life.</span>
+        <h1 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(2rem,5vw,3.2rem)", fontWeight: 700, color: "#ffffff", lineHeight: 1.15, marginBottom: "1rem", letterSpacing: "-0.01em" }}>
+          Ancient Practices,<br /><span style={{ color: "#5A6651", fontStyle: "italic" }}>Modern Life.</span>
         </h1>
         <p style={{ fontSize: "clamp(0.85rem,1.2vw,0.96rem)", color: "rgba(255,255,255,0.55)", lineHeight: 1.7, maxWidth: 520, margin: "0 auto" }}>
           Three rituals. Five steps each. A complete daily practice for clarity, intention, and inner renewal.
@@ -4575,53 +4589,55 @@ function RitualsPage() {
       </div>
 
       {/* Ritual cards */}
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "4rem clamp(1.5rem,5vw,3rem) 5rem" }}>
+      <div style={{ maxWidth: 760, margin: "0 auto", padding: "5rem clamp(1.2rem,5vw,2.5rem) 6rem" }}>
         {rituals.map((r, idx) => (
-          <div
+          <motion.div
             key={r.title}
-            ref={el => refs.current[idx] = el}
-            className={visible[idx] ? "ritual-card-visible" : "ritual-card-enter"}
-            style={{ marginBottom: idx < rituals.length - 1 ? "5rem" : 0, transitionDelay: `${idx * 0.1}s` }}
+            className="ritual-arch-card"
+            initial={{ opacity: 0, x: idx % 2 === 0 ? -120 : 120, y: 20 }}
+            whileInView={{ opacity: 1, x: 0, y: 0 }}
+            viewport={{ once: true, margin: "-120px" }}
+            transition={{ duration: 0.85, cubicBezier: [0.16, 1, 0.3, 1] }}
           >
             {/* Card label */}
-            <div style={{ display: "flex", alignItems: "center", gap: "1.2rem", marginBottom: "1rem" }}>
-              <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#8D7A5B", letterSpacing: "0.22em", textTransform: "uppercase", whiteSpace: "nowrap" }}>{r.label}</span>
-              <div style={{ flex: 1, height: 1, background: "linear-gradient(90deg, #8D7A5B44, transparent)" }} />
-              <span style={{ fontSize: "0.65rem", color: "#4C5A43", fontWeight: 600, letterSpacing: "0.1em", background: "rgba(76,90,67,0.08)", padding: "3px 10px", borderRadius: 20, whiteSpace: "nowrap" }}>{r.time}</span>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1.2rem", width: "100%", marginBottom: "1.5rem" }}>
+              <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#5A6651", letterSpacing: "0.22em", textTransform: "uppercase", whiteSpace: "nowrap" }}>{r.label}</span>
+              <div style={{ width: 30, height: 1, background: "rgba(90, 102, 81, 0.2)" }} />
+              <span style={{ fontSize: "0.65rem", color: "#5A6651", fontWeight: 700, letterSpacing: "0.1em", background: "rgba(90,102,81,0.08)", padding: "3px 12px", borderRadius: 20, whiteSpace: "nowrap" }}>{r.time}</span>
             </div>
 
             {/* Title */}
-            <h2 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(1.5rem,3vw,2rem)", fontWeight: 700, color: "#2C3320", marginBottom: "0.4rem", letterSpacing: "-0.01em" }}>{r.title}</h2>
-            <p style={{ fontSize: "0.85rem", color: "#8D7A5B", fontStyle: "italic", marginBottom: "2rem", fontWeight: 500 }}>{r.desc}</p>
+            <h2 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(1.5rem,3vw,1.9rem)", fontWeight: 800, color: "#000000", marginBottom: "0.4rem", letterSpacing: "-0.01em" }}>{r.title}</h2>
+            <p style={{ fontSize: "0.85rem", color: "#5A6651", fontStyle: "italic", marginBottom: "2.5rem", fontWeight: 600 }}>{r.desc}</p>
 
             {/* Steps */}
-            <div>
+            <div style={{ width: "100%" }}>
               {r.steps.map((s, si) => (
-                <div key={si} className="ritual-step-row">
-                  <div style={{ minWidth: 80, paddingTop: "0.15rem" }}>
-                    <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#4C5A43", letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.7 }}>{s.step}</span>
+                <div key={si} className="ritual-step-item">
+                  <div style={{ marginBottom: "0.4rem" }}>
+                    <span style={{ fontSize: "0.65rem", fontWeight: 800, color: "#5A6651", letterSpacing: "0.18em", textTransform: "uppercase" }}>{s.step}</span>
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <p style={{ fontSize: "0.9rem", color: "#3a3a2e", lineHeight: 1.75, margin: 0 }}>{s.text}</p>
+                  <div>
+                    <p style={{ fontSize: "0.88rem", color: "#000000", lineHeight: 1.7, margin: 0 }}>{s.text}</p>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
       {/* Bottom CTA */}
-      <div style={{ background: "#2C3320", padding: "3.5rem clamp(1.5rem,5vw,3rem)", textAlign: "center" }}>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.75rem", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: "0.8rem" }}>Ready to begin?</p>
-        <h3 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(1.3rem,3vw,1.8rem)", fontWeight: 700, color: "#F9F7F3", marginBottom: "1.5rem" }}>
+      <div style={{ background: "#5A6651", padding: "4rem clamp(1.5rem,5vw,3rem)", textAlign: "center" }}>
+        <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.75rem", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: "0.8rem" }}>Ready to begin?</p>
+        <h3 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(1.3rem,3vw,1.8rem)", fontWeight: 700, color: "#ffffff", marginBottom: "1.8rem" }}>
           Your first ritual starts with a single breath.
         </h3>
         <button
           onClick={() => navigate("/shop")}
-          style={{ background: "#C8B89A", color: "#2C3320", border: "none", padding: "13px 32px", borderRadius: 30, fontSize: "0.82rem", fontWeight: 700, cursor: "pointer", letterSpacing: "0.06em", transition: "all 0.3s" }}
-          onMouseEnter={e => { e.currentTarget.style.background = "#d4c4a6"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "#C8B89A"; e.currentTarget.style.transform = "translateY(0)"; }}
+          style={{ background: "#ffffff", color: "#000000", border: "none", padding: "14px 36px", borderRadius: 30, fontSize: "0.85rem", fontWeight: 700, cursor: "pointer", letterSpacing: "0.06em", transition: "all 0.3s", boxShadow: "0 4px 14px rgba(0,0,0,0.1)" }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#f0f0f0"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "#ffffff"; e.currentTarget.style.transform = "translateY(0)"; }}
         >
           Find Your WishStone →
         </button>
@@ -4633,48 +4649,131 @@ function RitualsPage() {
 // ─── BENEFITS PAGE ────────────────────────────────────────────
 function BenefitsPage() {
   const benefits = [
-    { icon: "🧠", title: "Mental Clarity & Focus", desc: "A crowded mind can make it difficult for one to make even the most basic decisions. It is difficult to remain focused when there are many distractions around you. The WishStone aims to create opportunities for individuals to pause and focus on their inner peace and become clear-minded about their life objectives." },
-    { icon: "🌿", title: "Stress Relief & Inner Peace", desc: "Nervous energy and daily stressors can build up, disrupting your peace. WishStone acts as a grounding anchor, helping you release tension, slow down your breathing, and return to a state of calm." },
-    { icon: "💚", title: "Emotional Wellness", desc: "Gentle crystal healing helps release deep-seated emotional blockages, promoting self-forgiveness and heart-opening energy. Fosters a strong foundation of self-love and empathy." },
-    { icon: "🛡️", title: "Reducing Anxiety & Overthinking", desc: "When anxious thoughts spiral, the tactile feeling of holding your stone provides an immediate somatic anchor, bringing your focus back to the present moment and quietening mental chatter." },
-    { icon: "⚡", title: "Motivation & Positive Energy", desc: "Boosts your personal vibrational frequency, infusing your space with inspiration and positive energy. Perfect for overcoming procrastination and igniting creative flow." },
-    { icon: "🌸", title: "Self-Love & Self-Worth", desc: "Strengthens your relationship with yourself. Replaces self-doubt with confidence, reminding you of your inherent value and capability to manifest your desires." },
-    { icon: "🔋", title: "Burnout Recovery & Mental Recharging", desc: "A dedicated tool to step away from daily responsibilities. Gives your mind the space to recharge, restore cognitive resources, and prevent mental exhaustion." },
-    { icon: "😴", title: "Better Sleep & Evening Relaxation", desc: "Helps transition your mind from busy daytime energy to peaceful evening rest. Prepares the nervous system for deep, restorative sleep by letting go of the day's worries." },
-    { icon: "📱", title: "Digital Detox & Mindful Living", desc: "Acts as a physical prompt to step away from screens. Encourages brief periods of quiet mindfulness, connecting you back to your immediate environment." },
-    { icon: "📈", title: "Intentional Living & Personal Growth", desc: "Keeps your daily intentions top of mind. By consistently focusing on your goals, you align your daily actions with the future you are actively creating." }
+    { title: "Mental Clarity & Focus", desc: "A crowded mind can make it difficult for one to make even the most basic decisions. It is difficult to remain focused when there are many distractions around you. The WishStone aims to create opportunities for individuals to pause and focus on their inner peace and become clear-minded about their life objectives." },
+    { title: "Stress Relief & Inner Peace", desc: "Nervous energy and daily stressors can build up, disrupting your peace. WishStone acts as a grounding anchor, helping you release tension, slow down your breathing, and return to a state of calm." },
+    { title: "Emotional Wellness", desc: "Gentle crystal healing helps release deep-seated emotional blockages, promoting self-forgiveness and heart-opening energy. Fosters a strong foundation of self-love and empathy." },
+    { title: "Reducing Anxiety & Overthinking", desc: "When anxious thoughts spiral, the tactile feeling of holding your stone provides an immediate somatic anchor, bringing your focus back to the present moment and quietening mental chatter." },
+    { title: "Motivation & Positive Energy", desc: "Boosts your personal vibrational frequency, infusing your space with inspiration and positive energy. Perfect for overcoming procrastination and igniting creative flow." },
+    { title: "Self-Love & Self-Worth", desc: "Strengthens your relationship with yourself. Replaces self-doubt with confidence, reminding you of your inherent value and capability to manifest your desires." },
+    { title: "Burnout Recovery & Mental Recharging", desc: "A dedicated tool to step away from daily responsibilities. Gives your mind the space to recharge, restore cognitive resources, and prevent mental exhaustion." },
+    { title: "Better Sleep & Evening Relaxation", desc: "Helps transition your mind from busy daytime energy to peaceful evening rest. Prepares the nervous system for deep, restorative sleep by letting go of the day's worries." },
+    { title: "Digital Detox & Mindful Living", desc: "Acts as a physical prompt to step away from screens. Encourages brief periods of quiet mindfulness, connecting you back to your immediate environment." },
+    { title: "Intentional Living & Personal Growth", desc: "Keeps your daily intentions top of mind. By consistently focusing on your goals, you align your daily actions with the future you are actively creating." }
   ];
-  return (
-    <div style={{ paddingTop: 90, background: T.bg, minHeight: "100vh" }}>
-      <div className="max-w" style={{ padding: "clamp(1.5rem,4vw,3rem)" }}>
-        <h1 style={{ fontFamily: "'Playfair Display',serif", color: T.text, fontSize: "clamp(1.8rem,4vw,2.5rem)", fontWeight: 900, marginBottom: "0.4rem" }}>WishStone Benefits</h1>
-        <div style={{ width: 60, height: 3, background: `linear-gradient(90deg,${T.orange},transparent)`, marginBottom: "1.2rem" }} />
 
-        <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(1.1rem,2vw,1.35rem)", color: T.orange, fontWeight: 700, marginBottom: "0.8rem", lineHeight: 1.4 }}>
+  const css = `
+    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+    .benefits-page { font-family: 'Open Sans', sans-serif; }
+    .benefits-page * { font-family: 'Open Sans', sans-serif; }
+    .benefit-arch-card {
+      background: #ffffff;
+      border: 1px solid rgba(90, 102, 81, 0.15);
+      border-radius: 100px 100px 16px 16px;
+      padding: 3.5rem 1.8rem 2.5rem;
+      box-shadow: 0 8px 24px rgba(90, 102, 81, 0.03);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    @media(max-width: 768px) {
+      .benefit-arch-card {
+        border-radius: 80px 80px 14px 14px;
+        padding: 2.8rem 1.4rem 2rem;
+      }
+    }
+  `;
+
+  return (
+    <div className="benefits-page" style={{ paddingTop: 90, background: "#ffffff", minHeight: "100vh" }}>
+      <style>{css}</style>
+      <div className="max-w" style={{ padding: "clamp(1.5rem,4vw,3rem)" }}>
+        <h1 style={{ fontFamily: "'Open Sans', sans-serif", color: "#000000", fontSize: "clamp(1.8rem,4vw,2.5rem)", fontWeight: 800, marginBottom: "0.4rem" }}>WishStone Benefits</h1>
+        <div style={{ width: 60, height: 3, background: "#5A6651", marginBottom: "1.2rem" }} />
+
+        <h3 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(1.1rem,2vw,1.35rem)", color: "#5A6651", fontWeight: 700, marginBottom: "0.8rem", lineHeight: 1.4 }}>
           Supporting Your Journey Toward Mental Peace, Emotional Balance & Intentional Living
         </h3>
 
-        <p style={{ color: T.textMid, fontSize: "0.92rem", lineHeight: 1.7, marginBottom: "3rem", maxWidth: 780 }}>
+        <p style={{ color: "#5A6651", fontSize: "0.92rem", lineHeight: 1.7, marginBottom: "3rem", maxWidth: 780, fontWeight: 500 }}>
           Manifestation begins with intention. In a world filled with distractions, WishStone helps you pause, gain clarity, and focus your energy on what truly matters. Through mindful daily rituals, it encourages positive thinking, purposeful action, and alignment with the life you wish to create.
         </p>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.8rem", marginTop: "2rem" }} className="prod-grid">
           {benefits.map((b, i) => (
-            <div key={b.title} style={{
-              padding: "1.8rem 1.6rem",
-              background: "#fff",
-              borderRadius: 16,
-              borderLeft: "3px solid #4C5A43",
-              boxShadow: "0 2px 16px rgba(76,90,67,0.06)",
-              transition: "all 0.3s ease"
-            }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(76,90,67,0.12)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 2px 16px rgba(76,90,67,0.06)"; }}
+            <motion.div
+              key={b.title}
+              className="benefit-arch-card"
+              initial="initial"
+              whileInView="animate"
+              whileHover="hover"
+              viewport={{ once: true, margin: "-50px" }}
+              variants={{
+                initial: { 
+                  opacity: 0, 
+                  x: i % 2 === 0 ? -45 : 45, 
+                  y: 30,
+                  backgroundColor: "#ffffff",
+                  borderColor: "rgba(90, 102, 81, 0.15)",
+                  boxShadow: "0 8px 24px rgba(90, 102, 81, 0.03)"
+                },
+                animate: { 
+                  opacity: 1, 
+                  x: 0, 
+                  y: 0,
+                  backgroundColor: "#ffffff",
+                  borderColor: "rgba(90, 102, 81, 0.15)",
+                  boxShadow: "0 8px 24px rgba(90, 102, 81, 0.03)",
+                  transition: {
+                    x: { type: "spring", stiffness: 50, damping: 13, delay: (i % 3) * 0.08 },
+                    y: { type: "spring", stiffness: 50, damping: 13, delay: (i % 3) * 0.08 },
+                    opacity: { duration: 0.6, delay: (i % 3) * 0.08 }
+                  }
+                },
+                hover: { 
+                  y: -12, 
+                  scale: 1.025, 
+                  backgroundColor: "#FBFBFA", 
+                  borderColor: "#5A6651",
+                  boxShadow: "0 22px 50px rgba(90, 102, 81, 0.16)",
+                  transition: { type: "spring", stiffness: 260, damping: 22 }
+                }
+              }}
+              style={{ cursor: "pointer" }}
             >
-              <div style={{ fontSize: "1.6rem", marginBottom: "0.9rem", lineHeight: 1 }}>{b.icon}</div>
-              <h3 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "0.95rem", fontWeight: 700, color: "#2C3320", marginBottom: "0.7rem", letterSpacing: "-0.005em" }}>{b.title}</h3>
-              <p style={{ fontSize: "0.8rem", color: "#5C6654", lineHeight: 1.75, margin: 0 }}>{b.desc}</p>
-            </div>
+              {/* Decorative top center accent (propagates parent hover state) */}
+              <motion.div 
+                variants={{
+                  initial: { width: 32, backgroundColor: "rgba(90, 102, 81, 0.3)" },
+                  animate: { width: 32, backgroundColor: "rgba(90, 102, 81, 0.3)" },
+                  hover: { 
+                    width: 100, 
+                    backgroundColor: "#5A6651",
+                    transition: { type: "spring", stiffness: 200, damping: 18 }
+                  }
+                }}
+                style={{ height: 4, borderRadius: 2, marginBottom: "1.5rem" }} 
+              />
+              
+              <h3 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "0.95rem", fontWeight: 800, color: "#000000", marginBottom: "0.8rem", letterSpacing: "-0.01em" }}>
+                {b.title}
+              </h3>
+              
+              {/* Description (propagates parent hover state) */}
+              <motion.p 
+                variants={{
+                  initial: { color: "#5A6651" },
+                  animate: { color: "#5A6651" },
+                  hover: { 
+                    color: "#000000",
+                    transition: { duration: 0.22 }
+                  }
+                }}
+                style={{ fontSize: "0.8rem", lineHeight: 1.75, margin: 0, fontWeight: 500 }}
+              >
+                {b.desc}
+              </motion.p>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -4963,7 +5062,7 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
                     {onWish && (
                       <button onClick={e => { e.stopPropagation(); onWish(e, p._id); }}
                         style={{ position: "absolute", top: 10, right: 10, background: "#ffffff", border: "none", borderRadius: "50%", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 3px 8px rgba(0,0,0,0.12)", zIndex: 2 }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill={wished.includes(p._id) ? G : "none"} stroke="#5A6651" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill={wished.includes(p._id) ? "#5A6651" : "none"} stroke="#5A6651" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                         </svg>
                       </button>
@@ -7470,27 +7569,38 @@ function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
           { key: "orders", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>, label: "Orders" },
           { key: "track", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>, label: "Track" },
           { key: "profile", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>, label: "Profile" },
-          { key: "wishlist", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>, label: "Wishlist" },
+          { key: "logout", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>, label: "Logout", isLogout: true },
           { key: "cart", icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>, label: "Cart" },
         ].map(t => (
           <button key={t.key}
-            onClick={() => { if (t.key === "wishlist") onNav("wishlist"); else if (t.key === "cart") onNav("cart"); else setActiveTab(t.key); }}
+            onClick={() => {
+              if (t.isLogout) {
+                onLogout();
+              } else if (t.key === "cart") {
+                onNav("cart");
+              } else {
+                setActiveTab(t.key);
+              }
+            }}
             style={{
               flex: 1,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: 4,
+              gap: t.isLogout ? 2 : 4,
               background: "none",
-              border: "none",
+              border: t.isLogout ? "1px solid #c0392b" : "none",
+              borderRadius: t.isLogout ? "6px" : "0",
+              padding: t.isLogout ? "4px 0" : "6px 0",
+              margin: t.isLogout ? "2px 8px" : "0",
               cursor: "pointer",
-              padding: "6px 0",
-              fontFamily: "'Open Sans', sans-serif"
+              fontFamily: "'Open Sans', sans-serif",
+              transition: "all 0.18s ease"
             }}>
-            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 20, color: activeTab === t.key ? P : "#8a8a7a", transition: "color 0.2s" }}>
+            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 20, color: t.isLogout ? "#c0392b" : (activeTab === t.key ? P : "#8a8a7a"), transition: "color 0.2s" }}>
               {t.icon}
             </span>
-            <span style={{ fontSize: "0.58rem", fontWeight: 700, color: activeTab === t.key ? P : "#8a8a7a", letterSpacing: "0.06em", textTransform: "uppercase", transition: "color 0.2s" }}>{t.label}</span>
+            <span style={{ fontSize: "0.58rem", fontWeight: 700, color: t.isLogout ? "#c0392b" : (activeTab === t.key ? P : "#8a8a7a"), letterSpacing: "0.06em", textTransform: "uppercase", transition: "color 0.2s" }}>{t.label}</span>
           </button>
         ))}
       </nav>
