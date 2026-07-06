@@ -619,6 +619,98 @@ const GLOBAL_CSS = `
   .category-card:hover .arrow-icon {
     transform: translateX(4px) !important;
   }
+
+  /* Responsive category rows for Wish Story & Our Journey */
+  .ws-responsive-row {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+    width: 100%;
+  }
+  .ws-responsive-row.row {
+    flex-direction: row;
+  }
+  .ws-responsive-row.row-reverse {
+    flex-direction: row-reverse;
+  }
+  @media (max-width: 991px) {
+    .ws-responsive-row {
+      gap: 2.5rem;
+    }
+  }
+  @media (max-width: 768px) {
+    .ws-responsive-row,
+    .ws-responsive-row.row,
+    .ws-responsive-row.row-reverse {
+      flex-direction: column !important;
+      gap: 1.5rem !important;
+      text-align: center;
+    }
+  }
+
+  /* Responsive Blog Grid */
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    width: 100%;
+  }
+  @media (max-width: 1024px) {
+    .blog-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+  }
+  @media (max-width: 768px) {
+    .blog-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  /* Blog modal responsive elements */
+  .blog-modal-content {
+    background: #ffffff;
+    color: #0c0b0a;
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    border-radius: 24px;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    border: 1px solid rgba(120, 127, 86, 0.1);
+  }
+  .blog-modal-header-img {
+    width: 100%;
+    height: 350px;
+    position: relative;
+    overflow: hidden;
+  }
+  .blog-modal-header-text {
+    position: absolute;
+    bottom: 25px;
+    left: 35px;
+    right: 35px;
+    color: #ffffff;
+  }
+  .blog-modal-body {
+    padding: 3rem 2.5rem;
+    background: #fcfcfa;
+  }
+  @media (max-width: 768px) {
+    .blog-modal-header-img {
+      height: 220px !important;
+    }
+    .blog-modal-header-text {
+      bottom: 15px !important;
+      left: 15px !important;
+      right: 15px !important;
+    }
+    .blog-modal-body {
+      padding: 1.5rem 1.2rem !important;
+    }
+  }
   `;
 
 // ─── HEADER ───────────────────────────────────────────────────
@@ -1196,8 +1288,8 @@ function Hero({ onShop, onRitual }) {
             Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
           </p>
           <div>
-            <button onClick={onRitual} style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "#C39D5F", color: "#fff", border: "none", padding: "12px 26px", borderRadius: 30, fontSize: "0.85rem", fontWeight: 700, cursor: "pointer", letterSpacing: "0.05em", textTransform: "uppercase", transition: "all 0.25s ease", boxShadow: "0 10px 24px rgba(195,157,95,0.25)" }} onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 14px 30px rgba(195,157,95,0.35)"; }} onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 24px rgba(195,157,95,0.25)"; }}>
-              Explore Rituals<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+            <button onClick={onShop} style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "#C39D5F", color: "#fff", border: "none", padding: "12px 26px", borderRadius: 30, fontSize: "0.85rem", fontWeight: 700, cursor: "pointer", letterSpacing: "0.05em", textTransform: "uppercase", transition: "all 0.25s ease", boxShadow: "0 10px 24px rgba(195,157,95,0.25)" }} onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 14px 30px rgba(195,157,95,0.35)"; }} onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 24px rgba(195,157,95,0.25)"; }}>
+              SHOP NOW<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
             </button>
           </div>
         </div>
@@ -5898,7 +5990,7 @@ function StoriesPage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            style={{ padding: "4rem 1.5rem" }}
+            style={{ padding: "clamp(2rem, 6vw, 4rem) 1.5rem" }}
           >
             <div className="max-w" style={{ textAlign: "center", marginBottom: "4rem" }}>
               <span style={{ color: "#787F56", fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", display: "inline-block", marginBottom: 12 }}>
@@ -5912,7 +6004,7 @@ function StoriesPage() {
               </p>
             </div>
 
-            <div className="max-w" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "2.5rem", padding: "0 1rem" }}>
+            <div className="max-w" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "2.5rem", padding: "0 1rem" }}>
               {/* Category 1: Wish Story */}
               <motion.div
                 whileHover={{ y: -8 }}
@@ -6073,9 +6165,8 @@ function StoriesPage() {
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
             {/* Hero Section */}
-            <section style={{ background: "#0C0B0A", color: "#fff", padding: "5rem 1.5rem" }}>
-              <div className="max-w" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3rem", alignItems: "center" }}
-                className="hero-grid">
+            <section style={{ background: "#0C0B0A", color: "#fff", padding: "clamp(3rem, 8vw, 5rem) 1.5rem" }}>
+              <div className="max-w ws-two-col" style={{ gap: "clamp(1.5rem, 4vw, 3rem)", alignItems: "center" }}>
                 <div>
                   <span style={{ color: "#C39D5F", fontSize: "0.68rem", fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>THE COLLECTION OVERVIEW</span>
                   <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem, 5vw, 3.2rem)", fontWeight: 900, lineHeight: 1.15, margin: "1rem 0" }}>
@@ -6086,7 +6177,7 @@ function StoriesPage() {
                   </p>
 
                   {/* Hero Bottom Buttons */}
-                  <div style={{ display: "flex", gap: "1rem" }}>
+                  <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
                     <button
                       onClick={() => setActiveCategory("blog")}
                       style={{ background: "#C39D5F", border: "none", color: "#fff", padding: "12px 28px", borderRadius: 30, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer" }}
@@ -6110,8 +6201,8 @@ function StoriesPage() {
             </section>
 
             {/* Zig Zag Product Stories list */}
-            <section style={{ padding: "6rem 1.5rem" }}>
-              <div className="max-w" style={{ display: "flex", flexDirection: "column", gap: "6rem" }}>
+            <section style={{ padding: "clamp(3rem, 8vw, 6rem) 1.5rem" }}>
+              <div className="max-w" style={{ display: "flex", flexDirection: "column", gap: "clamp(3rem, 8vw, 6rem)" }}>
                 <div style={{ textAlign: "center", maxWidth: 600, margin: "0 auto 1.5rem" }}>
                   <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "2.2rem", fontWeight: 800 }}>Tactile Anchoring System</h2>
                   <p style={{ color: T.textMid, fontSize: "0.9rem", marginTop: 8 }}>Explore the engineering and craftsmanship behind each item.</p>
@@ -6122,16 +6213,10 @@ function StoriesPage() {
                   return (
                     <div
                       key={idx}
-                      style={{
-                        display: "flex",
-                        flexDirection: isEven ? "row" : "row-reverse",
-                        gap: "4rem",
-                        alignItems: "center"
-                      }}
-                      className="hero-grid"
+                      className={`ws-responsive-row ${isEven ? "row" : "row-reverse"}`}
                     >
                       {/* Product Image */}
-                      <div style={{ flex: 1 }}>
+                      <div style={{ flex: 1, width: "100%" }}>
                         <div style={{ overflow: "hidden", borderRadius: 16, boxShadow: "0 16px 40px rgba(120, 127, 86,0.08)", border: `1px solid ${T.border}` }}>
                           <img src={item.image} alt={item.title} style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", display: "block" }} />
                         </div>
@@ -6195,7 +6280,7 @@ function StoriesPage() {
                     <p style={{ color: T.textLight, fontSize: "0.95rem" }}>No active blogs published yet. Add some in the Admin Panel.</p>
                   </div>
                 ) : (
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "2rem" }} className="prod-grid">
+                  <div className="blog-grid">
                     {blogs.map((blog, idx) => (
                       <motion.article
                         key={blog._id}
@@ -6285,7 +6370,7 @@ function StoriesPage() {
                 height: "55vh",
                 minHeight: "350px",
                 backgroundImage: "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('/founder.png')",
-                backgroundSize: "contain",
+                backgroundSize: "cover",
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "center",
                 backgroundColor: "#0C0B0A",
@@ -6305,12 +6390,12 @@ function StoriesPage() {
             </section>
 
             {/* Zig Zag Layout of origin */}
-            <section style={{ padding: "6rem 1.5rem" }}>
-              <div className="max-w" style={{ display: "flex", flexDirection: "column", gap: "6rem" }}>
+            <section style={{ padding: "clamp(3rem, 8vw, 6rem) 1.5rem" }}>
+              <div className="max-w" style={{ display: "flex", flexDirection: "column", gap: "clamp(3rem, 8vw, 6rem)" }}>
 
                 {/* 1st Block: Sacred Wishstone */}
-                <div style={{ display: "flex", gap: "4rem", alignItems: "center" }} className="hero-grid">
-                  <div style={{ flex: 1 }}>
+                <div className="ws-responsive-row row">
+                  <div style={{ flex: 1, width: "100%" }}>
                     <img src={journeyTimeline[0].image} alt="Sacred Wishstone" style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", borderRadius: 16, boxShadow: "0 10px 30px rgba(120, 127, 86,0.06)" }} />
                   </div>
                   <div style={{ flex: 1 }}>
@@ -6323,8 +6408,8 @@ function StoriesPage() {
                 </div>
 
                 {/* 2nd Block: Cosmic Eye Grid */}
-                <div style={{ display: "flex", flexDirection: "row-reverse", gap: "4rem", alignItems: "center" }} className="hero-grid">
-                  <div style={{ flex: 1 }}>
+                <div className="ws-responsive-row row-reverse">
+                  <div style={{ flex: 1, width: "100%" }}>
                     <img src={journeyTimeline[2].image} alt="Cosmic Eye Grid" style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", borderRadius: 16, boxShadow: "0 10px 30px rgba(120, 127, 86,0.06)" }} />
                   </div>
                   <div style={{ flex: 1 }}>
@@ -6347,8 +6432,8 @@ function StoriesPage() {
                 </div>
 
                 {/* 3rd Block: Vibrational Diffuser */}
-                <div style={{ display: "flex", gap: "4rem", alignItems: "center" }} className="hero-grid">
-                  <div style={{ flex: 1 }}>
+                <div className="ws-responsive-row row">
+                  <div style={{ flex: 1, width: "100%" }}>
                     <img src={journeyTimeline[1].image} alt="Vibrational Diffuser" style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", borderRadius: 16, boxShadow: "0 10px 30px rgba(120, 127, 86,0.06)" }} />
                   </div>
                   <div style={{ flex: 1 }}>
@@ -6361,8 +6446,8 @@ function StoriesPage() {
                 </div>
 
                 {/* 4th Block: Habit Builder */}
-                <div style={{ display: "flex", flexDirection: "row-reverse", gap: "4rem", alignItems: "center" }} className="hero-grid">
-                  <div style={{ flex: 1 }}>
+                <div className="ws-responsive-row row-reverse">
+                  <div style={{ flex: 1, width: "100%" }}>
                     <img src={journeyTimeline[3].image} alt="Habit Builder" style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", borderRadius: 16, boxShadow: "0 10px 30px rgba(120, 127, 86,0.06)" }} />
                   </div>
                   <div style={{ flex: 1 }}>
@@ -6427,18 +6512,7 @@ function StoriesPage() {
               exit={{ y: 50, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 180 }}
               onClick={(e) => e.stopPropagation()}
-              style={{
-                background: "#ffffff",
-                color: "#0c0b0a",
-                width: "100%",
-                maxWidth: "800px",
-                maxHeight: "90vh",
-                borderRadius: "24px",
-                overflowY: "auto",
-                position: "relative",
-                boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
-                border: "1px solid rgba(120, 127, 86, 0.1)"
-              }}
+              className="blog-modal-content"
             >
               {/* Close Button */}
               <button
@@ -6470,7 +6544,7 @@ function StoriesPage() {
               </button>
 
               {/* Cover Image Header */}
-              <div style={{ width: "100%", height: "350px", position: "relative", overflow: "hidden" }}>
+              <div className="blog-modal-header-img">
                 {selectedBlog.coverImage ? (
                   <img
                     src={getImageUrl(selectedBlog.coverImage)}
@@ -6492,13 +6566,7 @@ function StoriesPage() {
                   background: "linear-gradient(to top, rgba(12,11,10,0.85), transparent)"
                 }} />
                 {/* Meta details overlaid */}
-                <div style={{
-                  position: "absolute",
-                  bottom: "25px",
-                  left: "35px",
-                  right: "35px",
-                  color: "#ffffff"
-                }} >
+                <div className="blog-modal-header-text">
                   <span style={{ fontSize: "0.75rem", color: "#C39D5F", fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>
                     By {selectedBlog.author || "Admin"} · {new Date(selectedBlog.createdAt).toLocaleDateString("en-IN")}
                   </span>
@@ -6516,7 +6584,7 @@ function StoriesPage() {
               </div>
 
               {/* Blog Reading Body */}
-              <div style={{ padding: "3rem 2.5rem", background: "#fcfcfa" }}>
+              <div className="blog-modal-body">
                 <p style={{
                   fontFamily: "'Playfair Display', serif",
                   fontSize: "1.1rem",
