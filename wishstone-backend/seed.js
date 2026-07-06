@@ -32,7 +32,7 @@ async function seed() {
       name: "Wishstone",
       slug: "wishstone",
       category: cats[0]._id,
-      shortDesc: "14-year charged sacred manifestation stone connecting your desires to your subconscious mind.",
+      shortDesc: "Authentic 14-year charged sacred manifestation stone.",
       fullDesc: "Wishstone is more than a rock. It's a story. Its been on a 14-year journey across India getting charged at places so now it holds a unique kind of energy. This stone works on two ideas: energy and how your subconscious mind really works. Since your subconscious is a bit mysterious, Wishstone acts as a link. A bridge connecting what you want with the deeper part of you that makes things happen. Use it every day for 45 days with focus and see what happens. There's no religion or rituals involved. Pure energy and your own belief.",
       suitableFor: "If you have a meaningful goal. Like a new job, better relationships or improved health. This is your tool. It's great for people who meditate or are into the Law of Attraction who want something to focus on. It's also perfect as a gift for big life moments or for anyone who wants something",
       benefits: [
@@ -48,34 +48,42 @@ async function seed() {
       stock: 100,
       isBestSeller: true,
       isFeatured: true,
-      images: ["/wishstone-horizontal.jpeg"]
+      images: [
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781514473/wishstone/products/s9zsy76yvklumrll9owx.png",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781514475/wishstone/products/qjh1vw3j6j0j9p7xxstu.png",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781514476/wishstone/products/sioal4rm5qwqjogxckme.png",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781514478/wishstone/products/ajybz7xuw2wlbn7ojsvp.png"
+      ]
     },
     {
       name: "Cosmic Eye",
       slug: "cosmic-eye",
       category: cats[1]._id,
-      shortDesc: "A way to connect with a special kind of energy to remove hidden obstacles and shape your life.",
-      fullDesc: "The Cosmic Eye is more than a tool. It's a way to connect with a special kind of energy that can help shape your life. You're probably holding onto a dream or a big goal. Sometimes it feels like something is getting in the way. The Cosmic Eye helps clear those hidden obstacles so you can actually achieve what you want. It uses wisdom about energy alignment and acts like an antenna for good vibes sending that positive energy straight to your deepest desires. It's really helpful for you. It's even better as a gift for someone you care about.",
+      shortDesc: "Premium energy tool designed to dissolve hidden obstacles.",
+      fullDesc: "The Cosmic Eye is a premium energy tool designed to dissolve hidden obstacles and align positive frequencies. It acts as an energetic resonator to manifest clarity, ambition, and unshakeable focus.",
       suitableFor: "It's perfect for people who're new to energy tools but want something easy to use and powerful. If you're chasing a dream. Like a new job, better health or financial freedom. Or if you feel like something is always stopping you this eye can help. It also makes a gift for coworkers because its both high-quality and interesting to talk about. Its designed for ambitious people who are open to new possibilities.",
       benefits: [
-        "Think of it like a magnet for energy. It pulls in frequencies around you and directs them to your goal so your intention becomes clearer.",
-        "It helps get rid of blocks bad luck or negative patterns that might be holding you back.",
-        "Whenever you hold it and think about your goal your subconscious really takes note.",
-        "Over time you build up an energy field that keeps negativity away..",
-        "If you give it as a gift you're passing on real positive intention."
+        "Pulls in ambient frequencies to clear intention.",
+        "Dissolves hidden energy blocks and negative patterns."
       ],
       price: 1899,
       originalPrice: 2499,
       stock: 50,
       isBestSeller: true,
       isFeatured: true,
-      images: ["/cosmic-eye.jpeg"]
+      images: [
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781514519/wishstone/products/byvnpz0jhc28x4hjtaie.png",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781514521/wishstone/products/uk4zn9uhufevj72luzgb.png",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781514522/wishstone/products/v4mwny5hhvc2fx4wrv37.png",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781514523/wishstone/products/fxvvi05tlvnrhshbe1xg.jpg",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781514524/wishstone/products/ob2atsihprikhd9g57kw.png"
+      ]
     },
     {
       name: "Reed Diffuser (Earth Essence)",
       slug: "earth-essence-reed-diffuser",
       category: cats[1]._id,
-      shortDesc: "Luxury reed diffuser to lift your home fragrance and recalibrate your energy.",
+      shortDesc: "Luxury, natural reed diffuser to elevate ambient energy.",
       fullDesc: "Earth Essence is more than a home fragrance. It's an experience. This luxury reed diffuser blends a fragrance formula with natural reed sticks letting a pleasant scent fill your space day and night. No flame, no plugs needed. When your home smells great it feels like the energy lifts your mind. Your goals have room to grow. Earth Essence helps recalibrate your energy, one breath at a time.",
       suitableFor: "It's a fit for homemakers who care about their spaces energy, professionals who want a calm environment after work or anyone setting up a meditation or yoga zone. It also makes a premium memorable gift. Ideal for newlyweds or new homeowners who want to curate their space",
       benefits: [
@@ -90,13 +98,15 @@ async function seed() {
       stock: 60,
       isBestSeller: false,
       isFeatured: true,
-      images: ["/defuser-product.jpeg"]
+      images: [
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781531941/wishstone/products/mqbzhby50ipjacjsnrsq.jpg"
+      ]
     },
     {
       name: "Camphor (Kapoor)",
       slug: "premium-camphor",
       category: cats[1]._id,
-      shortDesc: "Premium upgrade camphor releasing a soothing fragrance as it purifies and cleanses your space.",
+      shortDesc: "Organic, premium camphor to purify space and soothe the mind.",
       fullDesc: "Forget the sharp-smelling camphor you're used to. Our camphor is a premium upgrade to a ritual made for modern homes. Traditional camphor purifies the air. Ours does that and more releasing a soothing fragrance as it burns. Light it. Instantly your space feels cleansed, warm and filled with a calming scent.",
       suitableFor: "Perfect for anyone with a ritual wanting to upgrade people who dislike harsh traditional camphor or those who believe in vastu and regularly cleanse their space. It's great for festivals, housewarming, special occasions or everyday moments that need a sacred touch.",
       benefits: [
@@ -110,13 +120,19 @@ async function seed() {
       originalPrice: 699,
       stock: 150,
       isBestSeller: false,
-      images: ["https://images.unsplash.com/photo-1602928321679-560bb453f190?w=600"]
+      images: [
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781532065/wishstone/products/fbzlnkek5z2w0rtnvyec.jpg",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781532065/wishstone/products/iy9glyjed5hixbisroyh.jpg",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781532065/wishstone/products/wairwmm1ffum3ipqarlz.jpg",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781532065/wishstone/products/wrqptjwr9p2ewjlrnd1a.jpg",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781532065/wishstone/products/zlsekgh1b2zfbctj0wnw.jpg"
+      ]
     },
     {
       name: "Habit Builder",
       slug: "habit-builder",
       category: cats[2]._id,
-      shortDesc: "21 cards, 21 days deck to build life habits one day at a time.",
+      shortDesc: "Screen-free, psychology-backed 21-day routine program.",
       fullDesc: "21 cards, 21 days. A brand new you. The Habit Builder deck makes self-improvement easy not overwhelming. Each card has one powerful habit. No complicated programs, no apps. Just pick a card each morning and focus on that one thing. By the end of three weeks you'll have swapped chaos for structure and wishful thinking for action. If your routine has totally fallen apart or you want a start this is your reset.",
       suitableFor: "Students struggling with routines professionals feeling stuck people who've tried app after app and need something anyone facing major life changes or parents seeking a meaningful gift for their teens.",
       benefits: [
@@ -130,13 +146,16 @@ async function seed() {
       originalPrice: 1099,
       stock: 80,
       isBestSeller: true,
-      images: ["/habit-builder2-product.jpeg"]
+      images: [
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781532090/wishstone/products/scrvoaqd1s5p90wuf5je.jpg",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781532090/wishstone/products/gf6dssic3igf3zvrd8et.jpg"
+      ]
     },
     {
       name: "Combo 1: WishStone + Reed Diffuser",
       slug: "combo-1",
       category: cats[0]._id,
-      shortDesc: "Complete 360-degree manifestation setup: align your mind and your environment.",
+      shortDesc: "Synergistic system to align your mindset and home environment.",
       fullDesc: "Manifestation takes more than thinking. It needs the right environment. With Wishstone and Earth Essence Diffuser you're aligning your mind and your space. Wishstone embeds your goal in your subconscious while Earth Essence makes your home positive and full of energy. This combo isn't two items. It's a complete system. It's your 360-degree manifestation setup.",
       suitableFor: "Best for people who want solutions, not stuff. First-timers serious about manifesting and anyone gifting something complete.",
       benefits: [
@@ -149,13 +168,19 @@ async function seed() {
       originalPrice: 2798,
       stock: 30,
       isBestSeller: true,
-      images: ["/wishstone-horizontal.jpeg"]
+      images: [
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781532126/wishstone/products/dyt2n5ff3ost6dha6lrh.png",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781532127/wishstone/products/pkfomlplq81mvqe280tc.png",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781532128/wishstone/products/nzriew6uommwm6r9hryl.jpg",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781532128/wishstone/products/qg02bv84z70muzmpinky.jpg",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781532128/wishstone/products/wlzpduphzcvwxkqrnfwn.jpg"
+      ]
     },
     {
       name: "Combo 2: Cosmic Eye + Reed Diffuser",
       slug: "combo-2",
       category: cats[0]._id,
-      shortDesc: "High-frequency home wellness combo: draw energy with Cosmic Eye and anchor it with Earth Essence Diffuser.",
+      shortDesc: "High-frequency wellness circuit to attract and hold positive energy.",
       fullDesc: "The Cosmic Eye draws in the energy. The Earth Essence Diffuser holds it. When you use them together your place turns into a circuit. Cosmic Eye pulls positive vibes into your space Diffuser keeps your homes atmosphere so good that energy stays put and keeps working. On their own both are strong. Combined the effect multiplies.",
       suitableFor: "Great, for folks, meditation fans and anyone wanting a complete home wellness upgrade. If you're gifting it stands out as truly purposeful and premium.",
       benefits: [
@@ -167,7 +192,13 @@ async function seed() {
       price: 2499,
       originalPrice: 3498,
       stock: 30,
-      images: ["/cosmic-eye.jpeg"]
+      images: [
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781532169/wishstone/products/wgxeervtdin3suocay2k.png",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781532170/wishstone/products/dvxeh8oywr00dzqmjpva.png",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781532172/wishstone/products/f9t6wikd0m5vfanbsi9x.png",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781532172/wishstone/products/gsghhtsv58y07e2ja0xz.jpg",
+        "https://res.cloudinary.com/dlrgf8fku/image/upload/v1781532173/wishstone/products/lewpvg98ohr4tpzcgtxa.jpg"
+      ]
     }
   ]);
   console.log("💎 Products created");

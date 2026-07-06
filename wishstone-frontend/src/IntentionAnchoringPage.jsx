@@ -2,10 +2,10 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 const T = {
-  bg: "#ffffff", bgDark: "#5A6651",
+  bg: "#ffffff", bgDark: "#787F56",
   text: "#000000", textMid: "#000000",
-  orange: "#5A6651", orangeD: "#5A6651",
-  white: "#ffffff", border: "rgba(90, 102, 81, 0.2)",
+  orange: "#787F56", orangeD: "#787F56",
+  white: "#ffffff", border: "rgba(120, 127, 86, 0.2)",
 };
 
 export default function IntentionAnchoringPage() {
@@ -22,7 +22,7 @@ export default function IntentionAnchoringPage() {
 
   return (
     <div style={{ background: T.bg, minHeight: "100vh" }}>
-      {/* Back Button */}
+      {}
       <div style={{ padding: "clamp(1rem, 4vw, 2rem) clamp(1.5rem, 5vw, 3.5rem)" }}>
         <button
           onClick={() => navigate("/")}
@@ -46,9 +46,9 @@ export default function IntentionAnchoringPage() {
         </button>
       </div>
 
-      {/* Main Content */}
+      {}
       <article style={{ maxWidth: 900, margin: "0 auto", padding: "2rem clamp(1.5rem, 5vw, 3.5rem) 6rem" }}>
-        {/* Hero Section */}
+        {}
         <header style={{ marginBottom: "4rem", textAlign: "center" }}>
           <h1
             style={{
@@ -75,7 +75,7 @@ export default function IntentionAnchoringPage() {
           </p>
         </header>
 
-        {/* Content Sections */}
+        {}
         <section style={{ marginBottom: "3.5rem" }}>
           <h2
             style={{
@@ -154,7 +154,7 @@ export default function IntentionAnchoringPage() {
           >
             WishStone: Staying Connected to Your Intention
           </h2>
-          <div style={{ background: "rgba(90, 102, 81, 0.08)", padding: "2rem", borderRadius: 12, border: `1px solid ${T.border}` }}>
+          <div style={{ background: "rgba(120, 127, 86, 0.08)", padding: "2rem", borderRadius: 12, border: `1px solid ${T.border}` }}>
             <p style={{ fontSize: "1rem", color: T.textMid, lineHeight: 1.8, marginBottom: "1rem" }}>
               Staying focused on one goal for a time is not easy. The mind shifts, and distractions come in. And slowly, your intention fades.
             </p>
@@ -192,7 +192,7 @@ export default function IntentionAnchoringPage() {
           </div>
         </section>
 
-        {/* CTA */}
+        {}
         <section style={{ textAlign: "center", marginTop: "4rem", padding: "3rem 2rem", background: T.bgDark, borderRadius: 16, color: T.white }}>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "2rem", fontWeight: 800, marginBottom: "1rem" }}>
             Ready to Amplify Your Manifestation?

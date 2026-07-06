@@ -6,6 +6,9 @@ const Category = require("../models/Category");
 const Order = require("../models/Order");
 const Coupon = require("../models/Coupon");
 const User = require("../models/User");
+const UGCVideo = require("../models/UGCVideo");
+const Blog = require("../models/Blog");
+const localUpload = require("../middleware/upload");
 
 router.use(protect, adminOnly);
 
@@ -463,6 +466,143 @@ router.delete("/users-clear-all", async (req, res) => {
     const result = await User.deleteMany({ role: { $ne: "admin" } });
     res.json({ success: true, message: `${result.deletedCount} users deleted successfully.` });
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// ── UGC VIDEOS ───────────────────────────────────────────────
+router.post("/ugc-video/add", localUpload.single("videoFile"), async (req, res) => {
+  try {
+    const { title, caption, tag, isActive } = req.body;
+    if (!title || !title.trim()) return res.status(400).json({ success: false, message: "Title is required." });
+    if (!req.file) return res.status(400).json({ success: false, message: "Video file is required." });
+
+    const videoUrl = req.file.path.replace(/\\/g, "/");
+
+    const video = await UGCVideo.create({
+      title: title.trim(),
+      videoUrl,
+      caption: caption || "",
+      tag: tag || "",
+      isActive: isActive === "true" || isActive === true,
+    });
+
+    res.status(201).json({ success: true, message: "UGC video added successfully!", video });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+router.put("/ugc-video/update/:id", localUpload.single("videoFile"), async (req, res) => {
+  try {
+    const updates = { ...req.body };
+    if (updates.isActive !== undefined) {
+      updates.isActive = updates.isActive === "true" || updates.isActive === true;
+    }
+    if (req.file) {
+      updates.videoUrl = req.file.path.replace(/\\/g, "/");
+    }
+
+    const video = await UGCVideo.findByIdAndUpdate(req.params.id, updates, { new: true });
+    if (!video) return res.status(404).json({ success: false, message: "Video not found." });
+
+    res.json({ success: true, message: "Video updated successfully!", video });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+router.delete("/ugc-video/delete/:id", async (req, res) => {
+  try {
+    await UGCVideo.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: "UGC video deleted successfully." });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+router.get("/ugc-videos", async (req, res) => {
+  try {
+    const videos = await UGCVideo.find().sort({ createdAt: -1 });
+    res.json({ success: true, videos });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+// ── BLOGS ────────────────────────────────────────────────────
+router.post("/blog/add", localUpload.single("coverImageFile"), async (req, res) => {
+  try {
+    const { title, content, author, isActive } = req.body;
+    if (!title || !title.trim()) return res.status(400).json({ success: false, message: "Title is required." });
+    if (!content || !content.trim()) return res.status(400).json({ success: false, message: "Content is required." });
+
+    let coverImage = "";
+    if (req.file) {
+      coverImage = req.file.path.replace(/\\/g, "/");
+    }
+
+    const baseSlug = title.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+    let slug = baseSlug;
+    let counter = 1;
+    while (await Blog.findOne({ slug })) { slug = `${baseSlug}-${counter++}`; }
+
+    const blog = await Blog.create({
+      title: title.trim(),
+      slug,
+      content: content.trim(),
+      coverImage,
+      author: author || "Admin",
+      isActive: isActive === "true" || isActive === true,
+    });
+
+    res.status(201).json({ success: true, message: "Blog added successfully!", blog });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+router.put("/blog/update/:id", localUpload.single("coverImageFile"), async (req, res) => {
+  try {
+    const updates = { ...req.body };
+    if (updates.isActive !== undefined) {
+      updates.isActive = updates.isActive === "true" || updates.isActive === true;
+    }
+    if (req.file) {
+      updates.coverImage = req.file.path.replace(/\\/g, "/");
+    }
+
+    if (updates.title) {
+      const baseSlug = updates.title.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+      let slug = baseSlug;
+      let counter = 1;
+      while (await Blog.findOne({ slug, _id: { $ne: req.params.id } })) { slug = `${baseSlug}-${counter++}`; }
+      updates.slug = slug;
+    }
+
+    const blog = await Blog.findByIdAndUpdate(req.params.id, updates, { new: true });
+    if (!blog) return res.status(404).json({ success: false, message: "Blog not found." });
+
+    res.json({ success: true, message: "Blog updated successfully!", blog });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+router.delete("/blog/delete/:id", async (req, res) => {
+  try {
+    await Blog.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: "Blog deleted successfully." });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+router.get("/blogs", async (req, res) => {
+  try {
+    const blogs = await Blog.find().sort({ createdAt: -1 });
+    res.json({ success: true, blogs });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
 });
 
 module.exports = router;

@@ -4,7 +4,28 @@ import { motion, AnimatePresence } from "framer-motion";
 import { gsap } from "gsap";
 
 // ─── API ──────────────────────────────────────────────────────
-const API = process.env.REACT_APP_API_URL || "https://wishstone.onrender.com/api";
+const getApiBase = () => {
+  if (typeof window !== "undefined" && window.location) {
+    const hostname = window.location.hostname;
+    const port = window.location.port;
+    const isLocal = hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname.startsWith("192.168.") ||
+      hostname.startsWith("10.") ||
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname) ||
+      port === "3000" ||
+      port === "3001" ||
+      port === "4000" ||
+      hostname.includes(".local") ||
+      !hostname.includes(".");
+    if (isLocal) {
+      return `http://${hostname}:5001/api`;
+    }
+  }
+  return process.env.REACT_APP_API_URL || "https://wishstone.onrender.com/api";
+};
+const API = getApiBase();
+
 const api = {
   get:      (url, token)       => axios.get(`${API}${url}`,    { headers: { Authorization: `Bearer ${token}` }, timeout: 12000 }),
   post:     (url, data, token) => axios.post(`${API}${url}`, data, { headers: { Authorization: `Bearer ${token}` }, timeout: 12000 }),
@@ -324,6 +345,24 @@ const NAV = [
         <rect x="2" y="9" width="20" height="12" rx="2" fill={active ? "rgba(232,114,12,0.1)" : "none"}/>
         <path d="M6 15h4" strokeLinecap="round"/>
         <circle cx="16" cy="15" r="2" fill={active ? "rgba(232,114,12,0.3)" : "none"}/>
+      </svg>
+    ),
+  },
+  {
+    id: "ugcVideos", label: "UGC Videos",
+    icon: (active) => (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? "#E8720C" : "#8a8a8a"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="23 7 16 12 23 17 23 7" fill={active ? "rgba(232,114,12,0.15)" : "none"}/>
+        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+      </svg>
+    ),
+  },
+  {
+    id: "blogs", label: "Blogs",
+    icon: (active) => (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={active ? "#E8720C" : "#8a8a8a"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 20h9" fill="none"/>
+        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" fill={active ? "rgba(232,114,12,0.15)" : "none"}/>
       </svg>
     ),
   },
@@ -1965,6 +2004,423 @@ function Categories({ token, showToast }) {
   );
 }
 
+// ─── UGC VIDEOS ───────────────────────────────────────────────
+function UGCVideos({ token, showToast }) {
+  const [videos, setVideos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [search, setSearch] = useState("");
+  const [confirm, setConfirm] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  const blank = { title: "", caption: "", tag: "", isActive: true };
+  const [form, setForm] = useState(blank);
+  const [videoFile, setVideoFile] = useState(null);
+  const [videoPreview, setVideoPreview] = useState("");
+
+  const load = useCallback(async () => {
+    try {
+      const r = await api.get("/admin/ugc-videos", token);
+      setVideos(r.data.videos || []);
+    } catch {
+      showToast("Failed to load UGC videos", "error");
+    }
+    setLoading(false);
+  }, [token, showToast]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const openAdd = () => {
+    setEditing(null);
+    setForm(blank);
+    setVideoFile(null);
+    setVideoPreview("");
+    setShowModal(true);
+  };
+
+  const openEdit = (v) => {
+    setEditing(v);
+    setForm({ title: v.title || "", caption: v.caption || "", tag: v.tag || "", isActive: !!v.isActive });
+    setVideoFile(null);
+    setVideoPreview(v.videoUrl || "");
+    setShowModal(true);
+  };
+
+  const handleVideoSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 100 * 1024 * 1024) {
+      showToast("Video file size cannot exceed 100MB", "error");
+      return;
+    }
+    setVideoFile(file);
+    setVideoPreview(URL.createObjectURL(file));
+  };
+
+  const handleSubmit = async () => {
+    if (!form.title) { showToast("Title is required", "error"); return; }
+    if (!editing && !videoFile) { showToast("Video file is required", "error"); return; }
+    setSaving(true);
+    try {
+      const fd = new FormData();
+      Object.entries(form).forEach(([k, v]) => {
+        fd.append(k, v);
+      });
+      if (videoFile) {
+        fd.append("videoFile", videoFile);
+      }
+
+      if (editing) {
+        await api.putForm(`/admin/ugc-video/update/${editing._id}`, fd, token);
+        showToast("UGC Video updated!", "success");
+      } else {
+        await api.postForm("/admin/ugc-video/add", fd, token);
+        showToast("UGC Video added!", "success");
+      }
+      setShowModal(false); load();
+    } catch (e) {
+      showToast(e.response?.data?.message || "Error saving UGC video", "error");
+    }
+    setSaving(false);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/admin/ugc-video/delete/${id}`, token);
+      showToast("UGC Video deleted.", "success");
+      setConfirm(null);
+      load();
+    } catch {
+      showToast("Failed to delete UGC video", "error");
+    }
+  };
+
+  const filtered = videos.filter(v => v.title?.toLowerCase().includes(search.toLowerCase()));
+
+  const getAssetUrl = (url) => {
+    if (!url) return "";
+    if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("blob:")) return url;
+    const cleaned = url.startsWith("/") ? url : `/${url}`;
+    return `${API.replace("/api", "")}${cleaned}`;
+  };
+
+  return (
+    <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+      <div className="ws-page-header">
+        <div>
+          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 800, color: T.text }}>UGC Videos</h1>
+          <p style={{ color: T.textLight, fontSize: "0.85rem", marginTop: 4 }}>{videos.length} community videos</p>
+        </div>
+        <button onClick={openAdd} style={btnPrimary}>+ Publish Video</button>
+      </div>
+
+      <div style={{ marginBottom: "1.5rem" }}>
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search UGC videos…"
+          style={{ ...inputSx, maxWidth: 340, background: T.white }}
+          onFocus={e => e.target.style.borderColor = T.orange} onBlur={e => e.target.style.borderColor = T.border} />
+      </div>
+
+      {loading ? <LoadingPage label="Loading UGC videos..." /> : (
+        <div style={{ background: T.white, borderRadius: 16, border: `1px solid ${T.border}`, boxShadow: T.shadow, overflow: "hidden" }}>
+          <div className="ws-table-wrap">
+            <table>
+              <thead>
+                <tr style={{ borderBottom: `1px solid ${T.border}`, background: T.bg }}>
+                  {["Video", "Title", "Caption", "Tag", "Status", "Actions"].map(h => (
+                    <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: T.textLight, fontSize: "0.72rem", letterSpacing: "0.1em", fontWeight: 700, textTransform: "uppercase" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((v, i) => (
+                  <tr key={v._id} style={{ borderBottom: `1px solid ${T.border}`, transition: "background 0.15s" }}
+                    onMouseEnter={e => e.currentTarget.style.background = T.bg}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                    <td style={{ padding: "12px 16px" }}>
+                      <div style={{ width: 60, height: 100, borderRadius: 8, overflow: "hidden", background: T.bg, flexShrink: 0, border: `1px solid ${T.border}` }}>
+                        <video src={getAssetUrl(v.videoUrl)} style={{ width: "100%", height: "100%", objectFit: "cover" }} muted loop playsInline onMouseEnter={e => e.currentTarget.play()} onMouseLeave={e => e.currentTarget.pause()} />
+                      </div>
+                    </td>
+                    <td style={{ padding: "12px 16px" }}><span style={{ color: T.text, fontSize: "0.88rem", fontWeight: 600 }}>{v.title}</span></td>
+                    <td style={{ padding: "12px 16px" }}><span style={{ color: T.textMid, fontSize: "0.85rem" }}>{v.caption || "—"}</span></td>
+                    <td style={{ padding: "12px 16px" }}><Badge color="blue">{v.tag || "UGC"}</Badge></td>
+                    <td style={{ padding: "12px 16px" }}><Badge color={v.isActive ? "green" : "gray"}>{v.isActive ? "Active" : "Inactive"}</Badge></td>
+                    <td style={{ padding: "12px 16px" }}>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button onClick={() => openEdit(v)} style={{ background: "rgba(37,99,235,0.08)", border: "1px solid rgba(37,99,235,0.2)", color: "#1d4ed8", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: "0.8rem", fontWeight: 600 }}>Edit</button>
+                        <button onClick={() => setConfirm(v._id)} style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.2)", color: "#dc2626", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: "0.8rem", fontWeight: 600 }}>Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {filtered.length === 0 && <EmptyState icon="🎥" title="No UGC videos found" sub={search ? "Try a different search term" : "Upload your first UGC video"} />}
+        </div>
+      )}
+
+      {showModal && (
+        <Modal title={editing ? "Edit UGC Video" : "Publish New UGC Video"} onClose={() => setShowModal(false)} width={500}>
+          <div className="ws-modal-grid">
+            <div style={{ gridColumn: "1/-1" }}>
+              <label style={labelSx}>Video Title *</label>
+              <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} style={inputSx} placeholder="e.g. Surrender & Stillness"
+                onFocus={e => e.target.style.borderColor = T.orange} onBlur={e => e.target.style.borderColor = T.border} />
+            </div>
+            <div style={{ gridColumn: "1/-1" }}>
+              <label style={labelSx}>Caption</label>
+              <input value={form.caption} onChange={e => setForm({ ...form, caption: e.target.value })} style={inputSx} placeholder="e.g. Letting go of what I can't control"
+                onFocus={e => e.target.style.borderColor = T.orange} onBlur={e => e.target.style.borderColor = T.border} />
+            </div>
+            <div>
+              <label style={labelSx}>Tag</label>
+              <input value={form.tag} onChange={e => setForm({ ...form, tag: e.target.value })} style={inputSx} placeholder="e.g. STILLNESS"
+                onFocus={e => e.target.style.borderColor = T.orange} onBlur={e => e.target.style.borderColor = T.border} />
+            </div>
+            <div style={{ gridColumn: "1/-1" }}>
+              <label style={labelSx}>Video File *</label>
+              <input type="file" accept="video/*" onChange={handleVideoSelect} style={{ ...inputSx, padding: "8px 14px" }} />
+              
+              {videoPreview && (
+                <div style={{ marginTop: "12px", borderRadius: 10, overflow: "hidden", border: `1px solid ${T.border}`, width: 140, height: 250 }}>
+                  <video src={getAssetUrl(videoPreview)} style={{ width: "100%", height: "100%", objectFit: "cover" }} controls />
+                </div>
+              )}
+            </div>
+            <div>
+              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "0.85rem", color: T.textMid }}>
+                <input type="checkbox" checked={form.isActive} onChange={e => setForm({ ...form, isActive: e.target.checked })} style={{ accentColor: T.orange, width: 16, height: 16 }} />
+                Active / Visible
+              </label>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 12, marginTop: "1.5rem", justifyContent: "flex-end" }}>
+            <button onClick={() => setShowModal(false)} style={btnGhost}>Cancel</button>
+            <button onClick={handleSubmit} disabled={saving} style={{ ...btnPrimary, opacity: saving ? 0.75 : 1 }}>
+              {saving ? "Publishing…" : editing ? "Update Video" : "Publish Video"}
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {confirm && (
+        <ConfirmModal title="Delete UGC Video" message="Are you sure you want to delete this video? This action cannot be undone."
+          onConfirm={() => handleDelete(confirm)} onCancel={() => setConfirm(null)} />
+      )}
+    </motion.div>
+  );
+}
+
+// ─── BLOGS ────────────────────────────────────────────────────
+function Blogs({ token, showToast }) {
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [search, setSearch] = useState("");
+  const [confirm, setConfirm] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  const blank = { title: "", content: "", author: "Admin", isActive: true };
+  const [form, setForm] = useState(blank);
+  const [coverFile, setCoverFile] = useState(null);
+  const [coverPreview, setCoverPreview] = useState("");
+
+  const load = useCallback(async () => {
+    try {
+      const r = await api.get("/admin/blogs", token);
+      setBlogs(r.data.blogs || []);
+    } catch {
+      showToast("Failed to load blogs", "error");
+    }
+    setLoading(false);
+  }, [token, showToast]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const openAdd = () => {
+    setEditing(null);
+    setForm(blank);
+    setCoverFile(null);
+    setCoverPreview("");
+    setShowModal(true);
+  };
+
+  const openEdit = (b) => {
+    setEditing(b);
+    setForm({ title: b.title || "", content: b.content || "", author: b.author || "Admin", isActive: !!b.isActive });
+    setCoverFile(null);
+    setCoverPreview(b.coverImage || "");
+    setShowModal(true);
+  };
+
+  const handleCoverSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      showToast("Image file size cannot exceed 10MB", "error");
+      return;
+    }
+    setCoverFile(file);
+    setCoverPreview(URL.createObjectURL(file));
+  };
+
+  const handleSubmit = async () => {
+    if (!form.title || !form.content) { showToast("Title and content are required", "error"); return; }
+    setSaving(true);
+    try {
+      const fd = new FormData();
+      Object.entries(form).forEach(([k, v]) => {
+        fd.append(k, v);
+      });
+      if (coverFile) {
+        fd.append("coverImageFile", coverFile);
+      }
+
+      if (editing) {
+        await api.putForm(`/admin/blog/update/${editing._id}`, fd, token);
+        showToast("Blog updated!", "success");
+      } else {
+        await api.postForm("/admin/blog/add", fd, token);
+        showToast("Blog published!", "success");
+      }
+      setShowModal(false); load();
+    } catch (e) {
+      showToast(e.response?.data?.message || "Error saving blog", "error");
+    }
+    setSaving(false);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/admin/blog/delete/${id}`, token);
+      showToast("Blog deleted.", "success");
+      setConfirm(null);
+      load();
+    } catch {
+      showToast("Failed to delete blog", "error");
+    }
+  };
+
+  const filtered = blogs.filter(b => b.title?.toLowerCase().includes(search.toLowerCase()));
+
+  const getAssetUrl = (url) => {
+    if (!url) return "";
+    if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("blob:")) return url;
+    const cleaned = url.startsWith("/") ? url : `/${url}`;
+    return `${API.replace("/api", "")}${cleaned}`;
+  };
+
+  return (
+    <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit">
+      <div className="ws-page-header">
+        <div>
+          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 800, color: T.text }}>Blogs</h1>
+          <p style={{ color: T.textLight, fontSize: "0.85rem", marginTop: 4 }}>{blogs.length} articles published</p>
+        </div>
+        <button onClick={openAdd} style={btnPrimary}>+ Write Blog</button>
+      </div>
+
+      <div style={{ marginBottom: "1.5rem" }}>
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search blogs…"
+          style={{ ...inputSx, maxWidth: 340, background: T.white }}
+          onFocus={e => e.target.style.borderColor = T.orange} onBlur={e => e.target.style.borderColor = T.border} />
+      </div>
+
+      {loading ? <LoadingPage label="Loading blogs..." /> : (
+        <div style={{ background: T.white, borderRadius: 16, border: `1px solid ${T.border}`, boxShadow: T.shadow, overflow: "hidden" }}>
+          <div className="ws-table-wrap">
+            <table>
+              <thead>
+                <tr style={{ borderBottom: `1px solid ${T.border}`, background: T.bg }}>
+                  {["Cover", "Title", "Author", "Date", "Status", "Actions"].map(h => (
+                    <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: T.textLight, fontSize: "0.72rem", letterSpacing: "0.1em", fontWeight: 700, textTransform: "uppercase" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((b, i) => (
+                  <tr key={b._id} style={{ borderBottom: `1px solid ${T.border}`, transition: "background 0.15s" }}
+                    onMouseEnter={e => e.currentTarget.style.background = T.bg}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                    <td style={{ padding: "12px 16px" }}>
+                      <div style={{ width: 64, height: 40, borderRadius: 6, overflow: "hidden", background: T.bg, flexShrink: 0, border: `1px solid ${T.border}` }}>
+                        {b.coverImage ? <img src={getAssetUrl(b.coverImage)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: T.textLight }}>◆</div>}
+                      </div>
+                    </td>
+                    <td style={{ padding: "12px 16px", maxWidth: 300 }}><span style={{ color: T.text, fontSize: "0.88rem", fontWeight: 600, display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{b.title}</span></td>
+                    <td style={{ padding: "12px 16px" }}><span style={{ color: T.textMid, fontSize: "0.85rem" }}>{b.author || "Admin"}</span></td>
+                    <td style={{ padding: "12px 16px" }}><span style={{ color: T.textLight, fontSize: "0.8rem" }}>{new Date(b.createdAt).toLocaleDateString("en-IN")}</span></td>
+                    <td style={{ padding: "12px 16px" }}><Badge color={b.isActive ? "green" : "gray"}>{b.isActive ? "Active" : "Inactive"}</Badge></td>
+                    <td style={{ padding: "12px 16px" }}>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button onClick={() => openEdit(b)} style={{ background: "rgba(37,99,235,0.08)", border: "1px solid rgba(37,99,235,0.2)", color: "#1d4ed8", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: "0.8rem", fontWeight: 600 }}>Edit</button>
+                        <button onClick={() => setConfirm(b._id)} style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.2)", color: "#dc2626", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: "0.8rem", fontWeight: 600 }}>Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {filtered.length === 0 && <EmptyState icon="✍️" title="No articles found" sub={search ? "Try a different search term" : "Write your first blog post"} />}
+        </div>
+      )}
+
+      {showModal && (
+        <Modal title={editing ? "Edit Blog Post" : "Write New Blog Post"} onClose={() => setShowModal(false)} width={640}>
+          <div className="ws-modal-grid">
+            <div style={{ gridColumn: "1/-1" }}>
+              <label style={labelSx}>Blog Title *</label>
+              <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} style={inputSx} placeholder="e.g. Finding peace in Delhi's chaos"
+                onFocus={e => e.target.style.borderColor = T.orange} onBlur={e => e.target.style.borderColor = T.border} />
+            </div>
+            <div>
+              <label style={labelSx}>Author</label>
+              <input value={form.author} onChange={e => setForm({ ...form, author: e.target.value })} style={inputSx} placeholder="Admin"
+                onFocus={e => e.target.style.borderColor = T.orange} onBlur={e => e.target.style.borderColor = T.border} />
+            </div>
+            <div style={{ gridColumn: "1/-1" }}>
+              <label style={labelSx}>Cover Image</label>
+              <input type="file" accept="image/*" onChange={handleCoverSelect} style={{ ...inputSx, padding: "8px 14px" }} />
+              
+              {coverPreview && (
+                <div style={{ marginTop: "12px", borderRadius: 8, overflow: "hidden", border: `1px solid ${T.border}`, width: 160, height: 100 }}>
+                  <img src={getAssetUrl(coverPreview)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+              )}
+            </div>
+            <div style={{ gridColumn: "1/-1" }}>
+              <label style={labelSx}>Content *</label>
+              <textarea value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} rows={10} style={{ ...inputSx, resize: "vertical" }} placeholder="Write blog content here..."
+                onFocus={e => e.target.style.borderColor = T.orange} onBlur={e => e.target.style.borderColor = T.border} />
+            </div>
+            <div>
+              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "0.85rem", color: T.textMid }}>
+                <input type="checkbox" checked={form.isActive} onChange={e => setForm({ ...form, isActive: e.target.checked })} style={{ accentColor: T.orange, width: 16, height: 16 }} />
+                Active / Visible
+              </label>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 12, marginTop: "1.5rem", justifyContent: "flex-end" }}>
+            <button onClick={() => setShowModal(false)} style={btnGhost}>Cancel</button>
+            <button onClick={handleSubmit} disabled={saving} style={{ ...btnPrimary, opacity: saving ? 0.75 : 1 }}>
+              {saving ? "Publishing…" : editing ? "Update Post" : "Publish Post"}
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {confirm && (
+        <ConfirmModal title="Delete Blog Post" message="Are you sure you want to delete this blog post? This action cannot be undone."
+          onConfirm={() => handleDelete(confirm)} onCancel={() => setConfirm(null)} />
+      )}
+    </motion.div>
+  );
+}
+
 // ─── MAIN APP ─────────────────────────────────────────────────
 export default function WishstoneAdmin() {
   const [token, setToken]       = useState(() => localStorage.getItem("ws_admin_token") || "");
@@ -2053,7 +2509,7 @@ export default function WishstoneAdmin() {
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
 
-  const PAGES = { dashboard: Dashboard, products: Products, orders: Orders, customers: Customers, users: Users, coupons: Coupons, categories: Categories };
+  const PAGES = { dashboard: Dashboard, products: Products, orders: Orders, customers: Customers, users: Users, coupons: Coupons, categories: Categories, ugcVideos: UGCVideos, blogs: Blogs };
   const PageComponent = PAGES[page] || Dashboard;
 
   return (

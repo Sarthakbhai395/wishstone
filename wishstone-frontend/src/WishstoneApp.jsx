@@ -1,14 +1,14 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams, Navigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import IntentionAnchoringPage from "./IntentionAnchoringPage";
 
 const T = {
-  bg: "#ffffff", bgDark: "#5A6651",
-  text: "#000000", textMid: "#5A6651",
-  orange: "#5A6651", orangeD: "#000000", orangeL: "#5A6651",
-  white: "#ffffff", border: "rgba(90, 102, 81, 0.2)",
+  bg: "#ffffff", bgDark: "#787F56",
+  text: "#000000", textMid: "#787F56",
+  orange: "#787F56", orangeD: "#000000", orangeL: "#787F56",
+  white: "#ffffff", border: "rgba(120, 127, 86, 0.2)",
 };
 
 const getApiBase = () => {
@@ -155,7 +155,7 @@ const GLOBAL_CSS = `
   }
   ::-webkit-scrollbar{width:5px;}
   ::-webkit-scrollbar-track{background:#ffffff;}
-  ::-webkit-scrollbar-thumb{background:#5A6651;border-radius:3px;}
+  ::-webkit-scrollbar-thumb{background:#787F56;border-radius:3px;}
   @keyframes autoScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
   .scroll-hide::-webkit-scrollbar{display:none;}
   .scroll-hide{-ms-overflow-style:none;scrollbar-width:none;}
@@ -165,9 +165,9 @@ const GLOBAL_CSS = `
     margin: 0.5rem -1.5rem 1rem -1.5rem;
     padding: 0.6rem 0;
     overflow: hidden;
-    background: rgba(90, 102, 81, 0.04);
-    border-top: 1px solid rgba(90, 102, 81, 0.1);
-    border-bottom: 1px solid rgba(90, 102, 81, 0.1);
+    background: rgba(120, 127, 86, 0.04);
+    border-top: 1px solid rgba(120, 127, 86, 0.1);
+    border-bottom: 1px solid rgba(120, 127, 86, 0.1);
     position: relative;
   }
   .nav-marquee-track {
@@ -189,7 +189,7 @@ const GLOBAL_CSS = `
     color: #000000 !important;
     background: transparent !important;
     border: none !important;
-    border-bottom: 1px solid rgba(90, 102, 81, 0.12) !important;
+    border-bottom: 1px solid rgba(120, 127, 86, 0.12) !important;
     border-radius: 0px !important;
     cursor: pointer !important;
     text-align: left !important;
@@ -201,27 +201,27 @@ const GLOBAL_CSS = `
     box-sizing: border-box !important;
   }
   .sidebar-link:hover {
-    color: #5A6651 !important;
+    color: #787F56 !important;
     padding-left: 10px !important;
   }
   .sidebar-link.active {
-    color: #5A6651 !important;
+    color: #787F56 !important;
     font-weight: 800 !important;
     padding-left: 10px !important;
   }
   .sidebar-link .chevron-icon {
     font-size: 1rem;
-    color: rgba(90, 102, 81, 0.3);
+    color: rgba(120, 127, 86, 0.3);
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
   }
   .sidebar-link:hover .chevron-icon {
-    color: #5A6651;
+    color: #787F56;
     transform: translateX(4px);
   }
   .sidebar-link.active .chevron-icon {
-    color: #5A6651;
+    color: #787F56;
   }
   .sidebar-showcase-row {
     display: flex;
@@ -357,17 +357,15 @@ const GLOBAL_CSS = `
     from{opacity:0;transform:translateX(32px) scale(0.98);}
     to{opacity:1;transform:translateX(0) scale(1);}
   }
-  .nav-link{background:none;border:none;cursor:pointer;font-family:'Open Sans',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#000000;padding:4px 0;transition:color 0.2s;position:relative;overflow:hidden;}
-  .nav-link:hover,.nav-link.active{color:#5A6651;}
-  .nav-link::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(90,102,81,0.15),transparent);transition:left 0.4s ease;pointer-events:none;}
-  .nav-link:hover::after{left:140%;}
+  .nav-link{background:none;border:none;cursor:pointer;font-family:'Open Sans',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#000000;padding:4px 0;transition:color 0.2s;position:relative;}
+  .nav-link:hover,.nav-link.active{color:#787F56;}
   @keyframes navShine {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
   }
   .nav-link-shine {
     position: relative;
-    background: linear-gradient(120deg, #000000 30%, #5A6651 45%, #ffffff 50%, #5A6651 55%, #000000 70%) !important;
+    background: linear-gradient(120deg, #000000 30%, #787F56 45%, #ffffff 50%, #787F56 55%, #000000 70%) !important;
     background-size: 200% auto !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
@@ -375,17 +373,17 @@ const GLOBAL_CSS = `
     animation: navShine 3s linear infinite !important;
   }
   .nav-link-shine:hover, .nav-link-shine.active {
-    background: linear-gradient(120deg, #5A6651 30%, #5A6651 45%, #ffffff 50%, #5A6651 55%, #5A6651 70%) !important;
+    background: linear-gradient(120deg, #787F56 30%, #787F56 45%, #ffffff 50%, #787F56 55%, #787F56 70%) !important;
     background-size: 200% auto !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
     color: transparent !important;
   }
-  .prod-card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 12px 32px rgba(90,102,81,0.03);transition:transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);cursor:pointer;}
-  .prod-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 24px 60px rgba(90,102,81,0.08);}
-  .btn-orange{background:#5A6651;border:none;color:#fff;cursor:pointer;font-family:'Open Sans',sans-serif;font-weight:700;letter-spacing:0.06em;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);box-shadow:0 4px 14px rgba(90,102,81,0.2);}
-  .btn-orange:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 12px 30px rgba(90,102,81,0.45);background:#5A6651;filter:brightness(0.9);}
-  .btn-orange:active{transform:translateY(-1px) scale(0.98);box-shadow:0 6px 18px rgba(90,102,81,0.3);}
+  .prod-card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 12px 32px rgba(120, 127, 86,0.03);transition:transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);cursor:pointer;}
+  .prod-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 24px 60px rgba(120, 127, 86,0.08);}
+  .btn-orange{background:#787F56;border:none;color:#fff;cursor:pointer;font-family:'Open Sans',sans-serif;font-weight:700;letter-spacing:0.06em;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);box-shadow:0 4px 14px rgba(120, 127, 86,0.2);}
+  .btn-orange:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 12px 30px rgba(120, 127, 86,0.45);background:#787F56;filter:brightness(0.9);}
+  .btn-orange:active{transform:translateY(-1px) scale(0.98);box-shadow:0 6px 18px rgba(120, 127, 86,0.3);}
   .btn-outline{background:transparent;border:1.5px solid #000000;color:#000000;cursor:pointer;font-family:'Open Sans',sans-serif;font-weight:600;letter-spacing:0.06em;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);}
   .btn-outline:hover{background:#000000;color:#ffffff;border-color:#000000;transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,0.08);}
   .btn-outline:active{transform:translateY(-1px);}
@@ -585,7 +583,43 @@ const GLOBAL_CSS = `
     .desktop-only-banner {
       display: none !important;
     }
-  }`;
+    .tabs-parent-grid {
+      grid-template-columns: 1fr !important;
+      gap: 16px !important;
+    }
+    .vertical-tabs-col {
+      flex-direction: row !important;
+      overflow-x: auto !important;
+      padding-bottom: 6px !important;
+      justify-content: flex-start !important;
+    }
+    .vertical-tabs-col::-webkit-scrollbar {
+      height: 3px !important;
+    }
+    .vertical-tabs-col::-webkit-scrollbar-thumb {
+      background: #787F56 !important;
+    }
+    .tabs-sidebar-card {
+      border-bottom: 1px solid #D9DDD5 !important;
+      padding-bottom: 16px !important;
+    }
+    .you-may-like-left-col {
+      display: none !important;
+    }
+  }
+  .category-card {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .category-card:hover {
+    box-shadow: 0 25px 50px rgba(120, 127, 86, 0.12) !important;
+  }
+  .category-card:hover .category-img {
+    transform: scale(1.05) !important;
+  }
+  .category-card:hover .arrow-icon {
+    transform: translateX(4px) !important;
+  }
+  `;
 
 // ─── HEADER ───────────────────────────────────────────────────
 function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
@@ -649,7 +683,7 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
     };
   }, [mobileOpen]);
 
-  const links = [["products", "Our Collection"], ["rituals", "The Ritual"], ["benefits", "Benefits"], ["stories", "Stories"]];
+  const links = [["products", "Shop Collection"], ["rituals", "The Ritual"], ["benefits", "Benefits"], ["stories", "Wish Story"]];
   const navTo = (k) => { onNav(k); setMobileOpen(false); };
 
   return (
@@ -678,9 +712,7 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
       <div className="max-w" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 64, padding: "0 clamp(1rem,4vw,2.5rem)" }}>
         <button onClick={() => navTo("home")} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <img src={`${process.env.PUBLIC_URL || ""}/wishstone svg.svg`} alt="WishStone" style={{ height: 20, width: "auto", display: "block" }} />
-          <div style={{ fontSize: "0.52rem", letterSpacing: "0.18em", color: "#8D7A5B", marginTop: 2, fontWeight: 700, textTransform: "uppercase", fontFamily: "'Inter', sans-serif" }}>
-            SACRED STORE
-          </div>
+
         </button>
 
         <nav className="header-nav" style={{ display: "flex", gap: "2.2rem", alignItems: "center" }}>
@@ -1067,102 +1099,107 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
 }
 
 function Hero({ onShop, onRitual }) {
-  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth <= 900 : false);
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [productImages, setProductImages] = useState([
+    "/wishstone-horizontal.jpeg",
+    "/cosmic-eye.jpeg",
+    "/defuser-product.jpeg",
+    "/habit-builder2-product.jpeg",
+    "/habit-builder3-product.jpeg",
+  ]);
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 900);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
+    const API_BASE = getApiBase();
+    fetch(`${API_BASE}/api/products?limit=20`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.products && data.products.length > 0) {
+          const imgs = data.products.map(p => p.images?.[0] || p.image).filter(Boolean).map(getImageUrl);
+          if (imgs.length > 0) {
+            setProductImages(imgs);
+          }
+        }
+      })
+      .catch(() => { });
   }, []);
 
-  /* ────────────────────────────────────────────────────────────
-     MOBILE HERO
-  ──────────────────────────────────────────────────────────── */
-  if (isMobile) return (
-    <section style={{ background: "#ffffff", width: "100%", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", top: 60, right: -30, width: "60%", height: "45%", background: `url(${process.env.PUBLIC_URL || ""}/hero_mobile_bg.png) no-repeat top right / cover`, opacity: 0.18, zIndex: 0, pointerEvents: "none", borderRadius: 0 }} />
-      <div style={{ position: "relative", zIndex: 1, paddingTop: "88px", paddingLeft: "1.4rem", paddingRight: "1.4rem", paddingBottom: "1.8rem" }}>
-        <div style={{ marginBottom: "0.75rem" }}>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="2" x2="12" y2="22" /><line x1="2" y1="12" x2="22" y2="12" /><line x1="5" y1="5" x2="19" y2="19" /><line x1="19" y1="5" x2="5" y2="19" />
-            <path d="M12 7l1.5 3.5L17 12l-3.5 1.5L12 17l-1.5-3.5L7 12l3.5-1.5z" fill="#5A6651" />
-          </svg>
-        </div>
-        <p style={{ fontSize: "0.77rem", color: "#5A6651", letterSpacing: "0.04em", marginBottom: "0.45rem", fontFamily: "'Open Sans',sans-serif" }}>
-          India's <span style={{ color: "#5A6651", fontWeight: 600 }}>Sacred</span> Manifestation Stone
-        </p>
-        <h1 style={{ fontFamily: "'Open Sans',sans-serif", fontSize: "clamp(2.8rem,9.5vw,3.5rem)", fontWeight: 900, color: "#000000", lineHeight: 1.08, margin: "0 0 1rem 0" }}>
-          Turn<br/>Intentions<br/>into <span style={{ color: "#5A6651", position: "relative", whiteSpace: "nowrap" }}>Reality<span style={{ fontSize: "0.45em", position: "absolute", top: "-0.2em", right: "-0.5em", color: "#5A6651" }}>✦</span></span>
-        </h1>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", width: "100%", maxWidth: "160px", margin: "1rem 0" }}>
-          <div style={{ height: "1px", flex: 1, background: "rgba(90,102,81,0.35)" }} /><span style={{ color: "#5A6651", fontSize: "10px" }}>✦</span><div style={{ height: "1px", flex: 1, background: "rgba(90,102,81,0.35)" }} />
-        </div>
-        <p style={{ fontSize: "0.83rem", color: "#5A6651", lineHeight: 1.72, marginBottom: "1.5rem", maxWidth: 305, fontFamily: "'Open Sans',sans-serif" }}>
-          Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
-        </p>
-        <button onClick={onRitual} style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "#000000", color: "#fff", border: "none", padding: "13px 26px", borderRadius: 4, fontSize: "0.85rem", fontWeight: 600, cursor: "pointer", letterSpacing: "0.02em", fontFamily: "'Open Sans',sans-serif", boxShadow: "0 4px 14px rgba(0,0,0,0.15)" }}>
-          Explore Rituals<span style={{ color: "#5A6651", fontSize: "1.1rem", fontWeight: 700 }}>→</span>
-        </button>
-      </div>
-      <div style={{ width: "100%", position: "relative", zIndex: 1 }}>
-        <img src={`${process.env.PUBLIC_URL || ""}/hero_mobile_stone.png`} alt="Wishstone Sacred Stone" style={{ width: "100%", height: "auto", display: "block", objectFit: "cover" }} onError={e => { e.currentTarget.src = `${process.env.PUBLIC_URL || ""}/hero_mobile_bg.png`; }} />
-        <div style={{ position: "absolute", bottom: 14, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", width: "80px" }}><div style={{ height: "1px", flex: 1, background: "rgba(90,102,81,0.35)" }} /><span style={{ color: "#5A6651", fontSize: 9 }}>✦</span><div style={{ height: "1px", flex: 1, background: "rgba(90,102,81,0.35)" }} /></div>
-          <span style={{ fontSize: "0.58rem", fontWeight: 700, color: "#5A6651", letterSpacing: "0.22em", fontFamily: "'Open Sans',sans-serif", textTransform: "uppercase" }}>SCROLL</span>
-        </div>
-      </div>
-    </section>
-  );
+  // Automatic slideshow interval
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIdx((prev) => (prev + 1) % productImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [productImages]);
 
-  /* ────────────────────────────────────────────────────────────
-     DESKTOP HERO
-  ──────────────────────────────────────────────────────────── */
+  // Sliding variants: left to right!
+  // New image slides in from left (-100% -> 0), old image exits to right (0 -> 100%)
+  const slideVariants = {
+    initial: { x: "-100%" },
+    animate: { x: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
+    exit: { x: "100%", transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+  };
+
   return (
-    <section style={{ position: "relative", width: "100%", minHeight: "100vh", background: "#ffffff", overflow: "hidden", display: "flex", flexDirection: "column" }}>
-      <div style={{ position: "absolute", inset: 0, zIndex: 0, background: `url(${process.env.PUBLIC_URL || ""}/hero_desktop_stone.png) no-repeat center right / contain` }} />
-      <div style={{ position: "absolute", inset: 0, zIndex: 1, background: "linear-gradient(90deg, #ffffff 35%, rgba(255,255,255,0.4) 52%, rgba(255,255,255,0) 65%)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 120, zIndex: 1, background: "linear-gradient(180deg, rgba(255,255,255,0.9) 0%, transparent 100%)", pointerEvents: "none" }} />
-      <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "120px clamp(1.5rem,5vw,4rem) 60px", maxWidth: 680 }}>
-        <div style={{ marginBottom: "1.4rem" }}>
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="2" x2="12" y2="22" /><line x1="2" y1="12" x2="22" y2="12" /><line x1="5" y1="5" x2="19" y2="19" /><line x1="19" y1="5" x2="5" y2="19" />
-            <path d="M12 7l1.5 3.5L17 12l-3.5 1.5L12 17l-1.5-3.5L7 12l3.5-1.5z" fill="#5A6651" />
-          </svg>
-        </div>
-        <p style={{ fontSize: "0.85rem", color: "#5A6651", letterSpacing: "0.04em", marginBottom: "0.6rem", fontFamily: "'Open Sans',sans-serif" }}>
-          India's <span style={{ color: "#5A6651", fontWeight: 600 }}>Sacred</span> Manifestation Stone
-        </p>
-        <h1 style={{ fontFamily: "'Open Sans',serif", fontSize: "clamp(3.5rem,5.5vw,5rem)", fontWeight: 900, color: "#000000", lineHeight: 1.06, margin: "0 0 1.2rem 0" }}>
-          Turn<br/>Intentions<br/>into <span style={{ color: "#5A6651", position: "relative", whiteSpace: "nowrap" }}>Reality<span style={{ fontSize: "0.4em", position: "absolute", top: "-0.25em", right: "-0.5em", color: "#5A6651" }}>✦</span></span>
-        </h1>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", width: "100%", maxWidth: "180px", margin: "1.2rem 0" }}>
-          <div style={{ height: "1px", flex: 1, background: "rgba(90,102,81,0.35)" }} /><span style={{ color: "#5A6651", fontSize: "12px" }}>✦</span><div style={{ height: "1px", flex: 1, background: "rgba(90,102,81,0.35)" }} />
-        </div>
-        <p style={{ fontSize: "clamp(0.88rem,1.1vw,1rem)", color: "#5A6651", lineHeight: 1.78, marginBottom: "2.2rem", maxWidth: 400, fontFamily: "'Open Sans',sans-serif" }}>
-          Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
-        </p>
-        <div>
-          <button onClick={onRitual} style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "#5A6651", color: "#fff", border: "none", padding: "15px 32px", borderRadius: 4, fontSize: "0.9rem", fontWeight: 600, cursor: "pointer", letterSpacing: "0.02em", fontFamily: "'Open Sans',sans-serif", boxShadow: "0 4px 20px rgba(90,102,81,0.28)", transition: "all 0.25s ease" }} onMouseEnter={e => { e.currentTarget.style.background = "#5A6651"; e.currentTarget.style.filter = "brightness(0.9)"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 28px rgba(90,102,81,0.35)"; }} onMouseLeave={e => { e.currentTarget.style.background = "#5A6651"; e.currentTarget.style.filter = "none"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(90,102,81,0.28)"; }}>
-            Explore Rituals<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </button>
-        </div>
+    <section style={{ position: "relative", width: "100%", height: "80vh", minHeight: "560px", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+      {/* Background Sliding Images */}
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, overflow: "hidden" }}>
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={currentIdx}
+            variants={slideVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              backgroundImage: `url(${productImages[currentIdx]})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center"
+            }}
+          />
+        </AnimatePresence>
+        {/* Dark overlay for contrast */}
+        <div style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: "linear-gradient(to right, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.3) 100%)",
+          zIndex: 1
+        }} />
       </div>
-      <div style={{ position: "relative", zIndex: 2, margin: "0 clamp(1.5rem,4vw,3rem) 3rem", background: "rgba(255,255,255,0.72)", backdropFilter: "blur(12px)", borderRadius: 16, padding: "22px 28px", boxShadow: "0 4px 24px rgba(90,102,81,0.08)", border: "1px solid rgba(255,255,255,0.9)" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 20, alignItems: "center" }}>
-          {[
-            { label: "Authentic WishStone", svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/><line x1="12" y1="2" x2="12" y2="6"/></svg> },
-            { label: "Ancient Wisdom Meets Modern Life", svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a9 9 0 1 0 0 18A9 9 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg> },
-            { label: "Energy You Can Feel", svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg> },
-            { label: "Made With Intention", svg: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> },
-          ].map((item, i) => (
-            <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 10 }}>
-              <div style={{ width: 46, height: 46, borderRadius: "50%", background: "rgba(90, 102, 81, 0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                {item.svg}
-              </div>
-              <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "#000000", lineHeight: 1.35, fontFamily: "'Open Sans',sans-serif" }}>{item.label}</span>
-            </div>
-          ))}
+
+      {/* Hero Content */}
+      <div className="max-w" style={{ position: "relative", zIndex: 2, padding: "0 clamp(1.2rem,5vw,4rem)", width: "100%", color: "#ffffff", boxSizing: "border-box", display: "flex", justifyContent: "flex-start" }}>
+        <div style={{
+          maxWidth: "580px",
+          textAlign: "left"
+        }}>
+          <div style={{ marginBottom: "1rem" }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C39D5F" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="2" x2="12" y2="22" /><line x1="2" y1="12" x2="22" y2="12" /><line x1="5" y1="5" x2="19" y2="19" /><line x1="19" y1="5" x2="5" y2="19" />
+              <path d="M12 7l1.5 3.5L17 12l-3.5 1.5L12 17l-1.5-3.5L7 12l3.5-1.5z" fill="#C39D5F" />
+            </svg>
+          </div>
+          <p style={{ fontSize: "0.85rem", color: "#C39D5F", letterSpacing: "0.1em", marginBottom: "0.5rem", fontWeight: 700, textTransform: "uppercase" }}>
+            India's <span style={{ color: "#ffffff" }}>Sacred</span> Manifestation Stone
+          </p>
+          <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem, 5vw, 3.8rem)", fontWeight: 900, color: "#ffffff", lineHeight: 1.1, margin: "0 0 1rem 0" }}>
+            Turn<br />Intentions<br />into <span style={{ color: "#C39D5F", position: "relative", whiteSpace: "nowrap" }}>Reality<span style={{ fontSize: "0.4em", position: "absolute", top: "-0.25em", right: "-0.5em", color: "#C39D5F" }}>✦</span></span>
+          </h1>
+          <p style={{ fontSize: "clamp(0.85rem,1.1vw,1rem)", color: "rgba(255,255,255,0.8)", lineHeight: 1.6, marginBottom: "2rem", fontFamily: "'Open Sans',sans-serif" }}>
+            Create mindful daily rituals that help you manifest your goals, cultivate inner peace, and stay aligned with the life you want to create.
+          </p>
+          <div>
+            <button onClick={onRitual} style={{ display: "inline-flex", alignItems: "center", gap: 12, background: "#C39D5F", color: "#fff", border: "none", padding: "12px 26px", borderRadius: 30, fontSize: "0.85rem", fontWeight: 700, cursor: "pointer", letterSpacing: "0.05em", textTransform: "uppercase", transition: "all 0.25s ease", boxShadow: "0 10px 24px rgba(195,157,95,0.25)" }} onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 14px 30px rgba(195,157,95,0.35)"; }} onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 10px 24px rgba(195,157,95,0.25)"; }}>
+              Explore Rituals<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -1194,6 +1231,23 @@ function CommunityVideoSection() {
   const videoRefs = useRef([]);
   const [activeVideo, setActiveVideo] = useState(null);
   const [playing, setPlaying] = useState(false);
+  const [videos, setVideos] = useState([]);
+
+  useEffect(() => {
+    const API_BASE = getApiBase();
+    fetch(`${API_BASE}/api/ugc-videos`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.videos && data.videos.length > 0) {
+          setVideos(data.videos);
+        } else {
+          setVideos(COMMUNITY_VIDEOS);
+        }
+      })
+      .catch(() => {
+        setVideos(COMMUNITY_VIDEOS);
+      });
+  }, []);
 
   // Auto-play videos when they enter viewport
   useEffect(() => {
@@ -1215,7 +1269,7 @@ function CommunityVideoSection() {
       observers.push(obs);
     });
     return () => observers.forEach(o => o.disconnect());
-  }, []);
+  }, [videos]);
 
   const handleClick = (i) => {
     const vid = videoRefs.current[i];
@@ -1251,9 +1305,9 @@ function CommunityVideoSection() {
 
       {/* Video Strip */}
       <div className="premium-fade-up" style={{ overflowX: "auto", overflowY: "hidden", scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch", display: "flex", gap: "1.5rem", paddingLeft: "clamp(1rem,4vw,3rem)", paddingRight: "clamp(1rem,4vw,3rem)", paddingBottom: 12, scrollbarWidth: "none" }}>
-        {COMMUNITY_VIDEOS.map((v, i) => (
+        {videos.map((v, i) => (
           <div
-            key={v.id}
+            key={v._id || v.id}
             onClick={() => handleClick(i)}
             style={{
               flex: "0 0 220px",
@@ -1271,7 +1325,7 @@ function CommunityVideoSection() {
           >
             <video
               ref={el => videoRefs.current[i] = el}
-              src={v.videoUrl}
+              src={getImageUrl(v.videoUrl)}
               autoPlay
               muted
               loop
@@ -1323,11 +1377,7 @@ function PowersSection({ onNav }) {
     <section style={{ background: T.bg, padding: "90px clamp(1.5rem,5vw,3.5rem)" }}>
       <div className="max-w">
         <div className="premium-fade-up" style={{ textAlign: "center", marginBottom: "3.5rem" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 14 }}>
-            <div style={{ height: 1, width: 40, background: "#4C5A43" }} />
-            <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#4C5A43", letterSpacing: "0.18em", textTransform: "uppercase" }}>WishStone की शक्ति</span>
-            <div style={{ height: 1, width: 40, background: "#4C5A43" }} />
-          </div>
+
           <h2 style={{ fontSize: "clamp(1.8rem,4vw,2.8rem)", fontWeight: 900, color: T.text, lineHeight: 1.25, letterSpacing: "-0.01em" }}>
             Three Powers to <em style={{ color: "#4C5A43", fontStyle: "italic" }}>Amplify</em><br />Your Manifestation
           </h2>
@@ -1371,32 +1421,32 @@ function QuoteSection() {
   }, []);
   const q = QUOTES[idx];
   return (
-    <section style={{ background: "rgba(90, 102, 81, 0.08)", padding: "64px clamp(1.5rem,5vw,3.5rem)", textAlign: "center", position: "relative", overflow: "hidden" }}>
+    <section style={{ background: "rgba(120, 127, 86, 0.08)", padding: "64px clamp(1.5rem,5vw,3.5rem)", textAlign: "center", position: "relative", overflow: "hidden" }}>
       <div className="max-w" style={{ maxWidth: 760, position: "relative" }}>
-        <div style={{ fontSize: "0.68rem", fontWeight: 800, color: "#5A6651", letterSpacing: "0.22em", textTransform: "uppercase", marginBottom: "1.2rem", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-          <span style={{ color: "#5A6651" }}>✦</span> Daily Manifestation Oracle <span style={{ color: "#5A6651" }}>✦</span>
+        <div style={{ fontSize: "0.68rem", fontWeight: 800, color: "#787F56", letterSpacing: "0.22em", textTransform: "uppercase", marginBottom: "1.2rem", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+          <span style={{ color: "#787F56" }}>✦</span> Daily Manifestation Oracle <span style={{ color: "#787F56" }}>✦</span>
         </div>
         <blockquote key={key} style={{ fontFamily: "'Open Sans',sans-serif", fontSize: "clamp(1.2rem,2.8vw,1.75rem)", fontWeight: 800, color: "#000000", lineHeight: 1.6, marginBottom: "1.2rem", fontStyle: "italic", animation: "quoteIn 0.5s ease both" }}>
           "{q.text}"
         </blockquote>
-        <cite style={{ fontSize: "0.8rem", fontWeight: 700, color: "#5A6651", letterSpacing: "0.2em", textTransform: "uppercase", fontStyle: "normal", display: "block", marginBottom: "1.8rem" }}>— {q.author}</cite>
+        <cite style={{ fontSize: "0.8rem", fontWeight: 700, color: "#787F56", letterSpacing: "0.2em", textTransform: "uppercase", fontStyle: "normal", display: "block", marginBottom: "1.8rem" }}>— {q.author}</cite>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1.2rem" }}>
           <button onClick={() => { setIdx(i => (i - 1 + QUOTES.length) % QUOTES.length); setKey(k => k + 1); }}
-            style={{ width: 34, height: 34, borderRadius: "50%", border: `1px solid rgba(90, 102, 81, 0.4)`, background: "none", color: "#5A6651", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#5A6651"; e.currentTarget.style.color = "#fff"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#5A6651"; }}>‹</button>
-          <div style={{ width: 180, height: 3, background: "rgba(90, 102, 81, 0.1)", borderRadius: 1.5, position: "relative" }}>
-            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", background: "#5A6651", borderRadius: 1.5, width: `${((idx + 1) / QUOTES.length) * 100}%`, transition: "width 0.4s ease" }} />
+            style={{ width: 34, height: 34, borderRadius: "50%", border: `1px solid rgba(120, 127, 86, 0.4)`, background: "none", color: "#787F56", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#787F56"; e.currentTarget.style.color = "#fff"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#787F56"; }}>‹</button>
+          <div style={{ width: 180, height: 3, background: "rgba(120, 127, 86, 0.1)", borderRadius: 1.5, position: "relative" }}>
+            <div style={{ position: "absolute", left: 0, top: 0, height: "100%", background: "#787F56", borderRadius: 1.5, width: `${((idx + 1) / QUOTES.length) * 100}%`, transition: "width 0.4s ease" }} />
           </div>
           <div style={{ display: "flex", gap: 6 }}>
             {QUOTES.map((_, i) => (
-              <button key={i} onClick={() => { setIdx(i); setKey(k => k + 1); }} style={{ width: i === idx ? 20 : 8, height: 8, borderRadius: 4, background: i === idx ? "#5A6651" : "rgba(90, 102, 81, 0.3)", border: "none", cursor: "pointer", transition: "all 0.3s", padding: 0 }} />
+              <button key={i} onClick={() => { setIdx(i); setKey(k => k + 1); }} style={{ width: i === idx ? 20 : 8, height: 8, borderRadius: 4, background: i === idx ? "#787F56" : "rgba(120, 127, 86, 0.3)", border: "none", cursor: "pointer", transition: "all 0.3s", padding: 0 }} />
             ))}
           </div>
           <button onClick={() => { setIdx(i => (i + 1) % QUOTES.length); setKey(k => k + 1); }}
-            style={{ width: 34, height: 34, borderRadius: "50%", border: `1px solid rgba(90, 102, 81, 0.4)`, background: "none", color: "#5A6651", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#5A6651"; e.currentTarget.style.color = "#fff"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#5A6651"; }}>›</button>
+            style={{ width: 34, height: 34, borderRadius: "50%", border: `1px solid rgba(120, 127, 86, 0.4)`, background: "none", color: "#787F56", cursor: "pointer", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#787F56"; e.currentTarget.style.color = "#fff"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#787F56"; }}>›</button>
         </div>
       </div>
     </section>
@@ -2539,7 +2589,7 @@ function BestSellersStrip({ onShop }) {
   const [backendProducts, setBackendProducts] = useState([]);
   useEffect(() => {
     const API_BASE = getApiBase();
-    fetch(`${API_BASE}/api/products?limit=100`)
+    fetch(`${API_BASE}/api/products/best-sellers`)
       .then(r => r.json())
       .then(data => {
         if (data.success && data.products) {
@@ -2581,7 +2631,7 @@ function BestSellersStrip({ onShop }) {
                 <div style={{ position: "relative", aspectRatio: "1", overflow: "hidden" }}>
                   <img referrerPolicy="no-referrer" src={p.image || p.images?.[0] || ""} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     onError={e => { e.currentTarget.onerror = null; e.currentTarget.style.display = "none"; if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = "flex"; }} />
-                  <div style={{ width: "100%", height: "100%", background: "#ece9e3", display: "none", alignItems: "center", justifyContent: "center", fontSize: 32, color: "#5A6651" }}>◆</div>
+                  <div style={{ width: "100%", height: "100%", background: "#ece9e3", display: "none", alignItems: "center", justifyContent: "center", fontSize: 32, color: "#787F56" }}>◆</div>
                   {((p.discount !== undefined && p.discount !== null) || (p.originalPrice > p.price)) && (
                     <div style={{ position: "absolute", top: 8, left: 8, background: "#4C5A43", color: "#fff", borderRadius: 4, padding: "2px 8px", fontSize: "0.6rem", fontWeight: 800 }}>
                       -{p.discount ?? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100)}%
@@ -2610,8 +2660,9 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
   const navigate = useNavigate();
   const location = useLocation();
   const API_BASE = getApiBase();
-  const [filter, setFilter] = useState("all");
   const [toastMsg, setToastMsg] = useState("");
+  const [hoveredProduct, setHoveredProduct] = useState(null);
+  const [hoveredImgIdx, setHoveredImgIdx] = useState({});
 
   useEffect(() => {
     if (toastMsg) {
@@ -2647,23 +2698,14 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
     }
   };
 
-  useEffect(() => {
-    if (location.state && location.state.category) setFilter(location.state.category);
-  }, [location.state]);
-
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [catRes, prodRes] = await Promise.all([
-          fetch(`${API_BASE}/api/categories`).then(r => r.json()),
-          fetch(`${API_BASE}/api/products?limit=100`).then(r => r.json()),
-        ]);
-        if (catRes.success) setCategories(catRes.categories || []);
+        const prodRes = await fetch(`${API_BASE}/api/products?limit=100`).then(r => r.json());
         if (prodRes.success) setProducts(prodRes.products || []);
       } catch { setProducts([]); }
       setLoading(false);
@@ -2690,421 +2732,522 @@ function ProductsPage({ onAdd, onAddAnim, onWish, wished, onClick, cart }) {
   });
 
   const normalized = products.map(normalize);
-  const filtered = normalized.filter(p => filter === "all" || p.category === filter);
 
-  const catTabs = [{ value: "all", label: "All" }, ...categories.map(c => ({ value: c.slug, label: c.name }))];
-  const tabs = catTabs.length > 1 ? catTabs : [
-    { value: "all", label: "All" },
-    { value: "manifestation", label: "Manifestation" },
-    { value: "therapy", label: "Therapy" },
-    { value: "habit-builder", label: "Habit Builder" },
-  ];
+  // We only sell WishStone Original/Self Love/Energy/Confidence and Cosmic Eye.
+  // Combos, kits, habit builders, camphor, diffusers, etc. go to Coming Soon.
+  const isFeatured = (name) => {
+    const n = name.toLowerCase();
+    if (n.includes("combo") || n.includes("kit") || n.includes("ritual") || n.includes("set") || n.includes("habit")) {
+      return false;
+    }
+    return n.includes("wishstone") || n.includes("cosmic eye") || n.includes("cosmiceye");
+  };
 
-  // ── Design constants ──────────────────────────────────────
-  const G = "#5A6651";   // green accent
-  const GB = "#F5F3EF";   // page bg
-  const CR = 16;          // card radius
+  const featuredProducts = normalized.filter(p => isFeatured(p.name));
+  const comingSoonProducts = normalized.filter(p => !isFeatured(p.name));
 
-  const css = `
-    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap');
-    .ws-collection-page * { font-family: 'Open Sans', sans-serif !important; }
+  const shopCss = `
+    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+    .ws-shop-v2 { font-family: 'Open Sans', sans-serif; }
+    .ws-shop-v2 * { font-family: 'Open Sans', sans-serif; box-sizing: border-box; }
+    .ws-shop-v2 img { max-width: 100%; display: block; }
 
-    @keyframes wsCardIn  { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes wsFadeIn  { from{opacity:0} to{opacity:1} }
+    @keyframes wsShopFadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
     @keyframes wsShimmer { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
-    @keyframes wsPulse   { 0%,100%{opacity:1} 50%{opacity:.55} }
 
-    /* ── Page wrapper ── */
-    .ws-collection-page { box-sizing:border-box; width:100%; }
-    .ws-collection-page *, .ws-collection-page *::before, .ws-collection-page *::after { box-sizing:border-box; }
-
-    /* ── Grid container ── */
-    .ws-prod-grid {
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:1.1rem;
-      width:100%;
-      max-width:1280px;
-      margin:0 auto;
-      padding:0 clamp(1rem,3vw,2.5rem) 4rem;
+    /* Wide horizontal layout, vertically compact but with enough height for text & pricing */
+    .ws-featured-card {
+      display: grid;
+      grid-template-columns: 0.54fr 1.46fr;
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(120,127,86,0.22);
+      box-shadow: 0 4px 18px rgba(120,127,86,0.03);
+      transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
+      cursor: pointer;
+      max-width: 1040px;
+      margin: 0 auto 1.8rem auto;
+      min-height: 310px;
+      height: auto;
+      position: relative;
     }
-
-    /* ── Card ── */
-    .ws-collection-card {
-      display:flex;
-      flex-direction:column;
-      background:#fff;
-      border-radius:${CR}px;
-      overflow:hidden;
-      border:1px solid rgba(90,102,81,0.12);
-      box-shadow:0 4px 20px rgba(90,102,81,0.06);
-      cursor:pointer;
-      animation:wsCardIn 0.45s ease both;
-      transition:all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      min-height:auto;
-      position:relative;
-    }
-    .ws-collection-card:hover {
-      box-shadow:0 20px 44px rgba(90,102,81,0.22);
-      transform:translateY(-5px);
-      border-color:rgba(90,102,81,0.28) !important;
+    .ws-featured-card:hover {
+      box-shadow: 0 16px 40px rgba(120,127,86,0.12);
+      transform: translateY(-4px);
+      border-color: #787F56;
     }
 
-    /* ── Card image column ── */
-    .ws-card-img {
-      position:relative;
-      width:calc(100% - 24px);
-      margin:12px 12px 0 12px;
-      border-radius:12px;
-      overflow:hidden;
-      border:1px solid rgba(90,102,81,0.12);
-      flex-shrink:0;
-      aspect-ratio:1.15;
+    /* Image area */
+    .ws-feat-img-main {
+      position: relative;
+      overflow: hidden;
+      height: 100%;
+      background: #E8E0D0;
     }
-    .ws-card-img img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.5s ease; }
-    .ws-collection-card:hover .ws-card-img img { transform:scale(1.07); }
-    .ws-card-img::after {
-      content:''; position:absolute; inset:0; opacity:0;
-      background:linear-gradient(180deg, transparent 50%, rgba(90,102,81,0.18) 100%);
-      transition:opacity 0.4s ease; pointer-events:none;
+    .ws-feat-img-main img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      inset: 0;
+      transition: opacity 0.4s ease, transform 0.5s ease;
     }
-    .ws-collection-card:hover .ws-card-img::after { opacity:1; }
-
-    /* ── Card body column ── */
-    .ws-card-body {
-      flex:1;
-      min-width:0;
-      padding:1.2rem 1.2rem 1.2rem;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      transition:background 0.4s ease;
-    }
-    .ws-collection-card:hover .ws-card-body { background:linear-gradient(135deg,#fafaf8 0%,#f5f2ec 100%); }
-    .ws-collection-card:hover .ws-add-btn { background:#2c3320; }
-
-    /* ── Category pill ── */
-    .ws-cat-pill {
-      padding:6px 16px; border-radius:20px; font-size:0.72rem; font-weight:600;
-      cursor:pointer; transition:all 0.2s;
-      border:1.5px solid rgba(90,102,81,0.28);
-      background:#fff; color:${G};
-      flex-shrink:0;
-      white-space:nowrap;
-    }
-    .ws-cat-pill.active { background:${G}; color:#fff; border-color:${G}; }
-
-    /* ── Category Row ── */
-    .ws-cat-row {
-      display:flex;
-      gap:8px;
-      padding:0 1.5rem 1.5rem;
-      justify-content:center;
-      flex-wrap:wrap;
-      overflow-x:auto;
-      scrollbar-width:none;
-      -ms-overflow-style:none;
-    }
-    .ws-cat-row::-webkit-scrollbar {
-      display:none;
+    .ws-featured-card:hover .ws-feat-img-active {
+      transform: scale(1.02);
     }
 
-    /* ── Add to Cart button ── */
-    @keyframes wsShineEffect {
-      0% { left: -100%; }
-      50%, 100% { left: 120%; }
+    /* Thumbnails container on Description side - permanently visible */
+    .ws-feat-thumbs-desc {
+      display: flex;
+      gap: 6px;
+      margin-top: 0.3rem;
+      margin-bottom: 0.3rem;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .ws-add-btn {
-      width:100%; padding:7px 0; border-radius:8px;
-      background:${G}; color:#fff; border:none; cursor:pointer;
-      font-size:0.72rem; font-weight:600; letter-spacing:0.03em;
-      display:flex; align-items:center; justify-content:center; gap:5px;
-      transition:all 0.2s ease, transform 0.15s;
+
+    /* Share button default style */
+    .ws-share-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1.5px solid rgba(120,127,86,0.2);
+      background: #fff;
+      color: #787F56;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+    .ws-share-btn:hover {
+      background: rgba(120,127,86,0.06);
+      border-color: rgba(120,127,86,0.35);
+    }
+    .ws-feat-thumb-desc {
+      width: 38px;
+      height: 38px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1.5px solid rgba(120,127,86,0.2);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ws-feat-thumb-desc.active, .ws-feat-thumb-desc:hover {
+      border-color: #30360E;
+      transform: scale(1.04);
+    }
+    .ws-feat-thumb-desc img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Coming soon card styling - matches featured cards landscape size */
+    .ws-coming-card-v2 {
+      display: grid;
+      grid-template-columns: 0.54fr 1.46fr;
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(120,127,86,0.18);
+      box-shadow: 0 4px 16px rgba(48,54,14,0.02);
+      max-width: 1040px;
+      margin: 0 auto 1.8rem auto;
+      min-height: 310px;
+      height: auto;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .ws-coming-card-v2::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(226,212,185,0.25);
+      backdrop-filter: blur(0.4px);
+      z-index: 2;
+      pointer-events: none;
+    }
+    .ws-coming-card-v2:hover {
+      box-shadow: 0 10px 24px rgba(48,54,14,0.05);
+      transform: translateY(-2px);
+    }
+
+    /* Add to cart btn */
+    .ws-shop-add-btn {
+      transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
       position: relative;
       overflow: hidden;
     }
-    .ws-add-btn:hover { background:#000000; transform:translateY(-1px); }
-    .ws-add-btn-shining::after {
+    .ws-shop-add-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 15px rgba(48,54,14,0.2) !important;
+      background: #1a2008 !important;
+    }
+    .ws-shop-add-btn::after {
       content: '';
       position: absolute;
       top: 0;
       left: -100%;
       width: 50%;
       height: 100%;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.4),
-        transparent
-      );
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
       transform: skewX(-20deg);
-      animation: wsShineEffect 3s infinite ease-in-out;
+      animation: wsShineSlide 3s infinite ease-in-out;
       pointer-events: none;
     }
-
-    /* ── Qty row ── */
-    .ws-qty-row { width:100%; border-radius:8px; overflow:hidden; display:flex; border:2px solid ${G}; }
-    .ws-qty-btn { flex:1; height:40px; background:none; border:none; cursor:pointer; font-size:18px; color:${G}; font-weight:700; transition:background 0.15s; }
-    .ws-qty-btn:hover { background:rgba(90,102,81,0.08); }
-
-    /* ── Shimmer ── */
-    .ws-shimmer { background:linear-gradient(90deg,#ece9e3 25%,#f5f3ef 50%,#ece9e3 75%); background-size:600px 100%; animation:wsShimmer 1.4s infinite; }
-    .ws-shimmer-img-skeleton {
-      width:calc(100% - 24px) !important;
-      margin:12px 12px 0 12px !important;
-      border-radius:12px;
-      overflow:hidden;
-      flex-shrink:0;
-      aspect-ratio:1.15;
+    @keyframes wsShineSlide {
+      0% { left: -100%; }
+      50%, 100% { left: 120%; }
     }
 
-    /* ── Shimmer grid (same as prod grid) ── */
-    .ws-shimmer-grid {
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:1.1rem;
-      width:100%;
-      max-width:1280px;
-      margin:0 auto;
-      padding:0 clamp(1rem,3vw,2.5rem) 4rem;
-    }
-    .ws-shimmer-card { display:flex; flex-direction:column; border-radius:${CR}px; overflow:hidden; background:#fff; min-height:auto; box-shadow:0 2px 10px rgba(90,102,81,0.07); }
+    /* Qty row */
+    .ws-shop-qty-row { border-radius: 8px; overflow: hidden; display: flex; border: 2px solid #30360E; }
+    .ws-shop-qty-btn { flex: 1; height: 38px; background: none; border: none; cursor: pointer; font-size: 16px; color: #30360E; font-weight: 700; transition: background 0.15s; }
+    .ws-shop-qty-btn:hover { background: rgba(48,54,14,0.06); }
 
-    /* ── Tablet ── */
-    @media(max-width:1024px) {
-      .ws-prod-grid, .ws-shimmer-grid { grid-template-columns:repeat(2,1fr) !important; gap:0.9rem; }
-      .ws-card-img, .ws-shimmer-img-skeleton { width:calc(100% - 24px) !important; min-width:auto !important; margin:12px 12px 0 12px !important; }
-    }
-
-    /* ── Mobile ── */
+    /* Responsive */
     @media(max-width:768px) {
-      .ws-prod-grid, .ws-shimmer-grid { grid-template-columns:1fr !important; padding:0 0.85rem 3rem; }
-      .ws-collection-card, .ws-shimmer-card { flex-direction:column; min-height:auto; }
-      .ws-card-img, .ws-shimmer-img-skeleton { width:calc(100% - 24px) !important; min-width:auto !important; margin:12px 12px 0 12px !important; }
-      .ws-cat-row { justify-content:flex-start !important; flex-wrap:nowrap !important; overflow-x:auto !important; -webkit-overflow-scrolling:touch !important; }
-    }
-
-    /* ── Small phone ── */
-    @media(max-width:400px) {
-      .ws-collection-card, .ws-shimmer-card { min-height:auto; }
-      .ws-card-img, .ws-shimmer-img-skeleton { width:calc(100% - 20px) !important; min-width:auto !important; margin:10px 10px 0 10px !important; }
-      .ws-card-body { padding:0.9rem 0.9rem 0.9rem; }
+      .ws-featured-card, .ws-coming-card-v2 { grid-template-columns: 1fr !important; height: auto !important; min-height: auto !important; }
+      .ws-feat-img-main { min-height: 240px !important; }
+      .ws-feat-thumbs-desc { opacity: 1 !important; transform: none !important; }
+      .ws-share-btn {
+        width: 44px !important;
+        height: 44px !important;
+        border-radius: 50% !important;
+        position: absolute !important;
+        bottom: 12px !important;
+        right: 12px !important;
+        z-index: 5 !important;
+        box-shadow: 0 4px 12px rgba(120,127,86,0.15) !important;
+      }
     }
   `;
 
-  const BenefitIcon = ({ idx }) => {
-    const icons = [
-      // sun rays
-      <svg key={0} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" /></svg>,
-      // target
-      <svg key={1} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>,
-      // lotus / flower
-      <svg key={2} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c0 0-8-4-8-10a8 8 0 0 1 16 0c0 6-8 10-8 10z" /><path d="M12 22V12" /></svg>,
-      // star
-      <svg key={3} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>,
-      // heart
-      <svg key={4} width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>,
-    ];
-    return icons[idx % icons.length];
-  };
-
   return (
-    <div className="ws-collection-page" style={{ background: GB, minHeight: "100vh", paddingTop: 80 }}>
-      <style>{css}</style>
+    <div className="ws-shop-v2" style={{ background: "#E2D4B9", minHeight: "100vh", paddingTop: 80 }}>
+      <style>{shopCss}</style>
 
-      {/* ── PAGE HEADER ── */}
-      <div style={{ textAlign: "center", padding: "2rem 1.5rem 1.5rem", animation: "wsFadeIn 0.6s ease" }}>
-        <p style={{ fontSize: "0.68rem", fontWeight: 600, letterSpacing: "0.22em", color: G, textTransform: "uppercase", marginBottom: "0.6rem" }}>
-          HANDPICKED FOR YOU
-        </p>
-        <h1 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(1.7rem,5vw,2.6rem)", fontWeight: 700, color: "#2c2c2c", lineHeight: 1.15, marginBottom: "0.75rem", letterSpacing: "-0.01em" }}>
+      {/* ═══════════════ HERO HEADER ═══════════════ */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+        style={{ textAlign: "center", padding: "clamp(2rem,4vw,3.2rem) 1.5rem clamp(1.2rem,2.5vw,2rem)" }}
+      >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: "0.8rem" }}>
+          <div style={{ height: 1, width: 40, background: "#787F56" }} />
+          <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#30360E", letterSpacing: "0.22em", textTransform: "uppercase" }}>SHOP COLLECTION</span>
+          <div style={{ height: 1, width: 40, background: "#787F56" }} />
+        </div>
+        <h1 style={{ fontSize: "clamp(2rem,4.5vw,2.8rem)", fontWeight: 800, color: "#30360E", lineHeight: 1.1, marginBottom: "0.6rem", letterSpacing: "-0.02em" }}>
           Manifest. Believe. Receive.
         </h1>
-        {/* decorative diamond */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "0.75rem" }}>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1 L15 8 L8 15 L1 8 Z" stroke={G} strokeWidth="1.2" fill="none" /><circle cx="8" cy="8" r="1.5" fill={G} /></svg>
-        </div>
-        <p style={{ fontSize: "0.82rem", color: "#8a8a7a", lineHeight: 1.75, maxWidth: 280, margin: "0 auto" }}>
-          Objects with purpose. Energy with intention.<br />Bring meaning into your space and life.
+        <p style={{ fontSize: "clamp(0.82rem,1vw,0.9rem)", color: "#787F56", lineHeight: 1.6, maxWidth: 420, margin: "0 auto", fontWeight: 500 }}>
+          Sacred objects crafted with intention. Choose what resonates with your journey.
         </p>
-      </div>
+      </motion.div>
 
-      {/* ── CATEGORY FILTER ── */}
-      <div className="ws-cat-row scroll-hide">
-        {tabs.map(({ value, label }) => (
-          <button key={value} className={`ws-cat-pill${filter === value ? " active" : ""}`} onClick={() => setFilter(value)}>{label}</button>
-        ))}
-      </div>
-
-      {/* ── PRODUCT LIST ── */}
-      <div>
-        {loading ? (
-          <div className="ws-shimmer-grid">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="ws-shimmer-card">
-                <div className="ws-shimmer ws-shimmer-img-skeleton" />
-                <div style={{ flex: 1, padding: "1.1rem" }}>
-                  <div className="ws-shimmer" style={{ height: 10, borderRadius: 4, marginBottom: 10, width: "55%" }} />
-                  <div className="ws-shimmer" style={{ height: 16, borderRadius: 4, marginBottom: 8, width: "80%" }} />
-                  <div className="ws-shimmer" style={{ height: 2, borderRadius: 2, marginBottom: 10, width: "20%" }} />
-                  <div className="ws-shimmer" style={{ height: 8, borderRadius: 4, marginBottom: 5, width: "95%" }} />
-                  <div className="ws-shimmer" style={{ height: 8, borderRadius: 4, marginBottom: 12, width: "70%" }} />
-                  <div className="ws-shimmer" style={{ height: 14, borderRadius: 4, marginBottom: 12, width: "40%" }} />
-                  <div className="ws-shimmer" style={{ height: 38, borderRadius: 10, width: "100%" }} />
-                </div>
+      {/* ═══════════════ FEATURED PRODUCTS ═══════════════ */}
+      {loading ? (
+        <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(1rem,4vw,2.5rem) 3rem" }}>
+          {[1, 2].map(i => (
+            <div key={i} style={{ background: "#fff", borderRadius: 16, overflow: "hidden", marginBottom: "2rem", display: "grid", gridTemplateColumns: "0.54fr 1.46fr", minHeight: 310 }}>
+              <div style={{ background: "linear-gradient(90deg,#ece9e3 25%,#f5f3ef 50%,#ece9e3 75%)", backgroundSize: "600px 100%", animation: "wsShimmer 1.4s infinite" }} />
+              <div style={{ padding: "1.5rem" }}>
+                <div style={{ height: 14, width: "35%", borderRadius: 4, background: "linear-gradient(90deg,#ece9e3 25%,#f5f3ef 50%,#ece9e3 75%)", backgroundSize: "600px 100%", animation: "wsShimmer 1.4s infinite", marginBottom: 12 }} />
+                <div style={{ height: 24, width: "60%", borderRadius: 4, background: "linear-gradient(90deg,#ece9e3 25%,#f5f3ef 50%,#ece9e3 75%)", backgroundSize: "600px 100%", animation: "wsShimmer 1.4s infinite", marginBottom: 8 }} />
               </div>
-            ))}
-          </div>
-        ) : filtered.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "4rem 2rem", color: "#8a8a7a" }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
-            <p>No products found.</p>
-          </div>
-        ) : (
-          <div className="ws-prod-grid">
-            {filtered.map((p, idx) => {
-              const qty = getQty(p.id);
-              const delay = `${idx * 0.06}s`;
-              return (
-                <div key={p._id} className="ws-collection-card" style={{ animationDelay: delay }} onClick={() => onClick(p)}>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div style={{ maxWidth: 1040, margin: "0 auto", padding: "0 clamp(1rem,4vw,2.5rem)" }}>
+          {featuredProducts.map((p, idx) => {
+            const qty = getQty(p.id);
+            const activeImg = hoveredImgIdx[p.id] ?? 0;
+            const isHovered = hoveredProduct === p.id;
 
-                  {/* LEFT — Image */}
-                  <div className="ws-card-img">
-                    {p.image ? (
-                      <img src={p.image} alt={p.name} referrerPolicy="no-referrer"
-                        onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = ""; e.currentTarget.style.display = "none"; if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = "flex"; }} />
-                    ) : null}
-                    <div style={{ width: "100%", height: "100%", background: "#ece9e3", display: p.image ? "none" : "flex", alignItems: "center", justifyContent: "center", fontSize: 36, color: G }}>◆</div>
-                    {p.discount > 0 && (
-                      <div style={{ position: "absolute", top: 10, left: 10, background: "#3D4935", color: "#fff", borderRadius: 4, padding: "3px 9px", fontSize: "0.68rem", fontWeight: 700, zIndex: 2 }}>
-                        -{p.discount}%
-                      </div>
+            return (
+              <motion.div
+                key={p._id}
+                className="ws-featured-card"
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.15, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                onMouseEnter={() => setHoveredProduct(p.id)}
+                onMouseLeave={() => setHoveredProduct(null)}
+                onClick={() => onClick(p)}
+              >
+                {/* Image Gallery Side */}
+                <div className="ws-feat-img-main">
+                  {p.images.map((img, i) => (
+                    <img
+                      key={i}
+                      src={img}
+                      alt={`${p.name} ${i + 1}`}
+                      className={activeImg === i ? "ws-feat-img-active" : ""}
+                      style={{ opacity: activeImg === i ? 1 : 0, zIndex: activeImg === i ? 1 : 0 }}
+                      referrerPolicy="no-referrer"
+                    />
+                  ))}
+                  {/* Gradient overlay */}
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 60%, rgba(48,54,14,0.1) 100%)", zIndex: 2, pointerEvents: "none" }} />
+
+                  {/* Discount badge */}
+                  {p.discount > 0 && (
+                    <div style={{ position: "absolute", top: 12, left: 12, background: "#30360E", color: "#E2D4B9", borderRadius: 6, padding: "4px 10px", fontSize: "0.65rem", fontWeight: 800, zIndex: 3, letterSpacing: "0.04em" }}>
+                      -{p.discount}% OFF
+                    </div>
+                  )}
+
+                  {/* Wishlist button */}
+                  <button onClick={e => { e.stopPropagation(); onWish(e, p.id); }}
+                    style={{ position: "absolute", top: 12, right: 12, background: "#fff", border: "none", borderRadius: "50%", width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 3px 10px rgba(0,0,0,0.1)", zIndex: 3, transition: "all 0.3s" }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill={wished.includes(p.id) ? "#30360E" : "none"} stroke={wished.includes(p.id) ? "#30360E" : "#1a1a1a"} strokeWidth={wished.includes(p.id) ? "3" : "2"} strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Description Side */}
+                <div style={{ padding: "clamp(1rem,2vw,1.4rem)", display: "flex", flexDirection: "column", justifyContent: "center", position: "relative" }}>
+                  {/* Best Seller badge */}
+                  {p.isBestSeller && (
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 5, marginBottom: "0.4rem", background: "rgba(120,127,86,0.08)", padding: "3px 10px", borderRadius: 20, width: "fit-content" }}>
+                      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+                      <span style={{ fontSize: "0.58rem", fontWeight: 800, color: "#787F56", letterSpacing: "0.14em", textTransform: "uppercase" }}>BEST SELLER</span>
+                    </div>
+                  )}
+
+                  {/* Product name */}
+                  <h2 style={{ fontSize: "clamp(1.2rem,2vw,1.45rem)", fontWeight: 800, color: "#30360E", lineHeight: 1.15, marginBottom: "0.3rem", letterSpacing: "-0.01em" }}>
+                    {p.name}
+                  </h2>
+
+                  {/* Short description */}
+                  {p.shortDesc && (
+                    <p style={{ fontSize: "0.78rem", color: "#787F56", lineHeight: 1.5, marginBottom: "0.6rem", maxWidth: 480 }}>
+                      {p.shortDesc.length > 90 ? p.shortDesc.slice(0, 90) + "..." : p.shortDesc}
+                    </p>
+                  )}
+
+                  {/* Benefits */}
+                  {p.benefits && p.benefits.length > 0 && (
+                    <div style={{ marginBottom: "0.5rem" }}>
+                      {p.benefits.slice(0, 2).map((b, i) => (
+                        <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                          <span style={{ fontSize: "0.68rem", color: "#787F56", fontWeight: 500 }}>{typeof b === 'string' ? b : b.title || b.text || ''}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Dynamic Thumbnails Strip (Visible on Hover) */}
+                  {p.images.length > 1 && (
+                    <div className="ws-feat-thumbs-desc">
+                      {p.images.map((img, i) => (
+                        <div
+                          key={i}
+                          className={`ws-feat-thumb-desc${activeImg === i ? " active" : ""}`}
+                          onMouseEnter={(e) => { e.stopPropagation(); setHoveredImgIdx(prev => ({ ...prev, [p.id]: i })); }}
+                          onClick={(e) => { e.stopPropagation(); setHoveredImgIdx(prev => ({ ...prev, [p.id]: i })); }}
+                        >
+                          <img src={img} alt={`${p.name} thumb ${i + 1}`} referrerPolicy="no-referrer" />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Price Row */}
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: "0.8rem", marginTop: "0.2rem" }}>
+                    <span style={{ fontSize: "1.2rem", fontWeight: 800, color: "#30360E" }}>
+                      ₹{p.price.toLocaleString("en-IN")}
+                    </span>
+                    {p.originalPrice > p.price && (
+                      <span style={{ fontSize: "0.8rem", color: "rgba(48,54,14,0.4)", textDecoration: "line-through" }}>
+                        ₹{p.originalPrice.toLocaleString("en-IN")}
+                      </span>
                     )}
-                    <button onClick={e => { e.stopPropagation(); onWish(e, p.id); }}
-                      style={{ position: "absolute", top: 12, right: 12, background: "#fff", border: "none", borderRadius: "50%", width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 3px 8px rgba(0,0,0,0.14)", zIndex: 2 }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill={wished.includes(p.id) ? G : "none"} stroke={wished.includes(p.id) ? G : "#1a1a1a"} strokeWidth={wished.includes(p.id) ? "3.2" : "2"} strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    {p.discount > 0 && (
+                      <span style={{ fontSize: "0.65rem", fontWeight: 800, color: "#787F56", background: "rgba(120,127,86,0.1)", padding: "2px 6px", borderRadius: 20 }}>
+                        Save {p.discount}%
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Action buttons */}
+                  <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }} onClick={e => e.stopPropagation()}>
+                    {p.stock === 0 ? (
+                      <button disabled style={{ padding: "10px 24px", borderRadius: 8, background: "rgba(0,0,0,0.06)", color: "rgba(0,0,0,0.3)", border: "none", fontSize: "0.78rem", fontWeight: 700, cursor: "not-allowed" }}>Out of Stock</button>
+                    ) : qty > 0 ? (
+                      <div className="ws-shop-qty-row" style={{ width: 120 }}>
+                        <button className="ws-shop-qty-btn" onClick={() => onAdd({ ...p, qty: -1 })}>−</button>
+                        <span style={{ flex: 1, textAlign: "center", fontWeight: 800, color: "#30360E", fontSize: "0.9rem", display: "flex", alignItems: "center", justifyContent: "center" }}>{qty}</span>
+                        <button className="ws-shop-qty-btn" onClick={() => onAdd(p)}>+</button>
+                      </div>
+                    ) : (
+                      <button
+                        className="ws-shop-add-btn"
+                        onClick={() => onAdd(p)}
+                        style={{
+                          display: "inline-flex", alignItems: "center", gap: 6,
+                          background: "#30360E", color: "#E2D4B9",
+                          border: "none", padding: "10px 24px", borderRadius: 8,
+                          fontSize: "0.78rem", fontWeight: 700, cursor: "pointer",
+                          letterSpacing: "0.04em",
+                          boxShadow: "0 3px 10px rgba(48,54,14,0.15)"
+                        }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        Add to Cart
+                      </button>
+                    )}
+
+                    {/* Share button */}
+                    <button
+                      onClick={(e) => handleShare(e, p)}
+                      className="ws-share-btn"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
                       </svg>
                     </button>
                   </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
 
-                  {/* RIGHT — Details (Minimal) */}
-                  <div className="ws-card-body">
-                    {p.isBestSeller && (
-                      <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: "0.35rem" }}>
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
-                        <span style={{ fontSize: "0.6rem", fontWeight: 700, color: G, letterSpacing: "0.14em", textTransform: "uppercase" }}>BEST SELLER</span>
+      {/* ═══════════════ COMING SOON SECTION ═══════════════ */}
+      {!loading && comingSoonProducts.length > 0 && (
+        <section style={{ maxWidth: 1040, margin: "0 auto", padding: "clamp(1.5rem,3vw,3rem) clamp(1rem,4vw,2.5rem) clamp(2rem,4vw,4rem)" }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            style={{ textAlign: "center", marginBottom: "2rem" }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 10 }}>
+              <div style={{ height: 1, width: 30, background: "#787F56" }} />
+              <span style={{ fontSize: "0.62rem", fontWeight: 700, color: "#30360E", letterSpacing: "0.2em", textTransform: "uppercase" }}>MORE SACRED OBJECTS</span>
+              <div style={{ height: 1, width: 30, background: "#787F56" }} />
+            </div>
+            <h2 style={{ fontSize: "clamp(1.3rem,3vw,1.8rem)", fontWeight: 800, color: "#30360E", marginBottom: "0.4rem" }}>Coming Soon</h2>
+            <p style={{ fontSize: "0.82rem", color: "#787F56", lineHeight: 1.6, fontWeight: 500 }}>These products are being crafted with love and intention.</p>
+          </motion.div>
+
+          <div style={{ width: "100%" }}>
+            {comingSoonProducts.map((p, idx) => {
+              const activeImg = hoveredImgIdx[p.id] ?? 0;
+              return (
+                <motion.div
+                  key={p._id}
+                  className="ws-coming-card-v2"
+                  initial={{ opacity: 0, y: 25 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.08, duration: 0.5 }}
+                >
+                  {/* Image Gallery Side */}
+                  <div className="ws-feat-img-main">
+                    {p.images.map((img, i) => (
+                      <img
+                        key={i}
+                        src={img}
+                        alt={`${p.name} ${i + 1}`}
+                        className={activeImg === i ? "ws-feat-img-active" : ""}
+                        style={{ opacity: activeImg === i ? 1 : 0, zIndex: activeImg === i ? 1 : 0, filter: "grayscale(0.2) opacity(0.85)" }}
+                        referrerPolicy="no-referrer"
+                      />
+                    ))}
+                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 60%, rgba(48,54,14,0.08) 100%)", zIndex: 2, pointerEvents: "none" }} />
+                  </div>
+
+                  {/* Description Side */}
+                  <div style={{ padding: "clamp(1rem,2vw,1.4rem)", display: "flex", flexDirection: "column", justifyContent: "center", position: "relative" }}>
+                    {/* Product name */}
+                    <h2 style={{ fontSize: "clamp(1.2rem,2vw,1.45rem)", fontWeight: 700, color: "#787F56", lineHeight: 1.15, marginBottom: "0.3rem", letterSpacing: "-0.01em" }}>
+                      {p.name}
+                    </h2>
+
+                    {/* Short description */}
+                    {p.shortDesc && (
+                      <p style={{ fontSize: "0.78rem", color: "#8c926f", lineHeight: 1.5, marginBottom: "0.6rem", maxWidth: 480 }}>
+                        {p.shortDesc.length > 90 ? p.shortDesc.slice(0, 90) + "..." : p.shortDesc}
+                      </p>
+                    )}
+
+                    {/* Benefits */}
+                    {p.benefits && p.benefits.length > 0 && (
+                      <div style={{ marginBottom: "0.5rem" }}>
+                        {p.benefits.slice(0, 2).map((b, i) => (
+                          <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(120,127,86,0.5)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                            <span style={{ fontSize: "0.68rem", color: "#787F56", fontWeight: 500 }}>{typeof b === 'string' ? b : b.title || b.text || ''}</span>
+                          </div>
+                        ))}
                       </div>
                     )}
-                    <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#000000", marginBottom: "0.35rem", lineHeight: 1.2, textTransform: "uppercase", letterSpacing: "0.02em", fontFamily: "'Open Sans', sans-serif" }}>{p.name}</h3>
 
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "0.9rem" }}>
-                        <span style={{ fontSize: "1.05rem", fontWeight: 800, color: "#000000", fontFamily: "'Open Sans', sans-serif" }}>
-                          Rs. {p.price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </span>
-                        {p.originalPrice > p.price && (
-                          <span style={{ fontSize: "0.82rem", color: "rgba(0, 0, 0, 0.4)", textDecoration: "line-through", fontFamily: "'Open Sans', sans-serif" }}>
-                            Rs. {p.originalPrice.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </span>
-                        )}
-                      </div>
+                    {/* Price */}
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: "0.8rem", marginTop: "0.2rem" }}>
+                      <span style={{ fontSize: "1.2rem", fontWeight: 800, color: "#787F56" }}>
+                        ₹{p.price.toLocaleString("en-IN")}
+                      </span>
+                    </div>
 
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px", width: "100%", marginTop: "auto", justifyContent: "space-between" }} onClick={e => e.stopPropagation()}>
-                        {/* Share Button */}
-                        <button
-                          onClick={(e) => handleShare(e, p)}
-                          style={{
-                            width: "36px",
-                            height: "36px",
-                            borderRadius: "8px",
-                            border: "1px solid rgba(90, 102, 81, 0.28)",
-                            background: "#ffffff",
-                            color: "#5A6651",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            cursor: "pointer",
-                            transition: "all 0.2s ease",
-                            flexShrink: 0
-                          }}
-                          onMouseEnter={e => {
-                            e.currentTarget.style.background = "rgba(90, 102, 81, 0.05)";
-                          }}
-                          onMouseLeave={e => {
-                            e.currentTarget.style.background = "#ffffff";
-                          }}
-                          title="Share Product"
-                        >
-                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="18" cy="5" r="3" />
-                            <circle cx="6" cy="12" r="3" />
-                            <circle cx="18" cy="19" r="3" />
-                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-                          </svg>
-                        </button>
-
-                        {/* Add to Cart Container */}
-                        <div style={{ flex: 1, display: "flex", justifyContent: "flex-end", maxWidth: "160px" }}>
-                          {p.stock === 0 ? (
-                            <button disabled style={{ width: "100%", height: "36px", borderRadius: "8px", background: "rgba(0, 0, 0, 0.08)", color: "rgba(0, 0, 0, 0.3)", border: "none", fontSize: "0.78rem", cursor: "not-allowed", fontWeight: 700 }}>Out of Stock</button>
-                          ) : qty > 0 ? (
-                            <div className="ws-qty-row" style={{ height: "36px", width: "100%" }}>
-                              <button className="ws-qty-btn" onClick={() => onAdd({ ...p, qty: -1 })} style={{ height: "100%", fontSize: "14px" }}>−</button>
-                              <span style={{ flex: 1, textAlign: "center", fontWeight: 700, color: G, fontSize: "0.85rem", display: "flex", alignItems: "center", justifyContent: "center", gap: 4, height: "100%" }}>
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                  <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
-                                </svg>
-                                {qty}
-                              </span>
-                              <button className="ws-qty-btn" onClick={() => onAdd(p)} style={{ height: "100%", fontSize: "14px" }}>+</button>
-                            </div>
-                          ) : (
-                            <button className="ws-add-btn ws-add-btn-shining" onClick={() => onAdd(p)} style={{ height: "36px", padding: 0, borderRadius: "8px", background: G, width: "100%" }}>
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                              </svg>
-                              Add
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                   </div>
-                 </div>
+                    {/* Coming Soon overlay badge */}
+                    <div style={{ zIndex: 5, background: "#30360E", color: "#E2D4B9", padding: "6px 16px", borderRadius: 20, fontSize: "0.65rem", fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", width: "fit-content", boxShadow: "0 3px 10px rgba(48,54,14,0.15)" }}>
+                      Coming Soon
+                    </div>
+                  </div>
+                </motion.div>
               );
             })}
           </div>
-        )}
+        </section>
+      )}
 
-        {/* ── FOOTER TAGLINE ── */}
-        {!loading && (
-          <div style={{ textAlign: "center", paddingTop: "1rem", paddingBottom: "2rem", animation: "wsFadeIn 0.8s ease" }}>
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ marginBottom: 8 }}><path d="M8 1 L15 8 L8 15 L1 8 Z" stroke={G} strokeWidth="1.2" fill="none" /><circle cx="8" cy="8" r="1.5" fill={G} /></svg>
-            <p style={{ fontSize: "0.75rem", color: "#8a8a7a", lineHeight: 1.7 }}>
-              Your intention is the beginning.<br />
-              <span style={{ color: G }}>These stones are here to support your journey.</span>
-            </p>
+      {/* ═══════════════ FOOTER TAGLINE ═══════════════ */}
+      {!loading && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          style={{ textAlign: "center", padding: "1rem 1.5rem 3rem" }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 10 }}>
+            <div style={{ height: 1, width: 20, background: "#787F56" }} />
+            <span style={{ color: "#30360E", fontSize: 10 }}>✦</span>
+            <div style={{ height: 1, width: 20, background: "#787F56" }} />
           </div>
-        )}
-      </div>
-      {/* Share Toast */}
+          <p style={{ fontSize: "0.78rem", color: "#30360E", lineHeight: 1.7, fontWeight: 600 }}>
+            Your intention is the beginning.<br />
+            <span style={{ color: "#787F56" }}>These stones are here to support your journey.</span>
+          </p>
+        </motion.div>
+      )}
+
+      {/* Toast */}
       {toastMsg && (
         <div style={{
-          position: "fixed",
-          bottom: "24px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          background: "#000000",
-          color: "#ffffff",
-          padding: "12px 24px",
-          borderRadius: "8px",
-          fontSize: "0.85rem",
-          fontWeight: 600,
-          zIndex: 99999,
-          boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-          animation: "wsFadeIn 0.3s ease"
+          position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
+          background: "#30360E", color: "#E2D4B9",
+          padding: "12px 24px", borderRadius: 12, fontSize: "0.85rem", fontWeight: 600,
+          zIndex: 99999, boxShadow: "0 10px 30px rgba(48,54,14,0.3)",
+          animation: "wsShopFadeIn 0.3s ease"
         }}>
           {toastMsg}
         </div>
@@ -3271,7 +3414,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
     // Wishstone Website 7 Active Products Mapping
     if (slug === "wishstone" || name.toLowerCase().includes("wishstone")) {
       return {
-        description: "Wishstone is more than a rock. It's a story. Its been on a 14-year journey across India getting charged at places so now it holds a unique kind of energy. This stone works on two ideas: energy and how your subconscious mind really works. Since your subconscious is a bit mysterious, Wishstone acts as a link. A bridge connecting what you want with the deeper part of you that makes things happen. Use it every day for 45 days with focus and see what happens. There's no religion or rituals involved. Pure energy and your own belief.",
+        description: "Wishstone is an authentic, 14-year sacredly charged manifestation stone. It serves as a somatic anchor connecting your intentions directly with your subconscious mind to build positive life habits.",
         benefits: [
           { title: "14-Year Sacred Charging", text: "Charged at high-energy places across India for 14 years to hold a potent, unique energy field." },
           { title: "Subconscious Connection", text: "Acts as a physical link, helping your subconscious mind pick up on visual/tactile objects faster than vague thoughts." },
@@ -3293,7 +3436,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
 
     if (slug === "cosmic-eye" || name.toLowerCase().includes("cosmic eye")) {
       return {
-        description: "The Cosmic Eye is more than a tool. It's a way to connect with a special kind of energy that can help shape your life. You're probably holding onto a dream or a big goal. Sometimes it feels like something is getting in the way. The Cosmic Eye helps clear those hidden obstacles so you can actually achieve what you want. It uses wisdom about energy alignment and acts like an antenna for good vibes sending that positive energy straight to your deepest desires. It's really helpful for you. It's even better as a gift for someone you care about.",
+        description: "The Cosmic Eye is a premium energy tool designed to dissolve hidden obstacles and align positive frequencies. It acts as an energetic resonator to manifest clarity, ambition, and unshakeable focus.",
         benefits: [
           { title: "Energy Magnetism", text: "Pulls in ambient frequencies and directs them toward your goal, helping make your intentions clear and focused." },
           { title: "Obstacle Clearing", text: "Helps dissolve hidden energy blocks, negative patterns, or bad luck that might be holding you back." },
@@ -3314,7 +3457,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
 
     if (slug.includes("diffuser") || name.toLowerCase().includes("diffuser") || name.toLowerCase().includes("earth essence")) {
       return {
-        description: "Earth Essence is more than a home fragrance. It's an experience. This luxury reed diffuser blends a fragrance formula with natural reed sticks letting a pleasant scent fill your space day and night. No flame, no plugs needed. When your home smells great it feels like the energy lifts your mind. Your goals have room to grow. Earth Essence helps recalibrate your energy, one breath at a time.",
+        description: "Earth Essence is a luxury, natural reed diffuser designed to cleanse space and elevate ambient energy. It creates a serene sanctuary that boosts focus, eases anxiety, and welcomes positive intentions.",
         benefits: [
           { title: "Set-and-Forget Upkeep", text: "Set it up once and let it work continuously day and night without flame, plugs, or daily maintenance." },
           { title: "Nervous System Balancing", text: "The premium fragrance activates your sensory system, boosting mood, easing anxiety, and sharpening cognitive focus." },
@@ -3335,7 +3478,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
 
     if (slug.includes("camphor") || name.toLowerCase().includes("camphor") || name.toLowerCase().includes("kapoor")) {
       return {
-        description: "Forget the sharp-smelling camphor you're used to. Our camphor is a premium upgrade to a ritual made for modern homes. Traditional camphor purifies the air. Ours does that and more releasing a soothing fragrance as it burns. Light it. Instantly your space feels cleansed, warm and filled with a calming scent.",
+        description: "Our organic, premium camphor purifies air, cleanses stagnant energy, and promotes deep cognitive relaxation. Perfect for creating high-vibrational space during meditation and smoke rituals.",
         benefits: [
           { title: "Natural Air Purification", text: "Camphor's natural properties are proven to help clear and sanitize the air, zapping germs and bacteria as it burns." },
           { title: "Aromatic Energy Cleansing", text: "Cleanses stale or negative energy while releasing an exquisite, soothing fragrance that upgrades traditional rituals." },
@@ -3356,7 +3499,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
 
     if (slug.includes("habit") || name.toLowerCase().includes("habit builder")) {
       return {
-        description: "21 cards, 21 days. A brand new you. The Habit Builder deck makes self-improvement easy not overwhelming. Each card has one powerful habit. No complicated programs, no apps. Just pick a card each morning and focus on that one thing. By the end of three weeks you'll have swapped chaos for structure and wishful thinking for action. If your routine has totally fallen apart or you want a start this is your reset.",
+        description: "The Habit Builder deck is a screen-free, psychology-backed 21-day program. It features daily micro-steps to structure routine, boost productivity, and anchor positive behavioral habits.",
         benefits: [
           { title: "21-Day Habit Science", text: "Grounded in behavioral psychology, which suggests it takes 21 days of repetition to turn a new action into a natural habit." },
           { title: "Micro-Step Focus", text: "Prevents overwhelm by prompting you to change just one habit per day, avoiding the trap of trying to change everything at once." },
@@ -3377,7 +3520,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
 
     if (slug === "combo-1" || name.toLowerCase().includes("combo 1") || (name.toLowerCase().includes("wishstone") && name.toLowerCase().includes("diffuser"))) {
       return {
-        description: "Manifestation takes more than thinking. It needs the right environment. With Wishstone and Earth Essence Diffuser you're aligning your mind and your space. Wishstone embeds your goal in your subconscious while Earth Essence makes your home positive and full of energy. This combo isn't two items. It's a complete system. It's your 360-degree manifestation setup.",
+        description: "This complete 360-degree manifestation combo includes the tactile Wishstone and ambient Earth Essence Diffuser. A synergistic system to align your mindset and home environment 24/7.",
         benefits: [
           { title: "360-Degree Manifestation System", text: "Aligns both your internal mindset (Wishstone) and your external home environment (Diffuser) for full synergy." },
           { title: "Mind and Space Anchoring", text: "Wishstone keeps your goals anchored in your subconscious, while the Diffuser keeps your home's energy uplifted 24/7." },
@@ -3397,7 +3540,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
 
     if (slug === "combo-2" || name.toLowerCase().includes("combo 2") || (name.toLowerCase().includes("cosmic eye") && name.toLowerCase().includes("diffuser"))) {
       return {
-        description: "The Cosmic Eye draws in the energy. The Earth Essence Diffuser holds it. When you use them together your place turns into a circuit. Cosmic Eye pulls positive vibes into your space Diffuser keeps your homes atmosphere so good that energy stays put and keeps working. On their own both are strong. Combined the effect multiplies.",
+        description: "A high-frequency wellness circuit featuring the Cosmic Eye resonator and Earth Essence Diffuser. Together they attract ambient positive energy and lock peace into your home sanctuary.",
         benefits: [
           { title: "Attract & Anchor Circuit", text: "The Cosmic Eye acts as an antenna drawing energy in, while the Earth Essence Diffuser locks it into your home's atmosphere." },
           { title: "Continuous High Frequency", text: "Keeps your home environment at a high vibration, preventing energy dips and keeping negative patterns away." },
@@ -3417,7 +3560,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
 
     if (slug.includes("rose") || name.includes("Rose")) {
       return {
-        description: "Discover the ultimate stone of unconditional love and emotional healing. Sourced from the premium heartlands of Madagascar, each Celestial Rose Quartz WishStone is ethically mined, hand-polished to a smooth tactile finish, and charged under the full moon's light to amplify its high-vibration healing frequency. As a powerful activator of the Heart Chakra (Anahata), this premium rose quartz dissolves deeply rooted emotional blocks, releases stress, and opens the heart to foster self-compassion, inner peace, and harmonious relationships. Whether placed in your sacred space, held during heart-centered meditation, or integrated into your daily manifestation rituals, it serves as a beautiful physical anchor for love, peace, and spiritual alignment.",
+        description: "Madagascar celestial rose quartz cluster WishStone charged under the full moon to open the Heart Chakra. Fosters deep compassion, self-love, stress relief, and harmonious relationships.",
         benefits: [
           { title: "Heart Chakra Activation", text: "Opens and balances the heart chakra, encouraging receptivity and trust." },
           { title: "Emotional Trauma Cleansing", text: "Helps dissolve old wounds, resentment, and blockages to invite healing." },
@@ -3437,7 +3580,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
 
     if (slug.includes("amethyst") || name.includes("Amethyst")) {
       return {
-        description: "Elevate your spiritual consciousness and mental clarity with our Lunar Amethyst Cluster WishStone. Sourced from deep crystalline chambers in Brazil, this premium amethyst cluster acts as a natural tranquilizer, neutralizing geopathic stress and clearing negative energy from your surroundings. By aligning and stimulating the Third Eye and Crown Chakras, it enhances intuition, boosts cognitive focus, and aids in accessing higher meditative states of awareness. Perfect for placing on your desk to filter digital fatigue, or on your bedroom nightstand to cultivate restful sleep and clear, prophetic dreams.",
+        description: "Lunar Amethyst cluster WishStone ethically sourced from Brazil. Serves as a natural stress filter to purify the aura, stimulate intuition, and invite restful sleep.",
         benefits: [
           { title: "Third Eye & Crown Alignment", text: "Stimulates spiritual wisdom, intuition, and a connection to higher guidance." },
           { title: "Aura Purification", text: "Cleanses the personal energy field, neutralizing psychic pollutants." },
@@ -3457,7 +3600,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
 
     if (slug.includes("obsidian") || name.includes("Obsidian")) {
       return {
-        description: "Ground your energy system and secure your spiritual boundaries with our Volcanic Obsidian Protection Stone. Sourced from raw volcanic fields, this glossy, jet-black crystal is a master purifier of psychic smog. It acts as an energetic shield, absorbing negativity, stress, and toxic behaviors from your immediate environment. By stimulating the Root Chakra (Muladhara), Obsidian anchors you firmly to the earth, giving you the grounding strength needed to explore and integrate shadow aspects of the self. Use it to banish fear, release resentment, and hold your intentions with unshakeable stability.",
+        description: "Volcanic Obsidian protection WishStone to ground Root Chakra energy and shield spiritual boundaries. Absorbs geopathic stress, psychic smog, and toxic environment patterns.",
         benefits: [
           { title: "Root Chakra Grounding", text: "Firmly anchors your energy, reducing scattered thoughts and instability." },
           { title: "Psychic Shielding", text: "Absorbs negative environmental energies and prevents emotional drainage." },
@@ -3477,7 +3620,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
 
     if (slug.includes("moonstone") || name.includes("Moonstone")) {
       return {
-        description: "Harness the ancient magic of cosmic cycles with the Moonstone Ritual Kit. This luxury kit features a hand-selected, high-flash Moonstone crystal, a premium intention-journal, and a manifestation guide. Moonstone is the crystal of new beginnings, intuition, and feminine receptivity. Connected directly with the Crown Chakra and the moon's rhythmic pull, it assists in setting intentions aligned with lunar phases. The daily journaling practice acts as a somatic habit-builder, bridging your conscious desires with daily actions to manifest clarity, abundance, and self-awareness.",
+        description: "Premium Moonstone ritual kit featuring a high-flash lunar crystal, intention journal, and manifestation guide. Attunes self-reflection to moon phases for spiritual alignment.",
         benefits: [
           { title: "Cosmic Lunar Alignment", text: "Synchronizes your personal growth cycles with new moon and full moon energies." },
           { title: "Intuitive Awakening", text: "Fosters sensitivity to synchronicities, inner guidance, and deep dreams." },
@@ -3497,7 +3640,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
 
     if (slug.includes("lavender") || name.includes("Lavender")) {
       return {
-        description: "Purify your sanctuary and soothe your nervous system with our Hand-Harvested Organic Lavender Bundle. Sourced from high-altitude, family-run lavender fields, each stem is dried naturally to preserve its pure therapeutic essential oils. Lavender has been revered for millennia for its ability to clear heavy energies, induce deep somatic relaxation, and calm the central nervous system. Perfect for cleansing your home before meditation, burning during smoke rituals, or placing under your pillow to cultivate a serene, stress-free space.",
+        description: "Hand-harvested organic dried lavender bundle for smoke purification and somatic relaxation. Calms the nervous system, eases anxiety, and cleanses stagnant heavy energy.",
         benefits: [
           { title: "Somatic Nervous Relaxation", text: "Instantly relaxes the physical body, lowering cortisol and physical tension." },
           { title: "Sacred Smoke Cleansing", text: "Displaces stagnant, stale energies to create a fresh, peaceful environment." },
@@ -3517,7 +3660,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
 
     if (slug.includes("sandalwood") || name.includes("Sandalwood")) {
       return {
-        description: "Elevate your focus and invite sacred temple vibes with our Premium Mysore Sandalwood Incense. Handcrafted using authentic, sustainably harvested Sandalwood powder from Karnataka, this incense produces a rich, woody, and warm aroma. Sandalwood has been utilized in Indian temples for millennia due to its grounding qualities and its ability to gather mental focus. It is the ultimate scent for deep spiritual connection, prayer, yoga, and meditation practices, purifying the air while setting a royal, serene atmosphere.",
+        description: "Mysore sandalwood incense sustainably crafted to gather cognitive focus and purify air. Transmutes everyday tension into grounding sacred temple vibes.",
         benefits: [
           { title: "Cognitive Focus & Devotion", text: "Clarifies the mind, gathering focus for deep work, yoga, or meditation." },
           { title: "Temple Space Cleansing", text: "Instantly transforms any room into a high-vibration, sacred temple space." },
@@ -3575,7 +3718,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
             {/* Left Side - Image Gallery Nike Style */}
             <div style={{ minWidth: 0, width: "100%", maxWidth: "100%", overflow: "hidden" }}>
               {/* Main Image with Native Scroll & Snap */}
-              <div className="ep-main-gallery-wrapper" style={{ borderRadius: 20, overflow: "hidden", border: "1px solid #D9DDD5", boxShadow: "0 12px 48px rgba(90,102,81,0.04)", marginBottom: "1.2rem", aspectRatio: "1", background: "#FFFFFF", position: "relative", isolation: "isolate" }}>
+              <div className="ep-main-gallery-wrapper" style={{ borderRadius: 20, overflow: "hidden", border: "1px solid #D9DDD5", boxShadow: "0 12px 48px rgba(120, 127, 86,0.04)", marginBottom: "1.2rem", aspectRatio: "1", background: "#FFFFFF", position: "relative", isolation: "isolate" }}>
                 <div
                   ref={scrollContainerRef}
                   onScroll={(e) => {
@@ -3625,12 +3768,12 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                 </div>
 
                 {/* Image Counter */}
-                <div style={{ position: "absolute", bottom: 16, right: 16, background: "rgba(90, 102, 81, 0.85)", backdropFilter: "blur(4px)", color: "#ffffff", borderRadius: 20, padding: "6px 14px", fontSize: "0.72rem", fontWeight: 600, zIndex: 10, border: "1px solid rgba(255,255,255,0.2)" }}>
+                <div style={{ position: "absolute", bottom: 16, right: 16, background: "rgba(120, 127, 86, 0.85)", backdropFilter: "blur(4px)", color: "#ffffff", borderRadius: 20, padding: "6px 14px", fontSize: "0.72rem", fontWeight: 600, zIndex: 10, border: "1px solid rgba(255,255,255,0.2)" }}>
                   {activeImg + 1} / {imgs.length}
                 </div>
               </div>
 
-              {/* Thumbnail Strip — Square Boxes, Max 4, Fill Width */}
+              {/* Thumbnail Strip — Square Boxes, Fill Width */}
               <div style={{
                 display: "flex",
                 gap: "0.5rem",
@@ -3639,7 +3782,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                 alignItems: "center",
                 width: "100%"
               }} className="scroll-hide ep-thumb-strip">
-                {imgs.slice(0, 4).map((img, i) => (
+                {imgs.map((img, i) => (
                   <motion.div
                     key={i}
                     role="button"
@@ -3659,8 +3802,8 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                       padding: 3,
                       background: activeImg === i ? "#ffffff" : "transparent",
                       cursor: "pointer",
-                      boxShadow: activeImg === i ? "0 4px 16px rgba(90,102,81,0.18)" : "0 1px 4px rgba(0,0,0,0.04)",
-                      border: activeImg === i ? "2px solid #5A6651" : "2px solid transparent"
+                      boxShadow: activeImg === i ? "0 4px 16px rgba(120, 127, 86,0.18)" : "0 1px 4px rgba(0,0,0,0.04)",
+                      border: activeImg === i ? "2px solid #787F56" : "2px solid transparent"
                     }}
                   >
                     <img
@@ -3680,17 +3823,17 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
             </div>
             <div style={{ minWidth: 0, overflow: "hidden", wordBreak: "break-word" }}>
               {p.bestSeller && (
-                <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#F0F2EE", color: "#5A6651", border: "1px solid #D9DDD5", borderRadius: 30, padding: "4px 14px", fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.08em", marginBottom: "0.8rem", textTransform: "uppercase" }}>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#F0F2EE", color: "#787F56", border: "1px solid #D9DDD5", borderRadius: 30, padding: "4px 14px", fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.08em", marginBottom: "0.8rem", textTransform: "uppercase" }}>
                   <span>✦</span> BEST SELLER
                 </div>
               )}
               <h1 style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(1.4rem,3.5vw,2.4rem)", fontWeight: 900, color: "#000000", marginBottom: "0.4rem", lineHeight: 1.2, wordBreak: "break-word", overflowWrap: "break-word" }}>{p.name}</h1>
-              <p style={{ fontSize: "0.75rem", color: "#5A6651", fontWeight: "600", marginBottom: "1rem", textTransform: "uppercase", letterSpacing: "0.15em", wordBreak: "break-word", overflowWrap: "break-word" }}>{p.category}</p>
+              <p style={{ fontSize: "0.75rem", color: "#787F56", fontWeight: "600", marginBottom: "1rem", textTransform: "uppercase", letterSpacing: "0.15em", wordBreak: "break-word", overflowWrap: "break-word" }}>{p.category}</p>
               <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "1.8rem" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-                  <span style={{ fontSize: "1.8rem", color: "#5A6651", fontWeight: 800 }}>₹{p.price.toLocaleString()}</span>
+                  <span style={{ fontSize: "1.8rem", color: "#787F56", fontWeight: 800 }}>₹{p.price.toLocaleString()}</span>
                   {p.originalPrice > p.price && <span style={{ color: "#9ca3af", fontSize: "1rem", textDecoration: "line-through" }}>₹{p.originalPrice.toLocaleString()}</span>}
-                  {p.discount > 0 && <span style={{ background: "#F0F2EE", color: "#5A6651", border: "1px solid #D9DDD5", borderRadius: 6, padding: "4px 10px", fontSize: "0.75rem", fontWeight: 700 }}>{p.discount}% OFF</span>}
+                  {p.discount > 0 && <span style={{ background: "#F0F2EE", color: "#787F56", border: "1px solid #D9DDD5", borderRadius: 6, padding: "4px 10px", fontSize: "0.75rem", fontWeight: 700 }}>{p.discount}% OFF</span>}
                 </div>
                 <span style={{ fontSize: "0.72rem", color: "#6b7280", fontWeight: 500 }}>(incl. of all taxes)</span>
               </div>
@@ -3759,7 +3902,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                         )
                       }
                     ].map(t => (
-                                            <motion.button
+                      <motion.button
                         key={t.id}
                         onClick={() => setTab(t.id)}
                         whileTap={{ scale: 0.98 }}
@@ -3775,7 +3918,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                           cursor: "pointer",
                           border: "none",
                           background: "transparent",
-                          color: tab === t.id ? "#5A6651" : "#8c9685",
+                          color: tab === t.id ? "#787F56" : "#8c9685",
                           textAlign: "center",
                           position: "relative",
                           transition: "color 0.2s ease"
@@ -3790,7 +3933,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                               left: 0,
                               right: 0,
                               height: "2.5px",
-                              background: "#5A6651",
+                              background: "#787F56",
                               zIndex: 1
                             }}
                             transition={{ type: "spring", stiffness: 380, damping: 30 }}
@@ -3804,13 +3947,13 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
 
                   {/* You May Also Like Section */}
                   <div className="you-may-like-left-col">
-                    <div style={{ fontSize: "0.68rem", fontWeight: "800", color: "#5A6651", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "10px", textAlign: "center" }}>
+                    <div style={{ fontSize: "0.68rem", fontWeight: "800", color: "#787F56", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "10px", textAlign: "center" }}>
                       You May Also Like
                     </div>
                     <div className="recommendation-icons-wrapper">
                       {displayCats.map(cat => {
                         const isHovered = hoveredCat === cat.slug;
-                        const accentColor = "#5A6651";
+                        const accentColor = "#787F56";
                         const iconColor = isHovered ? "#FFFFFF" : accentColor;
                         return (
                           <div
@@ -3834,7 +3977,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                                 height: "42px",
                                 borderRadius: "50%",
                                 border: `1.5px solid ${accentColor}`,
-                                boxShadow: isHovered ? "0 4px 12px rgba(90,102,81,0.18)" : "0 2px 6px rgba(90,102,81,0.04)",
+                                boxShadow: isHovered ? "0 4px 12px rgba(120, 127, 86,0.18)" : "0 2px 6px rgba(120, 127, 86,0.04)",
                                 background: isHovered ? accentColor : "#FFFFFF",
                                 display: "flex",
                                 alignItems: "center",
@@ -3930,7 +4073,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                               style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}
                             >
                               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "20px", height: "20px", borderRadius: "50%", background: "#FFFFFF", border: "1px solid #D9DDD5", flexShrink: 0, marginTop: "2px" }}>
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
                                   <polyline points="20 6 9 17 4 12" />
                                 </svg>
                               </div>
@@ -3960,7 +4103,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                           >
                             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
                               <span style={{ fontSize: "1rem" }}>✨</span>
-                              <span style={{ fontSize: "0.72rem", fontWeight: "700", color: "#5A6651", letterSpacing: "0.06em", textTransform: "uppercase" }}>Activation Ritual</span>
+                              <span style={{ fontSize: "0.72rem", fontWeight: "700", color: "#787F56", letterSpacing: "0.06em", textTransform: "uppercase" }}>Activation Ritual</span>
                             </div>
                             <p style={{ fontSize: "0.78rem", color: "#4b5563", lineHeight: "1.5", fontStyle: "italic", margin: 0 }}>
                               {seoData.ritual}
@@ -3982,7 +4125,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                     title: "Free Shipping",
                     desc: "On orders above ₹999",
                     icon: (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
                         <rect x="1" y="3" width="15" height="13" />
                         <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
                         <circle cx="5.5" cy="18.5" r="2.5" />
@@ -3994,7 +4137,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                     title: "7-Day Returns",
                     desc: "Hassle-free process",
                     icon: (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
                         <polyline points="23 4 23 10 17 10" />
                         <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
                       </svg>
@@ -4004,7 +4147,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                     title: "100% Natural",
                     desc: "Ethically sourced",
                     icon: (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
                         <path d="M2 22C2 12 10 4 22 2c0 12-8 20-18 20z" />
                         <path d="M9 15l7-7" />
                       </svg>
@@ -4024,18 +4167,18 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                       gap: "8px",
                       textAlign: "center",
                       transition: "transform 0.2s, box-shadow 0.2s",
-                      boxShadow: "0 2px 8px rgba(90,102,81,0.02)"
+                      boxShadow: "0 2px 8px rgba(120, 127, 86,0.02)"
                     }}
                     onMouseEnter={e => {
                       e.currentTarget.style.transform = "translateY(-2px)";
-                      e.currentTarget.style.boxShadow = "0 6px 16px rgba(90,102,81,0.06)";
+                      e.currentTarget.style.boxShadow = "0 6px 16px rgba(120, 127, 86,0.06)";
                     }}
                     onMouseLeave={e => {
                       e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.boxShadow = "0 2px 8px rgba(90,102,81,0.02)";
+                      e.currentTarget.style.boxShadow = "0 2px 8px rgba(120, 127, 86,0.02)";
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "42px", height: "42px", borderRadius: "50%", background: "#FFFFFF", border: "1px solid #D9DDD5", boxShadow: "0 2px 8px rgba(90,102,81,0.04)" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "42px", height: "42px", borderRadius: "50%", background: "#FFFFFF", border: "1px solid #D9DDD5", boxShadow: "0 2px 8px rgba(120, 127, 86,0.04)" }}>
                       {item.icon}
                     </div>
                     <div>
@@ -4055,7 +4198,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
           {/* SEO Content Section: Science, Intention & Ritual */}
           <div style={{ marginBottom: "4rem" }}>
             <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
-              <span style={{ color: "#5A6651", fontSize: "0.75rem", fontWeight: "700", letterSpacing: "0.15em", textTransform: "uppercase" }}>Holistic Energy Integration</span>
+              <span style={{ color: "#787F56", fontSize: "0.75rem", fontWeight: "700", letterSpacing: "0.15em", textTransform: "uppercase" }}>Holistic Energy Integration</span>
               <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.6rem, 3vw, 2.2rem)", fontWeight: 900, color: "#000000", marginTop: "0.5rem", marginBottom: "0.8rem" }}>Ritual, Science & Intention</h2>
               <p style={{ color: "#4b5563", fontSize: "0.9rem", maxWidth: "600px", margin: "0 auto", lineHeight: 1.6 }}>Discover how ancient holistic wisdom and modern cognitive science combine to make this stone a powerful anchor for your daily manifestations.</p>
             </div>
@@ -4110,18 +4253,18 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
                   tag: "THE VIBRATION"
                 }
               ].map((card, idx) => (
-                <div key={idx} style={{ background: "#FFFFFF", border: "1px solid #D9DDD5", borderRadius: "16px", padding: "2rem", boxShadow: "0 4px 20px rgba(90,102,81,0.02)", display: "flex", flexDirection: "column", gap: "12px", position: "relative", transition: "transform 0.25s ease, box-shadow 0.25s ease" }}
+                <div key={idx} style={{ background: "#FFFFFF", border: "1px solid #D9DDD5", borderRadius: "16px", padding: "2rem", boxShadow: "0 4px 20px rgba(120, 127, 86,0.02)", display: "flex", flexDirection: "column", gap: "12px", position: "relative", transition: "transform 0.25s ease, box-shadow 0.25s ease" }}
                   onMouseEnter={e => {
                     e.currentTarget.style.transform = "translateY(-4px)";
-                    e.currentTarget.style.boxShadow = "0 8px 30px rgba(90,102,81,0.06)";
+                    e.currentTarget.style.boxShadow = "0 8px 30px rgba(120, 127, 86,0.06)";
                   }}
                   onMouseLeave={e => {
                     e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow = "0 4px 20px rgba(90,102,81,0.02)";
+                    e.currentTarget.style.boxShadow = "0 4px 20px rgba(120, 127, 86,0.02)";
                   }}
                 >
                   <div style={{ position: "absolute", top: "1.8rem", right: "1.8rem", opacity: 0.2 }}>{card.icon}</div>
-                  <span style={{ color: "#5A6651", fontSize: "0.65rem", fontWeight: "700", letterSpacing: "0.08em" }}>{card.tag}</span>
+                  <span style={{ color: "#787F56", fontSize: "0.65rem", fontWeight: "700", letterSpacing: "0.08em" }}>{card.tag}</span>
                   <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", fontWeight: 800, color: "#000000", margin: 0 }}>{card.title}</h3>
                   <p style={{ color: "#4b5563", fontSize: "0.82rem", lineHeight: 1.6, margin: 0 }}>{card.text}</p>
                 </div>
@@ -4132,7 +4275,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
           {/* FAQ Section */}
           <div style={{ maxWidth: "800px", margin: "0 auto 2rem auto" }}>
             <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
-              <span style={{ color: "#5A6651", fontSize: "0.75rem", fontWeight: "700", letterSpacing: "0.15em", textTransform: "uppercase" }}>Common Queries</span>
+              <span style={{ color: "#787F56", fontSize: "0.75rem", fontWeight: "700", letterSpacing: "0.15em", textTransform: "uppercase" }}>Common Queries</span>
               <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.6rem, 3vw, 2.2rem)", fontWeight: 900, color: "#000000", marginTop: "0.5rem" }}>Frequently Asked Questions</h2>
             </div>
 
@@ -4157,13 +4300,13 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
               ].map((faq, idx) => {
                 const isOpen = faqOpen === idx;
                 return (
-                  <div key={idx} style={{ background: "#FFFFFF", border: "1px solid #D9DDD5", borderRadius: "12px", overflow: "hidden", boxShadow: "0 2px 8px rgba(90,102,81,0.01)" }}>
+                  <div key={idx} style={{ background: "#FFFFFF", border: "1px solid #D9DDD5", borderRadius: "12px", overflow: "hidden", boxShadow: "0 2px 8px rgba(120, 127, 86,0.01)" }}>
                     <button
                       onClick={() => setFaqOpen(isOpen ? -1 : idx)}
                       style={{ width: "100%", padding: "18px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "none", border: "none", cursor: "pointer", textAlign: "left" }}
                     >
                       <span style={{ fontSize: "0.9rem", fontWeight: "700", color: "#000000", paddingRight: "16px", wordBreak: "break-word", overflowWrap: "break-word" }}>{faq.q}</span>
-                      <span style={{ color: "#5A6651", fontSize: "1.2rem", fontWeight: "300", transform: isOpen ? "rotate(45deg)" : "rotate(0deg)", transition: "transform 0.25s ease", flexShrink: 0 }}>+</span>
+                      <span style={{ color: "#787F56", fontSize: "1.2rem", fontWeight: "300", transform: isOpen ? "rotate(45deg)" : "rotate(0deg)", transition: "transform 0.25s ease", flexShrink: 0 }}>+</span>
                     </button>
                     <AnimatePresence initial={false}>
                       {isOpen && (
@@ -4189,15 +4332,15 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
       </div>
       <BestSellersStrip onShop={onShop} />
       {/* Sticky Add to Cart Bar */}
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 999, background: "rgba(255,255,255,0.96)", backdropFilter: "blur(14px)", borderTop: "1px solid #D9DDD5", padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", boxShadow: "0 -4px 20px rgba(90,102,81,0.05)" }}>
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 999, background: "rgba(255,255,255,0.96)", backdropFilter: "blur(14px)", borderTop: "1px solid #D9DDD5", padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", boxShadow: "0 -4px 20px rgba(120, 127, 86,0.05)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px", maxWidth: "500px", width: "100%" }}>
           {cartQty > 0 ? (
             <>
               {/* Compact qty counter */}
-              <div style={{ display: "flex", alignItems: "center", border: "1.5px solid #5A6651", background: "#F0F2EE", borderRadius: 8, overflow: "hidden", flexShrink: 0, height: 44 }}>
-                <button onClick={handleDec} style={{ width: 38, height: 44, background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#5A6651", fontWeight: 700 }}>−</button>
-                <span style={{ width: 32, textAlign: "center", fontWeight: 800, color: "#5A6651", fontSize: "0.95rem" }}>{cartQty}</span>
-                <button onClick={handleAdd} disabled={cart?.reduce((s, i) => s + i.qty, 0) >= 10} style={{ width: 38, height: 44, background: cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? "#e5e7eb" : "#5A6651", border: "none", cursor: cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? "not-allowed" : "pointer", fontSize: 16, color: "#fff", fontWeight: 700 }}>+</button>
+              <div style={{ display: "flex", alignItems: "center", border: "1.5px solid #787F56", background: "#F0F2EE", borderRadius: 8, overflow: "hidden", flexShrink: 0, height: 44 }}>
+                <button onClick={handleDec} style={{ width: 38, height: 44, background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#787F56", fontWeight: 700 }}>−</button>
+                <span style={{ width: 32, textAlign: "center", fontWeight: 800, color: "#787F56", fontSize: "0.95rem" }}>{cartQty}</span>
+                <button onClick={handleAdd} disabled={cart?.reduce((s, i) => s + i.qty, 0) >= 10} style={{ width: 38, height: 44, background: cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? "#e5e7eb" : "#787F56", border: "none", cursor: cart?.reduce((s, i) => s + i.qty, 0) >= 10 ? "not-allowed" : "pointer", fontSize: 16, color: "#fff", fontWeight: 700 }}>+</button>
               </div>
               {/* View Cart Button */}
               <button
@@ -4266,7 +4409,7 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
               flexShrink: 0
             }}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth={wished.includes(p.id) ? "3.2" : "2"} strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all 0.2s ease" }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill={(wished.includes(p.id) || wished.includes(p._id)) ? "#787F56" : "none"} stroke={(wished.includes(p.id) || wished.includes(p._id)) ? "#787F56" : "#000000"} strokeWidth={(wished.includes(p.id) || wished.includes(p._id)) ? "3.2" : "2"} strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all 0.2s ease" }}>
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
           </button>
@@ -4278,21 +4421,21 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
         .ep-nav-btn {
           background: rgba(255,255,255,0.95) !important;
           border: 1px solid #D9DDD5 !important;
-          color: #5A6651 !important;
+          color: #787F56 !important;
           transition: all 0.2s ease !important;
         }
         .ep-nav-btn:hover {
-          background: #5A6651 !important;
+          background: #787F56 !important;
           color: #ffffff !important;
-          border-color: #5A6651 !important;
+          border-color: #787F56 !important;
         }
         .ep-thumb-btn {
           border: 2px solid transparent !important;
           transition: all 0.2s ease !important;
         }
         .ep-thumb-btn.active {
-          border-color: #5A6651 !important;
-          box-shadow: 0 8px 24px rgba(90,102,81,0.15) !important;
+          border-color: #787F56 !important;
+          box-shadow: 0 8px 24px rgba(120, 127, 86,0.15) !important;
         }
         .ep-tab-btn-vertical {
           border: none !important;
@@ -4301,18 +4444,18 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
         }
         .ep-tab-btn-vertical:hover {
           background: transparent !important;
-          color: #5A6651 !important;
+          color: #787F56 !important;
         }
         .ep-tab-btn-vertical.active {
           background: transparent !important;
-          color: #5A6651 !important;
+          color: #787F56 !important;
           box-shadow: none !important;
         }
         .ep-tab-btn-vertical.active svg {
-          stroke: #5A6651 !important;
+          stroke: #787F56 !important;
         }
         .ep-primary-btn {
-          background: linear-gradient(135deg, #5A6651, #454F3F) !important;
+          background: linear-gradient(135deg, #787F56, #454F3F) !important;
           color: #ffffff !important;
           border: none !important;
           transition: all 0.2s ease !important;
@@ -4320,16 +4463,16 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
         .ep-primary-btn:hover {
           background: linear-gradient(135deg, #454F3F, #323B2F) !important;
           transform: translateY(-1px) !important;
-          box-shadow: 0 6px 20px rgba(90, 102, 81, 0.3) !important;
+          box-shadow: 0 6px 20px rgba(120, 127, 86, 0.3) !important;
         }
         .ep-secondary-btn {
           background: #ffffff !important;
           border: 1.5px solid #D9DDD5 !important;
-          color: #5A6651 !important;
+          color: #787F56 !important;
           transition: all 0.2s ease !important;
         }
         .ep-secondary-btn:hover {
-          border-color: #5A6651 !important;
+          border-color: #787F56 !important;
           background: #F0F2EE !important;
           color: #454F3F !important;
         }
@@ -4387,14 +4530,16 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
             border-radius: 14px !important;
           }
           .ep-thumb-strip {
-            justify-content: center !important;
-            gap: 0.6rem !important;
-            padding: 6px 0 !important;
+            justify-content: stretch !important;
+            gap: 0.4rem !important;
+            padding: 4px 0 !important;
           }
           .ep-thumb-strip .ep-thumb-btn {
-            width: 56px !important;
-            height: 56px !important;
-            border-radius: 10px !important;
+            width: auto !important;
+            height: auto !important;
+            flex: 1 1 0px !important;
+            aspect-ratio: 1 / 1 !important;
+            border-radius: 6px !important;
           }
           .tabs-parent-grid {
             grid-template-columns: 1fr !important;
@@ -4467,9 +4612,11 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
             border-radius: 12px !important;
           }
           .ep-thumb-strip .ep-thumb-btn {
-            width: 48px !important;
-            height: 48px !important;
-            border-radius: 8px !important;
+            width: auto !important;
+            height: auto !important;
+            flex: 1 1 0px !important;
+            aspect-ratio: 1 / 1 !important;
+            border-radius: 5px !important;
           }
           .tabs-sidebar-card, .tabs-content-card {
             padding: 0.8rem !important;
@@ -4486,162 +4633,617 @@ function ProductPage({ product: p, onAdd, onAddAnim, onWish, wished, cart, onSho
 // ─── RITUALS PAGE ─────────────────────────────────────────────
 function RitualsPage() {
   const navigate = useNavigate();
-  const rituals = [
-    {
-      label: "01 — New Moon",
-      title: "New Moon Ritual",
-      time: "15–20 min",
-      desc: "Manifest New Beginnings & Inner Clarity",
-      steps: [
-        { step: "Settle", text: "Hold your WishStone and take a few mindful breaths to arrive fully in the present." },
-        { step: "Intend", text: "Write down three clear intentions you wish to call into your life this month." },
-        { step: "Visualise", text: "Close your eyes. See your goals unfolding with vivid clarity and quiet confidence." },
-        { step: "Anchor", text: "Place the stone beside your written intentions and let it rest there overnight." },
-        { step: "Release", text: "End with a moment of genuine gratitude and surrender to what is on its way." },
-      ]
-    },
-    {
-      label: "02 — Morning",
-      title: "Morning Activation",
-      time: "5–10 min",
-      desc: "Begin Your Day with Peace & Purpose",
-      steps: [
-        { step: "Breathe", text: "Hold your WishStone in both palms. Inhale slowly for four counts, exhale for six." },
-        { step: "Set", text: "Choose one meaningful intention to carry with you through the day ahead." },
-        { step: "Affirm", text: "Speak a calm, positive affirmation aloud — let your own voice make it real." },
-        { step: "Carry", text: "Keep the stone close in your pocket or on your desk as a gentle daily anchor." },
-        { step: "Return", text: "Whenever focus drifts, hold the stone and return quietly to your morning intention." },
-      ]
-    },
-    {
-      label: "03 — Cleansing",
-      title: "Cleansing Ritual",
-      time: "10–15 min",
-      desc: "Release Stress & Restore Balance",
-      steps: [
-        { step: "Acknowledge", text: "Sit quietly and name the stress, emotion or energy you are ready to release today." },
-        { step: "Cleanse", text: "Rinse your WishStone gently under cool water or hold it briefly in morning sunlight." },
-        { step: "Breathe Out", text: "With each exhale, consciously let go of the weight you acknowledged. Repeat three times." },
-        { step: "Renew", text: "Set a simple, grounded intention for how you wish to feel for the rest of your day." },
-        { step: "Store", text: "Place the stone mindfully in a clean, quiet spot until your next ritual session." },
-      ]
-    }
+  const [hoveredCategory, setHoveredCategory] = useState(null);
+  const [activeStep, setActiveStep] = useState(0);
+
+  const categories = [
+    { id: "wishstone", icon: "sparkle", label: "Wishstone Ritual", desc: "Set conscious intentions and anchor them physically.", image: "/wishstone-horizontal.jpeg" },
+    { id: "cosmic-wye", icon: "target", label: "Cosmic Wye", desc: "Tune your spatial energy and activate focus.", image: "/cosmic-eye.jpeg" },
+    { id: "habit-builder", icon: "brain", label: "Habit Builder", desc: "Cultivate daily consistency and track growth.", image: "/habit-builder2-product.jpeg", isComingSoon: true },
   ];
 
+  const howItWorks = [
+    { num: "01", title: "Choose", desc: "Pick a ritual that resonates with your current needs." },
+    { num: "02", title: "Commit", desc: "Set aside time and create your sacred space." },
+    { num: "03", title: "Practice", desc: "Follow the steps and be fully present." },
+    { num: "04", title: "Transform", desc: "Feel the shift and carry the energy into your day." },
+  ];
+
+  const CategoryIcon = ({ type, size = 18, color = "#787F56" }) => {
+    if (type === "brain") return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2a9 9 0 1 0 0 18 9 9 0 0 0 0-18z" /><path d="M12 8v4l3 3" />
+      </svg>
+    );
+    if (type === "leaf") return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22c0 0-8-4-8-10a8 8 0 0 1 16 0c0 6-8 10-8 10z" /><path d="M12 22V12" />
+      </svg>
+    );
+    if (type === "heart") return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+      </svg>
+    );
+    if (type === "sparkle") return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" />
+      </svg>
+    );
+    if (type === "check") return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="20 6 9 17 4 12" />
+      </svg>
+    );
+    if (type === "clock") return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
+      </svg>
+    );
+    if (type === "feather") return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" /><line x1="16" y1="8" x2="2" y2="22" /><line x1="17.5" y1="15" x2="9" y2="15" />
+      </svg>
+    );
+    if (type === "calendar") return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+      </svg>
+    );
+    if (type === "target") return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" />
+      </svg>
+    );
+    if (type === "arrow") return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+      </svg>
+    );
+    return null;
+  };
+
   const css = `
-    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
-    .rituals-page { font-family: 'Open Sans', sans-serif; }
-    .rituals-page * { font-family: 'Open Sans', sans-serif; }
-    .ritual-arch-card {
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+    .rituals-v2 { font-family: 'Open Sans', sans-serif; }
+    .rituals-v2 * { box-sizing: border-box; }
+
+    @keyframes ritualFadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes ritualFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes ritualFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes ritualPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+    @keyframes ritualSlideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+
+    /* Category card */
+    .ritual-cat-card {
       background: #ffffff;
-      border: 1px solid rgba(90, 102, 81, 0.15);
-      border-radius: 120px 120px 24px 24px;
-      padding: 4.5rem 2.5rem 3.5rem;
-      box-shadow: 0 16px 48px rgba(90, 102, 81, 0.03);
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 5rem;
-      position: relative;
+      border-radius: 16px;
       overflow: hidden;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid rgba(120, 127, 86, 0.12);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+      position: relative;
     }
-    .ritual-arch-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 24px 64px rgba(90, 102, 81, 0.08);
-      border-color: rgba(90, 102, 81, 0.3);
+    .ritual-cat-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(120, 127, 86, 0.15);
+      border-color: rgba(120, 127, 86, 0.3);
     }
-    .ritual-step-item {
+    .ritual-cat-card:hover .ritual-cat-img img {
+      transform: scale(1.08);
+    }
+    .ritual-cat-img img {
       width: 100%;
-      padding: 1.2rem 0;
-      border-bottom: 1px solid rgba(90, 102, 81, 0.08);
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .ritual-step-item:last-child {
-      border-bottom: none;
+
+    /* Arrow circle button */
+    .ritual-arrow-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(120, 127, 86, 0.08);
+      border: 1px solid rgba(120, 127, 86, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
     }
-    @media(max-width: 768px) {
-      .ritual-arch-card {
-        border-radius: 80px 80px 20px 20px;
-        padding: 3rem 1.5rem 2.5rem;
-      }
+    .ritual-arrow-circle:hover {
+      background: #787F56;
+      border-color: #787F56;
+    }
+    .ritual-arrow-circle:hover svg {
+      stroke: #ffffff;
+    }
+
+    /* Stats card */
+    .ritual-stat-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 1.2rem 1.5rem;
+      border: 1px solid rgba(120, 127, 86, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.3s ease;
+    }
+    .ritual-stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(120, 127, 86, 0.08);
+    }
+
+    /* Daily ritual card */
+    .ritual-daily-card {
+      background: #F5F3EF;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(120, 127, 86, 0.1);
+      transition: all 0.4s ease;
+    }
+    .ritual-daily-card:hover {
+      box-shadow: 0 16px 48px rgba(120, 127, 86, 0.1);
+      transform: translateY(-3px);
+    }
+
+    /* How it works step */
+    .ritual-step-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(120, 127, 86, 0.06);
+      border: 1.5px solid rgba(120, 127, 86, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+    .ritual-step-circle:hover {
+      background: #787F56;
+      border-color: #787F56;
+    }
+    .ritual-step-circle:hover svg {
+      stroke: #ffffff;
+    }
+
+    /* Dashed connector */
+    .ritual-dashed-line {
+      flex: 1;
+      height: 0;
+      border-top: 2px dashed rgba(120, 127, 86, 0.2);
+      min-width: 30px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .ritual-hero-grid { grid-template-columns: 1fr !important; text-align: center !important; }
+      .ritual-hero-img { max-height: 360px !important; margin-top: 2rem; }
+      .ritual-cats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+      .ritual-daily-grid { grid-template-columns: 1fr !important; }
+      .ritual-steps-row { flex-wrap: wrap !important; justify-content: center !important; }
+      .ritual-dashed-line { display: none !important; }
+    }
+    @media (max-width: 640px) {
+      .ritual-cats-grid { grid-template-columns: 1fr !important; }
+      .ritual-stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
     }
   `;
 
   return (
-    <div className="rituals-page" style={{ paddingTop: 80, background: "#ffffff", minHeight: "100vh" }}>
+    <div className="rituals-v2" style={{ paddingTop: 80, background: "#FAFAF7", minHeight: "100vh" }}>
       <style>{css}</style>
 
-      {/* Hero header */}
-      <div style={{ background: "linear-gradient(180deg, #5A6651 0%, #000000 100%)", padding: "5rem clamp(1.5rem,6vw,5rem) 4rem", textAlign: "center", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 100%, rgba(90,102,81,0.18) 0%, transparent 60%)", pointerEvents: "none" }} />
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: "1.5rem", opacity: 0.7 }}>
-          <div style={{ height: 1, width: 40, background: "#5A6651" }} />
-          <span style={{ fontSize: "0.62rem", fontWeight: 700, color: "#5A6651", letterSpacing: "0.28em", textTransform: "uppercase" }}>SACRED RITUALS</span>
-          <div style={{ height: 1, width: 40, background: "#5A6651" }} />
-        </div>
-        <h1 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(2rem,5vw,3.2rem)", fontWeight: 700, color: "#ffffff", lineHeight: 1.15, marginBottom: "1rem", letterSpacing: "-0.01em" }}>
-          Ancient Practices,<br /><span style={{ color: "#5A6651", fontStyle: "italic" }}>Modern Life.</span>
-        </h1>
-        <p style={{ fontSize: "clamp(0.85rem,1.2vw,0.96rem)", color: "rgba(255,255,255,0.55)", lineHeight: 1.7, maxWidth: 520, margin: "0 auto" }}>
-          Three rituals. Five steps each. A complete daily practice for clarity, intention, and inner renewal.
-        </p>
-      </div>
+      {/* ═══════════════════════════════════════════════════════
+          SECTION 1 — HERO
+      ═══════════════════════════════════════════════════════ */}
+      <section style={{ background: "#FAFAF7", position: "relative", overflow: "hidden" }}>
+        {/* Subtle leaf shadow decorations */}
+        <div style={{ position: "absolute", top: 0, left: 0, width: "50%", height: "100%", background: "linear-gradient(135deg, rgba(120, 127, 86,0.04) 0%, transparent 50%)", pointerEvents: "none" }} />
 
-      {/* Ritual cards */}
-      <div style={{ maxWidth: 760, margin: "0 auto", padding: "5rem clamp(1.2rem,5vw,2.5rem) 6rem" }}>
-        {rituals.map((r, idx) => (
+        <div className="ritual-hero-grid" style={{
+          maxWidth: 1200, margin: "0 auto",
+          display: "grid", gridTemplateColumns: "1fr 1fr",
+          gap: "clamp(2rem, 4vw, 4rem)",
+          padding: "clamp(3rem, 6vw, 5rem) clamp(1.5rem, 4vw, 3rem)",
+          alignItems: "center"
+        }}>
+          {/* Left — Text */}
           <motion.div
-            key={r.title}
-            className="ritual-arch-card"
-            initial={{ opacity: 0, x: idx % 2 === 0 ? -120 : 120, y: 20 }}
-            whileInView={{ opacity: 1, x: 0, y: 0 }}
-            viewport={{ once: true, margin: "-120px" }}
-            transition={{ duration: 0.85, cubicBezier: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           >
-            {/* Card label */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1.2rem", width: "100%", marginBottom: "1.5rem" }}>
-              <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#5A6651", letterSpacing: "0.22em", textTransform: "uppercase", whiteSpace: "nowrap" }}>{r.label}</span>
-              <div style={{ width: 30, height: 1, background: "rgba(90, 102, 81, 0.2)" }} />
-              <span style={{ fontSize: "0.65rem", color: "#5A6651", fontWeight: 700, letterSpacing: "0.1em", background: "rgba(90,102,81,0.08)", padding: "3px 12px", borderRadius: 20, whiteSpace: "nowrap" }}>{r.time}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "1.2rem" }}>
+              <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#787F56", letterSpacing: "0.22em", textTransform: "uppercase" }}>RITUALS FOR</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="1.8">
+                <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" />
+              </svg>
             </div>
+            <h1 style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: "clamp(2.5rem, 5.5vw, 4rem)",
+              fontWeight: 700,
+              color: "#1a1a1a",
+              lineHeight: 1.05,
+              marginBottom: "1.5rem",
+              letterSpacing: "-0.02em"
+            }}>
+              Mind, Body<br /><span style={{ fontStyle: "italic", color: "#787F56" }}>&amp; Soul</span>
+            </h1>
+            <p style={{
+              fontSize: "clamp(0.88rem, 1.1vw, 1rem)",
+              color: "#5c5c5c",
+              lineHeight: 1.7,
+              maxWidth: 420,
+              marginBottom: "2rem"
+            }}>
+              Thoughtfully crafted rituals to help you slow down, reconnect and realign with what truly matters.
+            </p>
+            <button
+              onClick={() => { const el = document.getElementById('ritual-categories'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 12,
+                background: "#ffffff", color: "#1a1a1a",
+                border: "1.5px solid #1a1a1a",
+                padding: "14px 28px", borderRadius: 30,
+                fontSize: "0.85rem", fontWeight: 600,
+                cursor: "pointer", transition: "all 0.3s ease",
+                letterSpacing: "0.03em"
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#1a1a1a"; e.currentTarget.style.color = "#ffffff"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#ffffff"; e.currentTarget.style.color = "#1a1a1a"; }}
+            >
+              Explore Rituals
+              <CategoryIcon type="arrow" size={16} color="currentColor" />
+            </button>
+          </motion.div>
 
-            {/* Title */}
-            <h2 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(1.5rem,3vw,1.9rem)", fontWeight: 800, color: "#000000", marginBottom: "0.4rem", letterSpacing: "-0.01em" }}>{r.title}</h2>
-            <p style={{ fontSize: "0.85rem", color: "#5A6651", fontStyle: "italic", marginBottom: "2.5rem", fontWeight: 600 }}>{r.desc}</p>
+          {/* Right — Hero Image */}
+          <motion.div
+            className="ritual-hero-img"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            style={{ borderRadius: 24, overflow: "hidden", maxHeight: 500, position: "relative" }}
+          >
+            <img
+              src="/rituals_hero_banner.png"
+              alt="Sacred ritual setup with candle, ceramics and wishstone"
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              onError={e => { e.currentTarget.src = "/rituals_hero.png"; }}
+            />
+            {/* Gentle overlay leaf pattern */}
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 70%, rgba(250,250,247,0.3) 100%)", pointerEvents: "none" }} />
+          </motion.div>
+        </div>
+      </section>
 
-            {/* Steps */}
-            <div style={{ width: "100%" }}>
-              {r.steps.map((s, si) => (
-                <div key={si} className="ritual-step-item">
-                  <div style={{ marginBottom: "0.4rem" }}>
-                    <span style={{ fontSize: "0.65rem", fontWeight: 800, color: "#5A6651", letterSpacing: "0.18em", textTransform: "uppercase" }}>{s.step}</span>
+      {/* ═══════════════════════════════════════════════════════
+          SECTION 2 — STATS BAR
+      ═══════════════════════════════════════════════════════ */}
+      <section style={{ background: "#EAE6DE", padding: "clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2rem)" }}>
+        <div className="ritual-stats-grid" style={{
+          maxWidth: 1100, margin: "0 auto",
+          display: "grid", gridTemplateColumns: "repeat(4, 1fr)",
+          gap: "1rem"
+        }}>
+          {[
+            { icon: "check", num: "20+", label: "Curated Rituals" },
+            { icon: "calendar", num: "7", label: "Ritual Categories" },
+            { icon: "target", num: "5K+", label: "People Practicing" },
+            { icon: "sparkle", num: "Daily", label: "New Inspiration" },
+          ].map((stat, i) => (
+            <motion.div
+              key={i}
+              className="ritual-stat-card"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1, duration: 0.5 }}
+            >
+              <div style={{
+                width: 42, height: 42, borderRadius: "50%",
+                background: "rgba(120, 127, 86, 0.08)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0
+              }}>
+                <CategoryIcon type={stat.icon} size={18} color="#787F56" />
+              </div>
+              <div>
+                <div style={{ fontSize: "1.3rem", fontWeight: 800, color: "#1a1a1a", lineHeight: 1.1 }}>{stat.num}</div>
+                <div style={{ fontSize: "0.72rem", color: "#787F56", fontWeight: 500, marginTop: 2 }}>{stat.label}</div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════
+          SECTION 3 — EXPLORE BY CATEGORY
+      ═══════════════════════════════════════════════════════ */}
+      <section id="ritual-categories" style={{
+        maxWidth: 1200, margin: "0 auto",
+        padding: "clamp(3rem, 6vw, 5rem) clamp(1.5rem, 4vw, 3rem)"
+      }}>
+        <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: "clamp(2rem, 4vw, 4rem)", alignItems: "start" }} className="ritual-hero-grid">
+          {/* Left text */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <span style={{ fontSize: "0.62rem", fontWeight: 700, color: "#787F56", letterSpacing: "0.22em", textTransform: "uppercase", marginBottom: "0.8rem", display: "block" }}>
+              EXPLORE BY CATEGORY
+            </span>
+            <h2 style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: "clamp(1.6rem, 3vw, 2.2rem)",
+              fontWeight: 700, color: "#1a1a1a",
+              lineHeight: 1.15, marginBottom: "1rem",
+              letterSpacing: "-0.01em"
+            }}>
+              Find Your<br />Perfect Ritual
+            </h2>
+            <p style={{ fontSize: "0.85rem", color: "#5c5c5c", lineHeight: 1.65, marginBottom: "1.5rem" }}>
+              Rituals designed to support every part of your life.
+            </p>
+            <button
+              onClick={() => navigate("/shop")}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                background: "none", color: "#1a1a1a", border: "none",
+                fontSize: "0.82rem", fontWeight: 600, cursor: "pointer",
+                padding: 0, textDecoration: "underline", textUnderlineOffset: 3,
+                transition: "color 0.2s"
+              }}
+              onMouseEnter={e => { e.currentTarget.style.color = "#787F56"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = "#1a1a1a"; }}
+            >
+              View all rituals
+              <CategoryIcon type="arrow" size={14} color="currentColor" />
+            </button>
+          </motion.div>
+
+          {/* Right — category cards grid */}
+          <div className="ritual-cats-grid" style={{
+            display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem"
+          }}>
+            {categories.map((cat, i) => (
+              <motion.div
+                key={cat.id}
+                className="ritual-cat-card"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.6 }}
+                onMouseEnter={() => setHoveredCategory(cat.id)}
+                onMouseLeave={() => setHoveredCategory(null)}
+              >
+                {/* Image */}
+                <div className="ritual-cat-img" style={{ height: 140, overflow: "hidden", position: "relative" }}>
+                  <img src={cat.image} alt={cat.label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  {cat.isComingSoon && (
+                    <div style={{
+                      position: "absolute",
+                      top: 10,
+                      right: 10,
+                      background: "#787F56",
+                      color: "#fff",
+                      fontSize: "0.6rem",
+                      fontWeight: 800,
+                      padding: "3px 8px",
+                      borderRadius: 4,
+                      letterSpacing: "0.05em",
+                      textTransform: "uppercase",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.15)"
+                    }}>
+                      Coming Soon
+                    </div>
+                  )}
+                </div>
+                {/* Body */}
+                <div style={{ padding: "1rem" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: "0.5rem" }}>
+                    <CategoryIcon type={cat.icon} size={14} color="#787F56" />
+                    <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#1a1a1a" }}>{cat.label}</span>
                   </div>
-                  <div>
-                    <p style={{ fontSize: "0.88rem", color: "#000000", lineHeight: 1.7, margin: 0 }}>{s.text}</p>
+                  <p style={{ fontSize: "0.74rem", color: "#787F56", lineHeight: 1.5, margin: 0, marginBottom: "0.8rem" }}>
+                    {cat.desc}
+                  </p>
+                  <div className="ritual-arrow-circle" style={{ width: 30, height: 30 }}>
+                    <CategoryIcon type="arrow" size={12} color="#787F56" />
                   </div>
                 </div>
-              ))}
-            </div>
-          </motion.div>
-        ))}
-      </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      {/* Bottom CTA */}
-      <div style={{ background: "#5A6651", padding: "4rem clamp(1.5rem,5vw,3rem)", textAlign: "center" }}>
-        <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.75rem", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: "0.8rem" }}>Ready to begin?</p>
-        <h3 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(1.3rem,3vw,1.8rem)", fontWeight: 700, color: "#ffffff", marginBottom: "1.8rem" }}>
-          Your first ritual starts with a single breath.
-        </h3>
-        <button
-          onClick={() => navigate("/shop")}
-          style={{ background: "#ffffff", color: "#000000", border: "none", padding: "14px 36px", borderRadius: 30, fontSize: "0.85rem", fontWeight: 700, cursor: "pointer", letterSpacing: "0.06em", transition: "all 0.3s", boxShadow: "0 4px 14px rgba(0,0,0,0.1)" }}
-          onMouseEnter={e => { e.currentTarget.style.background = "#f0f0f0"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "#ffffff"; e.currentTarget.style.transform = "translateY(0)"; }}
+      {/* ═══════════════════════════════════════════════════════
+          SECTION 4 — DAILY RITUAL (Featured)
+      ═══════════════════════════════════════════════════════ */}
+      <section style={{
+        maxWidth: 1100, margin: "0 auto",
+        padding: "0 clamp(1.5rem, 4vw, 3rem) clamp(3rem, 5vw, 5rem)"
+      }}>
+        <motion.div
+          className="ritual-daily-card"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
         >
-          Find Your WishStone →
-        </button>
-      </div>
+          <div className="ritual-daily-grid" style={{
+            display: "grid", gridTemplateColumns: "0.45fr 0.55fr",
+            minHeight: 280
+          }}>
+            {/* Left — Image */}
+            <div style={{ position: "relative", overflow: "hidden" }}>
+              <img
+                src="/rituals_morning.png"
+                alt="Morning grounding ritual"
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, transparent 70%, rgba(245,243,239,0.15) 100%)", pointerEvents: "none" }} />
+            </div>
+
+            {/* Right — Content */}
+            <div style={{ padding: "clamp(1.5rem, 3vw, 2.5rem)", display: "flex", flexDirection: "column", justifyContent: "center", position: "relative" }}>
+              {/* Decorative leaf line art */}
+              <div style={{ position: "absolute", top: 20, right: 20, opacity: 0.06 }}>
+                <svg width="120" height="120" viewBox="0 0 120 120" fill="none" stroke="#787F56" strokeWidth="0.8">
+                  <path d="M60 10c20 20 50 40 50 70-10-5-25-5-50 10C85 60 80 30 60 10z" />
+                  <path d="M60 10c-20 20-50 40-50 70 10-5 25-5 50 10C35 60 40 30 60 10z" />
+                  <line x1="60" y1="10" x2="60" y2="110" />
+                </svg>
+              </div>
+
+              <span style={{ fontSize: "0.62rem", fontWeight: 700, color: "#787F56", letterSpacing: "0.22em", textTransform: "uppercase", marginBottom: "0.6rem" }}>
+                DAILY RITUAL
+              </span>
+              <h3 style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: "clamp(1.4rem, 2.5vw, 1.8rem)",
+                fontWeight: 700, color: "#1a1a1a",
+                lineHeight: 1.15, marginBottom: "0.6rem"
+              }}>
+                Morning Grounding
+              </h3>
+              <p style={{ fontSize: "0.85rem", color: "#5c5c5c", lineHeight: 1.6, marginBottom: "1.5rem", maxWidth: 380 }}>
+                Start your day with intention, gratitude and presence.
+              </p>
+
+              {/* Meta info */}
+              <div style={{ display: "flex", gap: "clamp(1rem, 2vw, 2rem)", marginBottom: "1.5rem", flexWrap: "wrap" }}>
+                {[
+                  { icon: "clock", value: "10 Min", label: "Duration" },
+                  { icon: "feather", value: "Beginner", label: "Level" },
+                  { icon: "calendar", value: "Daily", label: "Practice" },
+                ].map((meta, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <CategoryIcon type={meta.icon} size={16} color="#787F56" />
+                    <div>
+                      <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "#1a1a1a", lineHeight: 1.1 }}>{meta.value}</div>
+                      <div style={{ fontSize: "0.65rem", color: "#787F56", fontWeight: 500 }}>{meta.label}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                onClick={() => navigate("/frequency-activation")}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 10,
+                  background: "#787F56", color: "#ffffff",
+                  border: "none", padding: "12px 24px", borderRadius: 24,
+                  fontSize: "0.82rem", fontWeight: 600, cursor: "pointer",
+                  transition: "all 0.3s ease", width: "fit-content",
+                  boxShadow: "0 4px 14px rgba(120, 127, 86, 0.2)",
+                  letterSpacing: "0.03em"
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = "#4A5641"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(120, 127, 86, 0.3)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "#787F56"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 14px rgba(120, 127, 86, 0.2)"; }}
+              >
+                Begin Ritual
+                <CategoryIcon type="arrow" size={14} color="#ffffff" />
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════
+          SECTION 5 — HOW RITUALS WORK
+      ═══════════════════════════════════════════════════════ */}
+      <section style={{
+        padding: "clamp(3rem, 5vw, 5rem) clamp(1.5rem, 4vw, 3rem)",
+        background: "#FAFAF7"
+      }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          style={{ textAlign: "center", marginBottom: "clamp(2rem, 4vw, 3.5rem)" }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: "0.5rem" }}>
+            <div style={{ height: 1, width: 30, background: "#787F56" }} />
+            <span style={{ fontSize: "0.62rem", fontWeight: 700, color: "#787F56", letterSpacing: "0.22em", textTransform: "uppercase" }}>HOW RITUALS WORK</span>
+            <div style={{ height: 1, width: 30, background: "#787F56" }} />
+          </div>
+        </motion.div>
+
+        <div className="ritual-steps-row" style={{
+          maxWidth: 1100, margin: "0 auto",
+          display: "flex", alignItems: "flex-start", gap: 0
+        }}>
+          {howItWorks.map((step, i) => (
+            <React.Fragment key={i}>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15, duration: 0.5 }}
+                style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", flex: "0 0 auto", width: 160 }}
+              >
+                <div className="ritual-step-circle" style={{ marginBottom: "1rem" }}>
+                  <CategoryIcon type={i === 0 ? "check" : i === 1 ? "calendar" : i === 2 ? "target" : "heart"} size={20} color="#787F56" />
+                </div>
+                <div style={{ fontSize: "0.65rem", fontWeight: 800, color: "#787F56", letterSpacing: "0.15em", marginBottom: "0.3rem" }}>{step.num}</div>
+                <h4 style={{ fontSize: "0.95rem", fontWeight: 700, color: "#1a1a1a", marginBottom: "0.4rem" }}>{step.title}</h4>
+                <p style={{ fontSize: "0.75rem", color: "#787F56", lineHeight: 1.55, maxWidth: 150, margin: 0 }}>{step.desc}</p>
+              </motion.div>
+              {i < howItWorks.length - 1 && (
+                <div className="ritual-dashed-line" style={{ marginTop: 26 }} />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════
+          SECTION 6 — BOTTOM CTA
+      ═══════════════════════════════════════════════════════ */}
+      <section style={{ background: "#787F56", padding: "clamp(3rem, 5vw, 4.5rem) clamp(1.5rem, 5vw, 3rem)", textAlign: "center" }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.68rem", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "0.8rem", fontWeight: 600 }}>Ready to begin?</p>
+          <h3 style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: "clamp(1.4rem, 3vw, 2rem)",
+            fontWeight: 700, color: "#ffffff",
+            marginBottom: "2rem", lineHeight: 1.2
+          }}>
+            Your first ritual starts with a single breath.
+          </h3>
+          <button
+            onClick={() => navigate("/shop")}
+            style={{
+              background: "#ffffff", color: "#1a1a1a",
+              border: "none", padding: "14px 36px", borderRadius: 30,
+              fontSize: "0.85rem", fontWeight: 700, cursor: "pointer",
+              letterSpacing: "0.04em", transition: "all 0.3s ease",
+              boxShadow: "0 4px 14px rgba(0,0,0,0.1)",
+              display: "inline-flex", alignItems: "center", gap: 10
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#f0ece4"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.15)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "#ffffff"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 14px rgba(0,0,0,0.1)"; }}
+          >
+            Find Your WishStone
+            <CategoryIcon type="arrow" size={14} color="#1a1a1a" />
+          </button>
+        </motion.div>
+      </section>
     </div>
   );
 }
@@ -4667,10 +5269,10 @@ function BenefitsPage() {
     .benefits-page * { font-family: 'Open Sans', sans-serif; }
     .benefit-arch-card {
       background: #ffffff;
-      border: 1px solid rgba(90, 102, 81, 0.15);
+      border: 1px solid rgba(120, 127, 86, 0.15);
       border-radius: 100px 100px 16px 16px;
       padding: 3.5rem 1.8rem 2.5rem;
-      box-shadow: 0 8px 24px rgba(90, 102, 81, 0.03);
+      box-shadow: 0 8px 24px rgba(120, 127, 86, 0.03);
       text-align: center;
       display: flex;
       flex-direction: column;
@@ -4689,13 +5291,13 @@ function BenefitsPage() {
       <style>{css}</style>
       <div className="max-w" style={{ padding: "clamp(1.5rem,4vw,3rem)" }}>
         <h1 style={{ fontFamily: "'Open Sans', sans-serif", color: "#000000", fontSize: "clamp(1.8rem,4vw,2.5rem)", fontWeight: 800, marginBottom: "0.4rem" }}>WishStone Benefits</h1>
-        <div style={{ width: 60, height: 3, background: "#5A6651", marginBottom: "1.2rem" }} />
+        <div style={{ width: 60, height: 3, background: "#787F56", marginBottom: "1.2rem" }} />
 
-        <h3 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(1.1rem,2vw,1.35rem)", color: "#5A6651", fontWeight: 700, marginBottom: "0.8rem", lineHeight: 1.4 }}>
+        <h3 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(1.1rem,2vw,1.35rem)", color: "#787F56", fontWeight: 700, marginBottom: "0.8rem", lineHeight: 1.4 }}>
           Supporting Your Journey Toward Mental Peace, Emotional Balance & Intentional Living
         </h3>
 
-        <p style={{ color: "#5A6651", fontSize: "0.92rem", lineHeight: 1.7, marginBottom: "3rem", maxWidth: 780, fontWeight: 500 }}>
+        <p style={{ color: "#787F56", fontSize: "0.92rem", lineHeight: 1.7, marginBottom: "3rem", maxWidth: 780, fontWeight: 500 }}>
           Manifestation begins with intention. In a world filled with distractions, WishStone helps you pause, gain clarity, and focus your energy on what truly matters. Through mindful daily rituals, it encourages positive thinking, purposeful action, and alignment with the life you wish to create.
         </p>
 
@@ -4709,62 +5311,62 @@ function BenefitsPage() {
               whileHover="hover"
               viewport={{ once: true, margin: "-50px" }}
               variants={{
-                initial: { 
-                  opacity: 0, 
-                  x: i % 2 === 0 ? -45 : 45, 
+                initial: {
+                  opacity: 0,
+                  x: i % 2 === 0 ? -45 : 45,
                   y: 30,
                   backgroundColor: "#ffffff",
-                  borderColor: "rgba(90, 102, 81, 0.15)",
-                  boxShadow: "0 8px 24px rgba(90, 102, 81, 0.03)"
+                  borderColor: "rgba(120, 127, 86, 0.15)",
+                  boxShadow: "0 8px 24px rgba(120, 127, 86, 0.03)"
                 },
-                animate: { 
-                  opacity: 1, 
-                  x: 0, 
+                animate: {
+                  opacity: 1,
+                  x: 0,
                   y: 0,
                   backgroundColor: "#ffffff",
-                  borderColor: "rgba(90, 102, 81, 0.15)",
-                  boxShadow: "0 8px 24px rgba(90, 102, 81, 0.03)",
+                  borderColor: "rgba(120, 127, 86, 0.15)",
+                  boxShadow: "0 8px 24px rgba(120, 127, 86, 0.03)",
                   transition: {
                     x: { type: "spring", stiffness: 50, damping: 13, delay: (i % 3) * 0.08 },
                     y: { type: "spring", stiffness: 50, damping: 13, delay: (i % 3) * 0.08 },
                     opacity: { duration: 0.6, delay: (i % 3) * 0.08 }
                   }
                 },
-                hover: { 
-                  y: -12, 
-                  scale: 1.025, 
-                  backgroundColor: "#FBFBFA", 
-                  borderColor: "#5A6651",
-                  boxShadow: "0 22px 50px rgba(90, 102, 81, 0.16)",
+                hover: {
+                  y: -12,
+                  scale: 1.025,
+                  backgroundColor: "#FBFBFA",
+                  borderColor: "#787F56",
+                  boxShadow: "0 22px 50px rgba(120, 127, 86, 0.16)",
                   transition: { type: "spring", stiffness: 260, damping: 22 }
                 }
               }}
               style={{ cursor: "pointer" }}
             >
               {/* Decorative top center accent (propagates parent hover state) */}
-              <motion.div 
+              <motion.div
                 variants={{
-                  initial: { width: 32, backgroundColor: "rgba(90, 102, 81, 0.3)" },
-                  animate: { width: 32, backgroundColor: "rgba(90, 102, 81, 0.3)" },
-                  hover: { 
-                    width: 100, 
-                    backgroundColor: "#5A6651",
+                  initial: { width: 32, backgroundColor: "rgba(120, 127, 86, 0.3)" },
+                  animate: { width: 32, backgroundColor: "rgba(120, 127, 86, 0.3)" },
+                  hover: {
+                    width: 100,
+                    backgroundColor: "#787F56",
                     transition: { type: "spring", stiffness: 200, damping: 18 }
                   }
                 }}
-                style={{ height: 4, borderRadius: 2, marginBottom: "1.5rem" }} 
+                style={{ height: 4, borderRadius: 2, marginBottom: "1.5rem" }}
               />
-              
+
               <h3 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "0.95rem", fontWeight: 800, color: "#000000", marginBottom: "0.8rem", letterSpacing: "-0.01em" }}>
                 {b.title}
               </h3>
-              
+
               {/* Description (propagates parent hover state) */}
-              <motion.p 
+              <motion.p
                 variants={{
-                  initial: { color: "#5A6651" },
-                  animate: { color: "#5A6651" },
-                  hover: { 
+                  initial: { color: "#787F56" },
+                  animate: { color: "#787F56" },
+                  hover: {
                     color: "#000000",
                     transition: { duration: 0.22 }
                   }
@@ -4781,81 +5383,1160 @@ function BenefitsPage() {
   );
 }
 
-// ─── STORIES PAGE ─────────────────────────────────────────────
-function StoriesPage() {
-  const stories = [
+// ─── CANVAS PRODUCT VIDEO ANIMATOR ────────────────────────────
+function CanvasProductVideo() {
+  const canvasRef = useRef(null);
+  const [activeItem, setActiveItem] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const progressRef = useRef(0);
+  const imagesPreloaded = useRef([]);
+
+  const items = [
     {
-      name: "Neha R.",
-      city: "Mumbai",
-      rating: 5,
-      text: "Having WishStone with me has helped me take moments for reflection when I'm feeling too caught up in the hustle of my day.",
-      product: "WishStone",
-      avatar: "N"
+      title: "Sacred Wishstone",
+      sub: "SOMATIC ANCHOR",
+      desc: "A tactile heavy crystal mapping your conscious desires into physical spaces.",
+      color: "#787F56",
+      image: "/wishstone-horizontal.jpeg"
     },
     {
-      name: "Arjun",
-      city: "Bangalore",
-      rating: 5,
-      text: "My biggest problem has always been overthinking and reflecting on the events of the day too late at night. Having started using WishStone during the evenings, I find it much easier to disconnect and clear my head.",
-      product: "WishStone",
-      avatar: "A"
+      title: "Vibrational Diffuser",
+      sub: "RITUAL CHAMBER",
+      desc: "Dispersing grounding mist infused with natural essential oils.",
+      color: "#C39D5F",
+      image: "/defuser-product.jpeg"
     },
     {
-      name: "Priya",
-      city: "Pune",
-      rating: 5,
-      text: "As someone who is not really into spirituality, the only thing I care about is my intention setting practice which is easy and straightforward to incorporate into your daily routine.",
-      product: "WishStone",
-      avatar: "P"
+      title: "The Cosmic Eye Grid",
+      sub: "GEOMETRIC CONDUIT",
+      desc: "Sacred crystalline structures centering your meditation environment.",
+      color: "#8FA382",
+      image: "/cosmic-eye.jpeg"
     },
     {
-      name: "Vikram",
-      city: "Gurgaon",
-      rating: 5,
-      text: "The diffuser is responsible for an entire change in the atmosphere of my bedroom. Even after long hours at work, switching on the diffuser for just 20 minutes enables me to relax.",
-      product: "WishStone Diffuser",
-      avatar: "V"
-    },
-    {
-      name: "Meera",
-      city: "Chennai",
-      rating: 5,
-      text: "The reason I bought the Cosmic Eye is that I needed something spiritually meaningful in my meditation zone. This piece of art acts as a constant reminder for staying present and trusting the process.",
-      product: "Cosmic Eye",
-      avatar: "M"
-    },
-    {
-      name: "Ananya",
-      city: "Pune",
-      rating: 5,
-      text: "The Habit Builder has been a game-changer for my daily routine. It helps me stay mindful and grounded as I work towards my long-term goals.",
-      product: "Habit Builder",
-      avatar: "A"
+      title: "Habit Builder",
+      sub: "BEHAVIOR TRACKER",
+      desc: "Tactile tracking nodes to map intentions and lock in daily positive habits.",
+      color: "#6D7860",
+      image: "/habit-builder2-product.jpeg"
     }
   ];
+
+  useEffect(() => {
+    imagesPreloaded.current = items.map(it => {
+      const img = new Image();
+      img.src = it.image;
+      return img;
+    });
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let animationFrameId;
+    let angle = 0;
+    let scanY = 0;
+    let scanDir = 1;
+
+    canvas.width = 640;
+    canvas.height = 360;
+
+    const render = () => {
+      ctx.fillStyle = "#0C0B0A";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
+      for (let i = 0; i < 45; i++) {
+        const x = (Math.sin(i * 123) * 0.5 + 0.5) * canvas.width;
+        const y = (Math.cos(i * 456) * 0.5 + 0.5) * canvas.height;
+        ctx.fillRect(x, y, 1.5, 1.5);
+      }
+
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(canvas.width / 2, canvas.height / 2, 85, 0, Math.PI * 2);
+      ctx.stroke();
+
+      const current = items[activeItem];
+
+      const grad = ctx.createRadialGradient(
+        canvas.width / 2, canvas.height / 2, 10,
+        canvas.width / 2, canvas.height / 2, 90
+      );
+      grad.addColorStop(0, `${current.color}45`);
+      grad.addColorStop(1, "transparent");
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(canvas.width / 2, canvas.height / 2, 95, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Render product graphics based on active tab - 360 Spin!
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.scale(Math.sin(angle), 1); // 360 degree horizontal flip spin
+
+      const activeImg = imagesPreloaded.current[activeItem];
+      if (activeImg && activeImg.complete && activeImg.naturalWidth !== 0) {
+        ctx.beginPath();
+        ctx.arc(0, 0, 60, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(activeImg, -60, -60, 120, 120);
+      } else {
+        ctx.strokeStyle = current.color;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(0, 0, 45, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.beginPath();
+      ctx.arc(0, 0, 60, 0, Math.PI * 2);
+      ctx.clip();
+
+      ctx.strokeStyle = `${current.color}AA`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-60, scanY);
+      ctx.lineTo(60, scanY);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.font = "bold 9px 'Open Sans', sans-serif";
+      ctx.fillStyle = "#787F56";
+      ctx.letterSpacing = "2px";
+      ctx.fillText(`PRODUCT VISUALIZER 0${activeItem + 1}`, 40, 50);
+
+      ctx.font = "bold 20px 'Playfair Display', serif";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(current.title, 40, 78);
+
+      ctx.font = "11px 'Open Sans', sans-serif";
+      ctx.fillStyle = "rgba(255,255,255,0.65)";
+
+      const words = current.desc.split(" ");
+      let line = "";
+      let y = 105;
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + " ";
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > 220 && n > 0) {
+          ctx.fillText(line, 40, y);
+          line = words[n] + " ";
+          y += 18;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, 40, y);
+
+      ctx.fillStyle = "rgba(255,255,255,0.1)";
+      ctx.fillRect(40, canvas.height - 45, canvas.width - 80, 4);
+
+      ctx.fillStyle = current.color;
+      const w = (progressRef.current / 100) * (canvas.width - 80);
+      ctx.fillRect(40, canvas.height - 45, w, 4);
+
+      if (isPlaying) {
+        angle += 0.018; // Rotation angle
+        progressRef.current += 0.15; // Slower speed (approx 12-15s per item)
+
+        scanY += scanDir * 1.5;
+        if (scanY >= 60) scanDir = -1;
+        if (scanY <= -60) scanDir = 1;
+
+        if (progressRef.current >= 100) {
+          progressRef.current = 0;
+          setActiveItem((prev) => (prev + 1) % items.length);
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [isPlaying, activeItem]);
+
   return (
-    <div style={{ paddingTop: 90, background: T.bg, minHeight: "100vh" }}>
-      <div className="max-w" style={{ padding: "clamp(1.5rem,4vw,3rem)" }}>
-        <h1 style={{ fontFamily: "'Playfair Display',serif", color: T.text, fontSize: "clamp(1.6rem,4vw,2.2rem)", fontWeight: 900, marginBottom: "0.4rem" }}>Customer Stories</h1>
-        <div style={{ width: 60, height: 3, background: `linear-gradient(90deg,${T.orange},transparent)`, marginBottom: "0.8rem" }} />
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.5rem", marginTop: "2rem" }} className="prod-grid">
-          {stories.map((s, i) => (
-            <div key={i} style={{ background: "#fff", borderRadius: 16, padding: "1.5rem", border: `1px solid ${T.border}` }}>
-              <div style={{ display: "flex", gap: 3, marginBottom: "1rem" }}>
-                {Array(s.rating).fill(0).map((_, j) => <span key={j} style={{ color: T.orange, fontSize: 13 }}>★</span>)}
-              </div>
-              <p style={{ fontSize: "0.84rem", color: T.textMid, lineHeight: 1.7, marginBottom: "1.2rem", fontStyle: "italic" }}>"{s.text}"</p>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 36, height: 36, borderRadius: "50%", background: `linear-gradient(135deg,${T.orangeD},${T.orange})`, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "0.85rem" }}>{s.avatar}</div>
+    <div style={{ background: "#11100F", borderRadius: 24, padding: 12, border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 24px 64px rgba(0,0,0,0.4)" }}>
+      <div style={{ position: "relative", width: "100%", aspectRatio: "16/9", overflow: "hidden", borderRadius: 16 }}>
+        <canvas ref={canvasRef} style={{ width: "100%", height: "100%", display: "block" }} />
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12, padding: "0 6px" }}>
+        <div style={{ display: "flex", gap: 12 }}>
+          <button onClick={() => setIsPlaying(!isPlaying)} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em" }}>
+            {isPlaying ? "⏸ PAUSE" : "▶ PLAY"}
+          </button>
+          <div style={{ display: "flex", gap: 6 }}>
+            {items.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => {
+                  setActiveItem(idx);
+                  progressRef.current = 0;
+                }}
+                style={{
+                  background: activeItem === idx ? "#787F56" : "rgba(255,255,255,0.15)",
+                  border: "none",
+                  width: 18,
+                  height: 18,
+                  borderRadius: "50%",
+                  color: "#fff",
+                  fontSize: 8,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: 700
+                }}
+              >
+                {idx + 1}
+              </button>
+            ))}
+          </div>
+        </div>
+        <span style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", letterSpacing: "1px", fontWeight: 700 }}>GENERATIVE PRODUCT FILM</span>
+      </div>
+    </div>
+  );
+}
+
+function CanvasJourneyVideo() {
+  const canvasRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [activeStep, setActiveStep] = useState(0);
+  const progressRef = useRef(0);
+  const imagesPreloaded = useRef([]);
+
+  const steps = [
+    { label: "1. DISCOVERING THE IDEA", desc: "2024: Finding somatic anchors amidst daily hustle & setting intention blueprints.", color: "#787F56", image: "/wishstone-horizontal.jpeg" },
+    { label: "2. PRODUCT ORIGINS", desc: "Sourcing ethically hand-harvested crystals from ancient quartz riverbeds.", color: "#C39D5F", image: "/cosmic-eye.jpeg" },
+    { label: "3. HOW PRODUCTS ARE MADE", desc: "Lapidary artisans cut, wet-polish, Sage cleanse & moonlight charge every batch.", color: "#8FA382", image: "/defuser-product.jpeg" },
+    { label: "4. BEHIND THE SCENE LAUNCH", desc: "Sovereign linen wrapping & tracking nodes delivered directly to your doorstep.", color: "#6D7860", image: "/habit-builder2-product.jpeg" }
+  ];
+
+  useEffect(() => {
+    imagesPreloaded.current = steps.map(it => {
+      const img = new Image();
+      img.src = it.image;
+      return img;
+    });
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let animId;
+    let frame = 0;
+
+    canvas.width = 640;
+    canvas.height = 360;
+
+    const render = () => {
+      ctx.fillStyle = "#0C0B0A";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const step = steps[activeStep];
+
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
+      ctx.lineWidth = 1;
+      for (let i = 0; i < canvas.width; i += 40) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, canvas.height);
+        ctx.stroke();
+      }
+      for (let j = 0; j < canvas.height; j += 40) {
+        ctx.beginPath();
+        ctx.moveTo(0, j);
+        ctx.lineTo(canvas.width, j);
+        ctx.stroke();
+      }
+
+      const cx = canvas.width / 2 + 100;
+      const cy = canvas.height / 2;
+
+      const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 90);
+      grad.addColorStop(0, `${step.color}35`);
+      grad.addColorStop(1, "transparent");
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 100, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = step.color;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 75 + Math.sin(frame * 0.04) * 5, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(Math.sin(frame * 0.015), 1); // 360 spin rotation
+
+      const activeImg = imagesPreloaded.current[activeStep];
+      if (activeImg && activeImg.complete && activeImg.naturalWidth !== 0) {
+        ctx.beginPath();
+        ctx.arc(0, 0, 60, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(activeImg, -60, -60, 120, 120);
+      } else {
+        ctx.fillStyle = step.color;
+        ctx.beginPath();
+        ctx.arc(0, 0, 60, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      ctx.font = "bold 9px 'Open Sans', sans-serif";
+      ctx.fillStyle = "#787F56";
+      ctx.letterSpacing = "3px";
+      ctx.fillText(`JOURNEY STAGE 0${activeStep + 1}`, 50, 60);
+
+      ctx.font = "bold 20px 'Playfair Display', serif";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(step.label, 50, 90);
+
+      ctx.font = "11px 'Open Sans', sans-serif";
+      ctx.fillStyle = "rgba(255,255,255,0.65)";
+
+      const words = step.desc.split(" ");
+      let line = "";
+      let y = 120;
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + " ";
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > 220 && n > 0) {
+          ctx.fillText(line, 50, y);
+          line = words[n] + " ";
+          y += 18;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, 50, y);
+
+      ctx.fillStyle = "rgba(255,255,255,0.12)";
+      ctx.fillRect(50, canvas.height - 60, canvas.width - 100, 3);
+
+      ctx.fillStyle = "#787F56";
+      const w = (progressRef.current / 100) * (canvas.width - 100);
+      ctx.fillRect(50, canvas.height - 60, w, 3);
+
+      ctx.font = "bold 8px 'Open Sans', sans-serif";
+      ctx.fillStyle = "rgba(255,255,255,0.3)";
+      ctx.fillText("MATERIAL TIMELINE // LABORATORY BATCH", 50, canvas.height - 35);
+
+      if (isPlaying) {
+        frame++;
+        progressRef.current += 0.15; // Slow down stages to ~15s per step
+        if (progressRef.current >= 100) {
+          progressRef.current = 0;
+          setActiveStep((prev) => (prev + 1) % steps.length);
+        }
+      }
+
+      animId = requestAnimationFrame(render);
+    };
+
+    render();
+    return () => cancelAnimationFrame(animId);
+  }, [isPlaying, activeStep]);
+
+  return (
+    <div style={{ background: "#11100F", borderRadius: 20, padding: 12, border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 24px 64px rgba(0,0,0,0.4)" }}>
+      <div style={{ position: "relative", width: "100%", aspectRatio: "16/9", overflow: "hidden", borderRadius: 12 }}>
+        <canvas ref={canvasRef} style={{ width: "100%", height: "100%", display: "block" }} />
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12, padding: "0 6px" }}>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={() => setIsPlaying(!isPlaying)} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em" }}>
+            {isPlaying ? "⏸ PAUSE" : "▶ PLAY"}
+          </button>
+        </div>
+        <span style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", letterSpacing: "1px", fontWeight: 700 }}>EXCLUSIVE ORIGIN BATCH</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── STORIES PAGE ─────────────────────────────────────────────
+function StoriesPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const activeCategory = searchParams.get("cat") || "landing";
+
+  const setActiveCategory = (newCat) => {
+    if (newCat === "landing") {
+      navigate("/stories");
+    } else {
+      navigate(`/stories?cat=${newCat}`);
+    }
+  };
+
+  const [blogs, setBlogs] = useState([]);
+  const [blogsLoading, setBlogsLoading] = useState(true);
+  const [selectedBlog, setSelectedBlog] = useState(null);
+
+  // Fetch blogs on component mount
+  useEffect(() => {
+    setBlogsLoading(true);
+    fetch(`${getApiBase()}/api/blogs`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.blogs) {
+          setBlogs(data.blogs.filter(b => b.isActive));
+        }
+      })
+      .catch(err => console.error("Error fetching blogs:", err))
+      .finally(() => setBlogsLoading(false));
+  }, []);
+
+  const productStories = [
+    {
+      title: "Sacred Wishstone",
+      tagline: "Your physical somatic anchor",
+      desc: "Ethically hand-harvested from ancient river formations, each stone carries a unique natural composition. Holding the weight in your hands serves as a physical trigger to pull your attention away from daily stress and align back to your true goals.",
+      image: "/wishstone-horizontal.jpeg"
+    },
+    {
+      title: "Vibrational Diffuser",
+      tagline: "Cleanse your surrounding aura",
+      desc: "Dispersing micro-particles of pure botanical extracts, this ultrasonic vessel balances the room environment. By purifying the air, it creates a calming transition state ideal for reflection, yoga, or evening meditation.",
+      image: "/defuser-product.jpeg"
+    },
+    {
+      title: "The Cosmic Eye Grid",
+      tagline: "Map celestial intent",
+      desc: "Crafted on an alignment layout, this sacred platform centers crystal structures on custom nodes. It translates abstract objectives into a visual geometric layout, reinforcing intention focusing rituals.",
+      image: "/cosmic-eye.jpeg"
+    },
+    {
+      title: "Habit Builder",
+      tagline: "Cultivate daily consistency",
+      desc: "A beautifully structured physical ledger and tracking node to visually chart your micro-habits. Daily tactile mapping encourages continuous feedback loops and reinforces positive neuro-behavioral routines.",
+      image: "/habit-builder2-product.jpeg"
+    }
+  ];
+
+  const journeyTimeline = [
+    {
+      title: "Phase 1: Deep Earthen Mining",
+      desc: "Our crystals originate deep in mineral beds. Each stone is chosen by hand based on structural integrity, weight distribution, and energetic clarity.",
+      image: "/wishstone-horizontal.jpeg"
+    },
+    {
+      title: "Phase 2: Sculpting by Hand",
+      desc: "Local lapidary artisans cut and wet-polish each piece. We preserve the organic shape, carving only smooth, soft curves for comfortable tactile contact.",
+      image: "/defuser-product.jpeg"
+    },
+    {
+      title: "Phase 3: Charging and Activation",
+      desc: "Before dispatch, stones are placed on copper waves, bathed in moonlight, and cleansed with sage incense smoke to clear pre-existing charges.",
+      image: "/cosmic-eye.jpeg"
+    },
+    {
+      title: "Phase 4: Sovereign Packaging",
+      desc: "Each Wishstone is nestled inside a hand-stitched cotton linen pouch, complete with premium material origin leaves and intention-focusing guides.",
+      image: "/habit-builder2-product.jpeg"
+    }
+  ];
+
+  return (
+    <div style={{ paddingTop: 90, background: T.bg, minHeight: "100vh", color: T.text }} className="homepage-font-override">
+
+      {/* Back to Categories bar */}
+      {activeCategory !== "landing" && (
+        <div className="max-w" style={{ padding: "1.5rem 1.5rem 0.5rem 1.5rem", display: "flex", alignItems: "center" }}>
+          <button
+            onClick={() => setActiveCategory("landing")}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "#787F56",
+              fontSize: "0.78rem",
+              fontWeight: 700,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "8px 12px",
+              borderRadius: "6px",
+              transition: "all 0.2s"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(120, 127, 86, 0.08)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "none";
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Categories
+          </button>
+        </div>
+      )}
+
+      <AnimatePresence mode="wait">
+        {/* LANDING PAGE CATEGORIES */}
+        {activeCategory === "landing" && (
+          <motion.div
+            key="landing"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            style={{ padding: "4rem 1.5rem" }}
+          >
+            <div className="max-w" style={{ textAlign: "center", marginBottom: "4rem" }}>
+              <span style={{ color: "#787F56", fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", display: "inline-block", marginBottom: 12 }}>
+                ✦ Explore the Wisdom ✦
+              </span>
+              <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2.2rem, 5vw, 3.2rem)", fontWeight: 800, color: "#1a1a1a" }}>
+                Stories, Wisdom &amp; Journey
+              </h1>
+              <p style={{ color: T.textMid, fontSize: "0.95rem", marginTop: 12, maxWidth: "600px", margin: "12px auto 0", lineHeight: 1.6 }}>
+                Dive deeper into the world of Wishstone. Select a category below to explore our somatic anchoring system, vibrational logs, and hand-sculpting journey.
+              </p>
+            </div>
+
+            <div className="max-w" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "2.5rem", padding: "0 1rem" }}>
+              {/* Category 1: Wish Story */}
+              <motion.div
+                whileHover={{ y: -8 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                onClick={() => setActiveCategory("wish-story")}
+                className="category-card"
+                style={{
+                  background: "#ffffff",
+                  borderRadius: 20,
+                  overflow: "hidden",
+                  boxShadow: "0 15px 35px rgba(120, 127, 86, 0.06)",
+                  border: `1px solid ${T.border}`,
+                  cursor: "pointer",
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                  transition: "box-shadow 0.3s ease"
+                }}
+              >
+                <div style={{ height: 240, overflow: "hidden", position: "relative" }}>
+                  <img
+                    src="/wishstone-horizontal.jpeg"
+                    alt="Wish Story"
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    className="category-img"
+                  />
+                  <div style={{ position: "absolute", top: 16, left: 16, background: "rgba(245, 240, 232, 0.9)", backdropFilter: "blur(4px)", padding: "6px 14px", borderRadius: 20, fontSize: "0.65rem", fontWeight: 800, color: "#787F56", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                    Anchoring System
+                  </div>
+                </div>
+                <div style={{ padding: "2rem", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div>
+                    <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 800, marginBottom: "0.8rem", color: "#1a1a1a" }}>
+                      Wish Story
+                    </h3>
+                    <p style={{ color: T.textMid, fontSize: "0.88rem", lineHeight: 1.6, marginBottom: "1.5rem" }}>
+                      Explore the science and craftsmanship behind each item. Learn how our physical somatic weight anchors your conscious focus.
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#787F56", fontSize: "0.78rem", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                    Explore Stories
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s" }} className="arrow-icon">
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Category 2: Blog */}
+              <motion.div
+                whileHover={{ y: -8 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                onClick={() => setActiveCategory("blog")}
+                className="category-card"
+                style={{
+                  background: "#ffffff",
+                  borderRadius: 20,
+                  overflow: "hidden",
+                  boxShadow: "0 15px 35px rgba(120, 127, 86, 0.06)",
+                  border: `1px solid ${T.border}`,
+                  cursor: "pointer",
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                  transition: "box-shadow 0.3s ease"
+                }}
+              >
+                <div style={{ height: 240, overflow: "hidden", position: "relative" }}>
+                  <img
+                    src="/cosmic-eye.jpeg"
+                    alt="Blog"
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    className="category-img"
+                  />
+                  <div style={{ position: "absolute", top: 16, left: 16, background: "rgba(245, 240, 232, 0.9)", backdropFilter: "blur(4px)", padding: "6px 14px", borderRadius: 20, fontSize: "0.65rem", fontWeight: 800, color: "#787F56", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                    Wisdom Logs
+                  </div>
+                </div>
+                <div style={{ padding: "2rem", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div>
+                    <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 800, marginBottom: "0.8rem", color: "#1a1a1a" }}>
+                      Blog
+                    </h3>
+                    <p style={{ color: T.textMid, fontSize: "0.88rem", lineHeight: 1.6, marginBottom: "1.5rem" }}>
+                      Dive into rituals, manifestation guides, and cosmic teachings published directly by the Wishstone community and crew.
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#787F56", fontSize: "0.78rem", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                    Read Articles
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s" }} className="arrow-icon">
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Category 3: Our Journey */}
+              <motion.div
+                whileHover={{ y: -8 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                onClick={() => setActiveCategory("our-journey")}
+                className="category-card"
+                style={{
+                  background: "#ffffff",
+                  borderRadius: 20,
+                  overflow: "hidden",
+                  boxShadow: "0 15px 35px rgba(120, 127, 86, 0.06)",
+                  border: `1px solid ${T.border}`,
+                  cursor: "pointer",
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                  transition: "box-shadow 0.3s ease"
+                }}
+              >
+                <div style={{ height: 240, overflow: "hidden", position: "relative" }}>
+                  <img
+                    src="/founder.png"
+                    alt="Our Journey"
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    className="category-img"
+                  />
+                  <div style={{ position: "absolute", top: 16, left: 16, background: "rgba(245, 240, 232, 0.9)", backdropFilter: "blur(4px)", padding: "6px 14px", borderRadius: 20, fontSize: "0.65rem", fontWeight: 800, color: "#787F56", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                    The Maker Story
+                  </div>
+                </div>
+                <div style={{ padding: "2rem", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div>
+                    <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.6rem", fontWeight: 800, marginBottom: "0.8rem", color: "#1a1a1a" }}>
+                      Our Journey
+                    </h3>
+                    <p style={{ color: T.textMid, fontSize: "0.88rem", lineHeight: 1.6, marginBottom: "1.5rem" }}>
+                      Discover how we source, hand-sculpt, charge under moonlight, and deliver sacred crystals to activate your desires.
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#787F56", fontSize: "0.78rem", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                    Discover Journey
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s" }} className="arrow-icon">
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                      <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* CATEGORY 1: WISH STORY */}
+        {activeCategory === "wish-story" && (
+          <motion.div
+            key="wish-story"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            {/* Hero Section */}
+            <section style={{ background: "#0C0B0A", color: "#fff", padding: "5rem 1.5rem" }}>
+              <div className="max-w" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3rem", alignItems: "center" }}
+                className="hero-grid">
                 <div>
-                  <div style={{ fontWeight: 700, color: T.text, fontSize: "0.82rem" }}>{s.name}</div>
-                  <div style={{ fontSize: "0.68rem", color: T.textMid }}>{s.city} · {s.product}</div>
+                  <span style={{ color: "#C39D5F", fontSize: "0.68rem", fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>THE COLLECTION OVERVIEW</span>
+                  <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2rem, 5vw, 3.2rem)", fontWeight: 900, lineHeight: 1.15, margin: "1rem 0" }}>
+                    The Path of <br /><span style={{ color: "#C39D5F", fontStyle: "italic" }}>Conscious Focus</span>
+                  </h1>
+                  <p style={{ color: "rgba(255, 255, 255, 0.7)", fontSize: "0.95rem", lineHeight: 1.8, marginBottom: "2.5rem" }}>
+                    Every Wishstone creation acts as a tactile reminder. By anchoring your intentions, we bridge the gap between abstract desires and structural reality.
+                  </p>
+
+                  {/* Hero Bottom Buttons */}
+                  <div style={{ display: "flex", gap: "1rem" }}>
+                    <button
+                      onClick={() => setActiveCategory("blog")}
+                      style={{ background: "#C39D5F", border: "none", color: "#fff", padding: "12px 28px", borderRadius: 30, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer" }}
+                    >
+                      READ BLOGS
+                    </button>
+                    <button
+                      onClick={() => setActiveCategory("our-journey")}
+                      style={{ background: "transparent", border: "1.5px solid rgba(255, 255, 255, 0.4)", color: "#fff", padding: "12px 28px", borderRadius: 30, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer" }}
+                    >
+                      OUR JOURNEY
+                    </button>
+                  </div>
+                </div>
+
+                {/* Animated Generative Canvas Video */}
+                <div>
+                  <CanvasProductVideo />
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
+            </section>
+
+            {/* Zig Zag Product Stories list */}
+            <section style={{ padding: "6rem 1.5rem" }}>
+              <div className="max-w" style={{ display: "flex", flexDirection: "column", gap: "6rem" }}>
+                <div style={{ textAlign: "center", maxWidth: 600, margin: "0 auto 1.5rem" }}>
+                  <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "2.2rem", fontWeight: 800 }}>Tactile Anchoring System</h2>
+                  <p style={{ color: T.textMid, fontSize: "0.9rem", marginTop: 8 }}>Explore the engineering and craftsmanship behind each item.</p>
+                </div>
+
+                {productStories.map((item, idx) => {
+                  const isEven = idx % 2 === 0;
+                  return (
+                    <div
+                      key={idx}
+                      style={{
+                        display: "flex",
+                        flexDirection: isEven ? "row" : "row-reverse",
+                        gap: "4rem",
+                        alignItems: "center"
+                      }}
+                      className="hero-grid"
+                    >
+                      {/* Product Image */}
+                      <div style={{ flex: 1 }}>
+                        <div style={{ overflow: "hidden", borderRadius: 16, boxShadow: "0 16px 40px rgba(120, 127, 86,0.08)", border: `1px solid ${T.border}` }}>
+                          <img src={item.image} alt={item.title} style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", display: "block" }} />
+                        </div>
+                      </div>
+
+                      {/* Product Story */}
+                      <div style={{ flex: 1 }}>
+                        <span style={{ color: "#787F56", fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase" }}>{item.tagline}</span>
+                        <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 800, margin: "0.6rem 0" }}>{item.title}</h3>
+                        <p style={{ color: T.textMid, fontSize: "0.95rem", lineHeight: 1.8 }}>{item.desc}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* Bottom Navigation */}
+            <section style={{ padding: "0 1.5rem 5rem", textAlign: "center" }}>
+              <div className="max-w" style={{ borderTop: `1px solid ${T.border}`, paddingTop: "2.5rem", display: "flex", justifyContent: "center", gap: "1rem" }}>
+                <button
+                  onClick={() => setActiveCategory("landing")}
+                  style={{ background: "transparent", border: `1.5px solid #787F56`, color: "#787F56", padding: "10px 24px", borderRadius: 24, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", cursor: "pointer" }}
+                >
+                  ALL CATEGORIES
+                </button>
+                <button
+                  onClick={() => setActiveCategory("blog")}
+                  style={{ background: "#787F56", border: "none", color: "#fff", padding: "10px 24px", borderRadius: 24, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", cursor: "pointer" }}
+                >
+                  READ BLOGS
+                </button>
+              </div>
+            </section>
+          </motion.div>
+        )}
+
+        {/* CATEGORY 2: BLOG */}
+        {activeCategory === "blog" && (
+          <motion.div
+            key="blog"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            <section style={{ padding: "4rem 1.5rem" }}>
+              <div className="max-w">
+                <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+                  <span style={{ color: "#787F56", fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase" }}>WISHSTONE DIARY</span>
+                  <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "2.6rem", fontWeight: 800, marginTop: 8 }}>Vibrational Logs</h1>
+                  <p style={{ color: T.textMid, fontSize: "0.95rem", marginTop: 8 }}>Stories, rituals, and teachings published directly by our crew.</p>
+                </div>
+
+                {blogsLoading ? (
+                  <div style={{ display: "flex", justifyContent: "center", padding: "5rem" }}>
+                    <div style={{ width: 30, height: 30, border: `3px solid rgba(120, 127, 86, 0.2)`, borderTop: `3px solid #787F56`, borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                  </div>
+                ) : blogs.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "4rem", border: `1px dashed ${T.border}`, borderRadius: 16 }}>
+                    <p style={{ color: T.textLight, fontSize: "0.95rem" }}>No active blogs published yet. Add some in the Admin Panel.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "2rem" }} className="prod-grid">
+                    {blogs.map((blog, idx) => (
+                      <motion.article
+                        key={blog._id}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        whileHover={{ y: -8, boxShadow: "0 20px 40px rgba(120, 127, 86, 0.12)" }}
+                        onClick={() => setSelectedBlog(blog)}
+                        transition={{ delay: idx * 0.08, type: "spring", stiffness: 300, damping: 20 }}
+                        style={{
+                          background: "#fff",
+                          borderRadius: 16,
+                          border: `1px solid ${T.border}`,
+                          boxShadow: "0 10px 30px rgba(120, 127, 86,0.02)",
+                          overflow: "hidden",
+                          display: "flex",
+                          flexDirection: "column",
+                          cursor: "pointer"
+                        }}
+                      >
+                        {/* Cover image */}
+                        <div style={{ height: 180, background: "rgba(120, 127, 86, 0.05)", overflow: "hidden" }}>
+                          {blog.coverImage ? (
+                            <img src={getImageUrl(blog.coverImage)} alt={blog.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          ) : (
+                            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40 }}>✍️</div>
+                          )}
+                        </div>
+
+                        {/* Content */}
+                        <div style={{ padding: "1.5rem", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                          <div>
+                            <span style={{ fontSize: "0.68rem", color: "#787F56", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px" }}>
+                              By {blog.author || "Admin"} · {new Date(blog.createdAt).toLocaleDateString("en-IN")}
+                            </span>
+                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.2rem", fontWeight: 800, margin: "0.5rem 0", color: T.text }}>
+                              {blog.title}
+                            </h3>
+                            <p style={{ color: T.textMid, fontSize: "0.82rem", lineHeight: 1.6, lineClamp: 4, display: "-webkit-box", WebkitLineClamp: 4, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                              {blog.content}
+                            </p>
+                          </div>
+                        </div>
+                      </motion.article>
+                    ))}
+                  </div>
+                )}
+
+                {/* Bottom Navigation Buttons */}
+                <div style={{ display: "flex", justifyContent: "center", gap: "1rem", marginTop: "5rem", borderTop: `1px solid ${T.border}`, paddingTop: "2.5rem" }}>
+                  <button
+                    onClick={() => setActiveCategory("wish-story")}
+                    style={{ background: "transparent", border: `1.5px solid #787F56`, color: "#787F56", padding: "10px 24px", borderRadius: 24, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", cursor: "pointer" }}
+                  >
+                    BACK TO WISH STORY
+                  </button>
+                  <button
+                    onClick={() => setActiveCategory("landing")}
+                    style={{ background: "transparent", border: `1.5px solid #787F56`, color: "#787F56", padding: "10px 24px", borderRadius: 24, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", cursor: "pointer" }}
+                  >
+                    ALL CATEGORIES
+                  </button>
+                  <button
+                    onClick={() => setActiveCategory("our-journey")}
+                    style={{ background: "#787F56", border: "none", color: "#fff", padding: "10px 24px", borderRadius: 24, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", cursor: "pointer" }}
+                  >
+                    MOVE TO OUR JOURNEY
+                  </button>
+                </div>
+              </div>
+            </section>
+          </motion.div>
+        )}
+
+        {/* CATEGORY 3: OUR JOURNEY */}
+        {activeCategory === "our-journey" && (
+          <motion.div
+            key="our-journey"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            {/* Hero Section */}
+            <section
+              style={{
+                position: "relative",
+                height: "55vh",
+                minHeight: "350px",
+                backgroundImage: "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('/founder.png')",
+                backgroundSize: "contain",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
+                backgroundColor: "#0C0B0A",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#fff",
+                textAlign: "center"
+              }}
+            >
+              <div style={{ padding: "0 1rem" }}>
+                <span style={{ color: "#C39D5F", fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.3em", textTransform: "uppercase" }}>THE MAKERS</span>
+                <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(2.2rem, 6vw, 3.8rem)", fontWeight: 900, marginTop: 10, letterSpacing: "1px" }}>
+                  Our Exclusive Journey
+                </h1>
+              </div>
+            </section>
+
+            {/* Zig Zag Layout of origin */}
+            <section style={{ padding: "6rem 1.5rem" }}>
+              <div className="max-w" style={{ display: "flex", flexDirection: "column", gap: "6rem" }}>
+
+                {/* 1st Block: Sacred Wishstone */}
+                <div style={{ display: "flex", gap: "4rem", alignItems: "center" }} className="hero-grid">
+                  <div style={{ flex: 1 }}>
+                    <img src={journeyTimeline[0].image} alt="Sacred Wishstone" style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", borderRadius: 16, boxShadow: "0 10px 30px rgba(120, 127, 86,0.06)" }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <span style={{ color: "#787F56", fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase" }}>THE COMMENCEMENT</span>
+                    <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.9rem", fontWeight: 800, margin: "0.5rem 0" }}>The Journey of Wishstone</h2>
+                    <p style={{ color: T.textMid, fontSize: "0.95rem", lineHeight: 1.8 }}>
+                      Sourcing high-density minerals was our initial challenge. We searched far and wide to locate pure quartz beds that yield the exact tactile somatic weight required to anchor user intentions. Each specimen is selected for raw clarity.
+                    </p>
+                  </div>
+                </div>
+
+                {/* 2nd Block: Cosmic Eye Grid */}
+                <div style={{ display: "flex", flexDirection: "row-reverse", gap: "4rem", alignItems: "center" }} className="hero-grid">
+                  <div style={{ flex: 1 }}>
+                    <img src={journeyTimeline[2].image} alt="Cosmic Eye Grid" style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", borderRadius: 16, boxShadow: "0 10px 30px rgba(120, 127, 86,0.06)" }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <span style={{ color: "#787F56", fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase" }}>GEOMETRIC ARCHITECTURE</span>
+                    <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.9rem", fontWeight: 800, margin: "0.5rem 0" }}>Designing the Cosmic Eye</h2>
+                    <p style={{ color: T.textMid, fontSize: "0.95rem", lineHeight: 1.8 }}>
+                      Integrating ancient mathematics with modern physics, we mapped a geometric grid layout to center crystalline nodes. This creates a balanced focal space in meditation zones, providing structural feedback to mental objectives.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Animated Journey Stage Video */}
+                <div style={{ margin: "2rem 0" }}>
+                  <div style={{ textAlign: "center", maxWidth: 600, margin: "0 auto 2.5rem" }}>
+                    <span style={{ color: "#787F56", fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase" }}>THE TRANSFORMATION STAGES</span>
+                    <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 800, marginTop: 6 }}>Vibrational Blueprint Video</h3>
+                    <p style={{ color: T.textMid, fontSize: "0.88rem", marginTop: 6 }}>An automated timeline visualizing raw quartz to intention crystal activation.</p>
+                  </div>
+                  <CanvasJourneyVideo />
+                </div>
+
+                {/* 3rd Block: Vibrational Diffuser */}
+                <div style={{ display: "flex", gap: "4rem", alignItems: "center" }} className="hero-grid">
+                  <div style={{ flex: 1 }}>
+                    <img src={journeyTimeline[1].image} alt="Vibrational Diffuser" style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", borderRadius: 16, boxShadow: "0 10px 30px rgba(120, 127, 86,0.06)" }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <span style={{ color: "#787F56", fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase" }}>ATMOSPHERIC PURIFICATION</span>
+                    <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.9rem", fontWeight: 800, margin: "0.5rem 0" }}>Vaporizing Rituals</h2>
+                    <p style={{ color: T.textMid, fontSize: "0.95rem", lineHeight: 1.8 }}>
+                      Developing ultrasonic chambers required careful calibration. We engineered vessels that split clean water and essential oils into soothing micro-particles to cleanse rooms and create grounding environments.
+                    </p>
+                  </div>
+                </div>
+
+                {/* 4th Block: Habit Builder */}
+                <div style={{ display: "flex", flexDirection: "row-reverse", gap: "4rem", alignItems: "center" }} className="hero-grid">
+                  <div style={{ flex: 1 }}>
+                    <img src={journeyTimeline[3].image} alt="Habit Builder" style={{ width: "100%", aspectRatio: "4/3", objectFit: "cover", borderRadius: 16, boxShadow: "0 10px 30px rgba(120, 127, 86,0.06)" }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <span style={{ color: "#787F56", fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase" }}>CONSISTENCY LOOPS</span>
+                    <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.9rem", fontWeight: 800, margin: "0.5rem 0" }}>Building Daily Consistency</h2>
+                    <p style={{ color: T.textMid, fontSize: "0.95rem", lineHeight: 1.8 }}>
+                      To turn abstract intents into concrete progress, we designed a somatic tactile tracking board. By marking small milestones daily, you create healthy behavioral feedback loops that keep you aligned with long-term success.
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+            </section>
+
+            {/* Bottom Navigation */}
+            <section style={{ padding: "0 1.5rem 5rem", textAlign: "center" }}>
+              <div className="max-w" style={{ borderTop: `1px solid ${T.border}`, paddingTop: "2.5rem", display: "flex", justifyContent: "center", gap: "1rem" }}>
+                <button
+                  onClick={() => setActiveCategory("landing")}
+                  style={{ background: "transparent", border: `1.5px solid #787F56`, color: "#787F56", padding: "10px 24px", borderRadius: 24, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", cursor: "pointer" }}
+                >
+                  ALL CATEGORIES
+                </button>
+                <button
+                  onClick={() => setActiveCategory("wish-story")}
+                  style={{ background: "#787F56", border: "none", color: "#fff", padding: "10px 24px", borderRadius: 24, fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", cursor: "pointer" }}
+                >
+                  BACK TO WISH STORY
+                </button>
+              </div>
+            </section>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Blog Details Modal */}
+      <AnimatePresence>
+        {selectedBlog && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedBlog(null)}
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: "rgba(12, 11, 10, 0.8)",
+              backdropFilter: "blur(8px)",
+              zIndex: 9999,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: "2rem 1rem"
+            }}
+          >
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 50, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 180 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: "#ffffff",
+                color: "#0c0b0a",
+                width: "100%",
+                maxWidth: "800px",
+                maxHeight: "90vh",
+                borderRadius: "24px",
+                overflowY: "auto",
+                position: "relative",
+                boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
+                border: "1px solid rgba(120, 127, 86, 0.1)"
+              }}
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedBlog(null)}
+                style={{
+                  position: "absolute",
+                  top: "20px",
+                  right: "20px",
+                  background: "rgba(255,255,255,0.9)",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "40px",
+                  height: "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                  zIndex: 10,
+                  transition: "all 0.2s"
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.1)"}
+                onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+
+              {/* Cover Image Header */}
+              <div style={{ width: "100%", height: "350px", position: "relative", overflow: "hidden" }}>
+                {selectedBlog.coverImage ? (
+                  <img
+                    src={getImageUrl(selectedBlog.coverImage)}
+                    alt={selectedBlog.title}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                ) : (
+                  <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #787F56 0%, #0c0b0a 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "72px" }}>
+                    ✍️
+                  </div>
+                )}
+                {/* Visual overlay gradient */}
+                <div style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: "150px",
+                  background: "linear-gradient(to top, rgba(12,11,10,0.85), transparent)"
+                }} />
+                {/* Meta details overlaid */}
+                <div style={{
+                  position: "absolute",
+                  bottom: "25px",
+                  left: "35px",
+                  right: "35px",
+                  color: "#ffffff"
+                }} >
+                  <span style={{ fontSize: "0.75rem", color: "#C39D5F", fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+                    By {selectedBlog.author || "Admin"} · {new Date(selectedBlog.createdAt).toLocaleDateString("en-IN")}
+                  </span>
+                  <h2 style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontSize: "clamp(1.5rem, 4vw, 2.2rem)",
+                    fontWeight: 800,
+                    marginTop: "8px",
+                    lineHeight: 1.2,
+                    textShadow: "0 2px 4px rgba(0,0,0,0.5)"
+                  }}>
+                    {selectedBlog.title}
+                  </h2>
+                </div>
+              </div>
+
+              {/* Blog Reading Body */}
+              <div style={{ padding: "3rem 2.5rem", background: "#fcfcfa" }}>
+                <p style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: "1.1rem",
+                  lineHeight: 1.9,
+                  color: "#2C3320",
+                  whiteSpace: "pre-wrap",
+                  letterSpacing: "0.01em"
+                }}>
+                  {selectedBlog.content}
+                </p>
+
+                {/* Decorative End Mark */}
+                <div style={{ display: "flex", justifyContent: "center", margin: "3rem 0 1rem" }}>
+                  <span style={{ color: "#787F56", fontSize: "1.5rem", letterSpacing: "8px" }}>✦ ✦ ✦</span>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -4906,29 +6587,29 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
       display: flex;
       gap: 1rem;
       align-items: flex-start;
-      border: 1px solid rgba(90,102,81,0.1);
-      box-shadow: 0 2px 12px rgba(90,102,81,0.04);
+      border: 1px solid rgba(120, 127, 86,0.1);
+      box-shadow: 0 2px 12px rgba(120, 127, 86,0.04);
       transition: box-shadow 0.2s;
     }
-    .cart-item-card:hover { box-shadow: 0 6px 24px rgba(90,102,81,0.09); }
+    .cart-item-card:hover { box-shadow: 0 6px 24px rgba(120, 127, 86,0.09); }
     .cart-qty-btn {
       width: 32px; height: 32px;
-      border: 1.5px solid rgba(90,102,81,0.25);
+      border: 1.5px solid rgba(120, 127, 86,0.25);
       background: #fff; border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 1.1rem; color: #5A6651; font-weight: 700;
+      cursor: pointer; font-size: 1.1rem; color: #787F56; font-weight: 700;
       transition: all 0.15s;
     }
-    .cart-qty-btn:hover { background: #5A6651; color: #fff; border-color: #5A6651; }
+    .cart-qty-btn:hover { background: #787F56; color: #fff; border-color: #787F56; }
     .cart-summary-card {
-      background: linear-gradient(160deg, #5A6651 0%, #000000 100%);
+      background: linear-gradient(160deg, #787F56 0%, #000000 100%);
       border-radius: 20px;
       padding: 1.8rem 1.5rem;
       color: #fff;
     }
     .cart-checkout-btn {
       width: 100%; padding: 15px;
-      background: #5A6651; color: #fff;
+      background: #787F56; color: #fff;
       border: none; border-radius: 14px;
       font-size: 0.9rem; font-weight: 700;
       cursor: pointer; font-family: 'Open Sans', sans-serif;
@@ -4936,7 +6617,7 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
       letter-spacing: 0.02em; transition: all 0.25s;
       margin-top: 1.2rem;
     }
-    .cart-checkout-btn:hover { background: #000000; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(90,102,81,0.25); }
+    .cart-checkout-btn:hover { background: #000000; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(120, 127, 86,0.25); }
     .cart-trust-row {
       display: flex; justify-content: center; gap: 1.5rem;
       flex-wrap: wrap; margin-top: 1rem;
@@ -4954,18 +6635,18 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
     <div className="cart-page" style={{ paddingTop: 90, background: "#ffffff", minHeight: "100vh", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
       <style>{cartCss}</style>
       <div className="max-w" style={{ padding: "3rem clamp(1.5rem,5vw,3.5rem) 6rem", flex: 1, display: "flex", flexDirection: "column", gap: "3rem" }}>
-        
+
         {/* Main Grid: Left empty message, Right features/branding */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2.5rem", alignItems: "center" }}>
-          
+
           {/* Left Side: Empty State Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             style={{
-              background: "rgba(90, 102, 81, 0.04)",
-              border: "1px solid rgba(90, 102, 81, 0.12)",
+              background: "rgba(120, 127, 86, 0.04)",
+              border: "1px solid rgba(120, 127, 86, 0.12)",
               borderRadius: 20,
               padding: "3rem 2rem",
               textAlign: "center",
@@ -4973,12 +6654,12 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 8px 32px rgba(90, 102, 81, 0.03)"
+              boxShadow: "0 8px 32px rgba(120, 127, 86, 0.03)"
             }}
           >
             <div style={{ position: "relative", width: 90, height: 90, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1.5rem" }}>
-              <div style={{ width: 80, height: 80, borderRadius: "50%", background: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(90, 102, 81, 0.15)", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.2">
+              <div style={{ width: 80, height: 80, borderRadius: "50%", background: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(120, 127, 86, 0.15)", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="1.2">
                   <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
                   <line x1="3" y1="6" x2="21" y2="6" />
                   <path d="M16 10a4 4 0 0 1-8 0" />
@@ -4989,9 +6670,9 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
             </div>
 
             <h2 style={{ fontFamily: "'Open Sans', sans-serif", color: "#000000", fontSize: "clamp(1.5rem, 3.5vw, 1.85rem)", fontWeight: 800, marginBottom: "0.6rem", lineHeight: 1.25 }}>
-              Your Cart is <span style={{ color: "#5A6651" }}>Empty</span>
+              Your Cart is <span style={{ color: "#787F56" }}>Empty</span>
             </h2>
-            <p style={{ color: "#5A6651", fontSize: "0.85rem", lineHeight: 1.6, marginBottom: "1.8rem", maxWidth: 300, fontFamily: "'Open Sans', sans-serif" }}>
+            <p style={{ color: "#787F56", fontSize: "0.85rem", lineHeight: 1.6, marginBottom: "1.8rem", maxWidth: 300, fontFamily: "'Open Sans', sans-serif" }}>
               Your cart is waiting for sacred intentions. Explore our collection of manifestation tools to start your journey.
             </p>
 
@@ -5001,9 +6682,9 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
               style={{
                 display: "inline-flex", alignItems: "center", gap: "8px",
                 padding: "12px 28px", fontSize: "0.8rem", borderRadius: 30,
-                background: "#5A6651", color: "#ffffff", border: "none", fontWeight: 700,
+                background: "#787F56", color: "#ffffff", border: "none", fontWeight: 700,
                 cursor: "pointer", letterSpacing: "0.05em",
-                boxShadow: "0 6px 18px rgba(90, 102, 81, 0.25)", transition: "all 0.3s ease"
+                boxShadow: "0 6px 18px rgba(120, 127, 86, 0.25)", transition: "all 0.3s ease"
               }}
               onMouseEnter={e => { e.currentTarget.style.filter = "brightness(0.9)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
               onMouseLeave={e => { e.currentTarget.style.filter = "none"; e.currentTarget.style.transform = "translateY(0)"; }}
@@ -5015,17 +6696,17 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
           {/* Right Side: Features and Branding */}
           <div style={{ display: "flex", flexDirection: "column", gap: "1.8rem", padding: "1rem" }}>
             {[
-              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>, label: "Safe & Secure Checkout", sub: "Fully encrypted and certified gateway for seamless online payments." },
-              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.8"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M2 12h20"/></svg>, label: "Free Shipping Over ₹999", sub: "Dispatched within 24-48 hours with reliable courier tracking." },
-              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>, label: "100% Authentic Crystals", sub: "Ethically sourced, natural gemstones cleansed under direct moonlight." }
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 9.9-1" /></svg>, label: "Safe & Secure Checkout", sub: "Fully encrypted and certified gateway for seamless online payments." },
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="1.8"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" /><path d="M2 12h20" /></svg>, label: "Free Shipping Over ₹999", sub: "Dispatched within 24-48 hours with reliable courier tracking." },
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>, label: "100% Authentic Crystals", sub: "Ethically sourced, natural gemstones cleansed under direct moonlight." }
             ].map((f, i) => (
               <div key={i} style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
-                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(90, 102, 81, 0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(120, 127, 86, 0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   {f.icon}
                 </div>
                 <div>
                   <h4 style={{ fontSize: "0.9rem", fontWeight: 700, color: "#000000", marginBottom: 3, fontFamily: "'Open Sans', sans-serif" }}>{f.label}</h4>
-                  <p style={{ fontSize: "0.78rem", color: "#5A6651", lineHeight: 1.5, fontFamily: "'Open Sans', sans-serif" }}>{f.sub}</p>
+                  <p style={{ fontSize: "0.78rem", color: "#787F56", lineHeight: 1.5, fontFamily: "'Open Sans', sans-serif" }}>{f.sub}</p>
                 </div>
               </div>
             ))}
@@ -5042,27 +6723,27 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
             style={{ marginTop: "2rem" }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: "1.5rem" }}>
-              <div style={{ height: 1, flex: 1, background: "rgba(90, 102, 81, 0.15)" }} />
-              <h3 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "1rem", fontWeight: 700, color: "#5A6651", letterSpacing: "0.05em", textTransform: "uppercase", margin: 0 }}>Recommended for You</h3>
-              <div style={{ height: 1, flex: 1, background: "rgba(90, 102, 81, 0.15)" }} />
+              <div style={{ height: 1, flex: 1, background: "rgba(120, 127, 86, 0.15)" }} />
+              <h3 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "1rem", fontWeight: 700, color: "#787F56", letterSpacing: "0.05em", textTransform: "uppercase", margin: 0 }}>Recommended for You</h3>
+              <div style={{ height: 1, flex: 1, background: "rgba(120, 127, 86, 0.15)" }} />
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1.5rem" }}>
               {recommended.map(p => (
-                <div key={p._id} className="prod-card" style={{ display: "flex", flexDirection: "column", border: "1px solid rgba(90, 102, 81, 0.12)", borderRadius: 16, overflow: "hidden" }} onClick={() => onProductClick(p)}>
+                <div key={p._id} className="prod-card" style={{ display: "flex", flexDirection: "column", border: "1px solid rgba(120, 127, 86, 0.12)", borderRadius: 16, overflow: "hidden" }} onClick={() => onProductClick(p)}>
                   <div style={{ position: "relative", aspectRatio: "4/3", overflow: "hidden", background: "#fcfcfa" }}>
                     {p.image ? (
                       <img referrerPolicy="no-referrer" src={getImageUrl(p.image)} alt={p.name}
                         style={{ width: "100%", height: "100%", objectFit: "cover" }}
                         onError={e => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }} />
                     ) : null}
-                    <div style={{ width: "100%", height: "100%", background: "rgba(90, 102, 81, 0.08)", display: p.image ? "none" : "flex", alignItems: "center", justifyContent: "center", fontSize: 36, color: "#5A6651" }}>◆</div>
-                    
+                    <div style={{ width: "100%", height: "100%", background: "rgba(120, 127, 86, 0.08)", display: p.image ? "none" : "flex", alignItems: "center", justifyContent: "center", fontSize: 36, color: "#787F56" }}>◆</div>
+
                     {/* Wishlist toggle button */}
                     {onWish && (
                       <button onClick={e => { e.stopPropagation(); onWish(e, p._id); }}
                         style={{ position: "absolute", top: 10, right: 10, background: "#ffffff", border: "none", borderRadius: "50%", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 3px 8px rgba(0,0,0,0.12)", zIndex: 2 }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill={wished.includes(p._id) ? "#5A6651" : "none"} stroke="#5A6651" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill={wished.includes(p._id) ? "#787F56" : "none"} stroke="#787F56" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                         </svg>
                       </button>
@@ -5072,12 +6753,12 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
                     <div>
                       <h4 style={{ fontSize: "0.92rem", fontWeight: 700, color: "#000000", marginBottom: "0.4rem", fontFamily: "'Open Sans', sans-serif" }}>{p.name}</h4>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "1rem" }}>
-                        <span style={{ fontSize: "0.95rem", color: "#5A6651", fontWeight: 700 }}>₹{p.price.toLocaleString()}</span>
+                        <span style={{ fontSize: "0.95rem", color: "#787F56", fontWeight: 700 }}>₹{p.price.toLocaleString()}</span>
                         {p.originalPrice > p.price && <span style={{ color: "rgba(0,0,0,0.4)", fontSize: "0.75rem", textDecoration: "line-through" }}>₹{p.originalPrice.toLocaleString()}</span>}
                       </div>
                     </div>
                     {onAdd && (
-                      <button className="btn-orange" onClick={e => { e.stopPropagation(); onAdd(p); }} style={{ width: "100%", padding: "10px", fontSize: "0.72rem", borderRadius: 8, background: "#5A6651", color: "#ffffff", border: "none", fontWeight: 700, cursor: "pointer" }}>Add to Cart</button>
+                      <button className="btn-orange" onClick={e => { e.stopPropagation(); onAdd(p); }} style={{ width: "100%", padding: "10px", fontSize: "0.72rem", borderRadius: 8, background: "#787F56", color: "#ffffff", border: "none", fontWeight: 700, cursor: "pointer" }}>Add to Cart</button>
                     )}
                   </div>
                 </div>
@@ -5096,9 +6777,9 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
 
         {/* Page header */}
         <div style={{ marginBottom: "1.8rem" }}>
-          <p style={{ fontSize: "0.65rem", fontWeight: 700, color: "#5A6651", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 4 }}>SHOPPING CART</p>
+          <p style={{ fontSize: "0.65rem", fontWeight: 700, color: "#787F56", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 4 }}>SHOPPING CART</p>
           <h1 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "clamp(1.6rem,4vw,2.2rem)", fontWeight: 700, color: "#000000", lineHeight: 1.1 }}>Your Cart</h1>
-          <div style={{ width: 48, height: 3, background: "#5A6651", borderRadius: 2, marginTop: 8 }} />
+          <div style={{ width: 48, height: 3, background: "#787F56", borderRadius: 2, marginTop: 8 }} />
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "1.8rem", alignItems: "start" }} className="cart-page-grid checkout-grid">
@@ -5136,7 +6817,7 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
                     </div>
                     <button onClick={() => onRemove(item.id)}
                       style={{ background: "none", border: "none", cursor: "pointer", color: "#c0392b", fontSize: "0.72rem", fontWeight: 600, display: "flex", alignItems: "center", gap: 4, padding: "4px 0" }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4h6v2" /></svg>
                       Remove
                     </button>
                   </div>
@@ -5146,8 +6827,8 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10, flexShrink: 0 }}>
                   <span style={{ fontSize: "0.95rem", fontWeight: 800, color: "#2C3320" }}>Rs.{(item.price * item.qty).toLocaleString()}</span>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "rgba(76,90,67,0.07)", borderRadius: 10, padding: "6px 8px" }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><polyline points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-                    <span style={{ fontSize: "0.52rem", fontWeight: 700, color: "#4C5A43", marginTop: 3, textAlign: "center", lineHeight: 1.2 }}>Handcrafted<br/>Quality</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" /><polyline points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" /></svg>
+                    <span style={{ fontSize: "0.52rem", fontWeight: 700, color: "#4C5A43", marginTop: 3, textAlign: "center", lineHeight: 1.2 }}>Handcrafted<br />Quality</span>
                   </div>
                 </div>
               </div>
@@ -5159,7 +6840,7 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
             <div className="cart-summary-card">
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "1.2rem", paddingBottom: "1rem", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
                 <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8B89A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8B89A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
                 </div>
                 <span style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "1rem", fontWeight: 700, color: "#fff" }}>Order Summary</span>
                 <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4 }}>
@@ -5185,10 +6866,10 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
 
               <button className="cart-checkout-btn" onClick={onCheckout}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                   Proceed to Checkout
                 </div>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="M12 5l7 7-7 7" /></svg>
               </button>
             </div>
 
@@ -5196,9 +6877,9 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
             <div style={{ background: "#fff", borderRadius: 14, padding: "1rem", marginTop: "0.85rem", border: "1px solid rgba(76,90,67,0.1)" }}>
               <div className="cart-trust-row">
                 {[
-                  { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>, label: "Secure", sub: "Checkout" },
-                  { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>, label: "Fast & Safe", sub: "Delivery" },
-                  { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>, label: "Premium", sub: "Quality" },
+                  { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>, label: "Secure", sub: "Checkout" },
+                  { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="2" /><path d="M16 8h4l3 5v3h-7V8z" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></svg>, label: "Fast & Safe", sub: "Delivery" },
+                  { icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4C5A43" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6" /><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" /></svg>, label: "Premium", sub: "Quality" },
                 ].map((t, i) => (
                   <div key={i} className="cart-trust-item">
                     <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(76,90,67,0.07)", display: "flex", alignItems: "center", justifyContent: "center" }}>{t.icon}</div>
@@ -5210,7 +6891,7 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
             </div>
 
             <p style={{ textAlign: "center", fontSize: "0.65rem", color: "#8D9A84", marginTop: "0.7rem", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
               100% Secure Payments
             </p>
           </div>
@@ -5806,7 +7487,7 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
     if (!ids || ids.length === 0) {
       setItems([]);
       setLoading(false);
-      
+
       // Fetch recommendations
       setRecLoading(true);
       fetch(`${API_BASE}/api/products?limit=3`)
@@ -5866,8 +7547,8 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
   if (loading) return (
     <div style={{ paddingTop: 130, background: "#ffffff", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ textAlign: "center" }}>
-        <div style={{ width: 40, height: 40, border: "3px solid rgba(90, 102, 81, 0.2)", borderTop: `3px solid #5A6651`, borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
-        <p style={{ color: "#5A6651", fontSize: "0.88rem" }}>Loading wishlist…</p>
+        <div style={{ width: 40, height: 40, border: "3px solid rgba(120, 127, 86, 0.2)", borderTop: `3px solid #787F56`, borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
+        <p style={{ color: "#787F56", fontSize: "0.88rem" }}>Loading wishlist…</p>
       </div>
     </div>
   );
@@ -5875,18 +7556,18 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
   if (!items.length) return (
     <div style={{ paddingTop: 90, background: "#ffffff", minHeight: "100vh", display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
       <div className="max-w" style={{ padding: "3rem clamp(1.5rem,5vw,3.5rem) 6rem", flex: 1, display: "flex", flexDirection: "column", gap: "3rem" }}>
-        
+
         {/* Main Grid: Left empty message, Right features/branding */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "2.5rem", alignItems: "center" }}>
-          
+
           {/* Left Side: Empty State Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             style={{
-              background: "rgba(90, 102, 81, 0.04)",
-              border: "1px solid rgba(90, 102, 81, 0.12)",
+              background: "rgba(120, 127, 86, 0.04)",
+              border: "1px solid rgba(120, 127, 86, 0.12)",
               borderRadius: 20,
               padding: "3rem 2rem",
               textAlign: "center",
@@ -5894,12 +7575,12 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 8px 32px rgba(90, 102, 81, 0.03)"
+              boxShadow: "0 8px 32px rgba(120, 127, 86, 0.03)"
             }}
           >
             <div style={{ position: "relative", width: 90, height: 90, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1.5rem" }}>
-              <div style={{ width: 80, height: 80, borderRadius: "50%", background: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(90, 102, 81, 0.15)", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.2">
+              <div style={{ width: 80, height: 80, borderRadius: "50%", background: "#ffffff", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(120, 127, 86, 0.15)", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="1.2">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                 </svg>
               </div>
@@ -5908,9 +7589,9 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
             </div>
 
             <h2 style={{ fontFamily: "'Open Sans', sans-serif", color: "#000000", fontSize: "clamp(1.5rem, 3.5vw, 1.85rem)", fontWeight: 800, marginBottom: "0.6rem", lineHeight: 1.25 }}>
-              Your Wishlist is <span style={{ color: "#5A6651" }}>Empty</span>
+              Your Wishlist is <span style={{ color: "#787F56" }}>Empty</span>
             </h2>
-            <p style={{ color: "#5A6651", fontSize: "0.85rem", lineHeight: 1.6, marginBottom: "1.8rem", maxWidth: 300, fontFamily: "'Open Sans', sans-serif" }}>
+            <p style={{ color: "#787F56", fontSize: "0.85rem", lineHeight: 1.6, marginBottom: "1.8rem", maxWidth: 300, fontFamily: "'Open Sans', sans-serif" }}>
               Anchor your dreams. Explore our sacred collection of manifestation tools and save your favorites here.
             </p>
 
@@ -5920,9 +7601,9 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
               style={{
                 display: "inline-flex", alignItems: "center", gap: "8px",
                 padding: "12px 28px", fontSize: "0.8rem", borderRadius: 30,
-                background: "#5A6651", color: "#ffffff", border: "none", fontWeight: 700,
+                background: "#787F56", color: "#ffffff", border: "none", fontWeight: 700,
                 cursor: "pointer", letterSpacing: "0.05em",
-                boxShadow: "0 6px 18px rgba(90, 102, 81, 0.25)", transition: "all 0.3s ease"
+                boxShadow: "0 6px 18px rgba(120, 127, 86, 0.25)", transition: "all 0.3s ease"
               }}
               onMouseEnter={e => { e.currentTarget.style.filter = "brightness(0.9)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
               onMouseLeave={e => { e.currentTarget.style.filter = "none"; e.currentTarget.style.transform = "translateY(0)"; }}
@@ -5934,17 +7615,17 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
           {/* Right Side: Features and Branding */}
           <div style={{ display: "flex", flexDirection: "column", gap: "1.8rem", padding: "1rem" }}>
             {[
-              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>, label: "Intentional Anchoring", sub: "Save tools that resonate with your current manifestation goals to keep focus." },
-              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.8"><path d="M12 2a9 9 0 1 0 0 18A9 9 0 0 0 12 2z"/><path d="M12 6v6l4 2"/></svg>, label: "Clean, Ethical Energy", sub: "100% authentic, natural stones sourced responsibly and cleansed under moonlight." },
-              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6651" strokeWidth="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>, label: "Secure & Private", sub: "Your intentions and wishlist are personal and stored securely for you." }
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" /></svg>, label: "Intentional Anchoring", sub: "Save tools that resonate with your current manifestation goals to keep focus." },
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="1.8"><path d="M12 2a9 9 0 1 0 0 18A9 9 0 0 0 12 2z" /><path d="M12 6v6l4 2" /></svg>, label: "Clean, Ethical Energy", sub: "100% authentic, natural stones sourced responsibly and cleansed under moonlight." },
+              { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>, label: "Secure & Private", sub: "Your intentions and wishlist are personal and stored securely for you." }
             ].map((f, i) => (
               <div key={i} style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
-                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(90, 102, 81, 0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(120, 127, 86, 0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   {f.icon}
                 </div>
                 <div>
                   <h4 style={{ fontSize: "0.9rem", fontWeight: 700, color: "#000000", marginBottom: 3, fontFamily: "'Open Sans', sans-serif" }}>{f.label}</h4>
-                  <p style={{ fontSize: "0.78rem", color: "#5A6651", lineHeight: 1.5, fontFamily: "'Open Sans', sans-serif" }}>{f.sub}</p>
+                  <p style={{ fontSize: "0.78rem", color: "#787F56", lineHeight: 1.5, fontFamily: "'Open Sans', sans-serif" }}>{f.sub}</p>
                 </div>
               </div>
             ))}
@@ -5961,26 +7642,26 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
             style={{ marginTop: "2rem" }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: "1.5rem" }}>
-              <div style={{ height: 1, flex: 1, background: "rgba(90, 102, 81, 0.15)" }} />
-              <h3 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "1rem", fontWeight: 700, color: "#5A6651", letterSpacing: "0.05em", textTransform: "uppercase", margin: 0 }}>Recommended for You</h3>
-              <div style={{ height: 1, flex: 1, background: "rgba(90, 102, 81, 0.15)" }} />
+              <div style={{ height: 1, flex: 1, background: "rgba(120, 127, 86, 0.15)" }} />
+              <h3 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "1rem", fontWeight: 700, color: "#787F56", letterSpacing: "0.05em", textTransform: "uppercase", margin: 0 }}>Recommended for You</h3>
+              <div style={{ height: 1, flex: 1, background: "rgba(120, 127, 86, 0.15)" }} />
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1.5rem" }}>
               {recommended.map(p => (
-                <div key={p._id} className="prod-card" style={{ display: "flex", flexDirection: "column", border: "1px solid rgba(90, 102, 81, 0.12)", borderRadius: 16, overflow: "hidden" }} onClick={() => onClick(p)}>
+                <div key={p._id} className="prod-card" style={{ display: "flex", flexDirection: "column", border: "1px solid rgba(120, 127, 86, 0.12)", borderRadius: 16, overflow: "hidden" }} onClick={() => onClick(p)}>
                   <div style={{ position: "relative", aspectRatio: "4/3", overflow: "hidden", background: "#fcfcfa" }}>
                     {p.image ? (
                       <img referrerPolicy="no-referrer" src={getImageUrl(p.image)} alt={p.name}
                         style={{ width: "100%", height: "100%", objectFit: "cover" }}
                         onError={e => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }} />
                     ) : null}
-                    <div style={{ width: "100%", height: "100%", background: "rgba(90, 102, 81, 0.08)", display: p.image ? "none" : "flex", alignItems: "center", justifyContent: "center", fontSize: 36, color: "#5A6651" }}>◆</div>
-                    
+                    <div style={{ width: "100%", height: "100%", background: "rgba(120, 127, 86, 0.08)", display: p.image ? "none" : "flex", alignItems: "center", justifyContent: "center", fontSize: 36, color: "#787F56" }}>◆</div>
+
                     {/* Add/Wishlist button overlay */}
                     <button onClick={e => { e.stopPropagation(); onWish(p._id); }}
                       style={{ position: "absolute", top: 10, right: 10, background: "#ffffff", border: "none", borderRadius: "50%", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 3px 8px rgba(0,0,0,0.12)", zIndex: 2 }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill={ids.includes(p._id) ? "#5A6651" : "none"} stroke="#5A6651" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill={ids.includes(p._id) ? "#787F56" : "none"} stroke="#787F56" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                       </svg>
                     </button>
@@ -5989,11 +7670,11 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
                     <div>
                       <h4 style={{ fontSize: "0.92rem", fontWeight: 700, color: "#000000", marginBottom: "0.4rem", fontFamily: "'Open Sans', sans-serif" }}>{p.name}</h4>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "1rem" }}>
-                        <span style={{ fontSize: "0.95rem", color: "#5A6651", fontWeight: 700 }}>₹{p.price.toLocaleString()}</span>
+                        <span style={{ fontSize: "0.95rem", color: "#787F56", fontWeight: 700 }}>₹{p.price.toLocaleString()}</span>
                         {p.originalPrice > p.price && <span style={{ color: "rgba(0,0,0,0.4)", fontSize: "0.75rem", textDecoration: "line-through" }}>₹{p.originalPrice.toLocaleString()}</span>}
                       </div>
                     </div>
-                    <button className="btn-orange" onClick={e => { e.stopPropagation(); onAdd(p); }} style={{ width: "100%", padding: "10px", fontSize: "0.72rem", borderRadius: 8, background: "#5A6651", color: "#ffffff", border: "none", fontWeight: 700, cursor: "pointer" }}>Add to Cart</button>
+                    <button className="btn-orange" onClick={e => { e.stopPropagation(); onAdd(p); }} style={{ width: "100%", padding: "10px", fontSize: "0.72rem", borderRadius: 8, background: "#787F56", color: "#ffffff", border: "none", fontWeight: 700, cursor: "pointer" }}>Add to Cart</button>
                   </div>
                 </div>
               ))}
@@ -6008,11 +7689,11 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
     <div style={{ paddingTop: 90, background: "#ffffff", minHeight: "100vh" }}>
       <div className="max-w" style={{ padding: "clamp(1.5rem,4vw,3rem)" }}>
         <h1 style={{ fontFamily: "'Open Sans',sans-serif", color: "#000000", fontSize: "clamp(1.5rem,4vw,2rem)", fontWeight: 900, marginBottom: "0.4rem" }}>Your Wishlist</h1>
-        <div style={{ width: 60, height: 3, background: "#5A6651", marginBottom: "0.5rem" }} />
-        <p style={{ color: "#5A6651", fontSize: "0.85rem", marginBottom: "1.5rem" }}>{items.length} saved item{items.length !== 1 ? "s" : ""}</p>
+        <div style={{ width: 60, height: 3, background: "#787F56", marginBottom: "0.5rem" }} />
+        <p style={{ color: "#787F56", fontSize: "0.85rem", marginBottom: "1.5rem" }}>{items.length} saved item{items.length !== 1 ? "s" : ""}</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.5rem" }} className="prod-grid">
           {items.map(p => (
-            <div key={p._id} className="prod-card" onClick={() => onClick(p)} style={{ border: "1px solid rgba(90, 102, 81, 0.12)" }}>
+            <div key={p._id} className="prod-card" onClick={() => onClick(p)} style={{ border: "1px solid rgba(120, 127, 86, 0.12)" }}>
               <div style={{ position: "relative", aspectRatio: "4/3", overflow: "hidden" }}>
                 {p.image ? (
                   <img referrerPolicy="no-referrer" src={p.image} alt={p.name}
@@ -6021,26 +7702,26 @@ function WishlistPage({ ids, onAdd, onWish, onClick }) {
                     onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
                     onError={e => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "flex"; }} />
                 ) : null}
-                <div style={{ width: "100%", height: "100%", background: "rgba(90, 102, 81, 0.08)", display: p.image ? "none" : "flex", alignItems: "center", justifyContent: "center", fontSize: 48, color: "#5A6651" }}>◆</div>
-                {p.discount > 0 && <div style={{ position: "absolute", top: 10, left: 10, background: "#5A6651", color: "#fff", borderRadius: 4, padding: "3px 10px", fontSize: "0.65rem", fontWeight: 800 }}>-{p.discount}%</div>}
+                <div style={{ width: "100%", height: "100%", background: "rgba(120, 127, 86, 0.08)", display: p.image ? "none" : "flex", alignItems: "center", justifyContent: "center", fontSize: 48, color: "#787F56" }}>◆</div>
+                {p.discount > 0 && <div style={{ position: "absolute", top: 10, left: 10, background: "#787F56", color: "#fff", borderRadius: 4, padding: "3px 10px", fontSize: "0.65rem", fontWeight: 800 }}>-{p.discount}%</div>}
                 <button onClick={e => { e.stopPropagation(); onWish(p._id); }}
                   style={{ position: "absolute", top: 8, right: 8, background: "rgba(255,255,255,0.9)", border: "none", borderRadius: "50%", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "transform 0.2s" }}
                   onMouseEnter={e => e.currentTarget.style.transform = "scale(1.15)"}
                   onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#5A6651" stroke="#5A6651" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all 0.2s ease" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#787F56" stroke="#787F56" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all 0.2s ease" }}>
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                   </svg>
                 </button>
-                {p.isBestSeller && <div style={{ position: "absolute", bottom: 8, left: 8, background: "#5A6651", color: "#ffffff", borderRadius: 4, padding: "2px 8px", fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.08em" }}>BEST SELLER</div>}
+                {p.isBestSeller && <div style={{ position: "absolute", bottom: 8, left: 8, background: "#787F56", color: "#ffffff", borderRadius: 4, padding: "2px 8px", fontSize: "0.6rem", fontWeight: 700, letterSpacing: "0.08em" }}>BEST SELLER</div>}
               </div>
               <div style={{ padding: "1.2rem" }}>
                 <h4 style={{ fontSize: "0.92rem", fontWeight: 700, color: "#000000", marginBottom: "0.4rem", fontFamily: "'Open Sans', sans-serif" }}>{p.name}</h4>
-                {p.shortDesc && <p style={{ fontSize: "0.76rem", color: "#5A6651", marginBottom: "0.7rem", lineHeight: 1.5 }}>{p.shortDesc.slice(0, 65)}{p.shortDesc.length > 65 ? "..." : ""}</p>}
+                {p.shortDesc && <p style={{ fontSize: "0.76rem", color: "#787F56", marginBottom: "0.7rem", lineHeight: 1.5 }}>{p.shortDesc.slice(0, 65)}{p.shortDesc.length > 65 ? "..." : ""}</p>}
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "0.8rem" }}>
-                  <span style={{ fontSize: "1rem", color: "#5A6651", fontWeight: 700 }}>₹{p.price.toLocaleString()}</span>
+                  <span style={{ fontSize: "1rem", color: "#787F56", fontWeight: 700 }}>₹{p.price.toLocaleString()}</span>
                   {p.originalPrice > p.price && <span style={{ color: "rgba(0, 0, 0, 0.4)", fontSize: "0.75rem", textDecoration: "line-through" }}>₹{p.originalPrice.toLocaleString()}</span>}
                 </div>
-                <button className="btn-orange" onClick={e => { e.stopPropagation(); onAdd(p); }} style={{ width: "100%", padding: "10px", fontSize: "0.72rem", borderRadius: 8, background: "#5A6651", color: "#ffffff", border: "none", fontWeight: 700, cursor: "pointer" }}>Add to Cart</button>
+                <button className="btn-orange" onClick={e => { e.stopPropagation(); onAdd(p); }} style={{ width: "100%", padding: "10px", fontSize: "0.72rem", borderRadius: 8, background: "#787F56", color: "#ffffff", border: "none", fontWeight: 700, cursor: "pointer" }}>Add to Cart</button>
               </div>
             </div>
           ))}
@@ -6060,10 +7741,6 @@ function SignupPage({ onSignup, onSwitch }) {
 
   const GOOGLE_CLIENT_ID = "342285664182-b68b0t0tmj66jgu9eg14hg7212a57h2r.apps.googleusercontent.com";
 
-  useEffect(() => {
-    // google gsi script initialization removed to prevent GSI initialization warnings and errors
-  }, []);
-
   const handle = async e => {
     e.preventDefault(); setError("");
     if (!form.name || !form.email || !form.password) return setError("All fields are required.");
@@ -6078,374 +7755,462 @@ function SignupPage({ onSignup, onSwitch }) {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#5A6651", display: "flex", alignItems: "center", justifyContent: "center", padding: "clamp(1rem, 3vw, 2.5rem)", boxSizing: "border-box", paddingTop: 90, position: "relative", overflow: "hidden" }}>
-      {/* Background glass blur glows for mobile */}
-      <div className="login-bg-glow-1" style={{ position: "absolute", top: "15%", left: "5%", width: "clamp(240px, 50vw, 400px)", height: "clamp(240px, 50vw, 400px)", borderRadius: "50%", background: "radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%)", filter: "blur(50px)", pointerEvents: "none", zIndex: 0 }} />
-      <div className="login-bg-glow-2" style={{ position: "absolute", bottom: "10%", right: "-10%", width: "clamp(280px, 60vw, 480px)", height: "clamp(280px, 60vw, 480px)", borderRadius: "50%", background: "radial-gradient(circle, rgba(245, 176, 112, 0.15) 0%, transparent 70%)", filter: "blur(60px)", pointerEvents: "none", zIndex: 0 }} />
+    <div className="auth-page-container">
+      {/* Background shadow leaf elements to simulate leaf shadows */}
+      <div className="auth-leaf-shadow-1" />
+      <div className="auth-leaf-shadow-2" />
 
       <style>{`
-        .login-card {
-          font-family: 'Open Sans', sans-serif;
-          background: rgba(255, 255, 255, 0.78);
-          backdrop-filter: blur(20px) saturate(140%);
-          -webkit-backdrop-filter: blur(20px) saturate(140%);
-          border: 1px solid rgba(255, 255, 255, 0.5);
-          border-radius: 28px;
-          width: 100%;
-          max-width: 900px;
-          display: flex;
-          overflow: hidden;
-          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15);
-          min-height: 520px;
-          transition: all 0.3s ease;
-        }
-        .login-form-side {
-          flex: 1.1;
-          padding: clamp(1.5rem, 5vw, 3.2rem);
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-        }
-        .login-image-side {
-          flex: 0.9;
-          padding: 1.25rem;
-          display: flex;
-          align-items: stretch;
-        }
-        .login-image-container {
-          width: 100%;
-          border-radius: 20px;
-          overflow: hidden;
-          position: relative;
-        }
-        .login-image-src {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-          transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .login-image-container:hover .login-image-src {
-          transform: scale(1.05);
-        }
-        .login-main-title {
-          font-family: 'Open Sans', sans-serif;
-          font-weight: 700;
-          font-size: 2rem;
-          color: #000000;
-          margin: 0 0 0.4rem 0;
-          text-align: center;
-        }
-        .login-sub-title {
-          font-family: 'Open Sans', sans-serif;
-          font-size: 0.84rem;
-          color: #666666;
-          margin-bottom: 1.8rem;
-          text-align: center;
-          font-weight: 500;
-        }
-        .login-or-divider {
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Open+Sans:wght@300;400;500;600;700&display=swap');
+        
+        .auth-page-container {
+          min-height: 100vh;
+          background: #848974;
+          background-image: radial-gradient(circle at 10% 20%, rgba(48,54,14,0.06) 0%, transparent 60%);
           display: flex;
           align-items: center;
-          gap: 12px;
-          margin-bottom: 1.4rem;
+          justify-content: center;
+          padding: 1.5rem;
+          box-sizing: border-box;
+          padding-top: 90px;
+          position: relative;
+          overflow: hidden;
         }
-        .login-or-line {
-          flex: 1;
-          height: 1px;
-          background: rgba(0, 0, 0, 0.08);
+
+        /* Abstract Leaf Shadows */
+        .auth-leaf-shadow-1 {
+          position: absolute;
+          width: 500px;
+          height: 500px;
+          left: -150px;
+          top: -100px;
+          background: radial-gradient(ellipse at center, rgba(48,54,14,0.2) 0%, transparent 70%);
+          filter: blur(50px);
+          pointer-events: none;
+          transform: rotate(30deg);
         }
-        .login-or-text {
-          font-size: 0.78rem;
-          color: #999999;
-          font-weight: 500;
-          font-family: 'Open Sans', sans-serif;
+        .auth-leaf-shadow-2 {
+          position: absolute;
+          width: 600px;
+          height: 600px;
+          right: -200px;
+          bottom: -150px;
+          background: radial-gradient(ellipse at center, rgba(120,127,86,0.18) 0%, transparent 70%);
+          filter: blur(60px);
+          pointer-events: none;
         }
-        .login-input-group {
-          margin-bottom: 1.1rem;
+
+        .auth-card-clone {
+          background: #EAE2D5;
+          border: 1px solid rgba(255, 255, 255, 0.4);
+          border-radius: 20px;
+          width: 100%;
+          max-width: 410px;
+          padding: 2.2rem 2rem;
+          box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+          z-index: 10;
           position: relative;
         }
-        .login-input-icon {
+
+        .auth-logo-font {
+          font-family: 'Playfair Display', serif;
+          font-weight: 500;
+          font-size: 1.8rem;
+          color: #30360E;
+          text-align: center;
+          margin: 0;
+          letter-spacing: -0.01em;
+        }
+
+        .auth-logo-sub {
+          font-family: 'Open Sans', sans-serif;
+          font-size: 0.62rem;
+          font-weight: 600;
+          color: #787F56;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          text-align: center;
+          margin-top: 4px;
+          margin-bottom: 1.6rem;
+        }
+
+        /* Tabs container */
+        .auth-tabs-row {
+          display: flex;
+          justify-content: center;
+          width: 100%;
+          border-bottom: 1px solid rgba(120, 127, 86, 0.15);
+          margin-bottom: 1.6rem;
+        }
+        .auth-tab-btn {
+          background: none;
+          border: none;
+          padding: 8px 24px;
+          font-size: 0.92rem;
+          font-weight: 600;
+          color: #787F56;
+          cursor: pointer;
+          position: relative;
+          transition: color 0.25s;
+          font-family: 'Open Sans', sans-serif;
+        }
+        .auth-tab-btn.active {
+          color: #30360E;
+        }
+        .auth-tab-btn.active::after {
+          content: '';
           position: absolute;
-          left: 20px;
+          bottom: -1px;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background: #30360E;
+        }
+
+        /* Input Container */
+        .auth-input-group {
+          margin-bottom: 0.9rem;
+          position: relative;
+          width: 100%;
+        }
+        .auth-input-icon {
+          position: absolute;
+          left: 14px;
           top: 50%;
           transform: translateY(-50%);
-          color: #777777;
+          color: #787F56;
           display: flex;
           align-items: center;
           pointer-events: none;
-          transition: color 0.2s;
         }
-        .login-input-group:focus-within .login-input-icon {
-          color: #4C5A43;
-        }
-        .login-custom-input {
+        .auth-custom-input {
           width: 100%;
-          padding: 13px 20px 13px 48px;
-          border: 1.2px solid rgba(0,0,0,0.2);
-          border-radius: 9999px;
-          font-size: 0.9rem;
-          background: #ffffff;
-          color: #1a1a1a;
+          padding: 11px 14px 11px 40px;
+          border: 1px solid rgba(120, 127, 86, 0.12);
+          border-radius: 8px;
+          font-size: 0.88rem;
+          background: #ECE5D8;
+          color: #30360E;
           outline: none;
-          box-sizing: border-box;
           font-family: 'Open Sans', sans-serif;
-          transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+          transition: all 0.2s ease;
         }
-        .login-custom-input::placeholder {
-          color: #888888;
+        .auth-custom-input::placeholder {
+          color: #8E8A80;
         }
-        .login-custom-input:focus {
-          border-color: #4C5A43;
-          box-shadow: 0 0 0 3px rgba(76, 90, 67, 0.08);
+        .auth-custom-input:focus {
+          border-color: #30360E;
+          background: #F2ECE0;
         }
-        .login-pw-toggle {
+
+        .auth-pw-toggle {
           position: absolute;
-          right: 20px;
+          right: 14px;
           top: 50%;
           transform: translateY(-50%);
           background: none;
           border: none;
           cursor: pointer;
-          font-size: 1.1rem;
-          color: #777777;
+          color: #787F56;
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 0;
-          transition: color 0.2s;
         }
-        .login-pw-toggle:hover {
-          color: #4C5A43;
-        }
-        .login-submit-btn {
-          width: 100%;
-          padding: 13px;
-          font-size: 0.94rem;
+
+        .auth-forgot-link {
+          display: block;
+          text-align: right;
+          font-size: 0.74rem;
+          color: #787F56;
           font-weight: 600;
-          border-radius: 9999px;
-          border: none;
-          background: linear-gradient(135deg, #5A6651 0%, #3e4836 100%);
-          color: #ffffff;
-          cursor: pointer;
-          font-family: 'Open Sans', sans-serif;
-          transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
-          box-shadow: 0 4px 12px rgba(90, 102, 81, 0.2);
-        }
-        .login-submit-btn:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 6px 16px rgba(90, 102, 81, 0.35);
-          filter: brightness(1.08);
-        }
-        .login-submit-btn:active {
-          transform: translateY(0);
-        }
-        .login-signup-prompt {
-          text-align: center;
-          margin-top: 1.4rem;
-          font-size: 0.84rem;
-          color: #666666;
-          font-family: 'Open Sans', sans-serif;
-        }
-        .login-signup-link {
+          text-decoration: none;
+          margin-top: -0.4rem;
+          margin-bottom: 1.4rem;
           background: none;
           border: none;
           cursor: pointer;
-          color: #4C5A43;
+          font-family: 'Open Sans', sans-serif;
+          transition: color 0.2s;
+        }
+        .auth-forgot-link:hover {
+          color: #30360E;
+        }
+
+        /* Pill Submit Button */
+        .auth-submit-pill {
+          width: 100%;
+          padding: 11px 20px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          border-radius: 24px;
+          border: none;
+          background: #30360E;
+          color: #E2D4B9;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          font-family: 'Open Sans', sans-serif;
+          transition: all 0.25s ease;
+          box-shadow: 0 4px 12px rgba(48, 54, 14, 0.15);
+        }
+        .auth-submit-pill:hover {
+          background: #202409;
+          transform: translateY(-1px);
+          box-shadow: 0 6px 16px rgba(48, 54, 14, 0.25);
+        }
+
+        /* Divider */
+        .auth-divider {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin: 1.2rem 0;
+        }
+        .auth-divider-line {
+          flex: 1;
+          height: 1px;
+          background: rgba(120, 127, 86, 0.15);
+        }
+        .auth-divider-text {
+          font-size: 0.7rem;
+          color: #787F56;
+          font-weight: 600;
+          font-family: 'Open Sans', sans-serif;
+        }
+
+        /* Social circles */
+        .auth-social-row {
+          display: flex;
+          gap: 16px;
+          justify-content: center;
+          margin-bottom: 1.2rem;
+        }
+        .auth-social-circle {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          background: #ffffff;
+          border: 1px solid rgba(120, 127, 86, 0.12);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: 0 4px 12px rgba(48,54,14,0.04);
+          transition: all 0.2s;
+          position: relative;
+        }
+        .auth-social-circle:hover {
+          transform: scale(1.05);
+          box-shadow: 0 6px 16px rgba(48,54,14,0.08);
+        }
+
+        .auth-switch-prompt {
+          text-align: center;
+          margin-top: 1.2rem;
+          font-size: 0.8rem;
+          color: #787F56;
+          font-family: 'Open Sans', sans-serif;
+          font-weight: 500;
+        }
+        .auth-switch-link {
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: #30360E;
           font-weight: 700;
-          font-size: 0.84rem;
           padding: 0;
           margin-left: 4px;
-          text-decoration: none;
-          transition: color 0.15s;
-        }
-        .login-signup-link:hover {
-          color: #2C3320;
           text-decoration: underline;
-        }
-        @media (max-width: 992px) {
-          .login-card {
-            max-width: 800px;
-            min-height: 480px;
-          }
-          .login-form-side {
-            padding: 2rem;
-          }
-        }
-        @media (max-width: 768px) {
-          .login-card {
-            flex-direction: column;
-            width: 90%;
-            max-width: 400px;
-            min-height: auto;
-            border-radius: 28px;
-            border: 1px solid rgba(255, 255, 255, 0.45);
-            background: rgba(255, 255, 255, 0.55);
-            backdrop-filter: blur(24px) saturate(120%);
-            -webkit-backdrop-filter: blur(24px) saturate(120%);
-            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.12);
-          }
-          .login-form-side {
-            width: 100%;
-            flex: none;
-            padding: 2.2rem 1.8rem;
-          }
-          .login-image-side {
-            display: none;
-          }
-          .login-main-title {
-            font-size: 1.6rem;
-            margin-bottom: 0.3rem;
-          }
-          .login-sub-title {
-            font-size: 0.8rem;
-            margin-bottom: 1.4rem;
-          }
-          .google-login-custom-btn {
-            padding: 9px 12px;
-            font-size: 0.8rem;
-            margin-bottom: 0.8rem;
-          }
-          .login-or-divider {
-            margin-bottom: 1.1rem;
-          }
-          .login-input-group {
-            margin-bottom: 0.9rem;
-          }
-          .login-input-icon {
-            left: 16px;
-          }
-          .login-custom-input {
-            padding: 12px 18px 12px 42px;
-            font-size: 0.88rem;
-            background: rgba(255, 255, 255, 0.65);
-            border: 1.2px solid rgba(255, 255, 255, 0.35);
-            color: #000000;
-          }
-          .login-custom-input:focus {
-            background: rgba(255, 255, 255, 0.95);
-            border-color: #4C5A43;
-            box-shadow: 0 0 0 3px rgba(76, 90, 67, 0.12);
-          }
-          .login-pw-toggle {
-            right: 18px;
-            font-size: 1rem;
-          }
-          .login-forgot-pw-link {
-            margin-top: -0.4rem;
-            margin-bottom: 1.2rem;
-            font-size: 0.74rem;
-          }
-          .login-submit-btn {
-            padding: 12px;
-            font-size: 0.9rem;
-          }
-          .login-signup-prompt {
-            margin-top: 1.1rem;
-            font-size: 0.82rem;
-          }
+          font-family: 'Open Sans', sans-serif;
         }
       `}</style>
-      <motion.div className="login-card" style={{ zIndex: 1, position: "relative" }}
-        initial={{ opacity: 0, y: 32, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-      >
-        {/* Form Column */}
-        <div className="login-form-side">
-          <img src={`${process.env.PUBLIC_URL || ""}/wishstone svg.svg`} alt="WishStone" style={{ height: "clamp(32px, 5vw, 44px)", width: "auto", display: "block", margin: "0 auto 1rem" }} />
-          <h2 className="login-main-title">Create Account</h2>
-          <p className="login-sub-title">Please enter your details</p>
 
-          <div style={{ display: "flex", justifyContent: "center", width: "100%", marginBottom: "1.4rem" }}>
-            <GoogleLogin
-              onSuccess={async (credentialResponse) => {
-                const credential = credentialResponse.credential;
-                setGoogleLoading(true); setError("");
-                try {
-                  const res = await fetch(`${API_BASE}/api/auth/google`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ credential })
-                  });
-                  const data = await res.json();
-                  if (data.success && data.token) {
-                    localStorage.setItem("ws_token", data.token);
-                    localStorage.setItem("ws_user", JSON.stringify(data.user));
-                    onSignup({ ...data.user, joinedAt: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) });
-                  } else {
-                    setError(data.message || "Google sign-up failed.");
-                  }
-                } catch {
-                  setError("Google sign-up failed. Please try again.");
-                }
-                setGoogleLoading(false);
-              }}
-              onError={() => {
-                setError("Google sign-up failed. Please try again.");
-              }}
-              theme="outline"
-              size="large"
-              text="signup_with"
-              width="320px"
+      <motion.div
+        className="auth-card-clone"
+        initial={{ opacity: 0, y: 25, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {/* Star Sparkle Icon */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "0.5rem" }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="1.8">
+            <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="#787F56" />
+          </svg>
+        </div>
+
+        {/* Brand Logo and Subtitle */}
+        <h1 className="auth-logo-font">WishStone</h1>
+        <p className="auth-logo-sub">Rituals for mind, body & soul</p>
+
+        {/* Tab switcher */}
+        <div className="auth-tabs-row">
+          <button type="button" className="auth-tab-btn" onClick={onSwitch}>
+            Log In
+          </button>
+          <button type="button" className="auth-tab-btn active">
+            Sign Up
+          </button>
+        </div>
+
+        {/* Signup form */}
+        <form onSubmit={handle}>
+          <div className="auth-input-group">
+            <span className="auth-input-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </span>
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={form.name}
+              onChange={e => setForm({ ...form, name: e.target.value })}
+              className="auth-custom-input"
+              required
             />
           </div>
 
-          <div className="login-or-divider">
-            <div className="login-or-line" />
-            <span className="login-or-text">or</span>
-            <div className="login-or-line" />
+          <div className="auth-input-group">
+            <span className="auth-input-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+            </span>
+            <input
+              type="email"
+              placeholder="Email address"
+              value={form.email}
+              onChange={e => setForm({ ...form, email: e.target.value })}
+              className="auth-custom-input"
+              required
+            />
           </div>
 
-          <form onSubmit={handle}>
-            <div className="login-input-group">
-              <span className="login-input-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-              </span>
-              <input type="text" placeholder="Full Name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="login-custom-input" required />
-            </div>
-            <div className="login-input-group">
-              <span className="login-input-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-              </span>
-              <input type="email" placeholder="Email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="login-custom-input" required />
-            </div>
-            <div className="login-input-group">
-              <span className="login-input-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-              </span>
-              <input type={showPw ? "text" : "password"} placeholder="Password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} className="login-custom-input" required />
-              <button type="button" onClick={() => setShowPw(!showPw)} className="login-pw-toggle">
-                {showPw ? (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-                ) : (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                )}
-              </button>
-            </div>
-            <div className="login-input-group">
-              <span className="login-input-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-              </span>
-              <input type={showPw ? "text" : "password"} placeholder="Confirm Password" value={form.confirm} onChange={e => setForm({ ...form, confirm: e.target.value })} className="login-custom-input" required />
-            </div>
+          <div className="auth-input-group">
+            <span className="auth-input-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </span>
+            <input
+              type={showPw ? "text" : "password"}
+              placeholder="Password"
+              value={form.password}
+              onChange={e => setForm({ ...form, password: e.target.value })}
+              className="auth-custom-input"
+              required
+            />
+            <button type="button" onClick={() => setShowPw(!showPw)} className="auth-pw-toggle">
+              {showPw ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              )}
+            </button>
+          </div>
 
-            {error && <p style={{ color: "#c0392b", fontSize: "0.78rem", marginBottom: "1rem", textAlign: "center" }}>{error}</p>}
+          <div className="auth-input-group">
+            <span className="auth-input-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </span>
+            <input
+              type={showPw ? "text" : "password"}
+              placeholder="Confirm Password"
+              value={form.confirm}
+              onChange={e => setForm({ ...form, confirm: e.target.value })}
+              className="auth-custom-input"
+              required
+            />
+          </div>
 
-            <button type="submit" className="login-submit-btn">Create Account</button>
-          </form>
+          {error && <p style={{ color: "#c0392b", fontSize: "0.78rem", marginBottom: "1rem", textAlign: "center", fontWeight: 600 }}>{error}</p>}
 
-          <p className="login-signup-prompt">
-            Already have an account? <button onClick={onSwitch} className="login-signup-link">Sign In</button>
-          </p>
+          <button type="submit" className="auth-submit-pill">
+            Sign Up
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </button>
+        </form>
+
+        <div className="auth-divider">
+          <div className="auth-divider-line" />
+          <span className="auth-divider-text">or continue with</span>
+          <div className="auth-divider-line" />
         </div>
 
-        {/* Image Column */}
-        <div className="login-image-side">
-          <div className="login-image-container">
-            <img src={`${process.env.PUBLIC_URL || ""}/wishstone-product-login.png`} alt="Wishstone Manifest Crystal" className="login-image-src" />
+        {/* Social logins */}
+        <div className="auth-social-row">
+          <div className="auth-social-circle">
+            {/* Custom Google logo */}
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z" />
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.9 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+            </svg>
+            <div style={{ position: "absolute", inset: 0, opacity: 0.01, overflow: "hidden" }}>
+              <GoogleLogin
+                onSuccess={async (credentialResponse) => {
+                  const credential = credentialResponse.credential;
+                  setGoogleLoading(true); setError("");
+                  try {
+                    const res = await fetch(`${API_BASE}/api/auth/google`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ credential })
+                    });
+                    const data = await res.json();
+                    if (data.success && data.token) {
+                      localStorage.setItem("ws_token", data.token);
+                      localStorage.setItem("ws_user", JSON.stringify(data.user));
+                      onSignup({ ...data.user, joinedAt: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) });
+                    } else {
+                      setError(data.message || "Google sign-up failed.");
+                    }
+                  } catch {
+                    setError("Google sign-up failed. Please try again.");
+                  }
+                  setGoogleLoading(false);
+                }}
+                onError={() => {
+                  setError("Google sign-up failed. Please try again.");
+                }}
+                type="icon"
+                shape="circle"
+              />
+            </div>
+          </div>
+          <div className="auth-social-circle" onClick={() => alert("Apple Login is currently coming soon.")}>
+            {/* Apple Logo SVG */}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#000000">
+              <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.48C4.25 17 2.94 12.45 4.7 9.39C5.57 7.87 7.13 6.91 8.82 6.88C10.1 6.86 11.32 7.75 12.11 7.75C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.1 16.67C20.08 16.74 19.67 18.11 18.71 19.5M15.97 4.17C16.63 3.37 17.07 2.28 16.95 1C16 1.04 14.9 1.6 14.24 2.38C13.68 3.04 13.19 4.14 13.34 5.39C14.39 5.47 15.4 4.88 15.97 4.17Z" />
+            </svg>
           </div>
         </div>
+
+        <p className="auth-switch-prompt">
+          Already have an account?
+          <button type="button" onClick={onSwitch} className="auth-switch-link">
+            Log In
+          </button>
+        </p>
       </motion.div>
     </div>
   );
@@ -6457,11 +8222,8 @@ function LoginPage({ onLogin, onSwitch }) {
   const [error, setError] = useState("");
   const [googleLoading, setGoogleLoading] = useState(false);
   const API_BASE = getApiBase();
-  const GOOGLE_CLIENT_ID = "342285664182-b68b0t0tmj66jgu9eg14hg7212a57h2r.apps.googleusercontent.com";
 
-  useEffect(() => {
-    // google gsi script initialization removed to prevent GSI initialization warnings and errors
-  }, []);
+  const GOOGLE_CLIENT_ID = "342285664182-b68b0t0tmj66jgu9eg14hg7212a57h2r.apps.googleusercontent.com";
 
   const handle = async e => {
     e.preventDefault(); setError("");
@@ -6475,414 +8237,436 @@ function LoginPage({ onLogin, onSwitch }) {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#5A6651", display: "flex", alignItems: "center", justifyContent: "center", padding: "clamp(1rem, 3vw, 2.5rem)", boxSizing: "border-box", paddingTop: 90, position: "relative", overflow: "hidden" }}>
-      {/* Background glass blur glows for mobile */}
-      <div className="login-bg-glow-1" style={{ position: "absolute", top: "15%", left: "5%", width: "clamp(240px, 50vw, 400px)", height: "clamp(240px, 50vw, 400px)", borderRadius: "50%", background: "radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%)", filter: "blur(50px)", pointerEvents: "none", zIndex: 0 }} />
-      <div className="login-bg-glow-2" style={{ position: "absolute", bottom: "10%", right: "-10%", width: "clamp(280px, 60vw, 480px)", height: "clamp(280px, 60vw, 480px)", borderRadius: "50%", background: "radial-gradient(circle, rgba(245, 176, 112, 0.15) 0%, transparent 70%)", filter: "blur(60px)", pointerEvents: "none", zIndex: 0 }} />
+    <div className="auth-page-container">
+      {/* Background shadow leaf elements to simulate leaf shadows */}
+      <div className="auth-leaf-shadow-1" />
+      <div className="auth-leaf-shadow-2" />
 
       <style>{`
-        .login-card {
-          font-family: 'Open Sans', sans-serif;
-          background: rgba(255, 255, 255, 0.78);
-          backdrop-filter: blur(20px) saturate(140%);
-          -webkit-backdrop-filter: blur(20px) saturate(140%);
-          border: 1px solid rgba(255, 255, 255, 0.5);
-          border-radius: 28px;
-          width: 100%;
-          max-width: 900px;
-          display: flex;
-          overflow: hidden;
-          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15);
-          min-height: 520px;
-          transition: all 0.3s ease;
-        }
-        .login-form-side {
-          flex: 1.1;
-          padding: clamp(1.5rem, 5vw, 3.2rem);
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-        }
-        .login-image-side {
-          flex: 0.9;
-          padding: 1.25rem;
-          display: flex;
-          align-items: stretch;
-        }
-        .login-image-container {
-          width: 100%;
-          border-radius: 20px;
-          overflow: hidden;
-          position: relative;
-        }
-        .login-image-src {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-          transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .login-image-container:hover .login-image-src {
-          transform: scale(1.05);
-        }
-        .login-main-title {
-          font-family: 'Open Sans', sans-serif;
-          font-weight: 700;
-          font-size: 2rem;
-          color: #000000;
-          margin: 0 0 0.4rem 0;
-          text-align: center;
-        }
-        .login-sub-title {
-          font-family: 'Open Sans', sans-serif;
-          font-size: 0.84rem;
-          color: #666666;
-          margin-bottom: 1.8rem;
-          text-align: center;
-          font-weight: 500;
-        }
-        .google-login-custom-btn {
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Open+Sans:wght@300;400;500;600;700&display=swap');
+        
+        .auth-page-container {
+          min-height: 100vh;
+          background: #848974;
+          background-image: radial-gradient(circle at 10% 20%, rgba(48,54,14,0.06) 0%, transparent 60%);
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 12px;
-          width: 100%;
-          padding: 12px 16px;
-          border: 1px solid rgba(0, 0, 0, 0.8);
-          border-radius: 9999px;
-          background: #ffffff;
-          cursor: pointer;
-          font-size: 0.88rem;
-          font-weight: 600;
-          color: #000000;
-          font-family: 'Open Sans', sans-serif;
-          transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
-          margin-bottom: 1.4rem;
+          padding: 1.5rem;
           box-sizing: border-box;
+          padding-top: 90px;
+          position: relative;
+          overflow: hidden;
         }
-        .google-login-custom-btn:hover {
-          background: #f8f9fa;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-          transform: translateY(-1px);
+
+        /* Abstract Leaf Shadows */
+        .auth-leaf-shadow-1 {
+          position: absolute;
+          width: 500px;
+          height: 500px;
+          left: -150px;
+          top: -100px;
+          background: radial-gradient(ellipse at center, rgba(48,54,14,0.2) 0%, transparent 70%);
+          filter: blur(50px);
+          pointer-events: none;
+          transform: rotate(30deg);
         }
-        .google-login-custom-btn:active {
-          transform: translateY(0);
+        .auth-leaf-shadow-2 {
+          position: absolute;
+          width: 600px;
+          height: 600px;
+          right: -200px;
+          bottom: -150px;
+          background: radial-gradient(ellipse at center, rgba(120,127,86,0.18) 0%, transparent 70%);
+          filter: blur(60px);
+          pointer-events: none;
         }
-        .login-or-divider {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          margin-bottom: 1.4rem;
-        }
-        .login-or-line {
-          flex: 1;
-          height: 1px;
-          background: rgba(0, 0, 0, 0.08);
-        }
-        .login-or-text {
-          font-size: 0.78rem;
-          color: #999999;
-          font-weight: 500;
-          font-family: 'Open Sans', sans-serif;
-        }
-        .login-input-group {
-          margin-bottom: 1.1rem;
+
+        .auth-card-clone {
+          background: #EAE2D5;
+          border: 1px solid rgba(255, 255, 255, 0.4);
+          border-radius: 20px;
+          width: 100%;
+          max-width: 410px;
+          padding: 2.2rem 2rem;
+          box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+          z-index: 10;
           position: relative;
         }
-        .login-input-icon {
+
+        .auth-logo-font {
+          font-family: 'Playfair Display', serif;
+          font-weight: 500;
+          font-size: 1.8rem;
+          color: #30360E;
+          text-align: center;
+          margin: 0;
+          letter-spacing: -0.01em;
+        }
+
+        .auth-logo-sub {
+          font-family: 'Open Sans', sans-serif;
+          font-size: 0.62rem;
+          font-weight: 600;
+          color: #787F56;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          text-align: center;
+          margin-top: 4px;
+          margin-bottom: 1.6rem;
+        }
+
+        /* Tabs container */
+        .auth-tabs-row {
+          display: flex;
+          justify-content: center;
+          width: 100%;
+          border-bottom: 1px solid rgba(120, 127, 86, 0.15);
+          margin-bottom: 1.6rem;
+        }
+        .auth-tab-btn {
+          background: none;
+          border: none;
+          padding: 8px 24px;
+          font-size: 0.92rem;
+          font-weight: 600;
+          color: #787F56;
+          cursor: pointer;
+          position: relative;
+          transition: color 0.25s;
+          font-family: 'Open Sans', sans-serif;
+        }
+        .auth-tab-btn.active {
+          color: #30360E;
+        }
+        .auth-tab-btn.active::after {
+          content: '';
           position: absolute;
-          left: 20px;
+          bottom: -1px;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background: #30360E;
+        }
+
+        /* Input Container */
+        .auth-input-group {
+          margin-bottom: 0.9rem;
+          position: relative;
+          width: 100%;
+        }
+        .auth-input-icon {
+          position: absolute;
+          left: 14px;
           top: 50%;
           transform: translateY(-50%);
-          color: #777777;
+          color: #787F56;
           display: flex;
           align-items: center;
           pointer-events: none;
-          transition: color 0.2s;
         }
-        .login-input-group:focus-within .login-input-icon {
-          color: #4C5A43;
-        }
-        .login-custom-input {
+        .auth-custom-input {
           width: 100%;
-          padding: 13px 20px 13px 48px;
-          border: 1.2px solid rgba(0,0,0,0.2);
-          border-radius: 9999px;
-          font-size: 0.9rem;
-          background: #ffffff;
-          color: #1a1a1a;
+          padding: 11px 14px 11px 40px;
+          border: 1px solid rgba(120, 127, 86, 0.12);
+          border-radius: 8px;
+          font-size: 0.88rem;
+          background: #ECE5D8;
+          color: #30360E;
           outline: none;
-          box-sizing: border-box;
           font-family: 'Open Sans', sans-serif;
-          transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+          transition: all 0.2s ease;
         }
-        .login-custom-input::placeholder {
-          color: #888888;
+        .auth-custom-input::placeholder {
+          color: #8E8A80;
         }
-        .login-custom-input:focus {
-          border-color: #4C5A43;
-          box-shadow: 0 0 0 3px rgba(76, 90, 67, 0.08);
+        .auth-custom-input:focus {
+          border-color: #30360E;
+          background: #F2ECE0;
         }
-        .login-pw-toggle {
+
+        .auth-pw-toggle {
           position: absolute;
-          right: 20px;
+          right: 14px;
           top: 50%;
           transform: translateY(-50%);
           background: none;
           border: none;
           cursor: pointer;
-          font-size: 1.1rem;
-          color: #777777;
+          color: #787F56;
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 0;
-          transition: color 0.2s;
         }
-        .login-pw-toggle:hover {
-          color: #4C5A43;
-        }
-        .login-forgot-pw-link {
+
+        .auth-forgot-link {
           display: block;
           text-align: right;
-          font-size: 0.78rem;
-          color: #999999;
-          text-decoration: none;
-          margin-top: -0.5rem;
-          margin-bottom: 1.6rem;
-          font-weight: 500;
-          transition: color 0.2s;
-          background: none;
-          border: none;
-          cursor: pointer;
-          font-family: 'Open Sans', sans-serif;
-        }
-        .login-forgot-pw-link:hover {
-          color: #4C5A43;
-        }
-        .login-submit-btn {
-          width: 100%;
-          padding: 13px;
-          font-size: 0.94rem;
+          font-size: 0.74rem;
+          color: #787F56;
           font-weight: 600;
-          border-radius: 9999px;
-          border: none;
-          background: linear-gradient(135deg, #5A6651 0%, #3e4836 100%);
-          color: #ffffff;
-          cursor: pointer;
-          font-family: 'Open Sans', sans-serif;
-          transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
-          box-shadow: 0 4px 12px rgba(90, 102, 81, 0.2);
-        }
-        .login-submit-btn:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 6px 16px rgba(90, 102, 81, 0.35);
-          filter: brightness(1.08);
-        }
-        .login-submit-btn:active {
-          transform: translateY(0);
-        }
-        .login-signup-prompt {
-          text-align: center;
-          margin-top: 1.4rem;
-          font-size: 0.84rem;
-          color: #666666;
-          font-family: 'Open Sans', sans-serif;
-        }
-        .login-signup-link {
+          text-decoration: none;
+          margin-top: -0.4rem;
+          margin-bottom: 1.4rem;
           background: none;
           border: none;
           cursor: pointer;
-          color: #4C5A43;
+          font-family: 'Open Sans', sans-serif;
+          transition: color 0.2s;
+        }
+        .auth-forgot-link:hover {
+          color: #30360E;
+        }
+
+        /* Pill Submit Button */
+        .auth-submit-pill {
+          width: 100%;
+          padding: 11px 20px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          border-radius: 24px;
+          border: none;
+          background: #30360E;
+          color: #E2D4B9;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          font-family: 'Open Sans', sans-serif;
+          transition: all 0.25s ease;
+          box-shadow: 0 4px 12px rgba(48, 54, 14, 0.15);
+        }
+        .auth-submit-pill:hover {
+          background: #202409;
+          transform: translateY(-1px);
+          box-shadow: 0 6px 16px rgba(48, 54, 14, 0.25);
+        }
+
+        /* Divider */
+        .auth-divider {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin: 1.2rem 0;
+        }
+        .auth-divider-line {
+          flex: 1;
+          height: 1px;
+          background: rgba(120, 127, 86, 0.15);
+        }
+        .auth-divider-text {
+          font-size: 0.7rem;
+          color: #787F56;
+          font-weight: 600;
+          font-family: 'Open Sans', sans-serif;
+        }
+
+        /* Social circles */
+        .auth-social-row {
+          display: flex;
+          gap: 16px;
+          justify-content: center;
+          margin-bottom: 1.2rem;
+        }
+        .auth-social-circle {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          background: #ffffff;
+          border: 1px solid rgba(120, 127, 86, 0.12);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: 0 4px 12px rgba(48,54,14,0.04);
+          transition: all 0.2s;
+          position: relative;
+        }
+        .auth-social-circle:hover {
+          transform: scale(1.05);
+          box-shadow: 0 6px 16px rgba(48,54,14,0.08);
+        }
+
+        .auth-switch-prompt {
+          text-align: center;
+          margin-top: 1.2rem;
+          font-size: 0.8rem;
+          color: #787F56;
+          font-family: 'Open Sans', sans-serif;
+          font-weight: 500;
+        }
+        .auth-switch-link {
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: #30360E;
           font-weight: 700;
-          font-size: 0.84rem;
           padding: 0;
           margin-left: 4px;
-          text-decoration: none;
-          transition: color 0.15s;
-        }
-        .login-signup-link:hover {
-          color: #2C3320;
           text-decoration: underline;
-        }
-        @media (max-width: 992px) {
-          .login-card {
-            max-width: 800px;
-            min-height: 480px;
-          }
-          .login-form-side {
-            padding: 2rem;
-          }
-        }
-        @media (max-width: 768px) {
-          .login-card {
-            flex-direction: column;
-            width: 90%;
-            max-width: 400px;
-            min-height: auto;
-            border-radius: 28px;
-            border: 1px solid rgba(255, 255, 255, 0.45);
-            background: rgba(255, 255, 255, 0.55);
-            backdrop-filter: blur(24px) saturate(120%);
-            -webkit-backdrop-filter: blur(24px) saturate(120%);
-            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.12);
-          }
-          .login-form-side {
-            width: 100%;
-            flex: none;
-            padding: 2.2rem 1.8rem;
-          }
-          .login-image-side {
-            display: none;
-          }
-          .login-main-title {
-            font-size: 1.6rem;
-            margin-bottom: 0.3rem;
-          }
-          .login-sub-title {
-            font-size: 0.8rem;
-            margin-bottom: 1.4rem;
-          }
-          .google-login-custom-btn {
-            padding: 9px 12px;
-            font-size: 0.8rem;
-            margin-bottom: 0.8rem;
-          }
-          .login-or-divider {
-            margin-bottom: 1.1rem;
-          }
-          .login-input-group {
-            margin-bottom: 0.9rem;
-          }
-          .login-input-icon {
-            left: 16px;
-          }
-          .login-custom-input {
-            padding: 12px 18px 12px 42px;
-            font-size: 0.88rem;
-            background: rgba(255, 255, 255, 0.65);
-            border: 1.2px solid rgba(255, 255, 255, 0.35);
-            color: #000000;
-          }
-          .login-custom-input:focus {
-            background: rgba(255, 255, 255, 0.95);
-            border-color: #4C5A43;
-            box-shadow: 0 0 0 3px rgba(76, 90, 67, 0.12);
-          }
-          .login-pw-toggle {
-            right: 18px;
-            font-size: 1rem;
-          }
-          .login-forgot-pw-link {
-            margin-top: -0.4rem;
-            margin-bottom: 1.2rem;
-            font-size: 0.74rem;
-          }
-          .login-submit-btn {
-            padding: 12px;
-            font-size: 0.9rem;
-          }
-          .login-signup-prompt {
-            margin-top: 1.1rem;
-            font-size: 0.82rem;
-          }
+          font-family: 'Open Sans', sans-serif;
         }
       `}</style>
-      <motion.div className="login-card" style={{ zIndex: 1, position: "relative" }}
-        initial={{ opacity: 0, y: 32, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-      >
-        {/* Form Column */}
-        <div className="login-form-side">
-          <img src={`${process.env.PUBLIC_URL || ""}/wishstone svg.svg`} alt="WishStone" style={{ height: "clamp(32px, 5vw, 44px)", width: "auto", display: "block", margin: "0 auto 1rem" }} />
-          <h2 className="login-main-title">Welcome Back !!</h2>
-          <p className="login-sub-title">Please enter your details</p>
 
-          <div style={{ display: "flex", justifyContent: "center", width: "100%", marginBottom: "1.4rem" }}>
-            <GoogleLogin
-              onSuccess={async (credentialResponse) => {
-                const credential = credentialResponse.credential;
-                setGoogleLoading(true); setError("");
-                try {
-                  const res = await fetch(`${API_BASE}/api/auth/google`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ credential })
-                  });
-                  const data = await res.json();
-                  if (data.success && data.token) {
-                    localStorage.setItem("ws_token", data.token);
-                    localStorage.setItem("ws_user", JSON.stringify(data.user));
-                    onLogin({ ...data.user, joinedAt: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) });
-                  } else {
-                    setError(data.message || "Google sign-in failed.");
-                  }
-                } catch {
-                  setError("Google sign-in failed. Please try again.");
-                }
-                setGoogleLoading(false);
-              }}
-              onError={() => {
-                setError("Google sign-in failed. Please try again.");
-              }}
-              theme="outline"
-              size="large"
-              text="signin_with"
-              width="320px"
+      <motion.div
+        className="auth-card-clone"
+        initial={{ opacity: 0, y: 25, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {/* Star Sparkle Icon */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "0.5rem" }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="1.8">
+            <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="#787F56" />
+          </svg>
+        </div>
+
+        {/* Brand Logo and Subtitle */}
+        <h1 className="auth-logo-font">WishStone</h1>
+        <p className="auth-logo-sub">Rituals for mind, body & soul</p>
+
+        {/* Tab switcher */}
+        <div className="auth-tabs-row">
+          <button type="button" className="auth-tab-btn active">
+            Log In
+          </button>
+          <button type="button" className="auth-tab-btn" onClick={onSwitch}>
+            Sign Up
+          </button>
+        </div>
+
+        {/* Login form */}
+        <form onSubmit={handle}>
+          <div className="auth-input-group">
+            <span className="auth-input-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+            </span>
+            <input
+              type="email"
+              placeholder="Email address"
+              value={form.email}
+              onChange={e => setForm({ ...form, email: e.target.value })}
+              className="auth-custom-input"
+              required
             />
           </div>
 
-          <div className="login-or-divider">
-            <div className="login-or-line" />
-            <span className="login-or-text">or</span>
-            <div className="login-or-line" />
+          <div className="auth-input-group">
+            <span className="auth-input-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </span>
+            <input
+              type={showPw ? "text" : "password"}
+              placeholder="Password"
+              value={form.password}
+              onChange={e => setForm({ ...form, password: e.target.value })}
+              className="auth-custom-input"
+              required
+            />
+            <button type="button" onClick={() => setShowPw(!showPw)} className="auth-pw-toggle">
+              {showPw ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              )}
+            </button>
           </div>
 
-          <form onSubmit={handle}>
-            <div className="login-input-group">
-              <span className="login-input-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-              </span>
-              <input type="email" placeholder="Email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="login-custom-input" required />
-            </div>
-            <div className="login-input-group">
-              <span className="login-input-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-              </span>
-              <input type={showPw ? "text" : "password"} placeholder="Password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} className="login-custom-input" required />
-              <button type="button" onClick={() => setShowPw(!showPw)} className="login-pw-toggle">
-                {showPw ? (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
-                ) : (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                )}
-              </button>
-            </div>
+          <button type="button" onClick={() => alert("Password reset link has been sent to your email (mock).")} className="auth-forgot-link">
+            Forgot password?
+          </button>
 
-            <button type="button" onClick={() => alert("Password reset link has been sent to your email (mock).")} className="login-forgot-pw-link">Forgot password</button>
+          {error && <p style={{ color: "#c0392b", fontSize: "0.78rem", marginBottom: "1rem", textAlign: "center", fontWeight: 600 }}>{error}</p>}
 
-            {error && <p style={{ color: "#c0392b", fontSize: "0.78rem", marginBottom: "1rem", textAlign: "center" }}>{error}</p>}
+          <button type="submit" className="auth-submit-pill">
+            Log In
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </button>
+        </form>
 
-            <button type="submit" className="login-submit-btn">Log In</button>
-          </form>
-
-          <p className="login-signup-prompt">
-            Don't have an account? <button onClick={onSwitch} className="login-signup-link">Sign Up</button>
-          </p>
+        <div className="auth-divider">
+          <div className="auth-divider-line" />
+          <span className="auth-divider-text">or continue with</span>
+          <div className="auth-divider-line" />
         </div>
 
-        {/* Image Column */}
-        <div className="login-image-side">
-          <div className="login-image-container">
-            <img src={`${process.env.PUBLIC_URL || ""}/wishstone-product-login.png`} alt="Wishstone Manifest Crystal" className="login-image-src" />
+        {/* Social logins */}
+        <div className="auth-social-row">
+          <div className="auth-social-circle">
+            {/* Custom Google logo */}
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z" />
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.9 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+            </svg>
+            <div style={{ position: "absolute", inset: 0, opacity: 0.01, overflow: "hidden" }}>
+              <GoogleLogin
+                onSuccess={async (credentialResponse) => {
+                  const credential = credentialResponse.credential;
+                  setGoogleLoading(true); setError("");
+                  try {
+                    const res = await fetch(`${API_BASE}/api/auth/google`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ credential })
+                    });
+                    const data = await res.json();
+                    if (data.success && data.token) {
+                      localStorage.setItem("ws_token", data.token);
+                      localStorage.setItem("ws_user", JSON.stringify(data.user));
+                      onLogin({ ...data.user, joinedAt: new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) });
+                    } else {
+                      setError(data.message || "Google sign-in failed.");
+                    }
+                  } catch {
+                    setError("Google sign-in failed. Please try again.");
+                  }
+                  setGoogleLoading(false);
+                }}
+                onError={() => {
+                  setError("Google sign-in failed. Please try again.");
+                }}
+                type="icon"
+                shape="circle"
+              />
+            </div>
+          </div>
+          <div className="auth-social-circle" onClick={() => alert("Apple Login is currently coming soon.")}>
+            {/* Apple Logo SVG */}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#000000">
+              <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.48C4.25 17 2.94 12.45 4.7 9.39C5.57 7.87 7.13 6.91 8.82 6.88C10.1 6.86 11.32 7.75 12.11 7.75C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.1 16.67C20.08 16.74 19.67 18.11 18.71 19.5M15.97 4.17C16.63 3.37 17.07 2.28 16.95 1C16 1.04 14.9 1.6 14.24 2.38C13.68 3.04 13.19 4.14 13.34 5.39C14.39 5.47 15.4 4.88 15.97 4.17Z" />
+            </svg>
           </div>
         </div>
+
+        <p className="auth-switch-prompt">
+          Don't have an account?
+          <button type="button" onClick={onSwitch} className="auth-switch-link">
+            Sign Up
+          </button>
+        </p>
       </motion.div>
     </div>
   );
 }
-
 // ─── USER DASHBOARD ───────────────────────────────────────────
 function UserDashboard({ user, orders, onLogout, onNav, onUpdateUser }) {
   const [activeTab, setActiveTab] = useState("orders");
@@ -7915,9 +9699,7 @@ function PromoModal({ onClose, onShop, userEmail }) {
               alt="WishStone"
               style={{ height: 24, width: "auto", margin: "0 auto", display: "block" }}
             />
-            <div style={{ fontSize: "0.6rem", letterSpacing: "0.22em", color: "#A68D60", marginTop: 6, fontWeight: 700, fontFamily: "'Inter', sans-serif" }}>
-              SACRED STORE
-            </div>
+
           </div>
 
           {!claimed ? (
@@ -7936,7 +9718,7 @@ function PromoModal({ onClose, onShop, userEmail }) {
 
               {/* Subheader */}
               <p style={{ fontSize: "0.78rem", color: "#5C6654", lineHeight: 1.5, marginBottom: "1.2rem", padding: "0 8px", fontFamily: "'Inter', sans-serif" }}>
-                Unlock <span style={{ color: "#A68D60", fontWeight: 700 }}>₹300 OFF</span> on your first order<br/>and step into something meaningful.
+                Unlock <span style={{ color: "#A68D60", fontWeight: 700 }}>₹300 OFF</span> on your first order<br />and step into something meaningful.
               </p>
 
               {/* Input field wrapper */}

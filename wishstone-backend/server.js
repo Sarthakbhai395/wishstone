@@ -131,6 +131,8 @@ app.use("/api/orders",     require("./routes/orders"));
 app.use("/api/coupons",    require("./routes/coupons"));
 app.use("/api/payment",    require("./routes/payment"));
 app.use("/api/admin",      require("./routes/admin"));
+app.use("/api/blogs",      require("./routes/blogs"));
+app.use("/api/ugc-videos", require("./routes/ugcVideos"));
 
 // ─── STATIC FILES (after API routes) ─────────────────────────
 const frontendBuild = path.join(__dirname, "../wishstone-frontend/build");
