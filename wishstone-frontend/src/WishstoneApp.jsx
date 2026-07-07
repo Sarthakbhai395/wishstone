@@ -714,7 +714,7 @@ const GLOBAL_CSS = `
   `;
 
 // ─── HEADER ───────────────────────────────────────────────────
-function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
+function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout, onCartOpen }) {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -776,7 +776,14 @@ function Header({ cartCount, wishCount, onNav, currentPage, user, onLogout }) {
   }, [mobileOpen]);
 
   const links = [["products", "Shop Collection"], ["rituals", "The Ritual"], ["benefits", "Benefits"], ["stories", "Wish Story"]];
-  const navTo = (k) => { onNav(k); setMobileOpen(false); };
+  const navTo = (k) => {
+    if (k === "cart") {
+      if (onCartOpen) onCartOpen();
+    } else {
+      onNav(k);
+    }
+    setMobileOpen(false);
+  };
 
   return (
     <header style={{
@@ -5475,228 +5482,289 @@ function BenefitsPage() {
   );
 }
 
-// ─── CANVAS PRODUCT VIDEO ANIMATOR ────────────────────────────
-function CanvasProductVideo() {
-  const canvasRef = useRef(null);
+// ─── PRODUCT STORY SLIDER ─────────────────────────────────────
+function ProductStorySlider() {
   const [activeItem, setActiveItem] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
-  const progressRef = useRef(0);
-  const imagesPreloaded = useRef([]);
+  const timerRef = useRef(null);
+  const [progress, setProgress] = useState(0);
 
   const items = [
     {
       title: "Sacred Wishstone",
       sub: "SOMATIC ANCHOR",
-      desc: "A tactile heavy crystal mapping your conscious desires into physical spaces.",
+      desc: "Ethically hand-harvested from ancient river formations, this tactile heavy crystal serves as a physical trigger to pull your attention away from stress and ground your consciousness.",
       color: "#787F56",
       image: "/wishstone-horizontal.jpeg"
     },
     {
       title: "Vibrational Diffuser",
       sub: "RITUAL CHAMBER",
-      desc: "Dispersing grounding mist infused with natural essential oils.",
+      desc: "Dispersing micro-particles of pure botanical extracts, this ultrasonic vessel balances the room energy. It creates a calming transition state ideal for reflection.",
       color: "#C39D5F",
       image: "/defuser-product.jpeg"
     },
     {
       title: "The Cosmic Eye Grid",
       sub: "GEOMETRIC CONDUIT",
-      desc: "Sacred crystalline structures centering your meditation environment.",
+      desc: "Crafted on an alignment layout, this sacred platform centers crystal structures on custom nodes. It translates abstract objectives into a visual geometric layout.",
       color: "#8FA382",
       image: "/cosmic-eye.jpeg"
     },
     {
       title: "Habit Builder",
       sub: "BEHAVIOR TRACKER",
-      desc: "Tactile tracking nodes to map intentions and lock in daily positive habits.",
+      desc: "A beautifully structured physical ledger and tracking node to visually chart your micro-habits. Daily tactile mapping encourages continuous feedback loops.",
       color: "#6D7860",
       image: "/habit-builder2-product.jpeg"
     }
   ];
 
   useEffect(() => {
-    imagesPreloaded.current = items.map(it => {
-      const img = new Image();
-      img.src = it.image;
-      return img;
-    });
-  }, []);
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (!isPlaying) return;
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    let animationFrameId;
-    let angle = 0;
-    let scanY = 0;
-    let scanDir = 1;
+    const intervalTime = 50;
+    const duration = 5000;
+    const increment = (intervalTime / duration) * 100;
 
-    canvas.width = 640;
-    canvas.height = 360;
-
-    const render = () => {
-      ctx.fillStyle = "#0C0B0A";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
-      for (let i = 0; i < 45; i++) {
-        const x = (Math.sin(i * 123) * 0.5 + 0.5) * canvas.width;
-        const y = (Math.cos(i * 456) * 0.5 + 0.5) * canvas.height;
-        ctx.fillRect(x, y, 1.5, 1.5);
-      }
-
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(canvas.width / 2, canvas.height / 2, 85, 0, Math.PI * 2);
-      ctx.stroke();
-
-      const current = items[activeItem];
-
-      const grad = ctx.createRadialGradient(
-        canvas.width / 2, canvas.height / 2, 10,
-        canvas.width / 2, canvas.height / 2, 90
-      );
-      grad.addColorStop(0, `${current.color}45`);
-      grad.addColorStop(1, "transparent");
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(canvas.width / 2, canvas.height / 2, 95, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Render product graphics based on active tab - 360 Spin!
-      ctx.save();
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.scale(Math.sin(angle), 1); // 360 degree horizontal flip spin
-
-      const activeImg = imagesPreloaded.current[activeItem];
-      if (activeImg && activeImg.complete && activeImg.naturalWidth !== 0) {
-        ctx.beginPath();
-        ctx.arc(0, 0, 60, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(activeImg, -60, -60, 120, 120);
-      } else {
-        ctx.strokeStyle = current.color;
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.arc(0, 0, 45, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-      ctx.restore();
-
-      ctx.save();
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.beginPath();
-      ctx.arc(0, 0, 60, 0, Math.PI * 2);
-      ctx.clip();
-
-      ctx.strokeStyle = `${current.color}AA`;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(-60, scanY);
-      ctx.lineTo(60, scanY);
-      ctx.stroke();
-      ctx.restore();
-
-      ctx.font = "bold 9px 'Open Sans', sans-serif";
-      ctx.fillStyle = "#787F56";
-      ctx.letterSpacing = "2px";
-      ctx.fillText(`PRODUCT VISUALIZER 0${activeItem + 1}`, 40, 50);
-
-      ctx.font = "bold 20px 'Playfair Display', serif";
-      ctx.fillStyle = "#ffffff";
-      ctx.fillText(current.title, 40, 78);
-
-      ctx.font = "11px 'Open Sans', sans-serif";
-      ctx.fillStyle = "rgba(255,255,255,0.65)";
-
-      const words = current.desc.split(" ");
-      let line = "";
-      let y = 105;
-      for (let n = 0; n < words.length; n++) {
-        const testLine = line + words[n] + " ";
-        const metrics = ctx.measureText(testLine);
-        if (metrics.width > 220 && n > 0) {
-          ctx.fillText(line, 40, y);
-          line = words[n] + " ";
-          y += 18;
-        } else {
-          line = testLine;
+    timerRef.current = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          setActiveItem(current => (current + 1) % items.length);
+          return 0;
         }
-      }
-      ctx.fillText(line, 40, y);
+        return prev + increment;
+      });
+    }, intervalTime);
 
-      ctx.fillStyle = "rgba(255,255,255,0.1)";
-      ctx.fillRect(40, canvas.height - 45, canvas.width - 80, 4);
-
-      ctx.fillStyle = current.color;
-      const w = (progressRef.current / 100) * (canvas.width - 80);
-      ctx.fillRect(40, canvas.height - 45, w, 4);
-
-      if (isPlaying) {
-        angle += 0.018; // Rotation angle
-        progressRef.current += 0.15; // Slower speed (approx 12-15s per item)
-
-        scanY += scanDir * 1.5;
-        if (scanY >= 60) scanDir = -1;
-        if (scanY <= -60) scanDir = 1;
-
-        if (progressRef.current >= 100) {
-          progressRef.current = 0;
-          setActiveItem((prev) => (prev + 1) % items.length);
-        }
-      }
-
-      animationFrameId = requestAnimationFrame(render);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
     };
-
-    render();
-    return () => cancelAnimationFrame(animationFrameId);
   }, [isPlaying, activeItem]);
 
+  const selectSlide = (idx) => {
+    setActiveItem(idx);
+    setProgress(0);
+  };
+
+  const current = items[activeItem];
+
   return (
-    <div style={{ background: "#11100F", borderRadius: 24, padding: 12, border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 24px 64px rgba(0,0,0,0.4)" }}>
-      <div style={{ position: "relative", width: "100%", aspectRatio: "16/9", overflow: "hidden", borderRadius: 16 }}>
-        <canvas ref={canvasRef} style={{ width: "100%", height: "100%", display: "block" }} />
-      </div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12, padding: "0 6px" }}>
-        <div style={{ display: "flex", gap: 12 }}>
-          <button onClick={() => setIsPlaying(!isPlaying)} style={{ background: "none", border: "none", color: "#fff", cursor: "pointer", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em" }}>
-            {isPlaying ? "⏸ PAUSE" : "▶ PLAY"}
-          </button>
-          <div style={{ display: "flex", gap: 6 }}>
-            {items.map((_, idx) => (
+    <div style={{
+      background: "#30360E",
+      borderRadius: 24,
+      padding: "2rem",
+      border: "1px solid rgba(255,255,255,0.08)",
+      boxShadow: "0 24px 64px rgba(0,0,0,0.3)",
+      color: "#ffffff",
+      overflow: "hidden"
+    }}>
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "1.1fr 0.9fr",
+        gap: "2.5rem",
+        alignItems: "center"
+      }} className="ws-two-col">
+        
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeItem}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.4 }}
+            >
+              <span style={{
+                color: "#C39D5F",
+                fontSize: "0.75rem",
+                fontWeight: 800,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                display: "inline-block",
+                marginBottom: "0.5rem"
+              }}>
+                {current.sub}
+              </span>
+              <h2 style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: "clamp(1.6rem, 3.5vw, 2.2rem)",
+                fontWeight: 800,
+                marginBottom: "1rem",
+                color: "#ffffff",
+                lineHeight: 1.25
+              }}>
+                {current.title}
+              </h2>
+              <p style={{
+                color: "rgba(255, 255, 255, 0.75)",
+                fontSize: "0.92rem",
+                lineHeight: 1.7,
+                marginBottom: "1.8rem",
+                minHeight: "90px"
+              }}>
+                {current.desc}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
               <button
-                key={idx}
-                onClick={() => {
-                  setActiveItem(idx);
-                  progressRef.current = 0;
-                }}
+                onClick={() => setIsPlaying(!isPlaying)}
                 style={{
-                  background: activeItem === idx ? "#787F56" : "rgba(255,255,255,0.15)",
+                  background: "none",
                   border: "none",
-                  width: 18,
-                  height: 18,
-                  borderRadius: "50%",
-                  color: "#fff",
-                  fontSize: 8,
+                  color: "#ffffff",
                   cursor: "pointer",
+                  fontSize: "0.75rem",
+                  fontWeight: 800,
+                  letterSpacing: "0.08em",
+                  padding: 0,
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: 700
+                  gap: 6
                 }}
               >
-                {idx + 1}
+                {isPlaying ? (
+                  <>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                      <rect x="6" y="4" width="4" height="16" />
+                      <rect x="14" y="4" width="4" height="16" />
+                    </svg>
+                    PAUSE
+                  </>
+                ) : (
+                  <>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="5 3 19 12 5 21 5 3" />
+                    </svg>
+                    PLAY
+                  </>
+                )}
               </button>
-            ))}
+
+              <div style={{ display: "flex", gap: 8 }}>
+                {items.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => selectSlide(idx)}
+                    style={{
+                      background: activeItem === idx ? "#C39D5F" : "rgba(255, 255, 255, 0.2)",
+                      border: "none",
+                      width: 24,
+                      height: 24,
+                      borderRadius: "50%",
+                      color: "#ffffff",
+                      fontSize: "0.7rem",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: 700,
+                      transition: "all 0.3s ease"
+                    }}
+                  >
+                    {idx + 1}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{
+              background: "rgba(255, 255, 255, 0.12)",
+              height: 4,
+              borderRadius: 2,
+              width: "100%",
+              overflow: "hidden"
+            }}>
+              <div style={{
+                background: "#C39D5F",
+                height: "100%",
+                width: `${progress}%`,
+                transition: isPlaying ? "none" : "width 0.2s ease"
+              }} />
+            </div>
           </div>
         </div>
-        <span style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", letterSpacing: "1px", fontWeight: 700 }}>GENERATIVE PRODUCT FILM</span>
+
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          position: "relative"
+        }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeItem}
+              initial={{ opacity: 0, scale: 0.92, rotate: -4 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              exit={{ opacity: 0, scale: 0.92, rotate: 4 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              style={{
+                width: "100%",
+                aspectRatio: "1/1",
+                maxWidth: "320px",
+                position: "relative",
+                borderRadius: "24px",
+                overflow: "hidden",
+                border: "1.5px solid rgba(255, 255, 255, 0.12)",
+                boxShadow: "0 20px 48px rgba(0,0,0,0.35)",
+                background: "rgba(255,255,255,0.03)"
+              }}
+            >
+              <div style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "80%",
+                height: "80%",
+                background: `radial-gradient(circle, ${current.color}33 0%, transparent 70%)`,
+                pointerEvents: "none",
+                zIndex: 0
+              }} />
+
+              <img
+                src={current.image}
+                alt={current.title}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  position: "relative",
+                  zIndex: 1,
+                  display: "block"
+                }}
+              />
+              
+              <div style={{
+                position: "absolute",
+                bottom: 12,
+                left: 12,
+                background: "rgba(48, 54, 14, 0.85)",
+                backdropFilter: "blur(4px)",
+                padding: "6px 12px",
+                borderRadius: "12px",
+                fontSize: "0.58rem",
+                fontWeight: 800,
+                color: "#C39D5F",
+                letterSpacing: "0.08em",
+                zIndex: 2,
+                border: "1px solid rgba(255,255,255,0.08)"
+              }}>
+                RITUAL ASSET
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
       </div>
     </div>
   );
 }
+
 
 function CanvasJourneyVideo() {
   const canvasRef = useRef(null);
@@ -5942,37 +6010,46 @@ function StoriesPage() {
   ];
 
   return (
-    <div style={{ paddingTop: 90, background: T.bg, minHeight: "100vh", color: T.text }} className="homepage-font-override">
+    <div style={{ paddingTop: activeCategory === "landing" ? 90 : 0, background: T.bg, minHeight: "100vh", color: T.text, position: "relative" }} className="homepage-font-override">
 
       {/* Back to Categories bar */}
       {activeCategory !== "landing" && (
-        <div className="max-w" style={{ padding: "1.5rem 1.5rem 0.5rem 1.5rem", display: "flex", alignItems: "center" }}>
+        <div style={{
+          position: "absolute",
+          top: "115px",
+          left: "clamp(1.5rem, 5vw, 3.5rem)",
+          zIndex: 100
+        }}>
           <button
             onClick={() => setActiveCategory("landing")}
             style={{
-              background: "none",
-              border: "none",
+              background: "rgba(255, 255, 255, 0.08)",
+              backdropFilter: "blur(8px)",
+              border: `1px solid ${activeCategory === "blog" ? "rgba(120, 127, 86, 0.25)" : "rgba(255, 255, 255, 0.2)"}`,
               cursor: "pointer",
-              color: "#787F56",
-              fontSize: "0.78rem",
+              color: activeCategory === "blog" ? "#787F56" : "#ffffff",
+              fontSize: "0.75rem",
               fontWeight: 700,
               letterSpacing: "0.08em",
               textTransform: "uppercase",
               display: "flex",
               alignItems: "center",
-              gap: "6px",
-              padding: "8px 12px",
-              borderRadius: "6px",
-              transition: "all 0.2s"
+              gap: "8px",
+              padding: "10px 18px",
+              borderRadius: "30px",
+              transition: "all 0.3s ease",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.08)"
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(120, 127, 86, 0.08)";
+              e.currentTarget.style.background = activeCategory === "blog" ? "rgba(120, 127, 86, 0.12)" : "rgba(255, 255, 255, 0.18)";
+              e.currentTarget.style.transform = "translateY(-1px)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = "none";
+              e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
+              e.currentTarget.style.transform = "translateY(0)";
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
               <line x1="19" y1="12" x2="5" y2="12"></line>
               <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
@@ -6165,7 +6242,7 @@ function StoriesPage() {
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
             {/* Hero Section */}
-            <section style={{ background: "#0C0B0A", color: "#fff", padding: "clamp(3rem, 8vw, 5rem) 1.5rem" }}>
+            <section style={{ background: "#30360E", color: "#fff", padding: "calc(90px + 4rem) 1.5rem 5rem" }}>
               <div className="max-w ws-two-col" style={{ gap: "clamp(1.5rem, 4vw, 3rem)", alignItems: "center" }}>
                 <div>
                   <span style={{ color: "#C39D5F", fontSize: "0.68rem", fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase" }}>THE COLLECTION OVERVIEW</span>
@@ -6193,9 +6270,9 @@ function StoriesPage() {
                   </div>
                 </div>
 
-                {/* Animated Generative Canvas Video */}
+                {/* Animated Storytelling Product Slider */}
                 <div>
-                  <CanvasProductVideo />
+                  <ProductStorySlider />
                 </div>
               </div>
             </section>
@@ -6263,7 +6340,7 @@ function StoriesPage() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
-            <section style={{ padding: "4rem 1.5rem" }}>
+            <section style={{ padding: "calc(90px + 2.5rem) 1.5rem 4rem" }}>
               <div className="max-w">
                 <div style={{ textAlign: "center", marginBottom: "4rem" }}>
                   <span style={{ color: "#787F56", fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase" }}>WISHSTONE DIARY</span>
@@ -6367,16 +6444,18 @@ function StoriesPage() {
             <section
               style={{
                 position: "relative",
-                height: "55vh",
-                minHeight: "350px",
+                height: "58vh",
+                minHeight: "380px",
                 backgroundImage: "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('/founder.png')",
                 backgroundSize: "cover",
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "center",
                 backgroundColor: "#0C0B0A",
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
+                paddingTop: 90,
                 color: "#fff",
                 textAlign: "center"
               }}
@@ -10050,41 +10129,43 @@ function ProductPageWrapper({ onAdd, onAddAnim, onWish, wished, cart, onShop }) 
   return <ProductPage product={product} onAdd={onAdd} onAddAnim={onAddAnim} onWish={onWish} wished={wished} cart={cart} onShop={onShop} />;
 }
 
-// ─── FLY PARTICLE — heart flies from product to wishlist icon ──
-function FlyParticle({ startX, startY, endX, endY, onLand }) {
+// ─── FLY PARTICLE — item flies from product to target icon ─────
+function FlyParticle({ startX, startY, endX, endY, onLand, isCart }) {
   const dx = endX - startX;
   const dy = endY - startY;
 
   useEffect(() => {
     // Trigger icon pop + burst when particle lands
     const t = setTimeout(() => {
-      const btn = document.getElementById("wishlist-nav-btn");
-      if (btn) { btn.style.animation = "wishIconPop 0.45s cubic-bezier(0.36,0.07,0.19,0.97)"; setTimeout(() => { btn.style.animation = ""; }, 450); }
+      const btn = document.getElementById(isCart ? "cart-nav-desktop" : "wishlist-nav-btn") || document.getElementById(isCart ? "cart-nav-btn" : "wishlist-nav-btn");
+      if (btn) { btn.style.animation = isCart ? "cartIconAnim 0.7s cubic-bezier(0.36,0.07,0.19,0.97)" : "wishIconPop 0.45s cubic-bezier(0.36,0.07,0.19,0.97)"; setTimeout(() => { btn.style.animation = ""; }, isCart ? 700 : 450); }
       if (onLand) onLand();
     }, 820);
     return () => clearTimeout(t);
-  }, []);
+  }, [isCart]);
 
-  // Trail particles — 3 smaller hearts behind main
+  // Trail particles — 3 smaller items behind main
   const trails = [
-    { delay: "0.08s", scale: 0.65, color: "#ff6b6b" },
-    { delay: "0.16s", scale: 0.45, color: "#ffa0a0" },
-    { delay: "0.24s", scale: 0.28, color: "#ffc0c0" },
+    { delay: "0.08s", scale: 0.65, color: isCart ? "#787F56" : "#ff6b6b" },
+    { delay: "0.16s", scale: 0.45, color: isCart ? "#8FA382" : "#ffa0a0" },
+    { delay: "0.24s", scale: 0.28, color: isCart ? "#6D7860" : "#ffc0c0" },
   ];
 
   // Burst particles — 6 sparks on landing
   const bursts = [
-    { bx: -28, by: -22, br: "-30deg", emoji: "✨" },
-    { bx: 28, by: -22, br: "30deg", emoji: "💫" },
-    { bx: -32, by: 8, br: "-50deg", emoji: "⭐" },
-    { bx: 32, by: 8, br: "50deg", emoji: "✨" },
-    { bx: -8, by: -34, br: "-10deg", emoji: "💫" },
-    { bx: 8, by: -34, br: "10deg", emoji: "⭐" },
+    { bx: -28, by: -22, br: "-30deg", emoji: isCart ? "📦" : "✨" },
+    { bx: 28, by: -22, br: "30deg", emoji: isCart ? "✨" : "💫" },
+    { bx: -32, by: 8, br: "-50deg", emoji: isCart ? "✦" : "⭐" },
+    { bx: 32, by: 8, br: "50deg", emoji: isCart ? "✨" : "✨" },
+    { bx: -8, by: -34, br: "-10deg", emoji: isCart ? "💫" : "💫" },
+    { bx: 8, by: -34, br: "10deg", emoji: isCart ? "⭐" : "⭐" },
   ];
+
+  const particleEmoji = isCart ? "👜" : "❤️";
 
   return (
     <>
-      {/* Trail hearts */}
+      {/* Trail items */}
       {trails.map((tr, i) => (
         <div key={i} style={{
           position: "fixed", left: startX, top: startY,
@@ -10094,10 +10175,10 @@ function FlyParticle({ startX, startY, endX, endY, onLand }) {
           animation: `flyTrail 0.9s cubic-bezier(0.25,0.46,0.45,0.94) ${tr.delay} forwards`,
           "--dx": `${dx}px`, "--dy": `${dy}px`,
           filter: `drop-shadow(0 2px 6px ${tr.color})`,
-        }}>❤️</div>
+        }}>{particleEmoji}</div>
       ))}
 
-      {/* Main flying heart */}
+      {/* Main flying item */}
       <div style={{
         position: "fixed", left: startX - 14, top: startY - 14,
         width: 28, height: 28, fontSize: 20,
@@ -10105,8 +10186,8 @@ function FlyParticle({ startX, startY, endX, endY, onLand }) {
         zIndex: 99999, pointerEvents: "none",
         animation: "flyHeart 0.85s cubic-bezier(0.25,0.46,0.45,0.94) forwards",
         "--dx": `${dx}px`, "--dy": `${dy}px`,
-        filter: "drop-shadow(0 4px 12px rgba(229,62,62,0.8))",
-      }}>❤️</div>
+        filter: isCart ? "drop-shadow(0 4px 12px rgba(120,127,86,0.8))" : "drop-shadow(0 4px 12px rgba(229,62,62,0.8))",
+      }}>{particleEmoji}</div>
 
       {/* Burst sparks — appear at destination */}
       {bursts.map((b, i) => (
@@ -10122,11 +10203,364 @@ function FlyParticle({ startX, startY, endX, endY, onLand }) {
   );
 }
 
+// ─── CART SIDEBAR DRAWER ──────────────────────────────────────
+function CartDrawer({ isOpen, onClose, cart, onQty, onRemove, onCheckout, onProductClick }) {
+  const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const ship = sub >= 999 ? 0 : (cart.length > 0 ? 99 : 0);
+  const total = sub + ship;
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 10000, display: "flex", justifyContent: "flex-end" }}>
+          
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: "rgba(48, 54, 14, 0.45)",
+              backdropFilter: "blur(6px)"
+            }}
+          />
+
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 26, stiffness: 220 }}
+            style={{
+              position: "relative",
+              width: "100%",
+              maxWidth: "450px",
+              height: "100%",
+              background: "#ffffff",
+              boxShadow: "-10px 0 40px rgba(48, 54, 14, 0.15)",
+              display: "flex",
+              flexDirection: "column",
+              zIndex: 10001
+            }}
+          >
+            <div style={{
+              padding: "1.5rem",
+              borderBottom: "1px solid rgba(120, 127, 86, 0.12)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}>
+              <div>
+                <span style={{ fontSize: "0.62rem", fontWeight: 800, color: "#787F56", letterSpacing: "0.15em", textTransform: "uppercase" }}>
+                  Your Intentions
+                </span>
+                <h2 style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "1.2rem", fontWeight: 800, color: "#000000", margin: 0 }}>
+                  Shopping Cart ({cart.reduce((s, i) => s + i.qty, 0)})
+                </h2>
+              </div>
+              <button
+                onClick={onClose}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#000000",
+                  padding: "8px",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "background 0.2s"
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(120, 127, 86, 0.08)"}
+                onMouseLeave={e => e.currentTarget.style.background = "none"}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="scroll-hide" style={{
+              flex: 1,
+              overflowY: "auto",
+              padding: "1.5rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+              background: "#fafaf8"
+            }}>
+              {cart.length === 0 ? (
+                <div style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "100%",
+                  textAlign: "center",
+                  padding: "0 1.5rem"
+                }}>
+                  <div style={{
+                    width: 72,
+                    height: 72,
+                    borderRadius: "50%",
+                    background: "rgba(120, 127, 86, 0.08)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: "1.5rem"
+                  }}>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#787F56" strokeWidth="1.5">
+                      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                      <line x1="3" y1="6" x2="21" y2="6" />
+                      <path d="M16 10a4 4 0 0 1-8 0" />
+                    </svg>
+                  </div>
+                  <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "#1a1a1a", marginBottom: "0.5rem" }}>
+                    Your cart is empty
+                  </h3>
+                  <p style={{ fontSize: "0.82rem", color: "#787F56", lineHeight: 1.5, marginBottom: "1.5rem" }}>
+                    Start anchoring your goals by adding a sacred Wishstone to your collection.
+                  </p>
+                  <button
+                    onClick={() => { onClose(); onProductClick({ id: "" }); }}
+                    className="btn-orange"
+                    style={{ padding: "10px 24px", fontSize: "0.75rem", borderRadius: 20 }}
+                  >
+                    Shop Collection
+                  </button>
+                </div>
+              ) : (
+                cart.map(item => (
+                  <div
+                    key={item.id}
+                    style={{
+                      background: "#ffffff",
+                      borderRadius: 16,
+                      padding: "1rem",
+                      display: "flex",
+                      gap: "0.85rem",
+                      border: "1px solid rgba(120, 127, 86, 0.08)",
+                      boxShadow: "0 2px 10px rgba(0,0,0,0.02)"
+                    }}
+                  >
+                    <div
+                      onClick={() => onProductClick(item)}
+                      style={{
+                        width: 72,
+                        height: 72,
+                        borderRadius: 10,
+                        overflow: "hidden",
+                        flexShrink: 0,
+                        background: "#f0ede8",
+                        cursor: "pointer"
+                      }}
+                    >
+                      {item.image ? (
+                        <img
+                          referrerPolicy="no-referrer"
+                          src={item.image}
+                          alt={item.name}
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                      ) : (
+                        <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, color: "#787F56" }}>◆</div>
+                      )}
+                    </div>
+
+                    <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                      <div>
+                        <h4
+                          onClick={() => onProductClick(item)}
+                          style={{
+                            fontSize: "0.85rem",
+                            fontWeight: 700,
+                            color: "#1a1a1a",
+                            margin: "0 0 2px 0",
+                            cursor: "pointer",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis"
+                          }}
+                        >
+                          {item.name}
+                        </h4>
+                        <span style={{ fontSize: "0.7rem", color: "#8a8a7a" }}>
+                          Sacred Stone Accessory
+                        </span>
+                      </div>
+
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <button
+                            onClick={() => onQty(item.id, -1)}
+                            style={{
+                              width: 26, height: 26,
+                              borderRadius: 6,
+                              border: "1px solid rgba(120, 127, 86, 0.25)",
+                              background: "#ffffff",
+                              color: "#787F56",
+                              cursor: "pointer",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              fontWeight: 700, fontSize: "0.85rem",
+                              transition: "all 0.15s"
+                            }}
+                          >
+                            −
+                          </button>
+                          <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#1a1a1a", minWidth: 16, textAlign: "center" }}>
+                            {item.qty}
+                          </span>
+                          <button
+                            onClick={() => onQty(item.id, 1)}
+                            style={{
+                              width: 26, height: 26,
+                              borderRadius: 6,
+                              border: "1px solid rgba(120, 127, 86, 0.25)",
+                              background: "#ffffff",
+                              color: "#787F56",
+                              cursor: "pointer",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              fontWeight: 700, fontSize: "0.85rem",
+                              transition: "all 0.15s"
+                            }}
+                          >
+                            +
+                          </button>
+                        </div>
+                        
+                        <button
+                          onClick={() => onRemove(item.id)}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            color: "#c0392b",
+                            display: "flex",
+                            alignItems: "center",
+                            padding: "4px",
+                            borderRadius: 4
+                          }}
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6l-1 14H6L5 6" />
+                            <path d="M10 11v6" />
+                            <path d="M14 11v6" />
+                            <path d="M9 6V4h6v2" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", flexShrink: 0 }}>
+                      <span style={{ fontSize: "0.88rem", fontWeight: 800, color: "#1a1a1a" }}>
+                        ₹{(item.price * item.qty).toLocaleString()}
+                      </span>
+                    </div>
+
+                  </div>
+                ))
+              )}
+            </div>
+
+            {cart.length > 0 && (
+              <div style={{
+                padding: "1.5rem",
+                borderTop: "1px solid rgba(120, 127, 86, 0.12)",
+                background: "#ffffff"
+              }}>
+                <div style={{
+                  background: "linear-gradient(160deg, #787F56 0%, #000000 100%)",
+                  borderRadius: 16,
+                  padding: "1.25rem",
+                  color: "#ffffff"
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+                    <span style={{ fontSize: "0.78rem", color: "rgba(255, 255, 255, 0.7)" }}>Subtotal</span>
+                    <span style={{ fontSize: "0.85rem", fontWeight: 700 }}>₹{sub.toLocaleString()}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+                    <span style={{ fontSize: "0.78rem", color: "rgba(255, 255, 255, 0.7)" }}>Shipping</span>
+                    <span style={{ fontSize: "0.78rem", fontWeight: 700 }}>{ship === 0 ? "FREE" : `₹${ship}`}</span>
+                  </div>
+                  <div style={{
+                    borderTop: "1px solid rgba(255, 255, 255, 0.15)",
+                    paddingTop: "0.6rem",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "baseline",
+                    marginTop: "0.4rem"
+                  }}>
+                    <span style={{ fontSize: "0.85rem", fontWeight: 700 }}>Total</span>
+                    <span style={{ fontSize: "1.2rem", fontWeight: 800 }}>₹{total.toLocaleString()}</span>
+                  </div>
+
+                  <button
+                    onClick={onCheckout}
+                    style={{
+                      width: "100%",
+                      padding: "14px",
+                      background: "#787F56",
+                      color: "#ffffff",
+                      border: "none",
+                      borderRadius: 10,
+                      fontSize: "0.82rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      marginTop: "1.25rem",
+                      transition: "all 0.2s"
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.filter = "brightness(1.15)"}
+                    onMouseLeave={e => e.currentTarget.style.filter = "none"}
+                  >
+                    <span>Proceed to Checkout</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                      <polyline points="12 5 19 12 12 19" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
+
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 // ─── SCROLL TO TOP ON ROUTE CHANGE ────────────────────────────
 // v2.1 - routing fix
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
+
+function CartRedirect({ onOpen }) {
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate("/shop", { replace: true });
+    setTimeout(() => onOpen(), 300);
+  }, [navigate, onOpen]);
   return null;
 }
 
@@ -10137,6 +10571,7 @@ function AppInner() {
 
   const [cart, setCart] = useState([]);
   const [wished, setWished] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   useEffect(() => {
     const meta = document.querySelector('meta[name="theme-color"]');
@@ -10217,7 +10652,7 @@ function AppInner() {
     return () => clearTimeout(t);
   }, []);
 
-  const addToCart = p => {
+  const addToCart = (p, openDrawerDelay = 800) => {
     const MAX_TOTAL = 10; // Max 10 items total across all products
     if (p.qty === -1) {
       setCart(c => c.map(i => i.id === p.id ? { ...i, qty: i.qty - 1 } : i).filter(i => i.qty > 0));
@@ -10235,6 +10670,11 @@ function AppInner() {
         }
         return [...c, { ...p, qty: 1 }];
       });
+      if (openDrawerDelay > 0) {
+        setTimeout(() => setIsCartOpen(true), openDrawerDelay);
+      } else {
+        setIsCartOpen(true);
+      }
     }
   };
   const toggleWish = id => setWished(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]);
@@ -10257,14 +10697,14 @@ function AppInner() {
     setTimeout(() => setFlyParticles(p => p.filter(x => x.id !== pid)), 1500);
   };
 
-  // Flying bucket animation from click position to cart icon
+  // Flying bag animation from click position to cart icon
   const [flyCartParticles, setFlyCartParticles] = useState([]);
   const flyToCart = (e, product) => {
-    addToCart(product);
+    addToCart(product, 800);
     const rect = e.currentTarget.getBoundingClientRect();
     const startX = rect.left + rect.width / 2;
     const startY = rect.top + rect.height / 2;
-    const cartBtn = document.getElementById("cart-nav-btn") || document.getElementById("cart-nav-desktop");
+    const cartBtn = document.getElementById("cart-nav-desktop") || document.getElementById("cart-nav-btn");
     const endX = cartBtn ? cartBtn.getBoundingClientRect().left + 11 : window.innerWidth - 120;
     const endY = cartBtn ? cartBtn.getBoundingClientRect().top + 11 : 32;
     const pid = Date.now() + Math.random();
@@ -10356,9 +10796,13 @@ function AppInner() {
 
   // nav("key") called from child components → maps to URL
   const nav = pageKey => {
+    if (pageKey === "cart") {
+      setIsCartOpen(true);
+      return;
+    }
     const MAP = {
       home: "/", products: "/shop", rituals: "/rituals", benefits: "/benefits",
-      stories: "/stories", cart: "/cart", checkout: "/checkout",
+      stories: "/stories", checkout: "/checkout",
       wishlist: "/wishlist", auth: "/login", dashboard: "/dashboard",
       terms: "/terms-and-conditions", refund: "/refund-policy",
     };
@@ -10400,16 +10844,16 @@ function AppInner() {
     }}>
       <ScrollToTop />
       <style>{GLOBAL_CSS}</style>
-      <Header cartCount={cartCount} wishCount={wished.length} onNav={nav} currentPage={currentPage} user={user} onLogout={handleLogout} />
+      <Header cartCount={cartCount} wishCount={wished.length} onNav={nav} currentPage={currentPage} user={user} onLogout={handleLogout} onCartOpen={() => setIsCartOpen(true)} />
       <Routes>
         <Route path="/" element={<HomePage onShop={() => nav("products")} onRitual={() => nav("rituals")} onNav={nav} />} />
         <Route path="/intention-anchoring" element={<IntentionAnchoringPage />} />
-        <Route path="/shop" element={<ProductsPage onAdd={addToCart} onAddAnim={(e, p) => addToCart(p)} onWish={flyToWishlist} wished={wished} onClick={goToProduct} cart={cart} />} />
-        <Route path="/product/:id" element={<ProductPageWrapper onAdd={addToCart} onAddAnim={(e, p) => addToCart(p)} onWish={flyToWishlist} wished={wished} cart={cart} onShop={() => nav("products")} />} />
+        <Route path="/shop" element={<ProductsPage onAdd={addToCart} onAddAnim={flyToCart} onWish={flyToWishlist} wished={wished} onClick={goToProduct} cart={cart} />} />
+        <Route path="/product/:id" element={<ProductPageWrapper onAdd={addToCart} onAddAnim={flyToCart} onWish={flyToWishlist} wished={wished} cart={cart} onShop={() => nav("products")} />} />
         <Route path="/rituals" element={<RitualsPage />} />
         <Route path="/benefits" element={<BenefitsPage />} />
         <Route path="/stories" element={<StoriesPage />} />
-        <Route path="/cart" element={<CartPage cart={cart} onQty={updateQty} onRemove={removeFromCart} onCheckout={() => nav("checkout")} onProductClick={p => navigate("/product/" + p.id)} onAdd={addToCart} onWish={toggleWish} wished={wished} />} />
+        <Route path="/cart" element={<CartRedirect onOpen={() => setIsCartOpen(true)} />} />
         <Route path="/checkout" element={<CheckoutPage cart={cart} onPlaceOrder={handlePlaceOrder} />} />
         <Route path="/wishlist" element={<WishlistPage ids={wished} onAdd={addToCart} onWish={toggleWish} onClick={goToProduct} />} />
         <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage onLogin={handleLogin} onSwitch={() => navigate("/signup")} />} />
@@ -10441,6 +10885,22 @@ function AppInner() {
       {flyParticles.map(p => (
         <FlyParticle key={p.id} startX={p.startX} startY={p.startY} endX={p.endX} endY={p.endY} />
       ))}
+
+      {/* ── Flying Cart Particles ── */}
+      {flyCartParticles.map(p => (
+        <FlyParticle key={p.id} startX={p.startX} startY={p.startY} endX={p.endX} endY={p.endY} isCart={true} />
+      ))}
+
+      {/* ── Sidebar Cart Drawer ── */}
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cart={cart}
+        onQty={updateQty}
+        onRemove={removeFromCart}
+        onCheckout={() => { setIsCartOpen(false); nav("checkout"); }}
+        onProductClick={p => { setIsCartOpen(false); if (p.id) navigate("/product/" + p.id); else navigate("/shop"); }}
+      />
     </div>
   );
 }
