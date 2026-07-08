@@ -711,6 +711,336 @@ const GLOBAL_CSS = `
       padding: 1.5rem 1.2rem !important;
     }
   }
+
+  /* ── CART DRAWER RESPONSIVE STYLE ── */
+  .ws-cart-drawer {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+    height: 100%;
+    background: #ffffff;
+    box-shadow: -10px 0 40px rgba(48, 54, 14, 0.15);
+    display: flex;
+    flex-direction: column;
+    z-index: 10001;
+  }
+  @media (max-width: 767px) {
+    .ws-cart-drawer {
+      width: 50vw !important;
+      max-width: 50vw !important;
+      min-width: 280px !important;
+    }
+  }
+
+  /* ── REDESIGNED PREMIUM AUTH PAGES ── */
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+  
+  .auth-page-container {
+    min-height: 100vh;
+    background: #0A0D08; /* Deep cosmic dark background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    padding-top: 90px;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Outfit', sans-serif !important;
+  }
+
+  /* Moving Premium Ambient Orbs */
+  .auth-ambient-orb-1 {
+    position: absolute;
+    width: 450px;
+    height: 450px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(195,157,95,0.18) 0%, rgba(195,157,95,0) 70%);
+    left: -100px;
+    top: -50px;
+    filter: blur(80px);
+    pointer-events: none;
+    animation: ambientMove1 20s ease-in-out infinite alternate;
+  }
+  .auth-ambient-orb-2 {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(76,90,67,0.2) 0%, rgba(76,90,67,0) 70%);
+    right: -150px;
+    bottom: -100px;
+    filter: blur(100px);
+    pointer-events: none;
+    animation: ambientMove2 25s ease-in-out infinite alternate;
+  }
+
+  @keyframes ambientMove1 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(80px, 60px) scale(1.15); }
+  }
+  @keyframes ambientMove2 {
+    0% { transform: translate(0, 0) scale(1.1); }
+    100% { transform: translate(-60px, -80px) scale(0.9); }
+  }
+
+  /* High-End Glassmorphic Card Panel */
+  .auth-card-clone {
+    background: rgba(18, 22, 15, 0.65) !important; /* Frosted glass */
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 24px !important;
+    width: 100% !important;
+    max-width: 420px !important;
+    padding: 2.5rem 2.2rem !important;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(25px) saturate(140%) !important;
+    z-index: 10;
+    position: relative;
+  }
+
+  .auth-logo-font {
+    font-family: 'Playfair Display', serif !important;
+    font-weight: 700 !important;
+    font-size: 2.1rem !important;
+    text-align: center !important;
+    margin: 0 !important;
+    letter-spacing: -0.01em !important;
+    background: linear-gradient(135deg, #ffffff 0%, #C39D5F 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+  }
+
+  .auth-logo-sub {
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 0.68rem !important;
+    font-weight: 600 !important;
+    color: rgba(255, 255, 255, 0.5) !important;
+    letter-spacing: 0.2em !important;
+    text-transform: uppercase !important;
+    text-align: center !important;
+    margin-top: 6px !important;
+    margin-bottom: 2rem !important;
+  }
+
+  /* Tabs container */
+  .auth-tabs-row {
+    display: flex !important;
+    justify-content: center !important;
+    width: 100% !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    margin-bottom: 2rem !important;
+    gap: 12px !important;
+  }
+  .auth-tab-btn {
+    background: none !important;
+    border: none !important;
+    padding: 8px 16px !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: rgba(255, 255, 255, 0.4) !important;
+    cursor: pointer !important;
+    position: relative !important;
+    transition: all 0.3s ease !important;
+    font-family: 'Outfit', sans-serif !important;
+  }
+  .auth-tab-btn:hover {
+    color: rgba(255, 255, 255, 0.8) !important;
+  }
+  .auth-tab-btn.active {
+    color: #C39D5F !important;
+  }
+  .auth-tab-btn.active::after {
+    content: '' !important;
+    position: absolute !important;
+    bottom: -1px !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 2px !important;
+    background: #C39D5F !important;
+    box-shadow: 0 2px 8px rgba(195, 157, 95, 0.4) !important;
+  }
+
+  /* Input Container */
+  .auth-input-group {
+    margin-bottom: 1.1rem !important;
+    position: relative !important;
+    width: 100% !important;
+  }
+  .auth-input-icon {
+    position: absolute !important;
+    left: 16px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    color: rgba(255, 255, 255, 0.35) !important;
+    display: flex !important;
+    align-items: center !important;
+    pointer-events: none !important;
+    transition: color 0.3s ease !important;
+  }
+  .auth-custom-input {
+    width: 100% !important;
+    padding: 13px 16px 13px 44px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 12px !important;
+    font-size: 0.9rem !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    color: #ffffff !important;
+    outline: none !important;
+    font-family: 'Outfit', sans-serif !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .auth-custom-input::placeholder {
+    color: rgba(255, 255, 255, 0.3) !important;
+  }
+  .auth-custom-input:focus {
+    border-color: #C39D5F !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 0 0 15px rgba(195, 157, 95, 0.15) !important;
+  }
+  .auth-input-group:focus-within .auth-input-icon {
+    color: #C39D5F !important;
+  }
+
+  .auth-pw-toggle {
+    position: absolute !important;
+    right: 16px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    background: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    color: rgba(255, 255, 255, 0.35) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    transition: color 0.3s !important;
+  }
+  .auth-pw-toggle:hover {
+    color: #C39D5F !important;
+  }
+
+  .auth-forgot-link {
+    display: block !important;
+    text-align: right !important;
+    font-size: 0.76rem !important;
+    color: rgba(255, 255, 255, 0.45) !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    margin-top: -0.4rem !important;
+    margin-bottom: 1.6rem !important;
+    background: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    font-family: 'Outfit', sans-serif !important;
+    transition: color 0.3s !important;
+  }
+  .auth-forgot-link:hover {
+    color: #C39D5F !important;
+  }
+
+  /* Pill Submit Button */
+  .auth-submit-pill {
+    width: 100% !important;
+    padding: 13px 20px !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    border-radius: 30px !important;
+    border: none !important;
+    background: linear-gradient(135deg, #C39D5F 0%, #8E703F 100%) !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    font-family: 'Outfit', sans-serif !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: 0 4px 20px rgba(195, 157, 95, 0.25) !important;
+  }
+  .auth-submit-pill:hover {
+    background: linear-gradient(135deg, #d3ad6f 0%, #9e7f4c 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(195, 157, 95, 0.38) !important;
+  }
+
+  /* Divider */
+  .auth-divider {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 1.5rem 0 !important;
+  }
+  .auth-divider-line {
+    flex: 1 !important;
+    height: 1px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+  }
+  .auth-divider-text {
+    font-size: 0.72rem !important;
+    color: rgba(255, 255, 255, 0.4) !important;
+    font-weight: 500 !important;
+    font-family: 'Outfit', sans-serif !important;
+  }
+
+  /* Social circles */
+  .auth-social-row {
+    display: flex !important;
+    gap: 16px !important;
+    justify-content: center !important;
+    margin-bottom: 1.5rem !important;
+  }
+  .auth-social-circle {
+    width: 46px !important;
+    height: 46px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    position: relative !important;
+  }
+  .auth-social-circle:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: #C39D5F !important;
+    transform: translateY(-2px) scale(1.05) !important;
+    box-shadow: 0 8px 20px rgba(195, 157, 95, 0.15) !important;
+  }
+  .auth-social-circle svg {
+    fill: #ffffff !important;
+  }
+  .auth-social-circle path {
+    fill: #ffffff !important;
+  }
+
+  .auth-switch-prompt {
+    text-align: center !important;
+    margin-top: 1.5rem !important;
+    font-size: 0.85rem !important;
+    color: rgba(255, 255, 255, 0.45) !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 500 !important;
+  }
+  .auth-switch-link {
+    background: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    color: #C39D5F !important;
+    font-weight: 700 !important;
+    padding: 0 !important;
+    margin-left: 4px !important;
+    text-decoration: none !important;
+    font-family: 'Outfit', sans-serif !important;
+    transition: color 0.2s !important;
+  }
+  .auth-switch-link:hover {
+    color: #d3ad6f !important;
+    text-decoration: underline !important;
+  }
   `;
 
 // ─── HEADER ───────────────────────────────────────────────────
@@ -1357,9 +1687,13 @@ function CommunityVideoSection() {
       const obs = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
-            vid.play().catch(() => { });
+            if (vid.src && vid.src !== window.location.href) {
+              vid.play().catch(() => { });
+            }
           } else {
-            vid.pause();
+            if (vid.src && vid.src !== window.location.href) {
+              vid.pause();
+            }
           }
         },
         { threshold: 0.3 }
@@ -1372,13 +1706,13 @@ function CommunityVideoSection() {
 
   const handleClick = (i) => {
     const vid = videoRefs.current[i];
-    if (!vid) return;
+    if (!vid || !vid.src || vid.src === window.location.href) return;
     if (activeVideo === i) {
       if (vid.paused) { vid.play().catch(() => { }); setPlaying(true); }
       else { vid.pause(); setPlaying(false); }
     } else {
       videoRefs.current.forEach((v, idx) => {
-        if (v && idx !== i) { v.pause(); v.muted = true; v.currentTime = 0; v.play().catch(() => { }); }
+        if (v && idx !== i && v.src && v.src !== window.location.href) { v.pause(); v.muted = true; v.currentTime = 0; v.play().catch(() => { }); }
       });
       vid.muted = false;
       vid.play().catch(() => { });
@@ -1422,15 +1756,22 @@ function CommunityVideoSection() {
               transition: "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease",
             }}
           >
-            <video
-              ref={el => videoRefs.current[i] = el}
-              src={getImageUrl(v.videoUrl)}
-              autoPlay
-              muted
-              loop
-              playsInline
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-            />
+            {v.videoUrl ? (
+              <video
+                ref={el => videoRefs.current[i] = el}
+                src={getImageUrl(v.videoUrl)}
+                autoPlay
+                muted
+                loop
+                playsInline
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                onError={(e) => console.warn("Community video load failed", e)}
+              />
+            ) : (
+              <div style={{ width: "100%", height: "100%", background: "#1a1a1a", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "0.85rem" }}>
+                <span>🎥 Video Coming Soon</span>
+              </div>
+            )}
             {/* Bottom gradient + info */}
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.35) 60%, transparent 100%)", borderRadius: "0 0 24px 24px", padding: "1.4rem 1.1rem 1.1rem", pointerEvents: "none" }}>
               <div style={{ display: "inline-block", background: "rgba(76, 90, 67, 0.92)", color: "#fff", borderRadius: 4, padding: "3px 8px", fontSize: "0.55rem", fontWeight: 800, letterSpacing: "0.12em", marginBottom: "0.5rem" }}>{v.tag}</div>
@@ -7057,20 +7398,57 @@ const FALLBACK_COUPONS = [
 // ─── CHECKOUT PAGE ────────────────────────────────────────────
 function CheckoutPage({ cart, onPlaceOrder }) {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", email: "", phone: "", address: "", city: "", state: "", pincode: "" });
+  const [form, setForm] = useState(() => {
+    try {
+      const savedForm = localStorage.getItem("ws_checkout_form");
+      return savedForm ? JSON.parse(savedForm) : { name: "", email: "", phone: "", address: "", city: "", state: "", pincode: "" };
+    } catch {
+      return { name: "", email: "", phone: "", address: "", city: "", state: "", pincode: "" };
+    }
+  });
   const [coupon, setCoupon] = useState("");
   const [discount, setDiscount] = useState(0);
   const [couponMsg, setCouponMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [isGift, setIsGift] = useState(false);
-  const [giftNote, setGiftNote] = useState("");
+  const [isGift, setIsGift] = useState(() => {
+    try {
+      return localStorage.getItem("ws_checkout_isGift") === "true";
+    } catch {
+      return false;
+    }
+  });
+  const [giftNote, setGiftNote] = useState(() => {
+    try {
+      return localStorage.getItem("ws_checkout_giftNote") || "";
+    } catch {
+      return "";
+    }
+  });
   const [availableCoupons, setAvailableCoupons] = useState([]);
   const [fetchingCoupons, setFetchingCoupons] = useState(false);
   const [showCoupons, setShowCoupons] = useState(false);
   const [copiedCode, setCopiedCode] = useState("");
   const [payMethod, setPayMethod] = useState("razorpay"); // razorpay, qr, cod
   const [utr, setUtr] = useState("");
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("ws_checkout_form", JSON.stringify(form));
+    } catch (e) {}
+  }, [form]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("ws_checkout_isGift", isGift);
+    } catch (e) {}
+  }, [isGift]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("ws_checkout_giftNote", giftNote);
+    } catch (e) {}
+  }, [giftNote]);
 
   useEffect(() => {
     const fetchCoupons = async () => {
@@ -7904,276 +8282,8 @@ function SignupPage({ onSignup, onSwitch }) {
   return (
     <div className="auth-page-container">
       {/* Background shadow leaf elements to simulate leaf shadows */}
-      <div className="auth-leaf-shadow-1" />
-      <div className="auth-leaf-shadow-2" />
-
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Open+Sans:wght@300;400;500;600;700&display=swap');
-        
-        .auth-page-container {
-          min-height: 100vh;
-          background: #848974;
-          background-image: radial-gradient(circle at 10% 20%, rgba(48,54,14,0.06) 0%, transparent 60%);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 1.5rem;
-          box-sizing: border-box;
-          padding-top: 90px;
-          position: relative;
-          overflow: hidden;
-        }
-
-        /* Abstract Leaf Shadows */
-        .auth-leaf-shadow-1 {
-          position: absolute;
-          width: 500px;
-          height: 500px;
-          left: -150px;
-          top: -100px;
-          background: radial-gradient(ellipse at center, rgba(48,54,14,0.2) 0%, transparent 70%);
-          filter: blur(50px);
-          pointer-events: none;
-          transform: rotate(30deg);
-        }
-        .auth-leaf-shadow-2 {
-          position: absolute;
-          width: 600px;
-          height: 600px;
-          right: -200px;
-          bottom: -150px;
-          background: radial-gradient(ellipse at center, rgba(120,127,86,0.18) 0%, transparent 70%);
-          filter: blur(60px);
-          pointer-events: none;
-        }
-
-        .auth-card-clone {
-          background: #EAE2D5;
-          border: 1px solid rgba(255, 255, 255, 0.4);
-          border-radius: 20px;
-          width: 100%;
-          max-width: 410px;
-          padding: 2.2rem 2rem;
-          box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
-          z-index: 10;
-          position: relative;
-        }
-
-        .auth-logo-font {
-          font-family: 'Playfair Display', serif;
-          font-weight: 500;
-          font-size: 1.8rem;
-          color: #30360E;
-          text-align: center;
-          margin: 0;
-          letter-spacing: -0.01em;
-        }
-
-        .auth-logo-sub {
-          font-family: 'Open Sans', sans-serif;
-          font-size: 0.62rem;
-          font-weight: 600;
-          color: #787F56;
-          letter-spacing: 0.16em;
-          text-transform: uppercase;
-          text-align: center;
-          margin-top: 4px;
-          margin-bottom: 1.6rem;
-        }
-
-        /* Tabs container */
-        .auth-tabs-row {
-          display: flex;
-          justify-content: center;
-          width: 100%;
-          border-bottom: 1px solid rgba(120, 127, 86, 0.15);
-          margin-bottom: 1.6rem;
-        }
-        .auth-tab-btn {
-          background: none;
-          border: none;
-          padding: 8px 24px;
-          font-size: 0.92rem;
-          font-weight: 600;
-          color: #787F56;
-          cursor: pointer;
-          position: relative;
-          transition: color 0.25s;
-          font-family: 'Open Sans', sans-serif;
-        }
-        .auth-tab-btn.active {
-          color: #30360E;
-        }
-        .auth-tab-btn.active::after {
-          content: '';
-          position: absolute;
-          bottom: -1px;
-          left: 0;
-          right: 0;
-          height: 2px;
-          background: #30360E;
-        }
-
-        /* Input Container */
-        .auth-input-group {
-          margin-bottom: 0.9rem;
-          position: relative;
-          width: 100%;
-        }
-        .auth-input-icon {
-          position: absolute;
-          left: 14px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: #787F56;
-          display: flex;
-          align-items: center;
-          pointer-events: none;
-        }
-        .auth-custom-input {
-          width: 100%;
-          padding: 11px 14px 11px 40px;
-          border: 1px solid rgba(120, 127, 86, 0.12);
-          border-radius: 8px;
-          font-size: 0.88rem;
-          background: #ECE5D8;
-          color: #30360E;
-          outline: none;
-          font-family: 'Open Sans', sans-serif;
-          transition: all 0.2s ease;
-        }
-        .auth-custom-input::placeholder {
-          color: #8E8A80;
-        }
-        .auth-custom-input:focus {
-          border-color: #30360E;
-          background: #F2ECE0;
-        }
-
-        .auth-pw-toggle {
-          position: absolute;
-          right: 14px;
-          top: 50%;
-          transform: translateY(-50%);
-          background: none;
-          border: none;
-          cursor: pointer;
-          color: #787F56;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0;
-        }
-
-        .auth-forgot-link {
-          display: block;
-          text-align: right;
-          font-size: 0.74rem;
-          color: #787F56;
-          font-weight: 600;
-          text-decoration: none;
-          margin-top: -0.4rem;
-          margin-bottom: 1.4rem;
-          background: none;
-          border: none;
-          cursor: pointer;
-          font-family: 'Open Sans', sans-serif;
-          transition: color 0.2s;
-        }
-        .auth-forgot-link:hover {
-          color: #30360E;
-        }
-
-        /* Pill Submit Button */
-        .auth-submit-pill {
-          width: 100%;
-          padding: 11px 20px;
-          font-size: 0.9rem;
-          font-weight: 600;
-          border-radius: 24px;
-          border: none;
-          background: #30360E;
-          color: #E2D4B9;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          font-family: 'Open Sans', sans-serif;
-          transition: all 0.25s ease;
-          box-shadow: 0 4px 12px rgba(48, 54, 14, 0.15);
-        }
-        .auth-submit-pill:hover {
-          background: #202409;
-          transform: translateY(-1px);
-          box-shadow: 0 6px 16px rgba(48, 54, 14, 0.25);
-        }
-
-        /* Divider */
-        .auth-divider {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          margin: 1.2rem 0;
-        }
-        .auth-divider-line {
-          flex: 1;
-          height: 1px;
-          background: rgba(120, 127, 86, 0.15);
-        }
-        .auth-divider-text {
-          font-size: 0.7rem;
-          color: #787F56;
-          font-weight: 600;
-          font-family: 'Open Sans', sans-serif;
-        }
-
-        /* Social circles */
-        .auth-social-row {
-          display: flex;
-          gap: 16px;
-          justify-content: center;
-          margin-bottom: 1.2rem;
-        }
-        .auth-social-circle {
-          width: 44px;
-          height: 44px;
-          border-radius: 50%;
-          background: #ffffff;
-          border: 1px solid rgba(120, 127, 86, 0.12);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          box-shadow: 0 4px 12px rgba(48,54,14,0.04);
-          transition: all 0.2s;
-          position: relative;
-        }
-        .auth-social-circle:hover {
-          transform: scale(1.05);
-          box-shadow: 0 6px 16px rgba(48,54,14,0.08);
-        }
-
-        .auth-switch-prompt {
-          text-align: center;
-          margin-top: 1.2rem;
-          font-size: 0.8rem;
-          color: #787F56;
-          font-family: 'Open Sans', sans-serif;
-          font-weight: 500;
-        }
-        .auth-switch-link {
-          background: none;
-          border: none;
-          cursor: pointer;
-          color: #30360E;
-          font-weight: 700;
-          padding: 0;
-          margin-left: 4px;
-          text-decoration: underline;
-          font-family: 'Open Sans', sans-serif;
-        }
-      `}</style>
+      <div className="auth-ambient-orb-1" />
+      <div className="auth-ambient-orb-2" />
 
       <motion.div
         className="auth-card-clone"
@@ -8386,276 +8496,8 @@ function LoginPage({ onLogin, onSwitch }) {
   return (
     <div className="auth-page-container">
       {/* Background shadow leaf elements to simulate leaf shadows */}
-      <div className="auth-leaf-shadow-1" />
-      <div className="auth-leaf-shadow-2" />
-
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Open+Sans:wght@300;400;500;600;700&display=swap');
-        
-        .auth-page-container {
-          min-height: 100vh;
-          background: #848974;
-          background-image: radial-gradient(circle at 10% 20%, rgba(48,54,14,0.06) 0%, transparent 60%);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 1.5rem;
-          box-sizing: border-box;
-          padding-top: 90px;
-          position: relative;
-          overflow: hidden;
-        }
-
-        /* Abstract Leaf Shadows */
-        .auth-leaf-shadow-1 {
-          position: absolute;
-          width: 500px;
-          height: 500px;
-          left: -150px;
-          top: -100px;
-          background: radial-gradient(ellipse at center, rgba(48,54,14,0.2) 0%, transparent 70%);
-          filter: blur(50px);
-          pointer-events: none;
-          transform: rotate(30deg);
-        }
-        .auth-leaf-shadow-2 {
-          position: absolute;
-          width: 600px;
-          height: 600px;
-          right: -200px;
-          bottom: -150px;
-          background: radial-gradient(ellipse at center, rgba(120,127,86,0.18) 0%, transparent 70%);
-          filter: blur(60px);
-          pointer-events: none;
-        }
-
-        .auth-card-clone {
-          background: #EAE2D5;
-          border: 1px solid rgba(255, 255, 255, 0.4);
-          border-radius: 20px;
-          width: 100%;
-          max-width: 410px;
-          padding: 2.2rem 2rem;
-          box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
-          z-index: 10;
-          position: relative;
-        }
-
-        .auth-logo-font {
-          font-family: 'Playfair Display', serif;
-          font-weight: 500;
-          font-size: 1.8rem;
-          color: #30360E;
-          text-align: center;
-          margin: 0;
-          letter-spacing: -0.01em;
-        }
-
-        .auth-logo-sub {
-          font-family: 'Open Sans', sans-serif;
-          font-size: 0.62rem;
-          font-weight: 600;
-          color: #787F56;
-          letter-spacing: 0.16em;
-          text-transform: uppercase;
-          text-align: center;
-          margin-top: 4px;
-          margin-bottom: 1.6rem;
-        }
-
-        /* Tabs container */
-        .auth-tabs-row {
-          display: flex;
-          justify-content: center;
-          width: 100%;
-          border-bottom: 1px solid rgba(120, 127, 86, 0.15);
-          margin-bottom: 1.6rem;
-        }
-        .auth-tab-btn {
-          background: none;
-          border: none;
-          padding: 8px 24px;
-          font-size: 0.92rem;
-          font-weight: 600;
-          color: #787F56;
-          cursor: pointer;
-          position: relative;
-          transition: color 0.25s;
-          font-family: 'Open Sans', sans-serif;
-        }
-        .auth-tab-btn.active {
-          color: #30360E;
-        }
-        .auth-tab-btn.active::after {
-          content: '';
-          position: absolute;
-          bottom: -1px;
-          left: 0;
-          right: 0;
-          height: 2px;
-          background: #30360E;
-        }
-
-        /* Input Container */
-        .auth-input-group {
-          margin-bottom: 0.9rem;
-          position: relative;
-          width: 100%;
-        }
-        .auth-input-icon {
-          position: absolute;
-          left: 14px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: #787F56;
-          display: flex;
-          align-items: center;
-          pointer-events: none;
-        }
-        .auth-custom-input {
-          width: 100%;
-          padding: 11px 14px 11px 40px;
-          border: 1px solid rgba(120, 127, 86, 0.12);
-          border-radius: 8px;
-          font-size: 0.88rem;
-          background: #ECE5D8;
-          color: #30360E;
-          outline: none;
-          font-family: 'Open Sans', sans-serif;
-          transition: all 0.2s ease;
-        }
-        .auth-custom-input::placeholder {
-          color: #8E8A80;
-        }
-        .auth-custom-input:focus {
-          border-color: #30360E;
-          background: #F2ECE0;
-        }
-
-        .auth-pw-toggle {
-          position: absolute;
-          right: 14px;
-          top: 50%;
-          transform: translateY(-50%);
-          background: none;
-          border: none;
-          cursor: pointer;
-          color: #787F56;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0;
-        }
-
-        .auth-forgot-link {
-          display: block;
-          text-align: right;
-          font-size: 0.74rem;
-          color: #787F56;
-          font-weight: 600;
-          text-decoration: none;
-          margin-top: -0.4rem;
-          margin-bottom: 1.4rem;
-          background: none;
-          border: none;
-          cursor: pointer;
-          font-family: 'Open Sans', sans-serif;
-          transition: color 0.2s;
-        }
-        .auth-forgot-link:hover {
-          color: #30360E;
-        }
-
-        /* Pill Submit Button */
-        .auth-submit-pill {
-          width: 100%;
-          padding: 11px 20px;
-          font-size: 0.9rem;
-          font-weight: 600;
-          border-radius: 24px;
-          border: none;
-          background: #30360E;
-          color: #E2D4B9;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          font-family: 'Open Sans', sans-serif;
-          transition: all 0.25s ease;
-          box-shadow: 0 4px 12px rgba(48, 54, 14, 0.15);
-        }
-        .auth-submit-pill:hover {
-          background: #202409;
-          transform: translateY(-1px);
-          box-shadow: 0 6px 16px rgba(48, 54, 14, 0.25);
-        }
-
-        /* Divider */
-        .auth-divider {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          margin: 1.2rem 0;
-        }
-        .auth-divider-line {
-          flex: 1;
-          height: 1px;
-          background: rgba(120, 127, 86, 0.15);
-        }
-        .auth-divider-text {
-          font-size: 0.7rem;
-          color: #787F56;
-          font-weight: 600;
-          font-family: 'Open Sans', sans-serif;
-        }
-
-        /* Social circles */
-        .auth-social-row {
-          display: flex;
-          gap: 16px;
-          justify-content: center;
-          margin-bottom: 1.2rem;
-        }
-        .auth-social-circle {
-          width: 44px;
-          height: 44px;
-          border-radius: 50%;
-          background: #ffffff;
-          border: 1px solid rgba(120, 127, 86, 0.12);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          box-shadow: 0 4px 12px rgba(48,54,14,0.04);
-          transition: all 0.2s;
-          position: relative;
-        }
-        .auth-social-circle:hover {
-          transform: scale(1.05);
-          box-shadow: 0 6px 16px rgba(48,54,14,0.08);
-        }
-
-        .auth-switch-prompt {
-          text-align: center;
-          margin-top: 1.2rem;
-          font-size: 0.8rem;
-          color: #787F56;
-          font-family: 'Open Sans', sans-serif;
-          font-weight: 500;
-        }
-        .auth-switch-link {
-          background: none;
-          border: none;
-          cursor: pointer;
-          color: #30360E;
-          font-weight: 700;
-          padding: 0;
-          margin-left: 4px;
-          text-decoration: underline;
-          font-family: 'Open Sans', sans-serif;
-        }
-      `}</style>
+      <div className="auth-ambient-orb-1" />
+      <div className="auth-ambient-orb-2" />
 
       <motion.div
         className="auth-card-clone"
@@ -10220,6 +10062,22 @@ function CartDrawer({ isOpen, onClose, cart, onQty, onRemove, onCheckout, onProd
     };
   }, [isOpen]);
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 15 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 25 } }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -10242,18 +10100,8 @@ function CartDrawer({ isOpen, onClose, cart, onQty, onRemove, onCheckout, onProd
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 26, stiffness: 220 }}
-            style={{
-              position: "relative",
-              width: "100%",
-              maxWidth: "450px",
-              height: "100%",
-              background: "#ffffff",
-              boxShadow: "-10px 0 40px rgba(48, 54, 14, 0.15)",
-              display: "flex",
-              flexDirection: "column",
-              zIndex: 10001
-            }}
+            transition={{ type: "spring", damping: 30, stiffness: 300, mass: 0.8 }}
+            className="ws-cart-drawer"
           >
             <div style={{
               padding: "1.5rem",
@@ -10294,15 +10142,21 @@ function CartDrawer({ isOpen, onClose, cart, onQty, onRemove, onCheckout, onProd
               </button>
             </div>
 
-            <div className="scroll-hide" style={{
-              flex: 1,
-              overflowY: "auto",
-              padding: "1.5rem",
-              display: "flex",
-              flexDirection: "column",
-              gap: "1rem",
-              background: "#fafaf8"
-            }}>
+            <motion.div 
+              className="scroll-hide" 
+              variants={containerVariants}
+              initial="hidden"
+              animate="show"
+              style={{
+                flex: 1,
+                overflowY: "auto",
+                padding: "1.5rem",
+                display: "flex",
+                flexDirection: "column",
+                gap: "1rem",
+                background: "#fafaf8"
+              }}
+            >
               {cart.length === 0 ? (
                 <div style={{
                   display: "flex",
@@ -10345,8 +10199,9 @@ function CartDrawer({ isOpen, onClose, cart, onQty, onRemove, onCheckout, onProd
                 </div>
               ) : (
                 cart.map(item => (
-                  <div
+                  <motion.div
                     key={item.id}
+                    variants={itemVariants}
                     style={{
                       background: "#ffffff",
                       borderRadius: 16,
@@ -10472,10 +10327,10 @@ function CartDrawer({ isOpen, onClose, cart, onQty, onRemove, onCheckout, onProd
                       </span>
                     </div>
 
-                  </div>
+                  </motion.div>
                 ))
               )}
-            </div>
+            </motion.div>
 
             {cart.length > 0 && (
               <div style={{
@@ -10569,9 +10424,20 @@ function AppInner() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(() => {
+    try {
+      const savedCart = localStorage.getItem("ws_cart");
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch {
+      return [];
+    }
+  });
   const [wished, setWished] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem("ws_cart", JSON.stringify(cart));
+  }, [cart]);
 
   useEffect(() => {
     const meta = document.querySelector('meta[name="theme-color"]');
@@ -10721,6 +10587,11 @@ function AppInner() {
       return updated;
     });
     setCart([]);
+    try {
+      localStorage.removeItem("ws_checkout_form");
+      localStorage.removeItem("ws_checkout_isGift");
+      localStorage.removeItem("ws_checkout_giftNote");
+    } catch (e) {}
     setOrderConfirm(newOrder);
 
     // If backendOrder already exists, do not create duplicate order

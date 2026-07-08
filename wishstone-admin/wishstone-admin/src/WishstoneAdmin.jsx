@@ -2139,7 +2139,19 @@ function UGCVideos({ token, showToast }) {
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                     <td style={{ padding: "12px 16px" }}>
                       <div style={{ width: 60, height: 100, borderRadius: 8, overflow: "hidden", background: T.bg, flexShrink: 0, border: `1px solid ${T.border}` }}>
-                        <video src={getAssetUrl(v.videoUrl)} style={{ width: "100%", height: "100%", objectFit: "cover" }} muted loop playsInline onMouseEnter={e => e.currentTarget.play()} onMouseLeave={e => e.currentTarget.pause()} />
+                        {v.videoUrl ? (
+                          <video 
+                            src={getAssetUrl(v.videoUrl)} 
+                            style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                            muted 
+                            loop 
+                            playsInline 
+                            onMouseEnter={e => { if (e.currentTarget.src) e.currentTarget.play().catch(() => {}) }} 
+                            onMouseLeave={e => { if (e.currentTarget.src) e.currentTarget.pause() }} 
+                          />
+                        ) : (
+                          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: T.textLight, fontSize: "1.2rem" }}>🎥</div>
+                        )}
                       </div>
                     </td>
                     <td style={{ padding: "12px 16px" }}><span style={{ color: T.text, fontSize: "0.88rem", fontWeight: 600 }}>{v.title}</span></td>
@@ -2183,9 +2195,14 @@ function UGCVideos({ token, showToast }) {
               <label style={labelSx}>Video File *</label>
               <input type="file" accept="video/*" onChange={handleVideoSelect} style={{ ...inputSx, padding: "8px 14px" }} />
               
-              {videoPreview && (
+              {videoPreview && getAssetUrl(videoPreview) && (
                 <div style={{ marginTop: "12px", borderRadius: 10, overflow: "hidden", border: `1px solid ${T.border}`, width: 140, height: 250 }}>
-                  <video src={getAssetUrl(videoPreview)} style={{ width: "100%", height: "100%", objectFit: "cover" }} controls />
+                  <video 
+                    src={getAssetUrl(videoPreview)} 
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                    controls 
+                    onError={(e) => console.warn("Admin preview video failed to load", e)} 
+                  />
                 </div>
               )}
             </div>
