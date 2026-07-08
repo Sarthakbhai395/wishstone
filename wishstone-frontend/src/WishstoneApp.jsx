@@ -157,6 +157,11 @@ const GLOBAL_CSS = `
   ::-webkit-scrollbar-track{background:#ffffff;}
   ::-webkit-scrollbar-thumb{background:#787F56;border-radius:3px;}
   @keyframes autoScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @keyframes ws-shine {
+    0% { transform: translate(-30%, -30%) rotate(45deg); }
+    50% { transform: translate(30%, 30%) rotate(45deg); }
+    100% { transform: translate(-30%, -30%) rotate(45deg); }
+  }
   .scroll-hide::-webkit-scrollbar{display:none;}
   .scroll-hide{-ms-overflow-style:none;scrollbar-width:none;}
   @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
@@ -7090,22 +7095,44 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
     }
     .cart-qty-btn:hover { background: #787F56; color: #fff; border-color: #787F56; }
     .cart-summary-card {
-      background: linear-gradient(160deg, #787F56 0%, #000000 100%);
+      background: linear-gradient(135deg, #EBEAC5 0%, #DBDAAF 50%, #BCBB8D 100%);
       border-radius: 20px;
       padding: 1.8rem 1.5rem;
-      color: #fff;
+      color: #1E2415;
+      box-shadow: 0 16px 36px rgba(120, 127, 86, 0.12);
+      border: 1px solid rgba(219, 218, 175, 0.6);
+      position: relative;
+      overflow: hidden;
+    }
+    .cart-summary-card::before {
+      content: "";
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: linear-gradient(
+        45deg,
+        transparent 45%,
+        rgba(255, 255, 255, 0.25) 50%,
+        transparent 55%
+      );
+      transform: rotate(45deg);
+      pointer-events: none;
+      animation: ws-shine 6s infinite;
     }
     .cart-checkout-btn {
       width: 100%; padding: 15px;
-      background: #787F56; color: #fff;
+      background: #1E2415; color: #fff;
       border: none; border-radius: 14px;
       font-size: 0.9rem; font-weight: 700;
       cursor: pointer; font-family: 'Open Sans', sans-serif;
       display: flex; align-items: center; justify-content: space-between; gap: 10px;
       letter-spacing: 0.02em; transition: all 0.25s;
       margin-top: 1.2rem;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 4px 12px rgba(30, 36, 21, 0.15);
     }
-    .cart-checkout-btn:hover { background: #000000; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(120, 127, 86,0.25); }
+    .cart-checkout-btn:hover { background: #000000; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(30, 36, 21, 0.25); }
     .cart-trust-row {
       display: flex; justify-content: center; gap: 1.5rem;
       flex-wrap: wrap; margin-top: 1rem;
@@ -7326,33 +7353,33 @@ function CartPage({ cart, onQty, onRemove, onCheckout, onProductClick, onAdd, on
           {/* Order Summary */}
           <div className="cart-summary-sticky" style={{ position: "sticky", top: 90 }}>
             <div className="cart-summary-card">
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "1.2rem", paddingBottom: "1rem", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-                <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8B89A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "1.2rem", paddingBottom: "1rem", borderBottom: "1px solid rgba(30, 36, 21, 0.1)" }}>
+                <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(30, 36, 21, 0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6D7860" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
                 </div>
-                <span style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "1rem", fontWeight: 700, color: "#fff" }}>Order Summary</span>
+                <span style={{ fontFamily: "'Open Sans', sans-serif", fontSize: "1rem", fontWeight: 700, color: "#1E2415" }}>Order Summary</span>
                 <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4 }}>
-                  <div style={{ width: 80, height: 1, background: "rgba(200,184,154,0.3)" }} />
-                  <span style={{ color: "#C8B89A", fontSize: 10 }}>✦</span>
+                  <div style={{ width: 80, height: 1, background: "rgba(30, 36, 21, 0.15)" }} />
+                  <span style={{ color: "#6D7860", fontSize: 10 }}>✦</span>
                 </div>
               </div>
 
               {[["Subtotal", `Rs.${sub.toLocaleString()}`], ["Shipping", ship === 0 ? "FREE ✓" : `Rs.${ship}`]].map(([l, v]) => (
                 <div key={l} style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                  <span style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.84rem" }}>{l}</span>
-                  <span style={{ color: ship === 0 && l === "Shipping" ? "#C8B89A" : "#fff", fontSize: "0.84rem", fontWeight: 600 }}>{v}</span>
+                  <span style={{ color: "rgba(30, 36, 21, 0.7)", fontSize: "0.84rem" }}>{l}</span>
+                  <span style={{ color: ship === 0 && l === "Shipping" ? "#4a5e38" : "#1E2415", fontSize: "0.84rem", fontWeight: 600 }}>{v}</span>
                 </div>
               ))}
 
-              <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)", paddingTop: "0.9rem", display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 }}>
+              <div style={{ borderTop: "1px solid rgba(30, 36, 21, 0.12)", paddingTop: "0.9rem", display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 4 }}>
                 <div>
-                  <span style={{ color: "#fff", fontWeight: 700, fontSize: "0.9rem" }}>Total</span>
-                  <span style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.65rem", marginLeft: 6 }}>(Inclusive of all taxes)</span>
+                  <span style={{ color: "#1E2415", fontWeight: 700, fontSize: "0.9rem" }}>Total</span>
+                  <span style={{ color: "rgba(30, 36, 21, 0.5)", fontSize: "0.65rem", marginLeft: 6 }}>(Inclusive of all taxes)</span>
                 </div>
-                <span style={{ color: "#C8B89A", fontSize: "1.2rem", fontWeight: 800 }}>Rs.{total.toLocaleString()}</span>
+                <span style={{ color: "#1E2415", fontSize: "1.2rem", fontWeight: 800 }}>Rs.{total.toLocaleString()}</span>
               </div>
 
-              <button className="cart-checkout-btn" onClick={onCheckout}>
+              <button className="cart-checkout-btn" onClick={onCheckout} style={{ background: "#1E2415", color: "#fff" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                   Proceed to Checkout
@@ -7540,6 +7567,8 @@ function CheckoutPage({ cart, onPlaceOrder }) {
       couponCode: coupon || "",
       customer: { name: form.name, email: form.email, phone: form.phone },
       shippingAddress: { address: form.address, city: form.city, state: form.state, pincode: form.pincode, country: "India" },
+      isGift: isGift,
+      giftNote: giftNote
     };
 
     if (payMethod === "qr") {
@@ -7606,7 +7635,21 @@ function CheckoutPage({ cart, onPlaceOrder }) {
 
       const verifyPayment = async (response) => {
         try {
-          const vRes = await fetch(`${API_BASE}/api/payment/verify`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ razorpay_payment_id: response.razorpay_payment_id, razorpay_order_id: response.razorpay_order_id, razorpay_signature: response.razorpay_signature, items: orderPayload.items, customer: orderPayload.customer, shippingAddress: orderPayload.shippingAddress, couponCode: coupon || "" }) });
+          const vRes = await fetch(`${API_BASE}/api/payment/verify`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              items: orderPayload.items,
+              customer: orderPayload.customer,
+              shippingAddress: orderPayload.shippingAddress,
+              couponCode: coupon || "",
+              isGift: isGift,
+              giftNote: giftNote
+            })
+          });
           const vData = await vRes.json();
           if (vData.success) { onPlaceOrder({ items: cart, address: form, totalAmount: vData.order?.totalAmount || total, coupon, discount, isGift, giftNote, paymentMethod: "razorpay", razorpayPaymentId: response.razorpay_payment_id, razorpayOrderId: response.razorpay_order_id, backendOrder: vData.order }); }
           else { setError(vData.message || "Payment verification failed. Contact support if amount was deducted."); }
@@ -7679,10 +7722,38 @@ function CheckoutPage({ cart, onPlaceOrder }) {
     } catch (err) { setError("Something went wrong. Please try again."); setLoading(false); }
   };
 
+  const handleInputChange = async (key, val) => {
+    let formattedVal = val;
+    if (key === "pincode") {
+      formattedVal = val.replace(/\D/g, "").slice(0, 6);
+    }
+    setForm(prev => ({ ...prev, [key]: formattedVal }));
+
+    if (key === "pincode" && formattedVal.length === 6) {
+      try {
+        const res = await fetch(`https://api.postalpincode.in/pincode/${formattedVal}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data[0] && data[0].Status === "Success" && data[0].PostOffice && data[0].PostOffice.length > 0) {
+            const office = data[0].PostOffice[0];
+            setForm(prev => ({
+              ...prev,
+              pincode: formattedVal,
+              city: office.District || office.Block || prev.city,
+              state: office.State || prev.state
+            }));
+          }
+        }
+      } catch (err) {
+        console.error("Error auto-fetching pincode details:", err);
+      }
+    }
+  };
+
   const inp = (key, label, type = "text", half = false) => (
     <div style={{ gridColumn: half ? "span 1" : "span 2" }}>
       <label style={{ display: "block", fontSize: "0.68rem", fontWeight: 700, color: T.textMid, marginBottom: 5, letterSpacing: "0.08em", textTransform: "uppercase" }}>{label}</label>
-      <input type={type} value={form[key]} onChange={e => setForm({ ...form, [key]: e.target.value })} placeholder={label}
+      <input type={type} value={form[key] || ""} onChange={e => handleInputChange(key, e.target.value)} placeholder={label}
         style={{ width: "100%", padding: "11px 13px", border: `1.5px solid ${T.border}`, borderRadius: 8, fontSize: "0.86rem", background: "#fff", color: T.text, outline: "none", boxSizing: "border-box" }}
         onFocus={e => e.target.style.borderColor = T.orange} onBlur={e => e.target.style.borderColor = T.border} />
     </div>
@@ -7698,10 +7769,11 @@ function CheckoutPage({ cart, onPlaceOrder }) {
             <div style={{ background: "#fff", borderRadius: 16, padding: "1.5rem", border: `1px solid ${T.border}`, marginBottom: "1.2rem" }}>
               <h3 style={{ fontFamily: "'Playfair Display',serif", color: T.text, fontSize: "1rem", fontWeight: 700, marginBottom: "1.2rem" }}>Delivery Details</h3>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }} className="checkout-form-grid">
-                {inp("name", "Full Name")} {inp("email", "Email Address", "email")}
-                {inp("phone", "Phone Number", "tel")} {inp("address", "Street Address")}
+                {inp("name", "Full Name")}
+                {inp("email", "Email Address", "email")}
+                {inp("pincode", "Pincode", "text", true)} {inp("phone", "Phone Number", "tel", true)}
+                {inp("address", "Street Address")}
                 {inp("city", "City", "text", true)} {inp("state", "State", "text", true)}
-                {inp("pincode", "Pincode", "text", true)}
               </div>
             </div>
             <div style={{ background: "#fff", borderRadius: 16, padding: "1.5rem", border: `1px solid ${T.border}`, marginBottom: "1.2rem" }}>
@@ -7745,13 +7817,13 @@ function CheckoutPage({ cart, onPlaceOrder }) {
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: "1.1rem", animation: "float 2s infinite" }}>🏷️</span>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={T.orange} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: "float 2.5s ease-in-out infinite", flexShrink: 0 }}><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><line x1="7" y1="7" x2="7.01" y2="7" strokeWidth="3" /></svg>
                       <span style={{ fontSize: "0.82rem", fontWeight: 700, color: T.text, letterSpacing: "0.02em" }}>
                         Some offers are available! Grab them now
                       </span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ fontSize: "0.68rem", background: T.orange, color: "#fff", padding: "2px 8px", borderRadius: 20, fontWeight: 700 }}>
+                      <span style={{ fontSize: "0.68rem", background: T.orange, color: "#fff", padding: "2px 8px", borderRadius: 20, fontWeight: 700, whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
                         {couponsToShow.length} Offers
                       </span>
                       <svg
@@ -7912,8 +7984,11 @@ function CheckoutPage({ cart, onPlaceOrder }) {
                   {isGift && <span style={{ color: "#fff", fontSize: 13, lineHeight: 1, fontWeight: 900 }}>✓</span>}
                 </div>
                 <div>
-                  <span style={{ fontFamily: "'Playfair Display',serif", color: T.text, fontSize: "1rem", fontWeight: 700 }}>🎁 Gift Wrapping</span>
-                  <span style={{ display: "block", fontSize: "0.72rem", color: T.textMid, marginTop: 2 }}>Add premium gift wrapping — ₹50 per item</span>
+                  <span style={{ fontFamily: "'Playfair Display',serif", color: T.text, fontSize: "1rem", fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={T.orange} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: "pulse 2s infinite", flexShrink: 0 }}><polyline points="20 12 20 22 4 22 4 12" /><rect x="2" y="7" width="20" height="5" /><line x1="12" y1="22" x2="12" y2="7" /><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" /><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" /></svg>
+                    Gift Wrapping
+                  </span>
+                  <span style={{ display: "block", fontSize: "0.72rem", color: T.textMid, marginTop: 2, paddingLeft: 26 }}>Add premium gift wrapping — ₹50 per item</span>
                 </div>
               </label>
               {isGift && (
@@ -7935,13 +8010,16 @@ function CheckoutPage({ cart, onPlaceOrder }) {
                 </>
               ) : (
                 <>
-                  <span>🔒</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
                   {payMethod === "razorpay" ? `Pay ₹${total.toLocaleString()} Securely` : payMethod === "qr" ? `Confirm & Place Order (UPI)` : `Confirm & Place Order (COD)`}
                   {discount > 0 && ` (₹${discount} Discount)`}
                 </>
               )}
             </button>
-            <p style={{ textAlign: "center", fontSize: "0.65rem", color: T.textMid, marginTop: "0.6rem", opacity: 0.6 }}>🔒 Secured by Razorpay — 256-bit SSL encrypted</p>
+            <p style={{ textAlign: "center", fontSize: "0.65rem", color: T.textMid, marginTop: "0.6rem", opacity: 0.6, display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "inline-block", verticalAlign: "middle" }}><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+              Secured by Razorpay — 256-bit SSL encrypted
+            </p>
           </form>
           <div style={{ background: "#fff", borderRadius: 16, padding: "1.5rem", border: `1px solid ${T.border}`, position: "sticky", top: 90 }}>
             <h3 style={{ fontFamily: "'Playfair Display',serif", color: T.text, fontSize: "1.05rem", fontWeight: 700, marginBottom: "1.2rem" }}>Order Summary</h3>
@@ -10207,21 +10285,24 @@ function CartDrawer({ isOpen, onClose, cart, onQty, onRemove, onCheckout, onProd
                       borderRadius: 16,
                       padding: "1rem",
                       display: "flex",
-                      gap: "0.85rem",
+                      gap: "1rem",
                       border: "1px solid rgba(120, 127, 86, 0.08)",
-                      boxShadow: "0 2px 10px rgba(0,0,0,0.02)"
+                      boxShadow: "0 4px 16px rgba(120, 127, 86, 0.03)",
+                      position: "relative"
                     }}
                   >
+                    {/* Left: Image */}
                     <div
                       onClick={() => onProductClick(item)}
                       style={{
-                        width: 72,
-                        height: 72,
-                        borderRadius: 10,
+                        width: 80,
+                        height: 80,
+                        borderRadius: 12,
                         overflow: "hidden",
                         flexShrink: 0,
                         background: "#f0ede8",
-                        cursor: "pointer"
+                        cursor: "pointer",
+                        border: "1px solid rgba(120, 127, 86, 0.06)"
                       }}
                     >
                       {item.image ? (
@@ -10229,36 +10310,59 @@ function CartDrawer({ isOpen, onClose, cart, onQty, onRemove, onCheckout, onProd
                           referrerPolicy="no-referrer"
                           src={item.image}
                           alt={item.name}
-                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.2s" }}
+                          onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"}
+                          onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
                         />
                       ) : (
                         <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, color: "#787F56" }}>◆</div>
                       )}
                     </div>
 
-                    <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                      <div>
-                        <h4
-                          onClick={() => onProductClick(item)}
-                          style={{
-                            fontSize: "0.85rem",
-                            fontWeight: 700,
-                            color: "#1a1a1a",
-                            margin: "0 0 2px 0",
-                            cursor: "pointer",
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis"
-                          }}
-                        >
-                          {item.name}
-                        </h4>
-                        <span style={{ fontSize: "0.7rem", color: "#8a8a7a" }}>
-                          Sacred Stone Accessory
+                    {/* Right: Content details */}
+                    <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+                      {/* Name */}
+                      <h4
+                        onClick={() => onProductClick(item)}
+                        style={{
+                          fontSize: "0.86rem",
+                          fontWeight: 700,
+                          color: "#1a1a1a",
+                          margin: "0 0 2px 0",
+                          cursor: "pointer",
+                          lineHeight: 1.3,
+                          transition: "color 0.2s"
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.color = "#787F56"}
+                        onMouseLeave={e => e.currentTarget.style.color = "#1a1a1a"}
+                      >
+                        {item.name}
+                      </h4>
+
+                      {/* Tagline */}
+                      <span style={{ fontSize: "0.7rem", color: "#8a8a7a", marginBottom: "6px" }}>
+                        Sacred Somatic Anchor
+                      </span>
+
+                      {/* Pricing, Discount, Original Price */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
+                        <span style={{ fontSize: "0.9rem", fontWeight: 800, color: "#1e2415" }}>
+                          ₹{(item.price * item.qty).toLocaleString()}
                         </span>
+                        {item.originalPrice > item.price && (
+                          <>
+                            <span style={{ color: "#9ca3af", fontSize: "0.75rem", textDecoration: "line-through" }}>
+                              ₹{(item.originalPrice * item.qty).toLocaleString()}
+                            </span>
+                            <span style={{ fontSize: "0.7rem", color: "#E8720C", fontWeight: 700 }}>
+                              ({item.discount || Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)}% Off)
+                            </span>
+                          </>
+                        )}
                       </div>
 
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8 }}>
+                      {/* Quantity Selector & Remove Button */}
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "auto" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                           <button
                             onClick={() => onQty(item.id, -1)}
@@ -10269,7 +10373,7 @@ function CartDrawer({ isOpen, onClose, cart, onQty, onRemove, onCheckout, onProd
                               background: "#ffffff",
                               color: "#787F56",
                               cursor: "pointer",
-                              display: "flex", alignItems: "center", justifyContent: "center",
+                              display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center",
                               fontWeight: 700, fontSize: "0.85rem",
                               transition: "all 0.15s"
                             }}
@@ -10288,7 +10392,7 @@ function CartDrawer({ isOpen, onClose, cart, onQty, onRemove, onCheckout, onProd
                               background: "#ffffff",
                               color: "#787F56",
                               cursor: "pointer",
-                              display: "flex", alignItems: "center", justifyContent: "center",
+                              display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center",
                               fontWeight: 700, fontSize: "0.85rem",
                               transition: "all 0.15s"
                             }}
@@ -10307,8 +10411,11 @@ function CartDrawer({ isOpen, onClose, cart, onQty, onRemove, onCheckout, onProd
                             display: "flex",
                             alignItems: "center",
                             padding: "4px",
-                            borderRadius: 4
+                            borderRadius: 4,
+                            transition: "opacity 0.2s"
                           }}
+                          onMouseEnter={e => e.currentTarget.style.opacity = 0.7}
+                          onMouseLeave={e => e.currentTarget.style.opacity = 1}
                         >
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                             <polyline points="3 6 5 6 21 6" />
@@ -10319,14 +10426,8 @@ function CartDrawer({ isOpen, onClose, cart, onQty, onRemove, onCheckout, onProd
                           </svg>
                         </button>
                       </div>
-                    </div>
 
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", flexShrink: 0 }}>
-                      <span style={{ fontSize: "0.88rem", fontWeight: 800, color: "#1a1a1a" }}>
-                        ₹{(item.price * item.qty).toLocaleString()}
-                      </span>
                     </div>
-
                   </motion.div>
                 ))
               )}
@@ -10339,26 +10440,43 @@ function CartDrawer({ isOpen, onClose, cart, onQty, onRemove, onCheckout, onProd
                 background: "#ffffff"
               }}>
                 <div style={{
-                  background: "linear-gradient(160deg, #787F56 0%, #000000 100%)",
+                  background: "linear-gradient(135deg, #EBEAC5 0%, #DBDAAF 50%, #BCBB8D 100%)",
                   borderRadius: 16,
                   padding: "1.25rem",
-                  color: "#ffffff"
+                  color: "#1E2415",
+                  boxShadow: "0 10px 24px rgba(120, 127, 86, 0.12)",
+                  border: "1px solid rgba(219, 218, 175, 0.6)",
+                  position: "relative",
+                  overflow: "hidden"
                 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                    <span style={{ fontSize: "0.78rem", color: "rgba(255, 255, 255, 0.7)" }}>Subtotal</span>
+                  {/* Subtle shine effect */}
+                  <div style={{
+                    position: "absolute",
+                    top: "-50%", left: "-50%",
+                    width: "200%", height: "200%",
+                    background: "linear-gradient(45deg, transparent 45%, rgba(255, 255, 255, 0.2) 50%, transparent 55%)",
+                    transform: "rotate(45deg)",
+                    pointerEvents: "none",
+                    animation: "ws-shine 6s infinite"
+                  }} />
+
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem", position: "relative", zIndex: 1 }}>
+                    <span style={{ fontSize: "0.78rem", color: "rgba(30, 36, 21, 0.7)" }}>Subtotal</span>
                     <span style={{ fontSize: "0.85rem", fontWeight: 700 }}>₹{sub.toLocaleString()}</span>
                   </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-                    <span style={{ fontSize: "0.78rem", color: "rgba(255, 255, 255, 0.7)" }}>Shipping</span>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem", position: "relative", zIndex: 1 }}>
+                    <span style={{ fontSize: "0.78rem", color: "rgba(30, 36, 21, 0.7)" }}>Shipping</span>
                     <span style={{ fontSize: "0.78rem", fontWeight: 700 }}>{ship === 0 ? "FREE" : `₹${ship}`}</span>
                   </div>
                   <div style={{
-                    borderTop: "1px solid rgba(255, 255, 255, 0.15)",
+                    borderTop: "1px solid rgba(30, 36, 21, 0.15)",
                     paddingTop: "0.6rem",
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "baseline",
-                    marginTop: "0.4rem"
+                    marginTop: "0.4rem",
+                    position: "relative",
+                    zIndex: 1
                   }}>
                     <span style={{ fontSize: "0.85rem", fontWeight: 700 }}>Total</span>
                     <span style={{ fontSize: "1.2rem", fontWeight: 800 }}>₹{total.toLocaleString()}</span>
@@ -10369,7 +10487,7 @@ function CartDrawer({ isOpen, onClose, cart, onQty, onRemove, onCheckout, onProd
                     style={{
                       width: "100%",
                       padding: "14px",
-                      background: "#787F56",
+                      background: "#1E2415",
                       color: "#ffffff",
                       border: "none",
                       borderRadius: 10,
@@ -10380,10 +10498,13 @@ function CartDrawer({ isOpen, onClose, cart, onQty, onRemove, onCheckout, onProd
                       alignItems: "center",
                       justifyContent: "space-between",
                       marginTop: "1.25rem",
-                      transition: "all 0.2s"
+                      transition: "all 0.25s",
+                      position: "relative",
+                      zIndex: 1,
+                      boxShadow: "0 4px 12px rgba(30, 36, 21, 0.15)"
                     }}
-                    onMouseEnter={e => e.currentTarget.style.filter = "brightness(1.15)"}
-                    onMouseLeave={e => e.currentTarget.style.filter = "none"}
+                    onMouseEnter={e => e.currentTarget.style.background = "#000000"}
+                    onMouseLeave={e => e.currentTarget.style.background = "#1E2415"}
                   >
                     <span>Proceed to Checkout</span>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -10474,7 +10595,7 @@ function AppInner() {
   // Load user-specific data on mount (handled synchronously above)
   useEffect(() => { }, []);
 
-  // Periodically verify user still exists in backend — auto-logout if deleted by admin
+  // Verify user still exists in backend on mount — auto-logout if deleted by admin
   useEffect(() => {
     const checkUserExists = async () => {
       const token = localStorage.getItem("ws_token");
@@ -10497,10 +10618,8 @@ function AppInner() {
     };
     if (user) {
       checkUserExists();
-      const interval = setInterval(checkUserExists, 30000); // check every 30s
-      return () => clearInterval(interval);
     }
-  }, [user]);
+  }, []);
 
   // Save orders under user-specific key
   useEffect(() => {

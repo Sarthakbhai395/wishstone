@@ -7,7 +7,7 @@ const { protect } = require("../middleware/auth");
 // Create order (guest or authenticated user)
 router.post("/create", async (req, res) => {
   try {
-    const { customer, shippingAddress, items, couponCode, paymentMethod, razorpayPaymentId } = req.body;
+    const { customer, shippingAddress, items, couponCode, paymentMethod, razorpayPaymentId, isGift, giftNote } = req.body;
     
     // Validate required fields
     if (!customer || !shippingAddress || !items || items.length === 0) {
@@ -85,6 +85,11 @@ router.post("/create", async (req, res) => {
     
     // Calculate shipping and discount
     const shippingCost = subtotal >= 999 ? 0 : 99;
+
+    // Calculate gift charge
+    const totalQty = items.reduce((s, i) => s + (i.quantity || 1), 0);
+    const giftCharge = isGift ? totalQty * 50 : 0;
+
     let discount = 0;
     
     if (couponCode) {
@@ -98,7 +103,7 @@ router.post("/create", async (req, res) => {
       }
     }
     
-    const totalAmount = Math.max(0, subtotal + shippingCost - discount);
+    const totalAmount = Math.max(0, subtotal + shippingCost + giftCharge - discount);
     
     // Check if user is logged in (from token) and find user by email
     let userId = null;
@@ -120,6 +125,9 @@ router.post("/create", async (req, res) => {
       subtotal, 
       shippingCost, 
       discount, 
+      giftCharge,
+      isGift: !!isGift,
+      giftNote: giftNote || "",
       totalAmount, 
       couponCode, 
       paymentMethod,

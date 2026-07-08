@@ -2480,18 +2480,11 @@ export default function WishstoneAdmin() {
       }
     };
 
-    const interval = setInterval(() => {
-      document.title = sequence[idx].title;
-      updateFavicon(sequence[idx].emoji);
-      idx = (idx + 1) % sequence.length;
-    }, 1500);
-
-    // Initial load set
-    document.title = sequence[0].title;
-    updateFavicon(sequence[0].emoji);
+    // Initial load set (runs once on mount)
+    document.title = "💎 WISHSTONE ADMIN 💎";
+    updateFavicon("💎");
 
     return () => {
-      clearInterval(interval);
       document.title = "Wishstone Admin";
     };
   }, []);

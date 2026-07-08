@@ -45,7 +45,7 @@ router.post("/create-order", async (req, res) => {
       });
     }
 
-    const { items, couponCode, shippingAddress, customer } = req.body;
+    const { items, couponCode, shippingAddress, customer, isGift } = req.body;
 
     // Validate required fields
     if (!items || items.length === 0) {
@@ -114,6 +114,10 @@ router.post("/create-order", async (req, res) => {
     // Calculate shipping
     const shippingCost = subtotal >= 999 ? 0 : 99;
 
+    // Calculate gift charge
+    const totalQty = items.reduce((s, i) => s + (i.quantity || 1), 0);
+    const giftCharge = isGift ? totalQty * 50 : 0;
+
     // Calculate coupon discount
     let discount = 0;
     if (couponCode) {
@@ -131,7 +135,7 @@ router.post("/create-order", async (req, res) => {
       }
     }
 
-    const totalAmount = Math.max(0, subtotal + shippingCost - discount);
+    const totalAmount = Math.max(0, subtotal + shippingCost + giftCharge - discount);
 
     // Razorpay expects amount in paise (smallest currency unit)
     const amountInPaise = Math.round(totalAmount * 100);
@@ -205,6 +209,8 @@ router.post("/verify", async (req, res) => {
       customer,
       shippingAddress,
       couponCode,
+      isGift,
+      giftNote,
     } = req.body;
 
     // Validate required payment fields
@@ -312,6 +318,11 @@ router.post("/verify", async (req, res) => {
     }
 
     const shippingCost = subtotal >= 999 ? 0 : 99;
+
+    // Calculate gift charge
+    const totalQty = (orderItems || []).reduce((s, i) => s + (i.quantity || 1), 0);
+    const giftCharge = isGift ? totalQty * 50 : 0;
+
     let discount = 0;
 
     if (couponCode) {
@@ -324,7 +335,7 @@ router.post("/verify", async (req, res) => {
       }
     }
 
-    const totalAmount = Math.max(0, subtotal + shippingCost - discount);
+    const totalAmount = Math.max(0, subtotal + shippingCost + giftCharge - discount);
 
     // ── FIND USER ──
     let userId = null;
@@ -356,6 +367,9 @@ router.post("/verify", async (req, res) => {
       subtotal,
       shippingCost,
       discount,
+      giftCharge,
+      isGift: !!isGift,
+      giftNote: giftNote || "",
       totalAmount,
       couponCode: couponCode || "",
       paymentMethod: "razorpay",
