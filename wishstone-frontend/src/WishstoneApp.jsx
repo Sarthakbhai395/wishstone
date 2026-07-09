@@ -731,9 +731,9 @@ const GLOBAL_CSS = `
   }
   @media (max-width: 767px) {
     .ws-cart-drawer {
-      width: 50vw !important;
-      max-width: 50vw !important;
-      min-width: 280px !important;
+      width: 95vw !important;
+      max-width: 95vw !important;
+      min-width: 320px !important;
     }
   }
 
@@ -1541,6 +1541,7 @@ function Hero({ onShop, onRitual }) {
     "/habit-builder2-product.jpeg",
     "/habit-builder3-product.jpeg",
   ]);
+  const touchStartX = useRef(null);
 
   useEffect(() => {
     const API_BASE = getApiBase();
@@ -1573,8 +1574,34 @@ function Hero({ onShop, onRitual }) {
     exit: { x: "100%", transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
   };
 
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diffX = touchStartX.current - touchEndX;
+
+    // Swipe distance threshold
+    if (Math.abs(diffX) > 50) {
+      if (diffX > 0) {
+        // Swipe left -> Next slide
+        setCurrentIdx((prev) => (prev + 1) % productImages.length);
+      } else {
+        // Swipe right -> Previous slide
+        setCurrentIdx((prev) => (prev - 1 + productImages.length) % productImages.length);
+      }
+    }
+    touchStartX.current = null;
+  };
+
   return (
-    <section style={{ position: "relative", width: "100%", height: "80vh", minHeight: "560px", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+    <section 
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      style={{ position: "relative", width: "100%", height: "80vh", minHeight: "560px", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "center" }}
+    >
       {/* Background Sliding Images */}
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, overflow: "hidden" }}>
         <AnimatePresence initial={false}>
@@ -1635,6 +1662,34 @@ function Hero({ onShop, onRitual }) {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Dots indicators */}
+      <div style={{
+        position: "absolute",
+        bottom: "20px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        display: "flex",
+        gap: "8px",
+        zIndex: 5
+      }}>
+        {productImages.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setCurrentIdx(idx)}
+            style={{
+              width: idx === currentIdx ? "24px" : "8px",
+              height: "8px",
+              borderRadius: "4px",
+              background: idx === currentIdx ? "#C39D5F" : "rgba(255, 255, 255, 0.4)",
+              border: "none",
+              cursor: "pointer",
+              transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+              padding: 0
+            }}
+          />
+        ))}
       </div>
     </section>
   );
@@ -5080,12 +5135,154 @@ function RitualsPage() {
   const navigate = useNavigate();
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [activeStep, setActiveStep] = useState(0);
+  const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
+  const stickySectionRef = useRef(null);
+  const touchStartY = useRef(null);
+  const lastTransitionTime = useRef(0);
+  const transitionCooldown = 800;
 
   const categories = [
-    { id: "wishstone", icon: "sparkle", label: "Wishstone Ritual", desc: "Set conscious intentions and anchor them physically.", image: "/wishstone-horizontal.jpeg" },
-    { id: "cosmic-wye", icon: "target", label: "Cosmic Wye", desc: "Tune your spatial energy and activate focus.", image: "/cosmic-eye.jpeg" },
-    { id: "habit-builder", icon: "brain", label: "Habit Builder", desc: "Cultivate daily consistency and track growth.", image: "/habit-builder2-product.jpeg", isComingSoon: true },
+    { 
+      id: "wishstone", 
+      icon: "sparkle", 
+      label: "Wishstone Ritual", 
+      desc: "Set conscious intentions and anchor them physically.", 
+      image: "/wishstone-horizontal.jpeg",
+      steps: [
+        { title: "Purify & Cleanse", desc: "Cleanse under warm water or gentle sage smoke." },
+        { title: "Imprint Intention", desc: "Hold in your hand and whisper your goals." },
+        { title: "Physical Anchor", desc: "Keep it close as a tactile daily reminder." }
+      ]
+    },
+    { 
+      id: "cosmic-wye", 
+      icon: "target", 
+      label: "Cosmic Wye", 
+      desc: "Tune your spatial energy and activate focus.", 
+      image: "/cosmic-eye.jpeg",
+      steps: [
+        { title: "Align Alignment", desc: "Place Cosmic Wye in the center of your space." },
+        { title: "Visual Focus", desc: "Gaze at the center to align brainwaves." },
+        { title: "Synthesize", desc: "Carry the geometry into your focus session." }
+      ]
+    },
+    { 
+      id: "habit-builder", 
+      icon: "brain", 
+      label: "Habit Builder", 
+      desc: "Cultivate daily consistency and track growth.", 
+      image: "/habit-builder2-product.jpeg", 
+      isComingSoon: true,
+      steps: [
+        { title: "Atomic Habit", desc: "Choose one micro-habit to practice daily." },
+        { title: "Physical Log", desc: "Mark your board immediately after completion." },
+        { title: "Build Streak", desc: "Reflect weekly to reinforce new pathways." }
+      ]
+    },
   ];
+
+  useEffect(() => {
+    const section = stickySectionRef.current;
+    if (!section) return;
+
+    const handleWheel = (e) => {
+      const rect = section.getBoundingClientRect();
+      const isScrollingDown = e.deltaY > 0;
+      const isScrollingUp = e.deltaY < 0;
+
+      // Section is active when its top has reached the sticky header offset and bottom is still in view
+      const isNearSticky = rect.top <= 85 && rect.bottom >= window.innerHeight - 50;
+
+      if (isNearSticky) {
+        if (isScrollingDown && activeCategoryIndex < categories.length - 1) {
+          e.preventDefault();
+          // Snap scroll position perfectly to prevent jitter
+          const targetScrollY = window.scrollY + rect.top - 80;
+          if (Math.abs(window.scrollY - targetScrollY) > 2) {
+            window.scrollTo({ top: targetScrollY, behavior: "auto" });
+          }
+          const now = Date.now();
+          if (now - lastTransitionTime.current > transitionCooldown) {
+            setActiveCategoryIndex(prev => prev + 1);
+            lastTransitionTime.current = now;
+          }
+        } else if (isScrollingUp && activeCategoryIndex > 0) {
+          e.preventDefault();
+          // Snap scroll position perfectly
+          const targetScrollY = window.scrollY + rect.top - 80;
+          if (Math.abs(window.scrollY - targetScrollY) > 2) {
+            window.scrollTo({ top: targetScrollY, behavior: "auto" });
+          }
+          const now = Date.now();
+          if (now - lastTransitionTime.current > transitionCooldown) {
+            setActiveCategoryIndex(prev => prev - 1);
+            lastTransitionTime.current = now;
+          }
+        }
+      }
+    };
+
+    const handleTouchStart = (e) => {
+      touchStartY.current = e.touches[0].clientY;
+    };
+
+    const handleTouchMove = (e) => {
+      if (touchStartY.current === null) return;
+      const rect = section.getBoundingClientRect();
+      const currentY = e.touches[0].clientY;
+      const deltaY = touchStartY.current - currentY; // positive = swipe up / scroll down
+
+      if (Math.abs(deltaY) < 30) return;
+
+      const isScrollingDown = deltaY > 0;
+      const isScrollingUp = deltaY < 0;
+      const isNearSticky = rect.top <= 85 && rect.bottom >= window.innerHeight - 50;
+
+      if (isNearSticky) {
+        if (isScrollingDown && activeCategoryIndex < categories.length - 1) {
+          if (e.cancelable) e.preventDefault();
+          const targetScrollY = window.scrollY + rect.top - 80;
+          if (Math.abs(window.scrollY - targetScrollY) > 2) {
+            window.scrollTo({ top: targetScrollY, behavior: "auto" });
+          }
+          const now = Date.now();
+          if (now - lastTransitionTime.current > transitionCooldown) {
+            setActiveCategoryIndex(prev => prev + 1);
+            lastTransitionTime.current = now;
+            touchStartY.current = currentY;
+          }
+        } else if (isScrollingUp && activeCategoryIndex > 0) {
+          if (e.cancelable) e.preventDefault();
+          const targetScrollY = window.scrollY + rect.top - 80;
+          if (Math.abs(window.scrollY - targetScrollY) > 2) {
+            window.scrollTo({ top: targetScrollY, behavior: "auto" });
+          }
+          const now = Date.now();
+          if (now - lastTransitionTime.current > transitionCooldown) {
+            setActiveCategoryIndex(prev => prev - 1);
+            lastTransitionTime.current = now;
+            touchStartY.current = currentY;
+          }
+        }
+      }
+    };
+
+    const handleTouchEnd = () => {
+      touchStartY.current = null;
+    };
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [activeCategoryIndex, categories.length]);
 
   const howItWorks = [
     { num: "01", title: "Choose", desc: "Pick a ritual that resonates with your current needs." },
@@ -5276,6 +5473,95 @@ function RitualsPage() {
       .ritual-cats-grid { grid-template-columns: 1fr !important; }
       .ritual-stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
     }
+
+    /* Sticky Ritual Section Styling */
+    .sticky-ritual-container {
+      position: relative;
+      height: 300vh;
+      background: #FAFAF7;
+    }
+    .sticky-ritual-wrapper {
+      position: sticky;
+      top: 80px;
+      height: calc(100vh - 80px);
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #FAFAF7;
+    }
+    .ritual-sticky-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 4rem;
+      width: 100%;
+      max-width: 1200px;
+      height: 100%;
+      padding: 2rem;
+      align-items: center;
+    }
+    .ritual-sticky-image-container {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      perspective: 1200px;
+    }
+    .ritual-sticky-content-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      position: relative;
+      padding-bottom: 2rem;
+    }
+    .ritual-step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    @media (max-width: 1024px) {
+      .sticky-ritual-container {
+        height: 300vh;
+      }
+      .sticky-ritual-wrapper {
+        height: calc(100vh - 80px);
+        align-items: flex-start;
+        padding-top: 1.5rem;
+      }
+      .ritual-sticky-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 1rem 1.5rem;
+        height: auto;
+        align-items: stretch;
+      }
+      .ritual-sticky-image-container {
+        height: 220px;
+        perspective: 1000px;
+      }
+      .ritual-sticky-content-container {
+        padding-bottom: 1rem;
+      }
+      .ritual-step-item {
+        gap: 0.8rem;
+      }
+      .ritual-step-item p {
+        font-size: 0.75rem !important;
+      }
+      .ritual-step-item h4 {
+        font-size: 0.88rem !important;
+        margin-bottom: 1px !important;
+      }
+      .ritual-progress-dots {
+        bottom: -1rem !important;
+        justify-content: center;
+        width: 100%;
+      }
+    }
   `;
 
   return (
@@ -5408,104 +5694,254 @@ function RitualsPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════
-          SECTION 3 — EXPLORE BY CATEGORY
+          SECTION 3 — EXPLORE BY CATEGORY (STICKY SCROLL)
       ═══════════════════════════════════════════════════════ */}
-      <section id="ritual-categories" style={{
-        maxWidth: 1200, margin: "0 auto",
-        padding: "clamp(3rem, 6vw, 5rem) clamp(1.5rem, 4vw, 3rem)"
-      }}>
-        <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: "clamp(2rem, 4vw, 4rem)", alignItems: "start" }} className="ritual-hero-grid">
-          {/* Left text */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <span style={{ fontSize: "0.62rem", fontWeight: 700, color: "#787F56", letterSpacing: "0.22em", textTransform: "uppercase", marginBottom: "0.8rem", display: "block" }}>
-              EXPLORE BY CATEGORY
-            </span>
-            <h2 style={{
-              fontFamily: "'Playfair Display', serif",
-              fontSize: "clamp(1.6rem, 3vw, 2.2rem)",
-              fontWeight: 700, color: "#1a1a1a",
-              lineHeight: 1.15, marginBottom: "1rem",
-              letterSpacing: "-0.01em"
-            }}>
-              Find Your<br />Perfect Ritual
-            </h2>
-            <p style={{ fontSize: "0.85rem", color: "#5c5c5c", lineHeight: 1.65, marginBottom: "1.5rem" }}>
-              Rituals designed to support every part of your life.
-            </p>
-            <button
-              onClick={() => navigate("/shop")}
-              style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                background: "none", color: "#1a1a1a", border: "none",
-                fontSize: "0.82rem", fontWeight: 600, cursor: "pointer",
-                padding: 0, textDecoration: "underline", textUnderlineOffset: 3,
-                transition: "color 0.2s"
-              }}
-              onMouseEnter={e => { e.currentTarget.style.color = "#787F56"; }}
-              onMouseLeave={e => { e.currentTarget.style.color = "#1a1a1a"; }}
-            >
-              View all rituals
-              <CategoryIcon type="arrow" size={14} color="currentColor" />
-            </button>
-          </motion.div>
-
-          {/* Right — category cards grid */}
-          <div className="ritual-cats-grid" style={{
-            display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem"
-          }}>
-            {categories.map((cat, i) => (
-              <motion.div
-                key={cat.id}
-                className="ritual-cat-card"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.6 }}
-                onMouseEnter={() => setHoveredCategory(cat.id)}
-                onMouseLeave={() => setHoveredCategory(null)}
-              >
-                {/* Image */}
-                <div className="ritual-cat-img" style={{ height: 140, overflow: "hidden", position: "relative" }}>
-                  <img src={cat.image} alt={cat.label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  {cat.isComingSoon && (
-                    <div style={{
+      <section id="ritual-categories" ref={stickySectionRef} className="sticky-ritual-container">
+        <div className="sticky-ritual-wrapper">
+          <div className="ritual-sticky-grid">
+            {/* Left Column — 3D Product Image */}
+            <div className="ritual-sticky-image-container">
+              {/* Decorative ambient glowing background */}
+              <div style={{
+                position: "absolute",
+                inset: "20px",
+                background: "rgba(120, 127, 86, 0.12)",
+                filter: "blur(40px)",
+                borderRadius: 24,
+                zIndex: 1
+              }} />
+              
+              <AnimatePresence mode="popLayout">
+                {categories.map((cat, idx) => idx === activeCategoryIndex && (
+                  <motion.div
+                    key={cat.id}
+                    initial={{ opacity: 0, rotateY: 45, rotateX: 8, scale: 0.8, z: -200 }}
+                    animate={{ opacity: 1, rotateY: 0, rotateX: 0, scale: 1, z: 0 }}
+                    exit={{ opacity: 0, rotateY: -45, rotateX: -8, scale: 0.8, z: -200 }}
+                    transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+                    style={{
                       position: "absolute",
-                      top: 10,
-                      right: 10,
-                      background: "#787F56",
-                      color: "#fff",
-                      fontSize: "0.6rem",
-                      fontWeight: 800,
-                      padding: "3px 8px",
-                      borderRadius: 4,
-                      letterSpacing: "0.05em",
+                      width: "100%",
+                      height: "100%",
+                      zIndex: 2,
+                      borderRadius: 24,
+                      overflow: "hidden",
+                      boxShadow: "0 25px 50px rgba(48, 54, 14, 0.18)",
+                      border: "1px solid rgba(120, 127, 86, 0.2)",
+                      cursor: "pointer",
+                      transformStyle: "preserve-3d",
+                      backfaceVisibility: "hidden"
+                    }}
+                    onClick={() => {
+                      if (!cat.isComingSoon) {
+                        navigate("/shop");
+                      }
+                    }}
+                  >
+                    <img
+                      src={cat.image}
+                      alt={cat.label}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                    {cat.isComingSoon && (
+                      <div style={{
+                        position: "absolute",
+                        top: 20,
+                        right: 20,
+                        background: "#787F56",
+                        color: "#fff",
+                        fontSize: "0.68rem",
+                        fontWeight: 800,
+                        padding: "4px 12px",
+                        borderRadius: 6,
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                        zIndex: 10
+                      }}>
+                        Coming Soon
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+
+            {/* Right Column — Animated Ritual Steps */}
+            <div className="ritual-sticky-content-container">
+              <AnimatePresence mode="wait">
+                {categories.map((cat, idx) => idx === activeCategoryIndex && (
+                  <motion.div
+                    key={cat.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -30 }}
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ width: "100%" }}
+                  >
+                    {/* Tagline */}
+                    <span style={{
+                      fontSize: "0.65rem",
+                      fontWeight: 700,
+                      color: "#787F56",
+                      letterSpacing: "0.22em",
                       textTransform: "uppercase",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.15)"
+                      marginBottom: "0.8rem",
+                      display: "block"
                     }}>
-                      Coming Soon
+                      EXPLORE BY CATEGORY
+                    </span>
+                    
+                    {/* Title */}
+                    <h2 style={{
+                      fontFamily: "'Playfair Display', serif",
+                      fontSize: "clamp(1.8rem, 3.5vw, 2.5rem)",
+                      fontWeight: 700,
+                      color: "#1a1a1a",
+                      lineHeight: 1.15,
+                      marginBottom: "1rem",
+                      letterSpacing: "-0.01em"
+                    }}>
+                      {cat.label}
+                    </h2>
+                    
+                    {/* Description */}
+                    <p style={{
+                      fontSize: "0.88rem",
+                      color: "#5c5c5c",
+                      lineHeight: 1.6,
+                      marginBottom: "2rem"
+                    }}>
+                      {cat.desc}
+                    </p>
+                    
+                    {/* Step timeline */}
+                    <div style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "1.2rem",
+                      marginBottom: "2rem",
+                      position: "relative"
+                    }}>
+                      {/* Vertical line connecting steps */}
+                      <div style={{
+                        position: "absolute",
+                        left: "17px",
+                        top: "20px",
+                        bottom: "20px",
+                        width: "2px",
+                        background: "repeating-linear-gradient(to bottom, rgba(120, 127, 86, 0.3) 0px, rgba(120, 127, 86, 0.3) 4px, transparent 4px, transparent 8px)"
+                      }} />
+                      
+                      {cat.steps && cat.steps.map((step, sIdx) => (
+                        <motion.div
+                          key={sIdx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.15 + sIdx * 0.1, duration: 0.5 }}
+                          className="ritual-step-item"
+                        >
+                          {/* Number badge */}
+                          <div style={{
+                            width: "36px",
+                            height: "36px",
+                            borderRadius: "50%",
+                            background: "#787F56",
+                            color: "#ffffff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: "0.75rem",
+                            fontWeight: 700,
+                            boxShadow: "0 4px 10px rgba(120, 127, 86, 0.2)"
+                          }}>
+                            0{sIdx + 1}
+                          </div>
+                          
+                          {/* Step content */}
+                          <div style={{ flex: 1, paddingTop: "2px" }}>
+                            <h4 style={{
+                              fontSize: "0.95rem",
+                              fontWeight: 700,
+                              color: "#1a1a1a",
+                              margin: "0 0 2px 0"
+                            }}>
+                              {step.title}
+                            </h4>
+                            <p style={{
+                              fontSize: "0.8rem",
+                              color: "#787F56",
+                              lineHeight: 1.45,
+                              margin: 0
+                            }}>
+                              {step.desc}
+                            </p>
+                          </div>
+                        </motion.div>
+                      ))}
                     </div>
-                  )}
-                </div>
-                {/* Body */}
-                <div style={{ padding: "1rem" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: "0.5rem" }}>
-                    <CategoryIcon type={cat.icon} size={14} color="#787F56" />
-                    <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#1a1a1a" }}>{cat.label}</span>
-                  </div>
-                  <p style={{ fontSize: "0.74rem", color: "#787F56", lineHeight: 1.5, margin: 0, marginBottom: "0.8rem" }}>
-                    {cat.desc}
-                  </p>
-                  <div className="ritual-arrow-circle" style={{ width: 30, height: 30 }}>
-                    <CategoryIcon type="arrow" size={12} color="#787F56" />
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+                    
+                    {/* View all rituals button */}
+                    {!cat.isComingSoon && (
+                      <button
+                        onClick={() => navigate("/shop")}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 8,
+                          background: "none",
+                          color: "#1a1a1a",
+                          border: "none",
+                          fontSize: "0.85rem",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          padding: 0,
+                          textDecoration: "underline",
+                          textUnderlineOffset: 4,
+                          transition: "color 0.2s"
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.color = "#787F56"; }}
+                        onMouseLeave={e => { e.currentTarget.style.color = "#1a1a1a"; }}
+                      >
+                        Start Ritual
+                        <CategoryIcon type="arrow" size={14} color="currentColor" />
+                      </button>
+                    )}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+
+              {/* Progress indicators dots */}
+              <div className="ritual-progress-dots" style={{
+                position: "absolute",
+                bottom: "-2rem",
+                left: 0,
+                display: "flex",
+                gap: "0.6rem"
+              }}>
+                {categories.map((_, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => {
+                      setActiveCategoryIndex(idx);
+                      if (stickySectionRef.current) {
+                        const rect = stickySectionRef.current.getBoundingClientRect();
+                        const targetScrollY = window.scrollY + rect.top - 80;
+                        window.scrollTo({ top: targetScrollY, behavior: "smooth" });
+                      }
+                    }}
+                    style={{
+                      width: idx === activeCategoryIndex ? "36px" : "12px",
+                      height: "6px",
+                      borderRadius: "3px",
+                      background: idx === activeCategoryIndex ? "#787F56" : "rgba(120, 127, 86, 0.25)",
+                      cursor: "pointer",
+                      transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)"
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
